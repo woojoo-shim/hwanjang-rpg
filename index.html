@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>환장 RPG</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bg-stars"></div>
+
+<!-- 닉네임 -->
+<div class="screen" id="nick-screen">
+  <div class="pwrap">
+    <div class="panel">
+      <div class="titlebar">▣ 닉네임 설정 ▣</div>
+      <div class="cdeco"><span>HWANJANG RPG v1.0</span><span>CHAR CREATION</span></div>
+      <div class="nkintro">모험가여, 당신의 이름을 알려주세요.<br>한번 정해진 닉네임은 <span class="w">절대로 변경할 수 없으며</span><br>재가입 시에도 동일하게 유지됩니다.</div>
+      <div class="nbody">
+        <div class="ilbl">▸ 닉네임 입력</div>
+        <input type="text" id="ni" placeholder="닉네임을 입력하세요 (2~12자)" maxlength="12"/>
+        <div class="pgwrap"><div class="pgbar" id="pgb"></div></div>
+        <div id="atrow"><span>시도 횟수:</span><span class="atnum" id="atnum">0/5</span><div class="dotbar" id="dotbar"></div></div>
+        <button id="cbtn" onclick="tryNick()">확 인</button>
+        <div class="mbox" id="mbox"><div class="mlbl" id="mlbl"></div><div class="mtxt" id="mtxt"></div></div>
+        <div class="fbox" id="fbox">
+          <div class="flbl">[ 닉네임 확정 ]</div>
+          <div class="fname" id="fname"></div>
+          <div class="fsub">닉네임이 성공적으로 등록되었습니다.<br>변경 및 재설정은 불가능합니다.</div>
+        </div>
+        <button class="sbtn" id="sbtn" onclick="startGame()">▶ 게임 시작</button>
+      </div>
+      <div class="nkftr"><span style="color:#3a3a5a;font-size:10px;letter-spacing:1px;">서버: FLAMBERION</span><span style="color:#c9a84c44;font-size:10px;">◈ ◈ ◈</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 로딩 -->
+<div class="screen hidden" id="load-screen">
+  <div class="ltitle">환장 RPG</div>
+  <div class="lsub" id="lmsg">서버에 접속 중...</div>
+  <div class="lbwrap"><div class="lbar" id="lbar"></div></div>
+</div>
+
+<!-- 게임 -->
+<div class="screen hidden" id="game-screen">
+  <div class="hud">
+    <span class="hname" id="hname">???</span>
+    <span class="hlv">Lv.1</span>
+    <span style="color:#3a3a5a;margin:0 4px;">|</span>
+    <div class="hbg">
+      <div class="hbr"><span class="hbl" style="color:#7f4">HP</span><div class="hb"><div class="hbf hp" style="width:100%"></div></div><span class="hbv">100/100</span></div>
+      <div class="hbr"><span class="hbl" style="color:#46e">MP</span><div class="hb"><div class="hbf mp" style="width:100%"></div></div><span class="hbv">60/60</span></div>
+      <div class="hbr"><span class="hbl" style="color:#a6f">EXP</span><div id="exp-bar-wrap"><div id="exp-bar-fill"></div></div></div>
+    </div>
+    <div class="hsp"></div>
+    <div class="hrt"><span class="hloc">▸ 시작 마을</span><span class="htime" id="htime">00:00</span></div>
+    <button onclick="openInv()" style="margin-left:12px;background:#c9a84c22;color:#c9a84c;border:1px solid #c9a84c66;padding:3px 12px;font-size:10px;cursor:pointer;font-family:inherit;letter-spacing:2px;">I 인벤토리</button>
+  </div>
+  <div id="zone-banner"></div>
+  <div class="gmain">
+    <div id="cc">
+      <canvas id="gc"></canvas>
+      <div class="loverlay" id="lov">
+        <div id="f-hint">F — 공격</div>
+        <div class="chint">WASD 이동 &nbsp;|&nbsp; 드래그 카메라 &nbsp;|&nbsp; E 대화 &nbsp;|&nbsp; F 공격 &nbsp;|&nbsp; I 인벤토리</div>
+      </div>
+    </div>
+    <div class="sbar">
+      <div class="sbhdr"><span>▸ 채팅 / 알림</span><span class="ai-badge">AI NPC</span></div>
+      <div class="clog" id="clog"></div>
+      <div class="cinrow">
+        <input class="cin" id="cin" placeholder="채팅 입력..." maxlength="60"/>
+        <button class="csd" id="csd" onclick="sendChat()">전송</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- NPC 대화창 -->
+<div id="dbox">
+  <div id="dtop">
+    <div id="dwho"><span id="dwho-name">NPC</span><span class="ai-tag">AI</span></div>
+  </div>
+  <div id="dtxt"></div>
+  <div id="dinput-row">
+    <input type="text" id="dmsg" placeholder="NPC에게 말을 걸어보세요..." maxlength="80"/>
+    <button id="dsend" onclick="sendToNpc()">전송</button>
+    <button id="dclose" onclick="closeDialog()">닫기</button>
+  </div>
+</div>
+
+<!-- 인벤토리 -->
+<div id="inv-overlay">
+  <div id="inv-panel">
+    <div id="inv-header">
+      <h2>▣ 인벤토리</h2>
+      <div id="inv-header-right">
+        <span id="inv-gold">💰 0 골드</span>
+        <button id="inv-close-btn" onclick="closeInv()">[ I 닫기 ]</button>
+      </div>
+    </div>
+    <div id="inv-tabs">
+      <button class="inv-tab active" onclick="switchTab('all',this)">전체</button>
+      <button class="inv-tab" onclick="switchTab('weapon',this)">무기</button>
+      <button class="inv-tab" onclick="switchTab('armor',this)">방어구</button>
+      <button class="inv-tab" onclick="switchTab('consume',this)">소비</button>
+      <button class="inv-tab" onclick="switchTab('etc',this)">기타</button>
+      <button class="inv-tab" onclick="switchTab('hidden',this)" style="color:#aa44aa;">✦ 히든</button>
+    </div>
+    <div id="inv-body">
+      <div id="inv-grid"></div>
+      <div id="inv-detail">
+        <div id="inv-detail-empty">아이템을<br>선택하세요</div>
+        <div id="inv-detail-content" style="display:none">
+          <div id="inv-detail-icon"></div>
+          <div id="inv-detail-name"></div>
+          <div id="inv-detail-rarity"></div>
+          <div id="inv-detail-type"></div>
+          <div id="inv-detail-desc"></div>
+          <div id="inv-detail-stats"></div>
+          <div id="inv-detail-btns" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="inv-new-flash"></div>
+
+<!-- 상점 -->
+<div id="shop-overlay">
+  <div id="shop-panel">
+    <div id="shop-header">
+      <h2 id="shop-title-text">▣ 잡화상점 — 크로스핑거</h2>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="shop-gold-disp">💰 0 골드</span>
+        <button id="shop-close-btn" onclick="closeShop()">[ 닫기 ]</button>
+      </div>
+    </div>
+    <div id="shop-tabs">
+      <button class="shop-tab active" onclick="shopSwitchTab('buy',this)">▸ 구매</button>
+      <button class="shop-tab" onclick="shopSwitchTab('sell',this)">▸ 판매</button>
+    </div>
+    <div id="shop-body">
+      <div id="shop-items"></div>
+      <div id="shop-detail">
+        <div id="shop-detail-empty">아이템을<br>선택하세요</div>
+        <div id="shop-detail-wrap">
+          <div class="sd-icon" id="sd-icon"></div>
+          <div class="sd-name" id="sd-name"></div>
+          <div class="sd-rarity" id="sd-rarity"></div>
+          <div class="sd-type" id="sd-type"></div>
+          <div class="sd-desc" id="sd-desc"></div>
+          <div class="sd-stats" id="sd-stats"></div>
+          <div class="sd-price-row"><span class="sd-price-label">가격</span><span class="sd-price-val" id="sd-price">0 G</span></div>
+          <button id="shop-buy-btn" onclick="doBuy()">구 매</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS: 의존성 순서대로 로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/npc.js"></script>
+<script src="js/player.js"></script>
+<script src="js/monster.js"></script>
+<script src="js/world.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
