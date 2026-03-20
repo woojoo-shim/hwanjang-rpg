@@ -6,6 +6,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 .bgstar{position:absolute;border-radius:50%;opacity:0;animation:twinkle var(--d) ease-in-out infinite var(--dl);}
 @keyframes twinkle{0%,100%{opacity:0}50%{opacity:var(--op)}}
 
+/* ─── 로그인 ─── */
+#login-screen{z-index:11;}
+#google-login-btn{width:100%;background:#fff;color:#333;border:2px solid #c9a84c;padding:14px 0;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s,border-color .2s;}
+#google-login-btn:hover{background:#f5f0e0;border-color:#f0d060;}
+
 /* ─── 닉네임 ─── */
 #nick-screen{z-index:10;}
 .pwrap{position:relative;z-index:1;width:100%;max-width:500px;padding:20px;animation:fadeup .8s ease;}

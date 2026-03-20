@@ -3,6 +3,10 @@
 var ANTHROPIC_API_KEY=localStorage.getItem('ANTHROPIC_API_KEY')||'';
 function setApiKey(k){ANTHROPIC_API_KEY=k;localStorage.setItem('ANTHROPIC_API_KEY',k);}
 
+// Supabase 설정
+var SUPABASE_URL='https://ewjoafemcaisobcyqife.supabase.co';
+var SUPABASE_ANON_KEY='sb_publishable_nxhrZ04Z052EaS1WM2IOxg_h98fYhfW';
+
 /* ── 닉네임 화면 ── */
 var ERRS=[
   {t:"이미 사용 중인 닉네임입니다.\n다른 닉네임을 입력해주세요.",c:"#ff7070",b:"#ff4444",l:"[ 닉네임 중복 ]",lc:"#ff5555"},

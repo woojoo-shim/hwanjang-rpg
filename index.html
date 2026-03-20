@@ -10,8 +10,27 @@
 
 <div id="bg-stars"></div>
 
+<!-- 로그인 -->
+<div class="screen" id="login-screen">
+  <div class="pwrap">
+    <div class="panel">
+      <div class="titlebar">▣ 환장 RPG ▣</div>
+      <div class="cdeco"><span>HWANJANG RPG v1.0</span><span>LOGIN</span></div>
+      <div class="nkintro">모험을 시작하려면 로그인하세요.</div>
+      <div class="nbody" style="text-align:center;padding:30px 24px;">
+        <div class="ilbl" style="text-align:left;">▸ 이메일 입력</div>
+        <input type="email" id="login-email" placeholder="이메일을 입력하세요" style="width:100%;padding:12px;background:#0a0a1a;border:1px solid #c9a84c66;color:#e8dcc8;font-family:inherit;font-size:13px;margin-bottom:12px;"/>
+        <button id="email-login-btn" onclick="loginWithEmail()" style="width:100%;background:#c9a84c;color:#1a1a2e;border:none;padding:14px 0;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;">로그인 링크 받기</button>
+        <div id="login-status" style="font-size:11px;margin-top:12px;display:none;"></div>
+        <div style="color:#5a5a7a;font-size:10px;margin-top:16px;line-height:1.8;">이메일로 로그인 링크가 전송됩니다.<br>링크를 클릭하면 바로 로그인!</div>
+      </div>
+      <div class="nkftr"><span style="color:#3a3a5a;font-size:10px;letter-spacing:1px;">서버: FLAMBERION</span><span style="color:#c9a84c44;font-size:10px;">◈ ◈ ◈</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- 닉네임 -->
-<div class="screen" id="nick-screen">
+<div class="screen hidden" id="nick-screen">
   <div class="pwrap">
     <div class="panel">
       <div class="titlebar">▣ 닉네임 설정 ▣</div>
@@ -57,6 +76,7 @@
     <div class="hsp"></div>
     <div class="hrt"><span class="hloc">▸ 시작 마을</span><span class="htime" id="htime">00:00</span></div>
     <button onclick="openInv()" style="margin-left:12px;background:#c9a84c22;color:#c9a84c;border:1px solid #c9a84c66;padding:3px 12px;font-size:10px;cursor:pointer;font-family:inherit;letter-spacing:2px;">I 인벤토리</button>
+    <button onclick="logout()" style="margin-left:6px;background:#44222222;color:#aa6666;border:1px solid #aa666644;padding:3px 8px;font-size:9px;cursor:pointer;font-family:inherit;letter-spacing:1px;">로그아웃</button>
   </div>
   <div id="zone-banner"></div>
   <div class="gmain">
@@ -164,8 +184,10 @@
 </div>
 
 <!-- JS: 의존성 순서대로 로드 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="js/config.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/inventory.js"></script>
 <script src="js/npc.js"></script>

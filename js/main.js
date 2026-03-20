@@ -68,7 +68,12 @@ function startGame(){
     var k=prompt('AI NPC 대화를 위해 Anthropic API 키를 입력하세요.\n(한번 입력하면 브라우저에 저장됩니다)');
     if(k&&k.trim())setApiKey(k.trim());
   }
+  /* 새 플레이어면 DB에 저장 */
+  if(currentUser&&!playerData){
+    createPlayer(myName);
+  }
   document.getElementById('nick-screen').classList.add('hidden');
+  document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('load-screen').classList.remove('hidden');
   var steps=[
     {m:'서버에 접속 중...',p:15},{m:'캐릭터 데이터 불러오는 중...',p:30},
@@ -87,7 +92,23 @@ function enterGame(){
   document.getElementById('load-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
   document.getElementById('hname').textContent=myName;
-  setTimeout(initScene,80);
+  /* 복귀 유저 HUD 복원 */
+  if(playerData){
+    document.querySelector('.hlv').textContent='Lv.'+playerLevel;
+    updPlayerHpBar();
+    document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    var ef=document.getElementById('exp-bar-fill');
+    if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*100)*100)+'%';
+  }
+  setTimeout(function(){
+    initScene();
+    /* 복귀 유저 위치+장비 복원 */
+    if(playerData&&PL.group){
+      PL.group.position.x=playerData.position_x||0;
+      PL.group.position.z=playerData.position_z||8;
+      refreshWeaponMesh();
+    }
+  },80);
   var t=document.getElementById('toast');
   t.textContent=myName+'이(가) 로그인하셨습니다.';
   setTimeout(function(){t.classList.add('show');},400);
@@ -100,8 +121,10 @@ function enterGame(){
     [2400,'npc','마을 이장','어서 오게, 새 모험가여! ...잠깐, 자네 이름이 뭐라고?'],
   ];
   cm.forEach(function(c){setTimeout(function(){addChat(c[1],c[2],c[3]);},c[0]);});
-  setTimeout(giveStartItems,500);
+  if(!playerData)setTimeout(giveStartItems,500);
   updTime();setInterval(updTime,1000);
+  /* 자동 저장 시작 */
+  if(currentUser)startAutoSave();
 }
 function updTime(){
   var n=new Date();
@@ -161,3 +184,29 @@ function loop(){
   updLabels();
   renderer.render(scene,camera);
 }
+
+/* ── 앱 초기화 ── */
+(function initApp(){
+  initSupabase();
+  if(!sbClient){
+    /* Supabase 미설정 → 기존 방식 (로그인 없이 닉네임 화면) */
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('nick-screen').classList.remove('hidden');
+    return;
+  }
+  checkSession().then(function(hasSession){
+    if(hasSession&&playerData){
+      /* 복귀 유저 → 데이터 복원 후 바로 게임 */
+      document.getElementById('login-screen').classList.add('hidden');
+      restoreGameState();
+      startGame();
+    }else if(hasSession&&!playerData){
+      /* 로그인됨 + 새 유저 → 닉네임 화면 */
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('nick-screen').classList.remove('hidden');
+    }else{
+      /* 세션 없음 → 로그인 화면 */
+      document.getElementById('login-screen').classList.remove('hidden');
+    }
+  });
+})();

@@ -79,6 +79,7 @@ function updEquipHud(){
 }
 
 function giveStartItems(){
+  if(playerData)return;/* 복귀 유저는 스킵 */
   addItem('wooden_sword',1);
   gold=50;
   document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
