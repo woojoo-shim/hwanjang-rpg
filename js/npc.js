@@ -162,7 +162,7 @@ document.addEventListener('keydown',function(e){
   if(e.code==='Space'&&document.getElementById('dbox').classList.contains('show')&&document.activeElement!==document.getElementById('dmsg')){
     e.preventDefault();closeDialog();
   }
-  if(e.key.toLowerCase()==='i'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')&&document.activeElement!==document.getElementById('ni')){
+  if(e.key.toLowerCase()==='i'&&!document.getElementById('game-screen').classList.contains('hidden')&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')&&document.activeElement!==document.getElementById('ni')){
     e.preventDefault();
     if(invOpen)closeInv();else openInv();
   }
