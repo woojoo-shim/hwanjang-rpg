@@ -123,6 +123,8 @@ function enterGame(){
   cm.forEach(function(c){setTimeout(function(){addChat(c[1],c[2],c[3]);},c[0]);});
   if(!playerData)setTimeout(giveStartItems,500);
   updTime();setInterval(updTime,1000);
+  /* 멀티플레이 연결 */
+  setTimeout(function(){if(typeof connectParty==='function')connectParty();},500);
   /* 자동 저장 시작 */
   if(currentUser)startAutoSave();
 }
@@ -181,6 +183,7 @@ function loop(){
   updCam();updNpcs(now/1000);chkNpc();
   updMonsters(dt,now/1000);
   checkZone();
+  if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
   updLabels();
   renderer.render(scene,camera);
 }

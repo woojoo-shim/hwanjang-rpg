@@ -177,6 +177,7 @@ async function sendChat(){
   var btn=document.getElementById('csd');
   btn.disabled=true;ci.disabled=true;
   addChat('plr',myName,v);
+  if(typeof sendChatMP==='function')sendChatMP(myName,v);
   var npcName=CHAT_NPCS[chatNpcIdx%CHAT_NPCS.length];chatNpcIdx++;
   var thinkEl=document.createElement('div');thinkEl.className='cm inf';thinkEl.textContent=npcName+' 이(가) 입력 중...';
   document.getElementById('clog').appendChild(thinkEl);

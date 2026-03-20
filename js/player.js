@@ -128,6 +128,7 @@ function playerAttack(){
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
   attackCooldown=.75;
   triggerAtkAnim();
+  if(typeof sendAttackMP==='function')sendAttackMP();
   var ddx=target.mesh.position.x-PL.group.position.x;
   var ddz=target.mesh.position.z-PL.group.position.z;
   PL.group.rotation.y=Math.atan2(ddx,ddz);

@@ -1,0 +1,7 @@
+{
+  "name": "hwanjang-party",
+  "private": true,
+  "dependencies": {
+    "partykit": "^0.0.115"
+  }
+}
