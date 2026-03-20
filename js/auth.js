@@ -12,18 +12,33 @@ function initSupabase(){
   sbClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 }
 
-function loginWithEmail(){
+function doLogin(){
   if(!sbClient){alert('Supabase가 설정되지 않았습니다.');return;}
   var email=document.getElementById('login-email').value.trim();
-  if(!email){document.getElementById('login-status').style.display='block';document.getElementById('login-status').textContent='이메일을 입력해주세요.';return;}
+  var pw=document.getElementById('login-pw').value;
   var st=document.getElementById('login-status');
-  st.style.display='block';st.textContent='메일 전송 중...';st.style.color='#aaa';
-  sbClient.auth.signInWithOtp({
-    email:email,
-    options:{emailRedirectTo:window.location.origin}
-  }).then(function(r){
+  if(!email||!pw){st.style.display='block';st.textContent='이메일과 비밀번호를 입력해주세요.';st.style.color='#ff7070';return;}
+  st.style.display='block';st.textContent='로그인 중...';st.style.color='#aaa';
+  sbClient.auth.signInWithPassword({email:email,password:pw}).then(function(r){
     if(r.error){st.textContent='오류: '+r.error.message;st.style.color='#ff7070';}
-    else{st.textContent='✓ 로그인 링크가 메일로 전송됐습니다! 메일을 확인해주세요.';st.style.color='#44cc66';}
+    else{currentUser=r.data.user;loadPlayerData().then(function(){
+      if(playerData){document.getElementById('login-screen').classList.add('hidden');restoreGameState();enterGame();}
+      else{document.getElementById('login-screen').classList.add('hidden');document.getElementById('nick-screen').classList.remove('hidden');}
+    });}
+  });
+}
+
+function doSignup(){
+  if(!sbClient){alert('Supabase가 설정되지 않았습니다.');return;}
+  var email=document.getElementById('login-email').value.trim();
+  var pw=document.getElementById('login-pw').value;
+  var st=document.getElementById('login-status');
+  if(!email||!pw){st.style.display='block';st.textContent='이메일과 비밀번호를 입력해주세요.';st.style.color='#ff7070';return;}
+  if(pw.length<6){st.style.display='block';st.textContent='비밀번호는 6자 이상이어야 합니다.';st.style.color='#ff7070';return;}
+  st.style.display='block';st.textContent='회원가입 중...';st.style.color='#aaa';
+  sbClient.auth.signUp({email:email,password:pw}).then(function(r){
+    if(r.error){st.textContent='오류: '+r.error.message;st.style.color='#ff7070';}
+    else{currentUser=r.data.user;document.getElementById('login-screen').classList.add('hidden');document.getElementById('nick-screen').classList.remove('hidden');}
   });
 }
 

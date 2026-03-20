@@ -18,11 +18,13 @@
       <div class="cdeco"><span>HWANJANG RPG v1.0</span><span>LOGIN</span></div>
       <div class="nkintro">모험을 시작하려면 로그인하세요.</div>
       <div class="nbody" style="text-align:center;padding:30px 24px;">
-        <div class="ilbl" style="text-align:left;">▸ 이메일 입력</div>
+        <div class="ilbl" style="text-align:left;">▸ 이메일</div>
         <input type="email" id="login-email" placeholder="이메일을 입력하세요" style="width:100%;padding:12px;background:#0a0a1a;border:1px solid #c9a84c66;color:#e8dcc8;font-family:inherit;font-size:13px;margin-bottom:12px;"/>
-        <button id="email-login-btn" onclick="loginWithEmail()" style="width:100%;background:#c9a84c;color:#1a1a2e;border:none;padding:14px 0;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;">로그인 링크 받기</button>
+        <div class="ilbl" style="text-align:left;">▸ 비밀번호</div>
+        <input type="password" id="login-pw" placeholder="비밀번호 (6자 이상)" style="width:100%;padding:12px;background:#0a0a1a;border:1px solid #c9a84c66;color:#e8dcc8;font-family:inherit;font-size:13px;margin-bottom:16px;"/>
+        <button onclick="doLogin()" style="width:100%;background:#c9a84c;color:#1a1a2e;border:none;padding:14px 0;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-bottom:8px;">로그인</button>
+        <button onclick="doSignup()" style="width:100%;background:transparent;color:#c9a84c;border:1px solid #c9a84c66;padding:12px 0;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:2px;">회원가입</button>
         <div id="login-status" style="font-size:11px;margin-top:12px;display:none;"></div>
-        <div style="color:#5a5a7a;font-size:10px;margin-top:16px;line-height:1.8;">이메일로 로그인 링크가 전송됩니다.<br>링크를 클릭하면 바로 로그인!</div>
       </div>
       <div class="nkftr"><span style="color:#3a3a5a;font-size:10px;letter-spacing:1px;">서버: FLAMBERION</span><span style="color:#c9a84c44;font-size:10px;">◈ ◈ ◈</span></div>
     </div>
