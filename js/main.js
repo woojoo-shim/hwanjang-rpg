@@ -138,6 +138,8 @@ var keys={},cYaw=0,cPitch=0.38,isDrag=false,lmx=0,lmy=0;
 
 function setupInput(){
   document.addEventListener('keydown',function(e){
+    /* 게임 화면이 아니면 키 입력 무시 */
+    if(document.getElementById('game-screen').classList.contains('hidden'))return;
     keys[e.key.toLowerCase()]=true;
     if(e.key.toLowerCase()==='e'&&closestNpc&&!document.getElementById('dbox').classList.contains('show')&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
       talk(closestNpc);

@@ -244,3 +244,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 .sell-row:hover{border-color:#c9a84c66;}
 .sell-row-name{color:#c8b07a;}
 .sell-row-price{color:#f0c040;font-weight:700;}
+
+/* ─── 퀘스트 알림 ─── */
+#quest-notif{position:fixed;top:80px;left:20px;width:280px;background:#0c0c1eee;border:2px solid #c9a84c;z-index:200;padding:14px 16px;opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity .3s,transform .3s;}
+#quest-notif.show{opacity:1;pointer-events:all;transform:translateX(0);}
+.qn-header{font-size:12px;color:#c9a84c;font-weight:700;letter-spacing:3px;margin-bottom:8px;border-bottom:1px solid #c9a84c44;padding-bottom:6px;}
+.qn-name{font-size:14px;color:#f0d060;font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+.qn-desc{font-size:11px;color:#8a8a9a;line-height:1.6;margin-bottom:6px;}
+.qn-obj{font-size:11px;color:#88aaff;margin-bottom:4px;}
+.qn-reward{font-size:11px;color:#44cc66;margin-bottom:10px;}
+.qn-btns{display:flex;gap:8px;}
+.qn-btn{flex:1;padding:8px 0;font-size:12px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:inherit;border:none;transition:background .15s;}
+.qn-btn.accept{background:#c9a84c;color:#0c0c1e;}
+.qn-btn.accept:hover{background:#f0d060;}
+.qn-btn.reject{background:#1a1a2a;color:#aa6666;border:1px solid #aa666644;}
+.qn-btn.reject:hover{background:#2a1a1a;}
+
+/* ─── 퀘스트 트래커 ─── */
+#quest-tracker{position:fixed;top:80px;left:12px;width:220px;z-index:89;display:none;}
+.qt-title{font-size:11px;color:#c9a84c;letter-spacing:3px;font-weight:700;margin-bottom:6px;}
+.qt-item{background:#0c0c1ecc;border:1px solid #c9a84c33;padding:8px 10px;margin-bottom:4px;}
+.qt-name{font-size:11px;color:#f0d060;font-weight:700;letter-spacing:1px;margin-bottom:3px;}
+.qt-prog{font-size:10px;color:#8a8a9a;margin-bottom:4px;}
+.qt-bar{width:100%;height:4px;background:#1a1a2a;border:1px solid #2a2a4a;overflow:hidden;}
+.qt-bar-fill{height:100%;background:#c9a84c;transition:width .3s;}
+
+/* ─── 퀘스트 완료 ─── */
+#quest-complete{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:#0c0c1eee;border:2px solid #f0d060;padding:16px 30px;color:#f0d060;font-size:16px;font-weight:700;letter-spacing:3px;z-index:200;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;}
+#quest-complete.show{opacity:1;transform:translate(-50%,-50%) scale(1);}

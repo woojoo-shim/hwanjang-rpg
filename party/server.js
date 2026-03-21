@@ -8,7 +8,7 @@ export default {
     for (var c of room.getConnections()) {
       if (c.id === conn.id) continue;
       var st = c.deserializeAttachment();
-      if (st) players[c.id] = st;
+      if (st) players[st.uid || c.id] = st;
     }
     conn.send(JSON.stringify({ type: 'init', players: players }));
   },
@@ -17,10 +17,22 @@ export default {
     var data = JSON.parse(msg);
 
     if (data.type === 'join') {
-      var state = { name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
+      var uid = data.uid || conn.id;
+      var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
+
+      /* 같은 uid의 이전 연결 찾아서 킥 */
+      for (var c of room.getConnections()) {
+        if (c.id === conn.id) continue;
+        var oldSt = c.deserializeAttachment();
+        if (oldSt && oldSt.uid === uid) {
+          room.broadcast(JSON.stringify({ type: 'leave', id: uid }), [conn.id]);
+          c.close();
+        }
+      }
+
       conn.serializeAttachment(state);
       room.broadcast(JSON.stringify({
-        type: 'join', id: conn.id,
+        type: 'join', id: uid,
         name: data.name, level: data.level,
         x: data.x, z: data.z, ry: data.ry
       }), [conn.id]);
@@ -28,11 +40,13 @@ export default {
 
     if (data.type === 'move') {
       var st = conn.deserializeAttachment();
-      if (st) { st.x = data.x; st.z = data.z; st.ry = data.ry; conn.serializeAttachment(st); }
-      room.broadcast(JSON.stringify({
-        type: 'move', id: conn.id,
-        x: data.x, z: data.z, ry: data.ry, moving: data.moving
-      }), [conn.id]);
+      if (st) {
+        st.x = data.x; st.z = data.z; st.ry = data.ry; conn.serializeAttachment(st);
+        room.broadcast(JSON.stringify({
+          type: 'move', id: st.uid || conn.id,
+          x: data.x, z: data.z, ry: data.ry, moving: data.moving
+        }), [conn.id]);
+      }
     }
 
     if (data.type === 'chat') {
@@ -42,13 +56,16 @@ export default {
     }
 
     if (data.type === 'attack') {
+      var st = conn.deserializeAttachment();
       room.broadcast(JSON.stringify({
-        type: 'attack', id: conn.id
+        type: 'attack', id: st ? (st.uid || conn.id) : conn.id
       }), [conn.id]);
     }
   },
 
   onClose(conn, room) {
-    room.broadcast(JSON.stringify({ type: 'leave', id: conn.id }));
+    var st = conn.deserializeAttachment();
+    var uid = st ? (st.uid || conn.id) : conn.id;
+    room.broadcast(JSON.stringify({ type: 'leave', id: uid }));
   }
 };

@@ -17,8 +17,10 @@ function connectParty(){
 
   ws.onopen=function(){
     console.log('[MP] connected');
+    /* uid = Supabase userId 또는 myName (고유 식별자) */
+    var uid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
     ws.send(JSON.stringify({
-      type:'join',name:myName,level:playerLevel,
+      type:'join',uid:uid,name:myName,level:playerLevel,
       x:+PL.group.position.x.toFixed(2),
       z:+PL.group.position.z.toFixed(2),
       ry:+PL.group.rotation.y.toFixed(2)

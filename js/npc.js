@@ -65,8 +65,13 @@ async function askAI(npcName,userMsg){
     if(parsed.item){
       setTimeout(function(){addItem(parsed.item.id,1,parsed.item);flashHiddenItem(parsed.item.name);},800);
     }
-    npcData.history.push({role:'assistant',content:parsed.clean});
-    return parsed.clean;
+    var qp=parseQuest(parsed.clean);
+    if(qp.quest){
+      setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
+    }
+    var finalText=qp.clean;
+    npcData.history.push({role:'assistant',content:finalText});
+    return finalText;
   }catch(e){
     console.warn('AI fetch error',e);
     npcData.history.pop();

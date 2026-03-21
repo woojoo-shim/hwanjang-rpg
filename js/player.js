@@ -143,11 +143,13 @@ function killMonster(m){
   playerEXP+=m.def.exp;
   addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+m.def.exp+')');
   checkLevelUp();
+  if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   m.def.drops.forEach(function(drop){
     if(Math.random()<drop.rate){
       var qty=Array.isArray(drop.qty)?drop.qty[0]+Math.floor(Math.random()*(drop.qty[1]-drop.qty[0]+1)):drop.qty;
       addItem(drop.id,qty);
       var df=getItemDef(drop.id);if(df)addChat('sys','[시스템]','['+df.name+'] x'+qty+' 획득!');
+      if(typeof onItemCollect==='function')onItemCollect(drop.id,qty);
     }
   });
   setTimeout(function(){
