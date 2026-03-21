@@ -129,14 +129,14 @@ function enterGame(){
   setTimeout(function(){
     try{
       initScene();
-      /* 복귀 유저 위치+장비+존 복원 */
+      /* 복귀 유저 존+장비 복원 — 존 스폰 위치로 이동 */
       if(playerData&&PL.group){
         var savedZone=playerData.zone||'village';
         if(savedZone!=='village'&&ZONES[savedZone]){
           changeZone(savedZone);
         }
-        PL.group.position.x=playerData.position_x||0;
-        PL.group.position.z=playerData.position_z||8;
+        var sp=ZONES[savedZone]?ZONES[savedZone].spawn:ZONES.village.spawn;
+        PL.group.position.set(sp[0],0,sp[1]);
         refreshWeaponMesh();
       }
     }catch(e){console.error('initScene error',e);}
