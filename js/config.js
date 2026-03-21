@@ -225,21 +225,14 @@ var MONSTER_DEFS=[
    drops:[{id:'dragon_scale',rate:.25,qty:1},{id:'star_fragment',rate:.5,qty:1},{id:'eternal_chain',rate:.03,qty:1}]},
 ];
 
-/* ════════════ 존(섬) 정의 ════════════ */
-var ZONES={
-  village:{name:'시작 마을',color:'#c9a84c',bgColor:0x0a1510,fogColor:0x0a1510,fogNear:40,fogFar:90,
-    bounds:[-22,22,-32,16],spawn:[0,-8],
-    portals:[{px:0,pz:14,to:'meadow',label:'초원으로'}]},
-  meadow:{name:'초원',color:'#4aaa3a',bgColor:0x1a3010,fogColor:0x1a3010,fogNear:35,fogFar:80,
-    bounds:[-22,22,-5,55],spawn:[0,5],
-    portals:[{px:0,pz:-3,to:'village',label:'마을로'},{px:0,pz:53,to:'swamp',label:'늪으로'}]},
-  swamp:{name:'독 늪',color:'#44aa44',bgColor:0x050a05,fogColor:0x081008,fogNear:15,fogFar:50,
-    bounds:[-22,22,-5,70],spawn:[0,5],
-    portals:[{px:0,pz:-3,to:'meadow',label:'초원으로'},{px:0,pz:68,to:'darkforest',label:'숲으로'}]},
-  darkforest:{name:'어두운 숲',color:'#aa4422',bgColor:0x020202,fogColor:0x030303,fogNear:8,fogFar:35,
-    bounds:[-22,22,-5,85],spawn:[0,5],
-    portals:[{px:0,pz:-3,to:'swamp',label:'늪으로'},{px:0,pz:83,to:'volcano',label:'화산으로'}]},
-  volcano:{name:'화산 지대',color:'#ff4400',bgColor:0x100500,fogColor:0x1a0800,fogNear:12,fogFar:45,
-    bounds:[-22,22,-5,85],spawn:[0,5],
-    portals:[{px:0,pz:-3,to:'darkforest',label:'숲으로'}]},
+/* ════════════ 오픈 월드 설정 ════════════ */
+var WORLD_BOUNDS=[-80,80,-32,280]; // minX, maxX, minZ, maxZ
+var WORLD_SPAWN=[0,-8]; // 분수대 위치
+
+var ZONE_INFO={
+  village:  {name:'시작 마을',   color:'#c9a84c'},
+  meadow:   {name:'초원',        color:'#4aaa3a'},
+  swamp:    {name:'독 늪',       color:'#44aa44'},
+  darkforest:{name:'어두운 숲',  color:'#aa4422'},
+  volcano:  {name:'화산 지대',   color:'#ff4400'},
 };

@@ -129,14 +129,9 @@ function enterGame(){
   setTimeout(function(){
     try{
       initScene();
-      /* 복귀 유저 존+장비 복원 — 존 스폰 위치로 이동 */
+      /* 복귀 유저 장비 복원 — 스폰 위치로 이동 */
       if(playerData&&PL.group){
-        var savedZone=playerData.zone||'village';
-        if(savedZone!=='village'&&ZONES[savedZone]){
-          changeZone(savedZone);
-        }
-        var sp=ZONES[savedZone]?ZONES[savedZone].spawn:ZONES.village.spawn;
-        PL.group.position.set(sp[0],0,sp[1]);
+        PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
         refreshWeaponMesh();
       }
     }catch(e){console.error('initScene error',e);}
@@ -174,7 +169,6 @@ function setupInput(){
     if(document.getElementById('game-screen').classList.contains('hidden'))return;
     keys[e.key.toLowerCase()]=true;
     if(e.key.toLowerCase()==='e'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
-      if(closestPortal){changeZone(closestPortal.to);return;}
       if(closestNpc&&!document.getElementById('dbox').classList.contains('show'))talk(closestNpc);
     }
     if(e.key.toLowerCase()==='f'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
@@ -216,7 +210,7 @@ function loop(){
   var dialogOpen=document.getElementById('dbox').classList.contains('show');
   if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
   else tickAtkAnim(dt);
-  updCam();updNpcs(now/1000);chkNpc();chkPortal();
+  updCam();updNpcs(now/1000);chkNpc();
   updMonsters(dt,now/1000);
   checkZone();
   if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);

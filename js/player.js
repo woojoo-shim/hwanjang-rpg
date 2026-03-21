@@ -164,7 +164,12 @@ function playerDied(){
   addChat('sys','[시스템]','쓰러졌습니다. 마을로 귀환...');
   playerHP=Math.floor(playerMaxHP*.4);
   invincibleTimer=4;updPlayerHpBar();
-  changeZone('village');
+  PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
+  currentZone='village';
+  /* 분위기 복원 */
+  scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);
+  var zi=ZONE_INFO['village'];
+  document.querySelector('.hloc').textContent='▸ '+zi.name;
 }
 
 function checkLevelUp(){
@@ -186,8 +191,51 @@ function updPlayerHpBar(){
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }
 
-/* checkZone — 이제 포탈 기반 전환이므로 빈 함수 (호환성 유지) */
-function checkZone(){}
+/* checkZone — 오픈 월드 위치 기반 존 감지 + 분위기 전환 */
+function checkZone(){
+  var z=PL.group.position.z;
+  var x=Math.abs(PL.group.position.x);
+  var newZone;
+  if(z<=20) newZone='village';
+  else if(z<=100&&x>30) newZone='swamp';
+  else if(z<=100) newZone='meadow';
+  else if(z<=180) newZone='darkforest';
+  else newZone='volcano';
+
+  if(newZone!==currentZone){
+    var prevZone=currentZone;
+    currentZone=newZone;
+    /* 분위기 전환 */
+    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);}
+    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,35,110);scene.background=new THREE.Color(0x1a3010);}
+    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,15,60);scene.background=new THREE.Color(0x050a05);}
+    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,8,45);scene.background=new THREE.Color(0x020202);}
+    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,12,55);scene.background=new THREE.Color(0x100500);}
+
+    /* 배너 표시 */
+    var zi=ZONE_INFO[newZone];
+    if(zi){
+      var b=document.getElementById('zone-banner');
+      b.textContent='◈ '+zi.name+' 진입';b.style.color=zi.color;b.style.borderColor=zi.color+'66';
+      b.classList.add('show');setTimeout(function(){b.classList.remove('show');},2800);
+      document.querySelector('.hloc').textContent='▸ '+zi.name;
+    }
+    /* 시스템 메시지 */
+    var msgs={
+      meadow:'초원 진입. 토끼와 사슴이 있습니다.',
+      swamp:'독 늪 진입! 슬라임과 독두꺼비가 나타납니다.',
+      darkforest:'어두운 숲 진입! 고블린과 늑대를 조심하세요!',
+      volcano:'화산 지대 진입!! 용암 골렘과 드레이크가 기다립니다!!',
+      village:'마을로 귀환. HP 일부 회복.',
+    };
+    if(msgs[newZone])addChat('sys','[시스템]',msgs[newZone]);
+    /* 마을 귀환 시 HP 회복 */
+    if(newZone==='village'){
+      playerHP=Math.min(playerMaxHP,playerHP+Math.floor(playerMaxHP*.25));
+      updPlayerHpBar();
+    }
+  }
+}
 
 function handleMove(dt){
   tickAtkAnim(dt);
@@ -200,9 +248,9 @@ function handleMove(dt){
   if(moving){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
     var spd=6.0*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    var zb=ZONES[currentZone].bounds;
-    if(nx>zb[0]&&nx<zb[1])PL.group.position.x=nx;
-    if(nz>zb[2]&&nz<zb[3])PL.group.position.z=nz;
+    var wb=WORLD_BOUNDS;
+    if(nx>wb[0]&&nx<wb[1])PL.group.position.x=nx;
+    if(nz>wb[2]&&nz<wb[3])PL.group.position.z=nz;
     PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
     var wa=.32;
     PL.legL.rotation.x=Math.sin(PL.bobT)*wa;
