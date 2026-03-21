@@ -162,7 +162,7 @@ function updTime(){
 }
 
 /* ── 입력 ── */
-var keys={},cYaw=0,cPitch=0.38,isDrag=false,lmx=0,lmy=0;
+var keys={},cYaw=0,cPitch=0.75,isDrag=false,lmx=0,lmy=0;
 
 function setupInput(){
   document.addEventListener('keydown',function(e){
