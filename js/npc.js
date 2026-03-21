@@ -117,8 +117,10 @@ function talk(n){
   }
   typeText(greeting);
   addChat('npc',n.name,greeting);
-  NPC_AI[n.name].history=[];
-  NPC_AI[n.name].history.push({role:'assistant',content:greeting});
+  /* 기존 대화 기록 유지 — 초기화하지 않음 */
+  if(!NPC_AI[n.name].history||NPC_AI[n.name].history.length===0){
+    NPC_AI[n.name].history=[{role:'assistant',content:greeting}];
+  }
 }
 
 var typTmr=null;
