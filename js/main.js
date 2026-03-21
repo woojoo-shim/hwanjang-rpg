@@ -65,8 +65,10 @@ document.getElementById('ni').addEventListener('keydown',function(e){if(e.key===
 function startGame(){
   if(!myName){var v=document.getElementById('ni').value.trim();myName=v||'모험가';}
   if(!ANTHROPIC_API_KEY&&(location.hostname==='localhost'||location.hostname==='127.0.0.1')){
-    var k=prompt('AI NPC 대화를 위해 Anthropic API 키를 입력하세요.\n(한번 입력하면 브라우저에 저장됩니다)');
-    if(k&&k.trim())setApiKey(k.trim());
+    try{
+      var k=prompt('AI NPC 대화를 위해 Anthropic API 키를 입력하세요.\n(한번 입력하면 브라우저에 저장됩니다)');
+      if(k&&k.trim())setApiKey(k.trim());
+    }catch(e){}
   }
   /* 새 플레이어면 DB에 저장 (await) */
   if(currentUser&&!playerData){
