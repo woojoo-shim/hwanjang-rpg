@@ -10,11 +10,15 @@ var playerHP=100,playerMaxHP=100,playerEXP=0,playerLevel=1;
 var attackCooldown=0,invincibleTimer=0;
 
 /* ── 충돌 박스 [x, z, halfW, halfD] ── */
-var COLLIDERS=[
-  /* 성 */      [0,-30,7,6],
-  /* 분수 */    [0,-8,4.2,4.2],
-  /* 상점들 */  [-14,-6,1.5,1],[-14,-13,1.5,1],[14,-6,1.5,1],[14,-13,1.5,1],[-6,-18,1.5,1],[6,-18,1.5,1],
-];
+var COLLIDERS=[];
+/* 마을 콜라이더는 initVillageColliders에서 동적으로 설정 (타일맵 로드 후) */
+function initVillageColliders(vx,vz){
+  COLLIDERS=[
+    /* 성 */      [vx,vz-22,7,6],
+    /* 분수 */    [vx,vz,4.2,4.2],
+    /* 상점들 */  [vx-14,vz+2,1.5,1],[vx-14,vz-5,1.5,1],[vx+14,vz+2,1.5,1],[vx+14,vz-5,1.5,1],[vx-6,vz-10,1.5,1],[vx+6,vz-10,1.5,1],
+  ];
+}
 function hitCollider(x,z){
   for(var i=0;i<COLLIDERS.length;i++){
     var c=COLLIDERS[i];
@@ -181,7 +185,7 @@ function playerDied(){
   PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
   currentZone='village';
   /* 분위기 복원 */
-  scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);
+  scene.fog=new THREE.Fog(0x0a1510,50,160);scene.background=new THREE.Color(0x0a1510);
   var zi=ZONE_INFO['village'];
   document.querySelector('.hloc').textContent='▸ '+zi.name;
 }
@@ -205,26 +209,45 @@ function updPlayerHpBar(){
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }
 
-/* checkZone — 오픈 월드 위치 기반 존 감지 + 분위기 전환 */
+/* checkZone — 타일맵 기반 존 감지 + 분위기 전환 */
 function checkZone(){
-  var z=PL.group.position.z;
-  var x=Math.abs(PL.group.position.x);
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  var terrain=getTerrainAt(px,pz);
+
+  /* 마을 판정: 성 주변 반경 내이면 village */
   var newZone;
-  if(z<=20) newZone='village';
-  else if(z<=100&&x>30) newZone='swamp';
-  else if(z<=100) newZone='meadow';
-  else if(z<=180) newZone='darkforest';
-  else newZone='volcano';
+  var castleWP=(typeof tileToWorld==='function')?tileToWorld(10,10):{x:0,z:0};
+  var cdx=px-castleWP.x,cdz=pz-castleWP.z;
+  if(Math.sqrt(cdx*cdx+cdz*cdz)<25){
+    newZone='village';
+  } else {
+    newZone=terrain;
+  }
 
   if(newZone!==currentZone){
     var prevZone=currentZone;
     currentZone=newZone;
-    /* 분위기 전환 */
-    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);}
-    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,35,110);scene.background=new THREE.Color(0x1a3010);}
-    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,15,60);scene.background=new THREE.Color(0x050a05);}
-    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,8,45);scene.background=new THREE.Color(0x020202);}
-    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,12,55);scene.background=new THREE.Color(0x100500);}
+
+    /* 분위기 전환 — 지형 타입별 안개/배경 */
+    var fogConfig={
+      village:      {fog:0x0a1510,near:50,far:160},
+      plains:       {fog:0x1a3010,near:50,far:160},
+      forest:       {fog:0x0a1a08,near:30,far:100},
+      dark_forest:  {fog:0x020202,near:8,far:45},
+      mountain:     {fog:0x1a1510,near:30,far:100},
+      snow:         {fog:0xc8d8e8,near:20,far:80},
+      desert:       {fog:0x2a1a0a,near:40,far:120},
+      volcano:      {fog:0x100500,near:12,far:55},
+      lake:         {fog:0x0a1520,near:40,far:130},
+      wetland:      {fog:0x050a05,near:15,far:60},
+      highlands:    {fog:0x1a0a08,near:35,far:110},
+      water_city:   {fog:0x051520,near:30,far:100},
+      ocean:        {fog:0x0a1530,near:20,far:80},
+      beach:        {fog:0x1a2010,near:50,far:150},
+    };
+    var fc=fogConfig[newZone]||fogConfig.plains;
+    scene.fog=new THREE.Fog(fc.fog,fc.near,fc.far);
+    scene.background=new THREE.Color(fc.fog);
 
     /* 배너 표시 */
     var zi=ZONE_INFO[newZone];
@@ -236,11 +259,20 @@ function checkZone(){
     }
     /* 시스템 메시지 */
     var msgs={
-      meadow:'초원 진입. 토끼와 사슴이 있습니다.',
-      swamp:'독 늪 진입! 슬라임과 독두꺼비가 나타납니다.',
-      darkforest:'어두운 숲 진입! 고블린과 늑대를 조심하세요!',
+      plains:'초원 진입. 토끼와 사슴이 있습니다.',
+      forest:'숲 진입. 주변을 살펴보세요.',
+      wetland:'습지 진입! 슬라임과 독두꺼비가 나타납니다.',
+      dark_forest:'미혹의 숲 진입! 고블린과 늑대를 조심하세요!',
       volcano:'화산 지대 진입!! 용암 골렘과 드레이크가 기다립니다!!',
       village:'마을로 귀환. HP 일부 회복.',
+      mountain:'죽음의 산 진입! 험난한 길을 조심하세요.',
+      snow:'설산 진입. 눈보라가 몰아칩니다.',
+      desert:'사막 진입. 뜨거운 모래바람을 조심하세요.',
+      lake:'호수 지역 진입. 맑은 물이 반짝입니다.',
+      highlands:'고원 진입. 붉은 단풍이 아름답습니다.',
+      water_city:'조라의 마을 진입. 수중 종족의 영역입니다.',
+      ocean:'대해 진입! 깊은 바다에 주의하세요.',
+      beach:'해변 진입. 파도 소리가 들립니다.',
     };
     if(msgs[newZone])addChat('sys','[시스템]',msgs[newZone]);
     /* 마을 귀환 시 HP 회복 */

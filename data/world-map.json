@@ -1,0 +1,155 @@
+{
+  "name": "환장 RPG - 하이럴 대륙",
+  "version": "1.0.0",
+  "gridSize": { "width": 32, "height": 24 },
+  "tileSize": 48,
+  "regions": [
+    {
+      "id": "eldin_volcano",
+      "name": "엘딘 화산",
+      "description": "용암이 흐르는 위험한 화산 지대",
+      "color": "#ff6b35",
+      "heightLevel": 4,
+      "terrainType": "volcano"
+    },
+    {
+      "id": "lanayru_wetlands",
+      "name": "라넬 습지",
+      "description": "고대 기술이 숨겨진 신비로운 습지",
+      "color": "#4ecdc4",
+      "heightLevel": 1,
+      "terrainType": "wetland"
+    },
+    {
+      "id": "hebra_mountains",
+      "name": "헤브라 설산",
+      "description": "눈보라가 몰아치는 극한의 설원",
+      "color": "#e8f4f8",
+      "heightLevel": 5,
+      "terrainType": "snow"
+    },
+    {
+      "id": "gerudo_desert",
+      "name": "겔드 사막",
+      "description": "뜨거운 모래바람이 부는 황량한 사막",
+      "color": "#f4a460",
+      "heightLevel": 2,
+      "terrainType": "desert"
+    },
+    {
+      "id": "hyrule_field",
+      "name": "하이랄 평원",
+      "description": "광활한 초원이 펼쳐진 중심부",
+      "color": "#7cb342",
+      "heightLevel": 1,
+      "terrainType": "plains"
+    },
+    {
+      "id": "faron_woods",
+      "name": "피론 숲",
+      "description": "고대의 나무들이 우거진 신성한 숲",
+      "color": "#2d5a27",
+      "heightLevel": 2,
+      "terrainType": "forest"
+    },
+    {
+      "id": "great_sea",
+      "name": "대해",
+      "description": "끝없이 펼쳐진 푸른 바다",
+      "color": "#1a5fb4",
+      "heightLevel": 0,
+      "terrainType": "ocean"
+    },
+    {
+      "id": "death_mountain",
+      "name": "죽음의 산",
+      "description": "검은 연기가 피어오르는 험난한 산맥",
+      "color": "#5c4033",
+      "heightLevel": 5,
+      "terrainType": "mountain"
+    },
+    {
+      "id": "lake_hylia",
+      "name": "하이리아 호수",
+      "description": "맑은 물이 흐르는 거대한 호수",
+      "color": "#4fc3f7",
+      "heightLevel": 0,
+      "terrainType": "lake"
+    },
+    {
+      "id": "lost_woods",
+      "name": "미혹의 숲",
+      "description": "한번 들어가면 나올 수 없는 마법의 숲",
+      "color": "#1b4332",
+      "heightLevel": 2,
+      "terrainType": "dark_forest"
+    },
+    {
+      "id": "akkala_highlands",
+      "name": "아카라 고원",
+      "description": "붉은 단풍이 물든 아름다운 고원",
+      "color": "#c94c4c",
+      "heightLevel": 3,
+      "terrainType": "highlands"
+    },
+    {
+      "id": "zoras_domain",
+      "name": "조라의 마을",
+      "description": "수중 종족 조라가 사는 신비로운 영역",
+      "color": "#00bcd4",
+      "heightLevel": 2,
+      "terrainType": "water_city"
+    }
+  ],
+  "tiles": [
+    ["ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","beach","beach","snow","snow","snow","snow","snow","snow","snow","beach","beach","beach","beach","mountain","mountain","volcano","volcano","volcano","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","beach","beach","snow","snow","snow","snow","snow","snow","snow","snow","snow","beach","mountain","mountain","mountain","volcano","volcano","volcano","volcano","volcano","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","beach","snow","snow","snow","snow","snow","snow","snow","snow","beach","beach","mountain","mountain","mountain","volcano","volcano","volcano","volcano","volcano","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","snow","snow","snow","snow","snow","snow","snow","beach","beach","beach","mountain","mountain","mountain","volcano","volcano","volcano","volcano","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","beach","snow","snow","snow","snow","beach","beach","beach","plains","plains","mountain","mountain","highlands","highlands","volcano","beach","beach","beach","wetland","wetland","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","beach","beach","beach","beach","beach","beach","plains","plains","plains","plains","plains","mountain","highlands","highlands","highlands","beach","wetland","wetland","wetland","wetland","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","beach","beach","beach","beach","plains","plains","plains","plains","plains","plains","plains","plains","highlands","highlands","beach","beach","wetland","wetland","water_city","wetland","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","beach","desert","desert","beach","plains","plains","plains","plains","plains","plains","plains","plains","plains","beach","beach","wetland","wetland","water_city","water_city","wetland","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","desert","desert","desert","desert","beach","plains","plains","plains","plains","lake","lake","plains","plains","beach","beach","wetland","wetland","water_city","wetland","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","desert","desert","desert","desert","desert","beach","plains","plains","lake","lake","lake","lake","plains","plains","beach","beach","wetland","wetland","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","desert","desert","desert","desert","desert","beach","plains","plains","lake","lake","lake","lake","lake","plains","plains","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","desert","desert","desert","desert","beach","beach","plains","plains","lake","lake","lake","lake","plains","plains","forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","beach","beach","desert","desert","beach","beach","plains","plains","plains","plains","lake","lake","plains","plains","forest","forest","forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","beach","beach","beach","beach","plains","plains","plains","plains","plains","plains","plains","plains","forest","forest","dark_forest","dark_forest","forest","forest","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","beach","beach","plains","plains","plains","plains","plains","plains","plains","plains","forest","forest","dark_forest","dark_forest","dark_forest","dark_forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","beach","beach","plains","plains","plains","plains","plains","plains","plains","forest","forest","dark_forest","dark_forest","dark_forest","dark_forest","forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","beach","beach","plains","plains","plains","plains","plains","forest","forest","forest","forest","dark_forest","dark_forest","forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","beach","beach","plains","plains","plains","forest","forest","forest","forest","forest","forest","forest","forest","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","ocean","beach","beach","beach","beach","forest","forest","forest","forest","forest","forest","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","ocean","ocean","beach","beach","beach","beach","forest","forest","forest","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","beach","beach","beach","beach","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","beach","beach","beach","beach","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"],
+    ["ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean","ocean"]
+  ],
+  "terrainConfig": {
+    "ocean": { "color": "#1a5fb4", "height": 0, "name": "바다", "animated": true },
+    "beach": { "color": "#f5deb3", "height": 0.5, "name": "해변", "animated": false },
+    "plains": { "color": "#7cb342", "height": 1, "name": "초원", "animated": false },
+    "forest": { "color": "#2d5a27", "height": 2, "name": "숲", "animated": false },
+    "dark_forest": { "color": "#1b4332", "height": 2.5, "name": "미혹의 숲", "animated": false },
+    "mountain": { "color": "#5c4033", "height": 4, "name": "산", "animated": false },
+    "snow": { "color": "#e8f4f8", "height": 4, "name": "설원", "animated": false },
+    "desert": { "color": "#f4a460", "height": 1, "name": "사막", "animated": false },
+    "volcano": { "color": "#ff6b35", "height": 5, "name": "화산", "animated": true },
+    "lake": { "color": "#4fc3f7", "height": 0, "name": "호수", "animated": true },
+    "wetland": { "color": "#4ecdc4", "height": 0.5, "name": "습지", "animated": true },
+    "highlands": { "color": "#c94c4c", "height": 3, "name": "고원", "animated": false },
+    "water_city": { "color": "#00bcd4", "height": 1.5, "name": "조라의 마을", "animated": true }
+  },
+  "landmarks": [
+    { "id": "hyrule_castle", "name": "하이랄 성", "x": 10, "y": 10, "icon": "castle", "description": "왕국의 중심, 젤다 공주가 있는 곳" },
+    { "id": "death_mountain_summit", "name": "죽음의 산 정상", "x": 17, "y": 3, "icon": "volcano", "description": "고론족이 사는 뜨거운 화산" },
+    { "id": "zora_palace", "name": "조라의 궁전", "x": 20, "y": 8, "icon": "palace", "description": "조라족의 아름다운 수중 궁전" },
+    { "id": "gerudo_town", "name": "겔드 마을", "x": 4, "y": 11, "icon": "town", "description": "여전사 겔드족의 사막 도시" },
+    { "id": "rito_village", "name": "리토 마을", "x": 6, "y": 4, "icon": "village", "description": "조류족 리토가 사는 눈덮인 마을" },
+    { "id": "lost_woods_entrance", "name": "미혹의 숲 입구", "x": 15, "y": 15, "icon": "forest", "description": "마스터 소드가 잠든 신비로운 숲" },
+    { "id": "lake_hylia_bridge", "name": "하이리아 대교", "x": 11, "y": 11, "icon": "bridge", "description": "호수를 가로지르는 거대한 다리" },
+    { "id": "akkala_tower", "name": "아카라 탑", "x": 15, "y": 5, "icon": "tower", "description": "붉은 고원 위의 고대 탑" }
+  ]
+}
