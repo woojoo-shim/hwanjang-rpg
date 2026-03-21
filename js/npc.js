@@ -28,6 +28,34 @@ function parseHiddenItem(reply){
   return{clean:clean,item:item};
 }
 
+/* ── 가격 흥정 파싱 ── */
+function parsePrice(reply){
+  var changes=[];
+  var clean=reply.replace(/\[PRICE:([^\]]+)\]/g,function(_,m){
+    var p=m.split('|');
+    if(p.length>=2){
+      changes.push({item:p[0].trim(),price:parseInt(p[1])||0});
+    }
+    return '';
+  }).trim();
+  return{clean:clean,changes:changes};
+}
+function applyPriceChange(itemName,newPrice,npcName){
+  /* SHOP_STOCK에서 해당 아이템 가격 변경 */
+  var stocks=SHOP_STOCK[npcName];
+  if(!stocks)return;
+  for(var i=0;i<stocks.length;i++){
+    var def=getItemDef(stocks[i].id);
+    if(def&&def.name===itemName){
+      if(!stocks[i]._origPrice)stocks[i]._origPrice=stocks[i].price;
+      stocks[i].price=Math.max(1,newPrice);
+      addChat('sys','[시스템]','가격 변동: '+def.name+' → '+newPrice+' 골드');
+      if(shopOpen)renderShopItems();
+      return;
+    }
+  }
+}
+
 async function askAI(npcName,userMsg){
   var npcData=NPC_AI[npcName];if(!npcData)return'...';
   var sys=npcData.system;
@@ -65,7 +93,11 @@ async function askAI(npcName,userMsg){
     if(parsed.item){
       setTimeout(function(){addItem(parsed.item.id,1,parsed.item);flashHiddenItem(parsed.item.name);},800);
     }
-    var qp=parseQuest(parsed.clean);
+    var pp=parsePrice(parsed.clean);
+    if(pp.changes.length>0){
+      pp.changes.forEach(function(c){applyPriceChange(c.item,c.price,npcName);});
+    }
+    var qp=parseQuest(pp.clean);
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
     }
@@ -92,10 +124,9 @@ function npcFallback(npcName){
 
 /* ── 대화창 ── */
 function talk(n){
+  /* 상인/대장장이: 상점 + 대화창 동시 */
   if(n.name==='상인'||n.name==='대장장이'){
     openShop(n.name);
-    addChat('npc',n.name,n.name==='상인'?'어서오세요~ 뭐 필요하세요? ㅎㅎ':'뭐 필요해요.');
-    return;
   }
   /* 완료된 퀘스트 수령 체크 */
   var turned=tryTurnInQuests(n.name);
@@ -111,6 +142,8 @@ function talk(n){
   }else{
     var greetings={
       '마을 이장':'어서 오게, 새 모험가여! 오늘은 어떤 일로 찾아왔나?',
+      '상인':'어서오세요~ 뭐 필요하세요? 가격은 협상 가능해요 ㅎㅎ',
+      '대장장이':'뭐 필요해요. 가격은... 얘기해봐요.',
       '???':'...'
     };
     greeting=greetings[n.name]||'...';
