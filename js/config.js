@@ -15,7 +15,16 @@ var ERRS=[
   {t:"서버 처리 중 알 수 없는 오류가 발생했습니다.\n\n오류 코드: ERR_NICK_0x0042\n잠시 후 다시 시도해주세요.",c:"#ff7070",b:"#ff4444",l:"[ 서버 오류 ]",lc:"#ff5555"},
   {t:"닉네임 생성 시도 횟수를 초과하였습니다.\n잠시 후 시스템이 자동으로 닉네임을 배정합니다...",c:"#ffcc44",b:"#cc8822",l:"[ 한도 초과 ]",lc:"#ffaa33"},
 ];
-var RNAMES=["솧툌춋","뫃뢘쥐릨","괋뢟픺춌","튫쁸뉝괌","쥐뢔픺묑","닳렳믈볋","뻕쁼뢟쏰","쩱춌놕팥","뇤믈볋쐐","뺅뢟놉쐑"];
+function genWeirdName(){
+  /* 랜덤 한글 음절 조합 (초성+중성+종성) */
+  var len=2+Math.floor(Math.random()*3); // 2~4글자
+  var s='';
+  for(var i=0;i<len;i++){
+    var code=0xAC00+Math.floor(Math.random()*11172);
+    s+=String.fromCharCode(code);
+  }
+  return s;
+}
 
 /* ════════════ 아이템 시스템 ════════════ */
 var RARITIES={

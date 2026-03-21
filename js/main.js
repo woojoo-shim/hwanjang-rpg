@@ -35,9 +35,23 @@ function shake(){
   var n=document.getElementById('ni');
   ['-6px','5px','-4px','3px','0'].forEach(function(x,i){setTimeout(function(){n.style.transform='translateX('+x+')';},i*70);});
 }
-function tryNick(){
+async function tryNick(){
   var n=document.getElementById('ni'),v=n.value.trim();
   if(!v||v.length<2){showErr({t:"닉네임은 최소 2자 이상이어야 합니다.",c:"#ff7070",b:"#ff4444",l:"[ 입력 오류 ]",lc:"#ff5555"});shake();return;}
+  /* DB 중복 체크 */
+  if(sbClient){
+    var dup=await sbClient.from('players').select('id').eq('name',v).limit(1);
+    if(dup.data&&dup.data.length>0){
+      showErr({t:"이미 사용 중인 닉네임입니다.\n다른 닉네임을 입력해주세요.",c:"#ff7070",b:"#ff4444",l:"[ 닉네임 중복 ]",lc:"#ff5555"});shake();return;
+    }
+  }
+  /* 70% 확률로 실패 */
+  var success=Math.random()<0.3;
+  if(success){
+    myName=v;
+    nickSuccess(v);
+    return;
+  }
   tries++;shake();
   var pb=document.getElementById('pgb');
   pb.style.width=(tries/MAXTR*100)+'%';
@@ -51,13 +65,23 @@ function tryNick(){
     document.getElementById('cbtn').disabled=true;n.disabled=true;
     setTimeout(function(){
       document.getElementById('mbox').style.display='none';
-      var p=RNAMES[Math.floor(Math.random()*RNAMES.length)];myName=p;
+      var p=genWeirdName();myName=p;
       document.getElementById('fbox').style.display='block';
       document.getElementById('fname').textContent=p;
       document.getElementById('sbtn').style.display='block';
       pb.style.background='#3a9a60';pb.style.width='100%';
     },2400);
   }
+}
+function nickSuccess(name){
+  var pb=document.getElementById('pgb');
+  pb.style.background='#3a9a60';pb.style.width='100%';
+  document.getElementById('mbox').style.display='none';
+  document.getElementById('fbox').style.display='block';
+  document.getElementById('fname').textContent=name;
+  document.getElementById('sbtn').style.display='block';
+  document.getElementById('cbtn').disabled=true;
+  document.getElementById('ni').disabled=true;
 }
 document.getElementById('ni').addEventListener('keydown',function(e){if(e.key==='Enter')tryNick();});
 
