@@ -57,23 +57,14 @@ function logout(){
 async function checkSession(){
   if(!sbClient)return false;
   try{
-    var r=await sbClient.auth.getUser();
-    if(r.data.user){
-      currentUser=r.data.user;
+    var r=await sbClient.auth.getSession();
+    if(r.data.session){
+      currentUser=r.data.session.user;
       await loadPlayerData();
       return true;
-    }else{
-      /* 세션 토큰은 있지만 유저가 삭제됨 → 세션 정리 */
-      await sbClient.auth.signOut();
-      currentUser=null;playerData=null;
-      return false;
     }
-  }catch(e){
-    console.warn('Session check error',e);
-    await sbClient.auth.signOut();
-    currentUser=null;playerData=null;
-    return false;
-  }
+  }catch(e){console.warn('Session check error',e);}
+  return false;
 }
 
 async function loadPlayerData(){
