@@ -182,22 +182,12 @@ document.addEventListener('keydown',function(e){
   }
 });
 
-/* ── 채팅 (AI) ── */
-var chatNpcIdx=0;
-var CHAT_NPCS=['마을 이장','상인','대장장이','???'];
-async function sendChat(){
+/* ── 채팅 (플레이어 전용) ── */
+function sendChat(){
   var ci=document.getElementById('cin'),v=ci.value.trim();if(!v)return;
   ci.value='';
-  var btn=document.getElementById('csd');
-  btn.disabled=true;ci.disabled=true;
   addChat('plr',myName,v);
   if(typeof sendChatMP==='function')sendChatMP(myName,v);
-  var npcName=CHAT_NPCS[chatNpcIdx%CHAT_NPCS.length];chatNpcIdx++;
-  var thinkEl=document.createElement('div');thinkEl.className='cm inf';thinkEl.textContent=npcName+' 이(가) 입력 중...';
-  document.getElementById('clog').appendChild(thinkEl);
-  var reply=await askAI(npcName,v);
-  thinkEl.remove();
-  addChat('npc',npcName,reply);
-  btn.disabled=false;ci.disabled=false;ci.focus();
+  ci.focus();
 }
 document.getElementById('cin').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
