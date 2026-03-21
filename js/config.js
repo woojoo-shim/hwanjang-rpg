@@ -228,7 +228,7 @@ var MONSTER_DEFS=[
 /* ════════════ 존(섬) 정의 ════════════ */
 var ZONES={
   village:{name:'시작 마을',color:'#c9a84c',bgColor:0x0a1510,fogColor:0x0a1510,fogNear:40,fogFar:90,
-    bounds:[-22,22,-32,16],spawn:[2,-6],
+    bounds:[-22,22,-32,16],spawn:[0,-8],
     portals:[{px:0,pz:14,to:'meadow',label:'초원으로'}]},
   meadow:{name:'초원',color:'#4aaa3a',bgColor:0x1a3010,fogColor:0x1a3010,fogNear:35,fogFar:80,
     bounds:[-22,22,-5,55],spawn:[0,5],
