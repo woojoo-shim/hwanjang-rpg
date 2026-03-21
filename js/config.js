@@ -226,22 +226,13 @@ var MONSTER_DEFS=[
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
-var WORLD_BOUNDS=[-96,96,-72,72]; // minX, maxX, minZ, maxZ (32x24 tiles * 6 units)
-var WORLD_SPAWN=[5,-3]; // 분수 옆 (initScene에서 마을 중심 기준으로 재설정됨)
+var WORLD_BOUNDS=[-80,80,-32,280]; // minX, maxX, minZ, maxZ
+var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={
-  village:      {name:'시작 마을',       color:'#c9a84c'},
-  plains:       {name:'하이랄 평원',     color:'#7cb342'},
-  forest:       {name:'피론 숲',         color:'#2d5a27'},
-  dark_forest:  {name:'미혹의 숲',       color:'#1b4332'},
-  mountain:     {name:'죽음의 산',       color:'#5c4033'},
-  snow:         {name:'헤브라 설산',     color:'#e8f4f8'},
-  desert:       {name:'겔드 사막',       color:'#f4a460'},
-  volcano:      {name:'엘딘 화산',       color:'#ff6b35'},
-  lake:         {name:'하이리아 호수',   color:'#4fc3f7'},
-  wetland:      {name:'라넬 습지',       color:'#4ecdc4'},
-  highlands:    {name:'아카라 고원',     color:'#c94c4c'},
-  water_city:   {name:'조라의 마을',     color:'#00bcd4'},
-  ocean:        {name:'대해',            color:'#1a5fb4'},
-  beach:        {name:'해변',            color:'#f5deb3'},
+  village:  {name:'시작 마을',   color:'#c9a84c'},
+  meadow:   {name:'초원',        color:'#4aaa3a'},
+  swamp:    {name:'독 늪',       color:'#44aa44'},
+  darkforest:{name:'어두운 숲',  color:'#aa4422'},
+  volcano:  {name:'화산 지대',   color:'#ff4400'},
 };
