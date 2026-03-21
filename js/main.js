@@ -100,7 +100,7 @@ function enterGame(){
     var ef=document.getElementById('exp-bar-fill');
     if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*100)*100)+'%';
   }
-  setTimeout(function(){
+  try{
     initScene();
     /* 복귀 유저 위치+장비 복원 */
     if(playerData&&PL.group){
@@ -108,7 +108,7 @@ function enterGame(){
       PL.group.position.z=playerData.position_z||8;
       refreshWeaponMesh();
     }
-  },80);
+  }catch(e){console.error('initScene error',e);}
   var t=document.getElementById('toast');
   t.textContent=myName+'이(가) 로그인하셨습니다.';
   setTimeout(function(){t.classList.add('show');},400);
