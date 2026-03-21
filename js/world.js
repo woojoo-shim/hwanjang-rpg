@@ -427,7 +427,7 @@ function initScene(){
   PL.group=ph2.group;PL.legL=ph2.legL;PL.legR=ph2.legR;
   PL.armL=ph2.armL;PL.armR=ph2.armR;PL.armRPivot=ph2.armRPivot;
   PL.weaponMesh=null;PL.bobT=0;PL.atkAnim=0;PL.atkPhase=0;
-  PL.group.position.set(0,0,8);scene.add(PL.group);
+  var vs=ZONES.village.spawn;PL.group.position.set(vs[0],0,vs[1]);scene.add(PL.group);
 
   /* 플레이어 이름표 */
   var lov=document.getElementById('lov');

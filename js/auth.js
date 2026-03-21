@@ -90,7 +90,7 @@ async function createPlayer(name){
     level:1,hp:100,max_hp:100,exp:0,gold:50,
     inventory:[],
     equipped:{weapon:null,armor:null},
-    position_x:0,position_z:8,
+    position_x:ZONES.village.spawn[0],position_z:ZONES.village.spawn[1],
     zone:'village'
   };
   var r=await sbClient.from('players').insert(data);
