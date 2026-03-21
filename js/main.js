@@ -68,9 +68,9 @@ function startGame(){
     var k=prompt('AI NPC 대화를 위해 Anthropic API 키를 입력하세요.\n(한번 입력하면 브라우저에 저장됩니다)');
     if(k&&k.trim())setApiKey(k.trim());
   }
-  /* 새 플레이어면 DB에 저장 */
+  /* 새 플레이어면 DB에 저장 (await) */
   if(currentUser&&!playerData){
-    createPlayer(myName);
+    createPlayer(myName).catch(function(e){console.warn('createPlayer fail',e);});
   }
   document.getElementById('nick-screen').classList.add('hidden');
   document.getElementById('login-screen').classList.add('hidden');

@@ -22,7 +22,7 @@ function doLogin(){
   sbClient.auth.signInWithPassword({email:email,password:pw}).then(function(r){
     if(r.error){st.textContent='오류: '+r.error.message;st.style.color='#ff7070';}
     else{currentUser=r.data.user;loadPlayerData().then(function(){
-      if(playerData){document.getElementById('login-screen').classList.add('hidden');restoreGameState();enterGame();}
+      if(playerData){document.getElementById('login-screen').classList.add('hidden');restoreGameState();startGame();}
       else{document.getElementById('login-screen').classList.add('hidden');document.getElementById('nick-screen').classList.remove('hidden');}
     });}
   });
@@ -97,7 +97,7 @@ async function createPlayer(name){
     position_x:0,position_z:8
   };
   var r=await sbClient.from('players').insert(data);
-  if(r.error)console.warn('Create player error',r.error);
+  if(r.error)console.warn('Create player error',JSON.stringify(r.error));
   playerData=data;
 }
 
@@ -118,7 +118,7 @@ async function savePlayerData(){
     position_z:PL.group.position.z
   };
   var r=await sbClient.from('players').upsert(data);
-  if(r.error)console.warn('Save error',r.error);
+  if(r.error)console.warn('Save error',JSON.stringify(r.error));
 }
 
 function restoreGameState(){
