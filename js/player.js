@@ -9,6 +9,20 @@ var PL={group:null,legL:null,legR:null,armL:null,armR:null,armRPivot:null,weapon
 var playerHP=100,playerMaxHP=100,playerEXP=0,playerLevel=1;
 var attackCooldown=0,invincibleTimer=0;
 
+/* ── 충돌 박스 [x, z, halfW, halfD] ── */
+var COLLIDERS=[
+  /* 성 */      [0,-30,7,6],
+  /* 분수 */    [0,-8,4.2,4.2],
+  /* 상점들 */  [-14,-6,1.5,1],[-14,-13,1.5,1],[14,-6,1.5,1],[14,-13,1.5,1],[-6,-18,1.5,1],[6,-18,1.5,1],
+];
+function hitCollider(x,z){
+  for(var i=0;i<COLLIDERS.length;i++){
+    var c=COLLIDERS[i];
+    if(Math.abs(x-c[0])<c[2]&&Math.abs(z-c[1])<c[3])return true;
+  }
+  return false;
+}
+
 /* 장착 무기 3D 메시 빌드 */
 function buildWeaponMesh(itemId){
   if(!itemId)return null;
@@ -249,8 +263,8 @@ function handleMove(dt){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
     var spd=6.0*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     var wb=WORLD_BOUNDS;
-    if(nx>wb[0]&&nx<wb[1])PL.group.position.x=nx;
-    if(nz>wb[2]&&nz<wb[3])PL.group.position.z=nz;
+    if(nx>wb[0]&&nx<wb[1]&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
+    if(nz>wb[2]&&nz<wb[3]&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
     PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
     var wa=.32;
     PL.legL.rotation.x=Math.sin(PL.bobT)*wa;
