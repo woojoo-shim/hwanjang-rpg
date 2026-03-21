@@ -6,7 +6,7 @@
    선언: quests, activeQuests, questNotifQueue */
 
 var quests=[];       // 완료된 퀘스트 id 목록
-var activeQuests=[]; // {id,name,desc,type,target,count,progress,rewardType,rewardAmount,npc}
+var activeQuests=[]; // {id,name,desc,type,target,count,progress,rewardType,rewardAmount,npc,ready}
 var questNotifQueue=[];
 var questNotifShowing=false;
 
@@ -23,10 +23,11 @@ function parseQuest(reply){
     name:p[0].trim(),
     desc:p[1].trim(),
     type:p[2].trim(),       // kill, collect
-    target:p[3].trim(),     // 몬스터id 또는 아이템id
+    target:p[3].trim(),     // 몬스터이름 또는 아이템id
     count:parseInt(p[4])||1,
     rewardType:p[5].trim(), // exp, gold, item
     rewardAmount:p[6].trim(),
+    ready:false,            // 목표 달성 여부
   };
   return{clean:clean,quest:q};
 }
@@ -56,6 +57,7 @@ function popQuestNotif(){
 
 function acceptQuest(q){
   q.progress=0;
+  q.ready=false;
   activeQuests.push(q);
   addChat('sys','[시스템]','퀘스트 수락: ['+q.name+']');
   renderQuestTracker();
@@ -63,9 +65,34 @@ function acceptQuest(q){
   if(q.type==='collect'){
     var slot=inventory.find(function(s){return s.itemId===q.target;});
     if(slot)q.progress=Math.min(slot.qty,q.count);
-    if(q.progress>=q.count)completeQuest(q);
+    if(q.progress>=q.count){markQuestReady(q);}
     else renderQuestTracker();
   }
+}
+
+/* ── 목표 달성 → NPC에게 돌아가기 표시 ── */
+function markQuestReady(q){
+  q.ready=true;
+  addChat('sys','[시스템]','퀘스트 ['+q.name+'] 목표 달성! '+q.npc+'에게 돌아가세요.');
+  renderQuestTracker();
+}
+
+/* ── NPC에게 말 걸 때 완료 가능한 퀘스트 확인 ── */
+function tryTurnInQuests(npcName){
+  var turned=false;
+  var toRemove=[];
+  activeQuests.forEach(function(q){
+    if(q.ready&&q.npc===npcName){
+      completeQuest(q);
+      toRemove.push(q.id);
+      turned=true;
+    }
+  });
+  if(toRemove.length>0){
+    activeQuests=activeQuests.filter(function(a){return toRemove.indexOf(a.id)===-1;});
+    renderQuestTracker();
+  }
+  return turned;
 }
 
 /* ── 퀘스트 트래커 (좌측 상단) ── */
@@ -77,10 +104,12 @@ function renderQuestTracker(){
   activeQuests.forEach(function(q){
     var pct=Math.min(100,Math.floor(q.progress/q.count*100));
     var targetLabel=q.type==='kill'?q.target:q.target;
-    html+='<div class="qt-item">'+
-      '<div class="qt-name">'+q.name+'</div>'+
+    var readyTag=q.ready?'<span class="qt-ready">✦ 수령 가능</span>':'';
+    html+='<div class="qt-item'+(q.ready?' qt-done':'')+'">'+
+      '<div class="qt-name">'+q.name+readyTag+'</div>'+
       '<div class="qt-prog">'+targetLabel+' '+q.progress+'/'+q.count+'</div>'+
-      '<div class="qt-bar"><div class="qt-bar-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="qt-bar"><div class="qt-bar-fill'+(q.ready?' qt-bar-done':'')+'" style="width:'+pct+'%"></div></div>'+
+      (q.ready?'<div class="qt-turnin">→ '+q.npc+'에게 돌아가기</div>':'')+
       '</div>';
   });
   el.innerHTML=html;
@@ -89,25 +118,25 @@ function renderQuestTracker(){
 /* ── 퀘스트 진행 업데이트 ── */
 function onMonsterKill(monsterName){
   activeQuests.forEach(function(q){
-    if(q.type==='kill'&&q.target===monsterName){
+    if(q.type==='kill'&&!q.ready&&q.target===monsterName){
       q.progress=Math.min(q.progress+1,q.count);
       renderQuestTracker();
-      if(q.progress>=q.count)completeQuest(q);
+      if(q.progress>=q.count)markQuestReady(q);
     }
   });
 }
 
 function onItemCollect(itemId,qty){
   activeQuests.forEach(function(q){
-    if(q.type==='collect'&&q.target===itemId){
+    if(q.type==='collect'&&!q.ready&&q.target===itemId){
       q.progress=Math.min(q.progress+qty,q.count);
       renderQuestTracker();
-      if(q.progress>=q.count)completeQuest(q);
+      if(q.progress>=q.count)markQuestReady(q);
     }
   });
 }
 
-/* ── 퀘스트 완료 ── */
+/* ── 퀘스트 완료 (보상 지급) ── */
 function completeQuest(q){
   addChat('sys','[시스템]','✦ 퀘스트 완료: ['+q.name+'] ✦');
   // 보상 지급
@@ -128,10 +157,8 @@ function completeQuest(q){
   }
   // 완료 이펙트
   showQuestComplete(q.name);
-  // 목록에서 제거
+  // 완료 목록에 추가
   quests.push(q.id);
-  activeQuests=activeQuests.filter(function(a){return a.id!==q.id;});
-  renderQuestTracker();
 }
 
 function showQuestComplete(name){

@@ -97,21 +97,28 @@ function talk(n){
     addChat('npc',n.name,n.name==='상인'?'어서오세요~ 뭐 필요하세요? ㅎㅎ':'뭐 필요해요.');
     return;
   }
+  /* 완료된 퀘스트 수령 체크 */
+  var turned=tryTurnInQuests(n.name);
   activeNpc=n;
   document.getElementById('dwho-name').textContent='[ '+n.name+' ]';
   var te=document.getElementById('dtxt');
   te.innerHTML='';
   document.getElementById('dbox').classList.add('show');
   document.getElementById('dmsg').focus();
-  var greeting={
-    '마을 이장':'어서 오게, 새 모험가여! 오늘은 어떤 일로 찾아왔나?',
-    '???':'...'
-  };
-  var g=greeting[n.name]||'...';
-  typeText(g);
-  addChat('npc',n.name,g);
+  var greeting;
+  if(turned){
+    greeting='수고했네! 보상을 받게.';
+  }else{
+    var greetings={
+      '마을 이장':'어서 오게, 새 모험가여! 오늘은 어떤 일로 찾아왔나?',
+      '???':'...'
+    };
+    greeting=greetings[n.name]||'...';
+  }
+  typeText(greeting);
+  addChat('npc',n.name,greeting);
   NPC_AI[n.name].history=[];
-  NPC_AI[n.name].history.push({role:'assistant',content:g});
+  NPC_AI[n.name].history.push({role:'assistant',content:greeting});
 }
 
 var typTmr=null;
