@@ -129,8 +129,12 @@ function enterGame(){
   setTimeout(function(){
     try{
       initScene();
-      /* 복귀 유저 위치+장비 복원 */
+      /* 복귀 유저 위치+장비+존 복원 */
       if(playerData&&PL.group){
+        var savedZone=playerData.zone||'village';
+        if(savedZone!=='village'&&ZONES[savedZone]){
+          changeZone(savedZone);
+        }
         PL.group.position.x=playerData.position_x||0;
         PL.group.position.z=playerData.position_z||8;
         refreshWeaponMesh();

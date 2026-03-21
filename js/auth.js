@@ -90,7 +90,8 @@ async function createPlayer(name){
     level:1,hp:100,max_hp:100,exp:0,gold:50,
     inventory:[],
     equipped:{weapon:null,armor:null},
-    position_x:0,position_z:8
+    position_x:0,position_z:8,
+    zone:'village'
   };
   var r=await sbClient.from('players').insert(data);
   if(r.error)console.warn('Create player error',JSON.stringify(r.error));
@@ -111,7 +112,8 @@ async function savePlayerData(){
     inventory:inventory,
     equipped:equipped,
     position_x:PL.group.position.x,
-    position_z:PL.group.position.z
+    position_z:PL.group.position.z,
+    zone:currentZone||'village'
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
