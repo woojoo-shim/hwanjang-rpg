@@ -163,8 +163,8 @@ function killMonster(m){
 function playerDied(){
   addChat('sys','[시스템]','쓰러졌습니다. 마을로 귀환...');
   playerHP=Math.floor(playerMaxHP*.4);
-  PL.group.position.set(0,0,8);
   invincibleTimer=4;updPlayerHpBar();
+  changeZone('village');
 }
 
 function checkLevelUp(){
@@ -186,31 +186,8 @@ function updPlayerHpBar(){
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }
 
-function checkZone(){
-  var pz=PL.group.position.z;
-  var zone=pz>210?'volcano':pz>130?'darkforest':pz>65?'swamp':pz>14?'meadow':'village';
-  if(zone!==currentZone){
-    currentZone=zone;
-    var nm={village:'시작 마을',meadow:'초원',swamp:'독 늪',darkforest:'어두운 숲',volcano:'화산 지대'};
-    var cl={village:'#c9a84c',meadow:'#4aaa3a',swamp:'#44aa44',darkforest:'#aa4422',volcano:'#ff4400'};
-    var b=document.getElementById('zone-banner');
-    b.textContent='◈ '+nm[zone]+' 진입';b.style.color=cl[zone];b.style.borderColor=cl[zone]+'66';
-    b.classList.add('show');setTimeout(function(){b.classList.remove('show');},2800);
-    document.querySelector('.hloc').textContent='▸ '+nm[zone];
-    var msgs={
-      meadow:'초원 진입. 토끼와 사슴이 있습니다.',
-      swamp:'독 늪 진입! 슬라임과 독두꺼비가 나타납니다.',
-      darkforest:'어두운 숲 진입! 고블린과 늑대를 조심하세요!',
-      volcano:'화산 지대 진입!! 용암 골렘과 드레이크가 기다립니다!!',
-      village:'마을로 귀환. HP 일부 회복.',
-    };
-    if(msgs[zone])addChat('sys','[시스템]',msgs[zone]);
-    if(zone==='village'){
-      playerHP=Math.min(playerMaxHP,playerHP+Math.floor(playerMaxHP*.25));
-      updPlayerHpBar();
-    }
-  }
-}
+/* checkZone — 이제 포탈 기반 전환이므로 빈 함수 (호환성 유지) */
+function checkZone(){}
 
 function handleMove(dt){
   tickAtkAnim(dt);
@@ -223,8 +200,9 @@ function handleMove(dt){
   if(moving){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
     var spd=6.0*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    if(Math.abs(nx)<22)PL.group.position.x=nx;
-    if(nz>-32&&nz<290)PL.group.position.z=nz;
+    var zb=ZONES[currentZone].bounds;
+    if(nx>zb[0]&&nx<zb[1])PL.group.position.x=nx;
+    if(nz>zb[2]&&nz<zb[3])PL.group.position.z=nz;
     PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
     var wa=.32;
     PL.legL.rotation.x=Math.sin(PL.bobT)*wa;

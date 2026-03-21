@@ -42,4 +42,9 @@ function updLabels(){
   document.querySelectorAll('#lov .llabel.bld').forEach(function(el){
     posEl(el,parseFloat(el.dataset.wx),parseFloat(el.dataset.wy),parseFloat(el.dataset.wz));
   });
+  /* 포탈 라벨 */
+  portalMeshes.forEach(function(pm){
+    if(pm===closestPortal){pm.intEl.style.display='block';posEl(pm.intEl,pm.px,5,pm.pz);}
+    else pm.intEl.style.display='none';
+  });
 }

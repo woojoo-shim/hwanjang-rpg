@@ -169,8 +169,10 @@ function setupInput(){
     /* 게임 화면이 아니면 키 입력 무시 */
     if(document.getElementById('game-screen').classList.contains('hidden'))return;
     keys[e.key.toLowerCase()]=true;
-    if(e.key.toLowerCase()==='e'&&closestNpc&&!document.getElementById('dbox').classList.contains('show')&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
-      talk(closestNpc);
+    if(e.key.toLowerCase()==='e'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
+      if(closestPortal){changeZone(closestPortal.to);return;}
+      if(closestNpc&&!document.getElementById('dbox').classList.contains('show'))talk(closestNpc);
+    }
     if(e.key.toLowerCase()==='f'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
       playerAttack();
   });
@@ -210,7 +212,7 @@ function loop(){
   var dialogOpen=document.getElementById('dbox').classList.contains('show');
   if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
   else tickAtkAnim(dt);
-  updCam();updNpcs(now/1000);chkNpc();
+  updCam();updNpcs(now/1000);chkNpc();chkPortal();
   updMonsters(dt,now/1000);
   checkZone();
   if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
