@@ -227,7 +227,7 @@ var MONSTER_DEFS=[
 
 /* ════════════ 오픈 월드 설정 ════════════ */
 var WORLD_BOUNDS=[-80,80,-32,280]; // minX, maxX, minZ, maxZ
-var WORLD_SPAWN=[0,-8]; // 분수대 위치
+var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={
   village:  {name:'시작 마을',   color:'#c9a84c'},
