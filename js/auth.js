@@ -22,8 +22,13 @@ function doLogin(){
   sbClient.auth.signInWithPassword({email:email,password:pw}).then(function(r){
     if(r.error){st.textContent='오류: '+r.error.message;st.style.color='#ff7070';}
     else{currentUser=r.data.user;loadPlayerData().then(function(){
-      if(playerData){document.getElementById('login-screen').classList.add('hidden');restoreGameState();startGame();}
-      else{document.getElementById('login-screen').classList.add('hidden');document.getElementById('nick-screen').classList.remove('hidden');}
+      document.getElementById('login-screen').classList.add('hidden');
+      if(playerData){restoreGameState();startGame();}
+      else{document.getElementById('nick-screen').classList.remove('hidden');}
+    }).catch(function(e){
+      console.error('loadPlayerData error',e);
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('nick-screen').classList.remove('hidden');
     });}
   });
 }

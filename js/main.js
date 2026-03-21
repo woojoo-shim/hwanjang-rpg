@@ -202,18 +202,17 @@ function loop(){
     return;
   }
   checkSession().then(function(hasSession){
+    document.getElementById('login-screen').classList.add('hidden');
     if(hasSession&&playerData){
-      /* 복귀 유저 → 데이터 복원 후 바로 게임 */
-      document.getElementById('login-screen').classList.add('hidden');
       restoreGameState();
       startGame();
     }else if(hasSession&&!playerData){
-      /* 로그인됨 + 새 유저 → 닉네임 화면 */
-      document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('nick-screen').classList.remove('hidden');
     }else{
-      /* 세션 없음 → 로그인 화면 */
       document.getElementById('login-screen').classList.remove('hidden');
     }
+  }).catch(function(e){
+    console.error('initApp error',e);
+    document.getElementById('login-screen').classList.remove('hidden');
   });
 })();
