@@ -49,12 +49,14 @@ function connectParty(){
     onMpMessage(data);
   };
 
-  ws.onclose=function(){
-    console.log('[MP] disconnected');
+  ws.onclose=function(e){
+    console.log('[MP] disconnected code:',e.code);
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
     if(monsterPosTmr){clearInterval(monsterPosTmr);monsterPosTmr=null;isMonsterHost=false;}
+    /* 중복 킥(4000)이면 1초 후 재연결 (새 연결이 이미 활성) */
+    if(e.code===4000)return;
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
-    mpReconnectTimer=setTimeout(connectParty,15000);
+    mpReconnectTimer=setTimeout(connectParty,10000);
   };
 
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
