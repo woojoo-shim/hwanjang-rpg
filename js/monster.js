@@ -753,10 +753,22 @@ function updMonsters(dt,t){
           if(playerHP<=0)playerDied();
         }
       }
-      if(Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ))>22){
-        m.state='idle';m.hp=m.maxHp;m.hbf.style.width='100%';
+      var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
+      if(spDist>40){
+        /* 너무 멀면 어그로 해제, 걸어서 복귀 */
+        m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
+      }
+    }
+    if(m.state==='returning'){
+      var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
+      var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
+      if(rlen<1){
+        m.state='idle';
         m.mesh.position.set(m.spawnX,0,m.spawnZ);
-        m.mesh.rotation.x=0;m.mesh.rotation.z=0;
+      }else{
+        m.mesh.position.x+=rdx/rlen*m.def.spd*dt;
+        m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
+        m.mesh.rotation.y=Math.atan2(rdx,rdz);
       }
     }
   });
