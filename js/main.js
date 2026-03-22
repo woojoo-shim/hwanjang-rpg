@@ -214,8 +214,12 @@ function resetAfk(){lastActivity=Date.now();}
 
 /* ── 게임 루프 ── */
 var lastT=Date.now();
+var _loopRunning=false;
 function loop(){
-  requestAnimationFrame(loop);
+  if(_loopRunning)return;
+  _loopRunning=true;
+  function _tick(){
+    requestAnimationFrame(_tick);
   try{
     var now=Date.now(),dt=Math.min((now-lastT)/1000,.05);lastT=now;
     var dialogOpen=document.getElementById('dbox').classList.contains('show');
@@ -242,6 +246,8 @@ function loop(){
     if(composer)composer.render();
     else renderer.render(scene,camera);
   }catch(e){console.error('loop error:',e);}
+  }
+  _tick();
 }
 
 /* ── 앱 초기화 ── */
