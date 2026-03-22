@@ -167,6 +167,7 @@ function setupInput(){
   document.addEventListener('keydown',function(e){
     /* 게임 화면이 아니면 키 입력 무시 */
     if(document.getElementById('game-screen').classList.contains('hidden'))return;
+    if(!e.key)return;
     keys[e.key.toLowerCase()]=true;
     if(e.key.toLowerCase()==='e'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
       if(closestNpc&&!document.getElementById('dbox').classList.contains('show'))talk(closestNpc);
@@ -174,7 +175,7 @@ function setupInput(){
     if(e.key.toLowerCase()==='f'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
       playerAttack();
   });
-  document.addEventListener('keyup',function(e){keys[e.key.toLowerCase()]=false;});
+  document.addEventListener('keyup',function(e){if(e.key)keys[e.key.toLowerCase()]=false;});
 
   var cc=document.getElementById('cc');
   cc.addEventListener('contextmenu',function(e){e.preventDefault();});
