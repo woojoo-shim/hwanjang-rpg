@@ -83,7 +83,7 @@ var ITEM_POOL=[
 
 /* ════════════ 상점 재고 ════════════ */
 var SHOP_STOCK={
-  '상인':[
+  '(상인) 김도윤':[
     {id:'red_potion',    price:30},
     {id:'blue_potion',   price:40},
     {id:'leather_armor', price:120},
@@ -94,7 +94,7 @@ var SHOP_STOCK={
     {id:'deer_meat',     price:20},
     {id:'hunting_bow',   price:220},
   ],
-  '대장장이':[
+  '(대장장이) 이태산':[
     {id:'iron_sword',    price:180},
     {id:'steel_axe',     price:240},
     {id:'iron_helmet',   price:160},
@@ -106,7 +106,7 @@ var SHOP_STOCK={
 
 /* ════════════ AI NPC 시스템 프롬프트 ════════════ */
 var NPC_AI={
-  '마을 이장':{
+  '(이장) 박건호':{
     system:`너는 환장 RPG라는 판타지 게임 속 "시작 마을"의 마을 이장이야.
 성격: 친절하고 격식 있는 노인. 항상 "~하게", "~일세", "~하다네" 같은 어투를 씀.
 중요: 플레이어 닉네임을 부르려 할 때마다 혀가 꼬여서 제대로 못 부름.
@@ -128,7 +128,7 @@ var NPC_AI={
 답변은 2~4문장으로 간결하게. 한국어로만 대답.`,
     history:[]
   },
-  '상인':{
+  '(상인) 김도윤':{
     system:`너는 환장 RPG 시작 마을의 잡화상인 "크로스핑거"야.
 성격: 겉으로는 친절하지만 속으로는 사기꾼. 쓸모없는 물건을 비싸게 팔려고 함.
 말투: "~요", "~죠", "~에요" 친절한 경어체. 가끔 "ㅎㅎ", "^^" 이모티콘.
@@ -151,7 +151,7 @@ var NPC_AI={
 답변은 2~4문장으로 간결하게. 한국어로만 대답.`,
     history:[]
   },
-  '대장장이':{
+  '(대장장이) 이태산':{
     system:`너는 환장 RPG 시작 마을의 대장장이야.
 성격: 과묵하고 직설적. 말이 짧고 핵심만. 장비 강화에 자부심.
 말투: "~오", "~지", "~거든요" 짧고 건조한 말투.
@@ -172,7 +172,7 @@ var NPC_AI={
 답변은 1~3문장으로 매우 간결하게. 한국어로만 대답.`,
     history:[]
   },
-  '???':{
+  '(???) 정체불명':{
     system:`너는 환장 RPG의 최고 고인물 플레이어 "토끼공듀"야. 세계관 최강자.
 성격: 쿨하고 초연함. 뉴비를 귀여워하지만 티 잘 안 냄.
 말투: "...", "~다", "~네", 짧고 건조하게. 가끔 "뉴비"라고 부름.
@@ -259,19 +259,19 @@ var activeBuffs={};
 
 /* ════════════ NPC 정의 ════════════ */
 var NPC_DEF=[
-  {name:'마을 이장',px:-6, pz:0,  bc:0x7a4a18,hc:0xddaa77},
-  {name:'상인',      px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
-  {name:'대장장이',  px:7,  pz:-12,bc:0x3a2a1a,hc:0xcc9966},
-  {name:'???',       px:8,  pz:0,  bc:0x1a1030,hc:0xaaaacc},
-  /* 전직 NPC — 각 존에 배치 */
-  {name:'전사 교관',  px:20, pz:-5, bc:0x8b0000,hc:0xddcc99,classNpc:'warrior'},
-  {name:'현자',       px:-20,pz:-5, bc:0x1a1a8b,hc:0xaabbee,classNpc:'mage'},
-  {name:'사냥꾼',     px:-50,pz:60, bc:0x2a6a2a,hc:0xddcc99,classNpc:'archer'},
-  {name:'수호기사',   px:50, pz:60, bc:0xccaa33,hc:0xeeddaa,classNpc:'paladin'},
-  {name:'밀정',       px:-120,pz:100,bc:0x3a2a3a,hc:0xccbbaa,classNpc:'rogue'},
-  {name:'무당',       px:120,pz:100,bc:0x336633,hc:0x99cc99,classNpc:'shaman'},
-  {name:'그림자',     px:-80,pz:400,bc:0x1a1a2a,hc:0xbbbbcc,classNpc:'assassin'},
-  {name:'투사',       px:80, pz:400,bc:0x990000,hc:0xdd8866,classNpc:'berserker'},
+  {name:'(이장) 박건호',px:-6, pz:0,  bc:0x7a4a18,hc:0xddaa77},
+  {name:'(상인) 김도윤',px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
+  {name:'(대장장이) 이태산',px:7,pz:-12,bc:0x3a2a1a,hc:0xcc9966},
+  {name:'(???) 정체불명',px:8, pz:0,  bc:0x1a1030,hc:0xaaaacc},
+  /* 전직 NPC — 각 존에 숨겨진 위치 */
+  {name:'(검술사범) 최무현',px:65, pz:35,  bc:0x8b0000,hc:0xddcc99,classNpc:'warrior'},
+  {name:'(현자) 윤서연',   px:-70,pz:280, bc:0x1a1a8b,hc:0xaabbee,classNpc:'mage'},
+  {name:'(사냥꾼) 한시우', px:-180,pz:150,bc:0x2a6a2a,hc:0xddcc99,classNpc:'archer'},
+  {name:'(성기사) 강예준', px:175, pz:250,bc:0xccaa33,hc:0xeeddaa,classNpc:'paladin'},
+  {name:'(밀정) 서하린',   px:-190,pz:200,bc:0x3a2a3a,hc:0xccbbaa,classNpc:'rogue'},
+  {name:'(무당) 오지안',   px:185, pz:180,bc:0x336633,hc:0x99cc99,classNpc:'shaman'},
+  {name:'(그림자) 임카이', px:-110,pz:520,bc:0x1a1a2a,hc:0xbbbbcc,classNpc:'assassin'},
+  {name:'(투사) 백호진',   px:105, pz:480,bc:0x990000,hc:0xdd8866,classNpc:'berserker'},
 ];
 
 /* ════════════ 몬스터 정의 ════════════ */

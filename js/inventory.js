@@ -265,7 +265,7 @@ function renderShopItems(){
     }
     inventory.forEach(function(slot){
       var def=getItemFull(slot);
-      var bp=(SHOP_STOCK['상인']||[]).find(function(s){return s.id===slot.itemId;})||{price:50};
+      var bp=(SHOP_STOCK['(상인) 김도윤']||[]).find(function(s){return s.id===slot.itemId;})||{price:50};
       var sp=sellPrice(bp.price);
       var r=RARITIES[def.rarity]||RARITIES.common;
       var div=document.createElement('div');div.className='shop-item';
