@@ -269,6 +269,18 @@ function parsePrice(reply){
   }).trim();
   return{clean:clean,changes:changes};
 }
+function addShopItem(npcName,itemId,price){
+  var stocks=SHOP_STOCK[npcName];
+  if(!stocks)return;
+  /* 이미 있으면 무시 */
+  for(var i=0;i<stocks.length;i++){if(stocks[i].id===itemId)return;}
+  var def=getItemDef(itemId);
+  if(!def)return;
+  stocks.push({id:itemId,price:price});
+  addChat('sys','[시스템]','새 상품 등록: '+def.name+' ('+price+' 골드)');
+  if(shopOpen)renderShopItems();
+}
+
 function applyPriceChange(itemName,newPrice,npcName){
   /* SHOP_STOCK에서 해당 아이템 가격 변경 */
   var stocks=SHOP_STOCK[npcName];
@@ -279,7 +291,7 @@ function applyPriceChange(itemName,newPrice,npcName){
       if(!stocks[i]._origPrice)stocks[i]._origPrice=stocks[i].price;
       stocks[i].price=Math.max(1,newPrice);
       addChat('sys','[시스템]','가격 변동: '+def.name+' → '+newPrice+' 골드');
-      if(shopOpen)renderShopItems();
+      if(shopOpen){renderShopItems();if(shopSelectedItem)renderShopDetail(shopSelectedItem);}
       return;
     }
   }
@@ -326,6 +338,14 @@ async function askAI(npcName,userMsg){
     if(pp.changes.length>0){
       pp.changes.forEach(function(c){applyPriceChange(c.item,c.price,npcName);});
     }
+    /* 상점 아이템 추가 파싱 [SHOP_ADD:아이템id|가격] */
+    pp.clean=pp.clean.replace(/\[SHOP_ADD:([^\]]+)\]/g,function(_,m){
+      var p=m.split('|');if(p.length>=2){
+        var itemId=p[0].trim(),price=parseInt(p[1])||50;
+        addShopItem(npcName,itemId,price);
+      }
+      return '';
+    }).trim();
     var qp=parseQuest(pp.clean);
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
