@@ -178,9 +178,29 @@ function confirmClassSelect(){
   updPlayerHpBar();
   addChat('sys','[시스템]','★ '+def.name+'(으)로 전직하였습니다!');
   document.getElementById('class-modal').style.display='none';
+  /* 스킬바 UI 생성 */
+  buildSkillBar();
   /* HUD에 직업 표시 */
   var clsEl=document.getElementById('hclass');
   if(clsEl)clsEl.textContent=def.name;
+}
+
+function buildSkillBar(){
+  var bar=document.getElementById('skill-bar');
+  if(!bar)return;
+  bar.innerHTML='';
+  var skills=CLASS_SKILLS[playerClass]||[];
+  if(skills.length===0)return;
+  for(var i=0;i<skills.length;i++){
+    var sk=skills[i];
+    var slot=document.createElement('div');
+    slot.style.cssText='width:50px;height:50px;background:#1a1a2ecc;border:1px solid '+sk.color+';border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;';
+    slot.title=sk.name+': '+sk.desc;
+    slot.innerHTML='<div style="color:'+sk.color+';font-size:9px;font-weight:bold;">'+sk.key+'</div>'
+      +'<div style="color:#ddd;font-size:10px;">'+sk.name+'</div>'
+      +'<div id="skill-cd-'+i+'" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#ff4444;font-size:14px;font-weight:bold;"></div>';
+    bar.appendChild(slot);
+  }
 }
 
 /* ── 대화창 ── */

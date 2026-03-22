@@ -174,6 +174,12 @@ function setupInput(){
     }
     if(e.key.toLowerCase()==='f'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
       playerAttack();
+    /* 스킬 키: Q=0, R=1, T=2 */
+    var skillMap={'q':0,'r':1,'t':2};
+    var sk=skillMap[e.key.toLowerCase()];
+    if(sk!==undefined&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
+      if(typeof useSkill==='function')useSkill(sk);
+    }
   });
   document.addEventListener('keyup',function(e){if(e.key)keys[e.key.toLowerCase()]=false;});
 
@@ -228,6 +234,7 @@ function loop(){
     updCam();updNpcs(now/1000);chkNpc();
     updMonsters(dt,now/1000);
     if(typeof updateArrows==='function')updateArrows(dt);
+    if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
     checkZone();
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);

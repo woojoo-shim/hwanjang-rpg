@@ -226,6 +226,145 @@ function isRangedWeapon(){
   return def&&def.icon==='bow';
 }
 
+/* ═══════════ 스킬 시스템 ═══════════ */
+function useSkill(slotIdx){
+  if(playerClass==='none')return;
+  var skills=CLASS_SKILLS[playerClass];
+  if(!skills||slotIdx>=skills.length)return;
+  var sk=skills[slotIdx];
+  /* 쿨다운 체크 */
+  if(skillCooldowns[sk.id]&&skillCooldowns[sk.id]>0){
+    addChat('inf','','쿨다운 중 ('+Math.ceil(skillCooldowns[sk.id])+'초)');
+    return;
+  }
+  skillCooldowns[sk.id]=sk.cd;
+
+  var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
+  var baseAtk=5;
+  if(equipped.weapon){
+    var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
+    if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
+  }
+  var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul*(sk.dmgMul||1));
+
+  /* 자가 힐 */
+  if(sk.selfHeal){
+    var heal=Math.floor(playerMaxHP*sk.selfHeal);
+    playerHP=Math.min(playerMaxHP,playerHP+heal);
+    updPlayerHpBar();
+    spawnDmgNum('+'+heal,'#44ff88');
+    addChat('sys','[스킬]',sk.name+' 사용! HP +'+heal);
+  }
+  /* 자가 데미지 (광전사) */
+  if(sk.selfDmg){
+    var sd=Math.floor(playerMaxHP*sk.selfDmg);
+    playerHP=Math.max(1,playerHP-sd);
+    updPlayerHpBar();
+  }
+  /* 버프 */
+  if(sk.buff){
+    activeBuffs[sk.buff]={remaining:sk.buffDur};
+    addChat('sys','[스킬]',sk.name+' 발동! ('+sk.buffDur+'초)');
+  }
+  /* 범위 공격 (AOE) */
+  if(sk.aoe){
+    var px=PL.group.position.x,pz=PL.group.position.z;
+    var hitCount=0;
+    monsters.forEach(function(m){
+      if(m.state==='dead'||m.hp<=0)return;
+      var dx=px-m.mesh.position.x,dz=pz-m.mesh.position.z;
+      if(Math.sqrt(dx*dx+dz*dz)<sk.aoe){
+        m.hp=Math.max(0,m.hp-dmg);
+        m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
+        flashMonster(m);m.state='aggro';hitCount++;
+        if(m.hp<=0)killMonster(m);
+      }
+    });
+    if(hitCount>0)spawnDmgNum(sk.name+'! -'+dmg+'x'+hitCount,sk.color||'#ffdd44');
+    triggerAtkAnim();
+    return;
+  }
+  /* 발사체 스킬 */
+  if(sk.projectile){
+    var dx=mouseWorldX-PL.group.position.x;
+    var dz=mouseWorldZ-PL.group.position.z;
+    var len=Math.sqrt(dx*dx+dz*dz);
+    if(len<0.1){dx=0;dz=1;len=1;}
+    dx/=len;dz/=len;
+    PL.group.rotation.y=Math.atan2(dx,dz);
+    shootArrow(dx,dz,dmg);
+    triggerAtkAnim();
+    spawnDmgNum(sk.name+'!',sk.color||'#ffdd44');
+    return;
+  }
+  /* 멀티샷 (궁수) */
+  if(sk.multiShot){
+    var dx=mouseWorldX-PL.group.position.x;
+    var dz=mouseWorldZ-PL.group.position.z;
+    var len=Math.sqrt(dx*dx+dz*dz);
+    if(len<0.1){dx=0;dz=1;len=1;}
+    dx/=len;dz/=len;
+    var angle=Math.atan2(dx,dz);
+    var spread=0.25;
+    for(var si=0;si<sk.multiShot;si++){
+      var a=angle+(si-(sk.multiShot-1)/2)*spread;
+      shootArrow(Math.sin(a),Math.cos(a),Math.floor(dmg/sk.multiShot*sk.dmgMul));
+    }
+    PL.group.rotation.y=angle;
+    triggerAtkAnim();
+    spawnDmgNum(sk.name+'!',sk.color||'#ffdd44');
+    return;
+  }
+  /* 근접 단일/멀티 타격 */
+  var target=null,bestDist=sk.range||6;
+  monsters.forEach(function(m){
+    if(m.state==='dead')return;
+    var dx2=PL.group.position.x-m.mesh.position.x,dz2=PL.group.position.z-m.mesh.position.z;
+    var d=Math.sqrt(dx2*dx2+dz2*dz2);
+    if(d<bestDist){bestDist=d;target=m;}
+  });
+  if(!target){addChat('inf','','근처에 대상이 없다.');skillCooldowns[sk.id]=0;return;}
+  /* 순간이동 (암살자) */
+  if(sk.teleport){
+    PL.group.position.x=target.mesh.position.x+1;
+    PL.group.position.z=target.mesh.position.z+1;
+  }
+  var hits=sk.multiHit||1;
+  for(var hi=0;hi<hits;hi++){
+    var finalDmg=sk.forceCrit?Math.floor(dmg*cls.critDmg):dmg;
+    target.hp=Math.max(0,target.hp-finalDmg);
+    target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
+    spawnDmgNum('-'+finalDmg,sk.color||'#ffdd44');
+  }
+  if(sk.healMul){var h2=Math.floor(dmg*sk.healMul);playerHP=Math.min(playerMaxHP,playerHP+h2);updPlayerHpBar();}
+  flashMonster(target);target.state='aggro';
+  var ddx=target.mesh.position.x-PL.group.position.x;
+  var ddz=target.mesh.position.z-PL.group.position.z;
+  PL.group.rotation.y=Math.atan2(ddx,ddz);
+  triggerAtkAnim();
+  if(target.hp<=0)killMonster(target);
+}
+
+/* 스킬 쿨다운 + 버프 틱 (매 프레임 호출) */
+function updateSkills(dt){
+  for(var id in skillCooldowns){
+    if(skillCooldowns[id]>0)skillCooldowns[id]-=dt;
+  }
+  for(var b in activeBuffs){
+    activeBuffs[b].remaining-=dt;
+    if(activeBuffs[b].remaining<=0)delete activeBuffs[b];
+  }
+  /* HUD 스킬 쿨다운 표시 */
+  var skills=CLASS_SKILLS[playerClass]||[];
+  for(var i=0;i<skills.length;i++){
+    var el=document.getElementById('skill-cd-'+i);
+    if(!el)continue;
+    var cd=skillCooldowns[skills[i].id]||0;
+    el.textContent=cd>0?Math.ceil(cd)+'s':'';
+    el.parentElement.style.opacity=cd>0?'0.5':'1';
+  }
+}
+
 function playerAttack(){
   if(attackCooldown>0)return;
 

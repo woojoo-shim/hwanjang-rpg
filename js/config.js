@@ -207,6 +207,56 @@ var CLASS_DEFS={
 };
 var playerClass='none';
 
+/* ════════════ 스킬 시스템 ════════════ */
+var CLASS_SKILLS={
+  none:[],
+  warrior:[
+    {id:'shield_bash',name:'방패 강타',key:'Q',cd:5,desc:'전방 적에게 강력한 일격 (ATK x3)',dmgMul:3,range:4,color:'#ff4444'},
+    {id:'war_cry',name:'전투 함성',key:'R',cd:15,desc:'8초간 ATK +50%',buff:'atkUp',buffDur:8,color:'#ff8800'},
+    {id:'iron_wall',name:'철벽 방어',key:'T',cd:20,desc:'5초간 받는 데미지 70% 감소',buff:'defUp',buffDur:5,color:'#aaaaaa'}
+  ],
+  mage:[
+    {id:'fireball',name:'파이어볼',key:'Q',cd:4,desc:'마우스 방향으로 화염구 발사 (ATK x4)',dmgMul:4,range:20,projectile:true,color:'#ff6600',pColor:0xff4400},
+    {id:'ice_nova',name:'아이스 노바',key:'R',cd:12,desc:'주변 적 전체에 빙결 데미지 (ATK x2)',dmgMul:2,aoe:10,color:'#44ccff'},
+    {id:'mana_shield',name:'마나 실드',key:'T',cd:25,desc:'6초간 받는 데미지 50% 감소',buff:'defUp',buffDur:6,color:'#4444ff'}
+  ],
+  archer:[
+    {id:'multi_shot',name:'멀티샷',key:'Q',cd:6,desc:'3발의 화살을 부채꼴로 발사',multiShot:3,dmgMul:1.5,color:'#44ff44'},
+    {id:'rapid_fire',name:'속사',key:'R',cd:10,desc:'5초간 공격속도 2배',buff:'spdUp',buffDur:5,color:'#88ff44'},
+    {id:'snipe',name:'저격',key:'T',cd:15,desc:'긴 사거리 강력한 한 발 (ATK x5)',dmgMul:5,range:30,projectile:true,color:'#ffff44',pColor:0xffcc00}
+  ],
+  rogue:[
+    {id:'backstab',name:'백스탭',key:'Q',cd:5,desc:'뒤에서 강타 (ATK x4, 항상 치명타)',dmgMul:4,range:4,forceCrit:true,color:'#aa44aa'},
+    {id:'smoke_bomb',name:'연막탄',key:'R',cd:15,desc:'3초간 무적',buff:'invincible',buffDur:3,color:'#888888'},
+    {id:'blade_fury',name:'칼날 폭풍',key:'T',cd:12,desc:'주변 적 전체 공격 (ATK x2)',dmgMul:2,aoe:6,color:'#cc44cc'}
+  ],
+  paladin:[
+    {id:'holy_strike',name:'신성 강타',key:'Q',cd:5,desc:'빛의 일격 (ATK x3) + HP 회복',dmgMul:3,range:4,healMul:0.2,color:'#ffdd44'},
+    {id:'heal',name:'치유',key:'R',cd:12,desc:'HP 30% 회복',selfHeal:0.3,color:'#44ff88'},
+    {id:'divine_shield',name:'신성 보호막',key:'T',cd:25,desc:'5초간 무적',buff:'invincible',buffDur:5,color:'#ffffaa'}
+  ],
+  berserker:[
+    {id:'frenzy',name:'광란',key:'Q',cd:4,desc:'3연타 (각 ATK x1.5)',multiHit:3,dmgMul:1.5,range:4,color:'#ff2222'},
+    {id:'blood_rage',name:'피의 분노',key:'R',cd:15,desc:'HP 20% 소모, 10초간 ATK 2배',selfDmg:0.2,buff:'atkUp2',buffDur:10,color:'#cc0000'},
+    {id:'earthquake',name:'지진',key:'T',cd:18,desc:'주변 적 전체 강타 (ATK x3)',dmgMul:3,aoe:8,color:'#884400'}
+  ],
+  shaman:[
+    {id:'poison_dart',name:'독침',key:'Q',cd:4,desc:'독 발사체 (ATK x2 + 5초 독)',dmgMul:2,range:15,projectile:true,poisonDur:5,color:'#44aa44',pColor:0x22aa22},
+    {id:'totem',name:'토템 설치',key:'R',cd:20,desc:'10초간 주변 적에게 지속 데미지',summon:'totem',dur:10,color:'#886633'},
+    {id:'curse',name:'저주',key:'T',cd:15,desc:'가장 가까운 적 5초간 받는 데미지 2배',debuff:'curse',debuffDur:5,range:10,color:'#440044'}
+  ],
+  assassin:[
+    {id:'shadow_strike',name:'그림자 일격',key:'Q',cd:3,desc:'순간이동 후 공격 (ATK x5)',dmgMul:5,range:10,teleport:true,color:'#6644aa'},
+    {id:'vanish',name:'은신',key:'R',cd:18,desc:'5초간 투명+다음 공격 치명타 확정',buff:'stealth',buffDur:5,color:'#444466'},
+    {id:'death_mark',name:'죽음의 표식',key:'T',cd:20,desc:'대상에 표식, 5초 후 ATK x8 폭발',markDmg:8,markDur:5,range:8,color:'#aa0044'}
+  ]
+};
+
+/* 스킬 쿨다운 상태 */
+var skillCooldowns={};
+/* 버프 상태 {buffId: {remaining:초, ...}} */
+var activeBuffs={};
+
 /* ════════════ NPC 정의 ════════════ */
 var NPC_DEF=[
   {name:'마을 이장',px:-6, pz:0,  bc:0x7a4a18,hc:0xddaa77},
