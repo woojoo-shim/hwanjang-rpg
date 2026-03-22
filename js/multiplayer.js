@@ -27,7 +27,7 @@ function connectParty(){
       ry:+PL.group.rotation.y.toFixed(2)
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
-    mpSendTimer=setInterval(sendPosition,100);
+    mpSendTimer=setInterval(sendPosition,50);
     addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');
   };
 
@@ -38,13 +38,15 @@ function connectParty(){
   };
 
   ws.onclose=function(e){
-    console.log('[MP] disconnected, code:',e.code);
+    console.log('[MP] disconnected, code:',e.code,'reason:',e.reason);
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
-    /* 서버에서 킥당한 경우(중복 접속) 재연결 안 함 */
-    if(e.code===4000||mpKicked)return;
-    /* 5초 후 재연결 */
+    if(monsterMoveTimer){clearInterval(monsterMoveTimer);monsterMoveTimer=null;}
+    isMonsterHost=false;
+    /* 중복 접속 킥만 재연결 안 함 */
+    if(e.code===4000&&e.reason==='duplicate'){mpKicked=true;return;}
+    /* 3초 후 재연결 */
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
-    mpReconnectTimer=setTimeout(connectParty,5000);
+    mpReconnectTimer=setTimeout(function(){mpKicked=false;connectParty();},3000);
   };
 
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
@@ -154,13 +156,13 @@ function updateRemotePlayers(dt){
   for(var id in remotePlayers){
     var r=remotePlayers[id];
     /* 위치 보간 */
-    r.group.position.x+=(r.tx-r.group.position.x)*0.15;
-    r.group.position.z+=(r.tz-r.group.position.z)*0.15;
+    r.group.position.x+=(r.tx-r.group.position.x)*0.25;
+    r.group.position.z+=(r.tz-r.group.position.z)*0.25;
     /* 회전 보간 */
     var dRot=r.try_-r.group.rotation.y;
     if(dRot>Math.PI)dRot-=Math.PI*2;
     if(dRot<-Math.PI)dRot+=Math.PI*2;
-    r.group.rotation.y+=dRot*0.1;
+    r.group.rotation.y+=dRot*0.2;
 
     /* 걷기 애니메이션 */
     if(r.moving){
