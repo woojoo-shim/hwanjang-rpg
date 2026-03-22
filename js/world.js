@@ -208,10 +208,8 @@ function mkWaterRiver(parent){
   var depthM=new THREE.MeshLambertMaterial({color:0x114466,transparent:true,opacity:.45});
   var dl=new THREE.Mesh(new THREE.PlaneGeometry(6,560),depthM);dl.rotation.x=-Math.PI/2;dl.position.set(-55,-.04,270);p.add(dl);
   var dr=new THREE.Mesh(new THREE.PlaneGeometry(6,560),depthM);dr.rotation.x=-Math.PI/2;dr.position.set(55,-.04,270);p.add(dr);
-  var wl1=new THREE.PointLight(0x2288ff,.5,30);wl1.position.set(-55,1,160);p.add(wl1);
-  var wl2=new THREE.PointLight(0x2288ff,.5,30);wl2.position.set(55,1,160);p.add(wl2);
-  var wl3=new THREE.PointLight(0x2288ff,.4,30);wl3.position.set(-55,1,350);p.add(wl3);
-  var wl4=new THREE.PointLight(0x2288ff,.4,30);wl4.position.set(55,1,350);p.add(wl4);
+  var wl1=new THREE.PointLight(0x2288ff,.5,40);wl1.position.set(0,1,160);p.add(wl1);
+  var wl2=new THREE.PointLight(0x2288ff,.4,40);wl2.position.set(0,1,350);p.add(wl2);
 }
 
 /* ════════════ 지면 디테일 유틸 ════════════ */
@@ -301,11 +299,10 @@ function buildVillage(){
   scatterGroundDetail(scene,25,16,16,'flower',0,-6);
 
   /* 조명 — 따뜻한 앰버 톤 */
-  var fbl=new THREE.PointLight(0xffaa44,.15,15);fbl.position.set(0,3,-8);scene.add(fbl);
+
 
   /* 건물 주변 포인트 라이트 (따뜻한 글로우) */
-  var shopLight1=new THREE.PointLight(0xff9944,.15,10);shopLight1.position.set(-14,3,-8);scene.add(shopLight1);
-  var shopLight2=new THREE.PointLight(0xff9944,.15,10);shopLight2.position.set(14,3,-8);scene.add(shopLight2);
+  var shopLight1=new THREE.PointLight(0xff9944,.2,18);shopLight1.position.set(0,3,-8);scene.add(shopLight1);
 
   /* 반투명 안개 평면 (지면 레벨) */
   var fogPlaneM=new THREE.MeshLambertMaterial({color:0xaabb88,transparent:true,opacity:.06});
@@ -459,7 +456,7 @@ function initScene(){
 
   /* ── 그림자 활성화 ── */
   renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type=THREE.BasicShadowMap;
 
   /* scene 배경은 스카이돔이 대신하므로 투명하게 */
   scene=new THREE.Scene();
@@ -486,8 +483,8 @@ function initScene(){
   var sun=new THREE.DirectionalLight(0xfff0d0,.8);
   sun.position.set(-120,200,400);
   sun.castShadow=true;
-  sun.shadow.mapSize.width=2048;
-  sun.shadow.mapSize.height=2048;
+  sun.shadow.mapSize.width=1024;
+  sun.shadow.mapSize.height=1024;
   sun.shadow.camera.near=0.5;
   sun.shadow.camera.far=900;
   sun.shadow.camera.left=-220;
@@ -500,7 +497,7 @@ function initScene(){
   /* 달 + 별 */
   var moon=new THREE.Mesh(new THREE.SphereGeometry(10,16,16),new THREE.MeshBasicMaterial({color:0xfffde8}));
   moon.position.set(-200,280,-400);scene.add(moon);
-  var moonL=new THREE.PointLight(0xddeeff,.4,600);moonL.position.set(-200,280,-400);scene.add(moonL);
+  /* moonL 제거 — 성능 최적화 */
 
   var STAR_COUNT=4000,sp=new Float32Array(STAR_COUNT*3);
   for(var i=0;i<STAR_COUNT;i++){
@@ -2100,12 +2097,8 @@ function buildBossDecor(){
   });
 
   /* ── 보스 구역 분위기 조명 ── */
-  var bossL1=new THREE.PointLight(0x330000,.6,50);bossL1.position.set(0,5,800);scene.add(bossL1);
-  var bossL2=new THREE.PointLight(0x220000,.4,40);bossL2.position.set(-8,4,793);scene.add(bossL2);
-  var bossL3=new THREE.PointLight(0x220000,.4,40);bossL3.position.set(8,4,807);scene.add(bossL3);
-  var bossL4=new THREE.PointLight(0x440000,.3,50);bossL4.position.set(0,4,820);scene.add(bossL4);
-  var bossL5=new THREE.PointLight(0x220000,.3,50);bossL5.position.set(-15,4,800);scene.add(bossL5);
-  var bossL6=new THREE.PointLight(0x220000,.3,50);bossL6.position.set(15,4,800);scene.add(bossL6);
+  var bossL1=new THREE.PointLight(0x440000,.8,60);bossL1.position.set(0,5,800);scene.add(bossL1);
+  var bossL2=new THREE.PointLight(0x330000,.5,50);bossL2.position.set(0,4,820);scene.add(bossL2);
 }
 
 /* changeZone — 호환성 유지용. 오픈월드에서는 playerDied에서 호출됨 */

@@ -130,16 +130,17 @@ function tickAtkAnim(dt){
   }
 }
 
+/* 공용 히트 플래시 머티리얼 (1번만 생성) */
+var _hitFlashMat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:1.0});
+
 function flashMonster(m){
-  /* 피격 애니메이션 상태 트리거 */
   m.hitFlash=0.35;
-  /* 흰색 플래시 — 이전 orig 있으면 먼저 복원 */
   if(m._origMats){m._origMats.forEach(function(o){o.mesh.material=o.orig;});m._origMats=null;}
   var mats=[];
   m.mesh.traverse(function(c){
     if(c.isMesh){
       mats.push({mesh:c,orig:c.material});
-      c.material=new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:1.0});
+      c.material=_hitFlashMat;
     }
   });
   m._origMats=mats;

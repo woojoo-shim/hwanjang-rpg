@@ -771,9 +771,17 @@ function updMonsters(dt,t){
     if(m.state==='dead')return;
     var mx=m.mesh.position.x,mz=m.mesh.position.z;
     var dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
-    /* 먼 몬스터는 UI 업데이트 스킵 (성능) */
-    if(dist<80){
+    /* 먼 몬스터는 AI+렌더링 전부 스킵 */
+    if(dist>100){
+      m.wrap.style.display='none';
+      m.mesh.visible=false;
+      if(m.state==='aggro'){m.state='idle';m.mesh.position.set(m.spawnX,0,m.spawnZ);}
+      return;
+    }
+    m.mesh.visible=true;
+    if(dist<60){
       posEl(m.wrap,mx,m.mesh.position.y+2.1,mz);
+      m.wrap.style.display='';
       m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
     } else {
       m.wrap.style.display='none';
