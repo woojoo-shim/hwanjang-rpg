@@ -1,7 +1,5 @@
 /** @type {import("partykit/server").default} */
 export default {
-  options: { hibernate: true },
-
   onConnect(conn, room) {
     var players = {};
     for (var c of room.getConnections()) {

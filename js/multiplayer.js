@@ -22,7 +22,7 @@ function connectParty(){
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
-    addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');
+    if(!window._mpFirstConnect){window._mpFirstConnect=true;addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');}
   };
 
   ws.onmessage=function(e){
