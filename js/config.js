@@ -195,15 +195,15 @@ var NPC_AI={
 
 /* ════════════ 직업 시스템 ════════════ */
 var CLASS_DEFS={
-  none:{name:'무직',color:0x2a5a3a,hc:0xddcc99,hpMul:1,atkMul:1,spdMul:1,crit:0,critDmg:2,weapons:['sword','axe','bow','staff','dagger'],passive:null,desc:'아직 전직하지 않은 모험가'},
-  warrior:{name:'전사',color:0x8b0000,hc:0xddcc99,hpMul:1.5,atkMul:1.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:'defense',desc:'높은 HP와 방어력의 근접 탱커'},
-  mage:{name:'마법사',color:0x1a1a8b,hc:0xaabbee,hpMul:0.8,atkMul:2.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['staff'],passive:'mana_burst',desc:'강력한 원거리 마법 공격'},
-  archer:{name:'궁수',color:0x2a6a2a,hc:0xddcc99,hpMul:1.0,atkMul:1.0,spdMul:1.5,crit:0.15,critDmg:2,weapons:['bow'],passive:'rapid_fire',desc:'빠른 공격속도의 원거리 딜러'},
-  rogue:{name:'도적',color:0x3a2a3a,hc:0xccbbaa,hpMul:0.9,atkMul:1.2,spdMul:1.3,crit:0.3,critDmg:2.5,weapons:['dagger'],passive:'stealth',desc:'높은 치명타와 빠른 이동'},
-  paladin:{name:'성기사',color:0xccaa33,hc:0xeeddaa,hpMul:1.3,atkMul:0.9,spdMul:0.9,crit:0.05,critDmg:2,weapons:['sword'],passive:'lifesteal',desc:'공격 시 HP를 흡수하는 성전사'},
-  berserker:{name:'광전사',color:0x990000,hc:0xdd8866,hpMul:0.7,atkMul:2.0,spdMul:1.1,crit:0.1,critDmg:2.5,weapons:['axe'],passive:'rage',desc:'HP가 낮을수록 공격력 증가'},
-  shaman:{name:'주술사',color:0x336633,hc:0x99cc99,hpMul:0.9,atkMul:1.3,spdMul:1.0,crit:0.1,critDmg:2,weapons:['staff'],passive:'poison',desc:'공격 시 지속 독 데미지'},
-  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단'}
+  none:{name:'무직',color:0x2a5a3a,hc:0xddcc99,hpMul:1,atkMul:1,spdMul:1,crit:0,critDmg:2,weapons:['sword','axe','bow','staff','dagger'],passive:null,desc:'아직 전직하지 않은 모험가',quest:null},
+  warrior:{name:'전사',color:0x8b0000,hc:0xddcc99,hpMul:1.5,atkMul:1.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:'defense',desc:'높은 HP와 방어력의 근접 탱커',quest:{type:'kill',target:'사슴',count:5,desc:'사슴 5마리를 처치하라'}},
+  mage:{name:'마법사',color:0x1a1a8b,hc:0xaabbee,hpMul:0.8,atkMul:2.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['staff'],passive:'mana_burst',desc:'강력한 원거리 마법 공격',quest:{type:'kill',target:'슬라임',count:8,desc:'슬라임 8마리를 처치하라'}},
+  archer:{name:'궁수',color:0x2a6a2a,hc:0xddcc99,hpMul:1.0,atkMul:1.0,spdMul:1.5,crit:0.15,critDmg:2,weapons:['bow'],passive:'rapid_fire',desc:'빠른 공격속도의 원거리 딜러',quest:{type:'kill',target:'토끼',count:10,desc:'토끼 10마리를 사냥하라'}},
+  rogue:{name:'도적',color:0x3a2a3a,hc:0xccbbaa,hpMul:0.9,atkMul:1.2,spdMul:1.3,crit:0.3,critDmg:2.5,weapons:['dagger'],passive:'stealth',desc:'높은 치명타와 빠른 이동',quest:{type:'kill',target:'독두꺼비',count:6,desc:'독두꺼비 6마리를 처치하라'}},
+  paladin:{name:'성기사',color:0xccaa33,hc:0xeeddaa,hpMul:1.3,atkMul:0.9,spdMul:0.9,crit:0.05,critDmg:2,weapons:['sword'],passive:'lifesteal',desc:'공격 시 HP를 흡수하는 성전사',quest:{type:'kill',target:'사슴',count:8,desc:'사슴 8마리를 처치하여 자비를 증명하라'}},
+  berserker:{name:'광전사',color:0x990000,hc:0xdd8866,hpMul:0.7,atkMul:2.0,spdMul:1.1,crit:0.1,critDmg:2.5,weapons:['axe'],passive:'rage',desc:'HP가 낮을수록 공격력 증가',quest:{type:'kill',target:'고블린',count:5,desc:'고블린 5마리를 처치하라'}},
+  shaman:{name:'주술사',color:0x336633,hc:0x99cc99,hpMul:0.9,atkMul:1.3,spdMul:1.0,crit:0.1,critDmg:2,weapons:['staff'],passive:'poison',desc:'공격 시 지속 독 데미지',quest:{type:'kill',target:'슬라임',count:10,desc:'슬라임 10마리를 처치하여 독의 힘을 깨달아라'}},
+  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단',quest:{type:'kill',target:'늑대',count:5,desc:'늑대 5마리를 은밀히 처치하라'}}
 };
 var playerClass='none';
 

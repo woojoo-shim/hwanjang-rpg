@@ -7,6 +7,24 @@
 var activeNpc=null;
 var isAiThinking=false;
 
+/* 전직 퀘스트 상태 {classKey: {state:'none'|'active'|'done', progress:0, target:'', count:0}} */
+var classQuestState={};
+
+/* 몬스터 킬 시 전직 퀘스트 진행 체크 */
+function checkClassQuestKill(monsterName){
+  for(var k in classQuestState){
+    var cq=classQuestState[k];
+    if(cq.state==='active'&&cq.target===monsterName){
+      cq.progress++;
+      addChat('sys','[전직 퀘스트] '+monsterName+' 처치 ('+cq.progress+'/'+cq.count+')');
+      if(cq.progress>=cq.count){
+        cq.state='done';
+        addChat('sys','[시스템]','★ 전직 퀘스트 완료! 전직 NPC에게 돌아가세요.');
+      }
+    }
+  }
+}
+
 function parseHiddenItem(reply){
   var re=/\[HIDDEN_ITEM:([^\]]+)\]/;
   var m=reply.match(re);
@@ -178,7 +196,28 @@ function talk(n){
       addChat('npc',n.name,'이미 '+CLASS_DEFS[playerClass].name+'(으)로 전직했군. 대단하네.');
       return;
     }
-    showSingleClassSelect(npcDef.classNpc,n.name);
+    var ck=npcDef.classNpc;
+    var cq=classQuestState[ck];
+    /* 퀘스트 미수락 */
+    if(!cq||cq.state==='none'){
+      var q=CLASS_DEFS[ck].quest;
+      addChat('npc',n.name,CLASS_DEFS[ck].name+'이(가) 되고 싶은가? 먼저 시험을 통과해야 한다.');
+      addChat('npc',n.name,'[전직 퀘스트] '+q.desc);
+      classQuestState[ck]={state:'active',progress:0,target:q.target,count:q.count};
+      addChat('sys','[시스템]','전직 퀘스트 수락: '+q.desc);
+      return;
+    }
+    /* 퀘스트 진행 중 */
+    if(cq.state==='active'){
+      var q=CLASS_DEFS[ck].quest;
+      addChat('npc',n.name,'아직 끝나지 않았군. ('+cq.progress+'/'+cq.count+')');
+      return;
+    }
+    /* 퀘스트 완료 — 전직 가능 */
+    if(cq.state==='done'){
+      showSingleClassSelect(ck,n.name);
+      return;
+    }
     return;
   }
   /* 상인/대장장이: 상점 + 대화창 동시 */
