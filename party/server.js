@@ -17,15 +17,6 @@ export default {
       var uid = data.uid || conn.id;
       var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
 
-      for (var c of room.getConnections()) {
-        if (c.id === conn.id) continue;
-        var oldSt = c.deserializeAttachment();
-        if (oldSt && oldSt.uid === uid) {
-          c.serializeAttachment(null);
-          c.close();
-        }
-      }
-
       conn.serializeAttachment(state);
       room.broadcast(JSON.stringify({
         type: 'join', id: uid,
