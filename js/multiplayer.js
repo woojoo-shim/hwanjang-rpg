@@ -28,7 +28,7 @@ function connectParty(){
       ry:+PL.group.rotation.y.toFixed(2)
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
-    mpSendTimer=setInterval(sendPosition,50);
+    mpSendTimer=setInterval(sendPosition,100);
     /* 핑으로 연결 유지 */
     if(mpPingTimer)clearInterval(mpPingTimer);
     mpPingTimer=setInterval(function(){
@@ -106,6 +106,9 @@ function onMpMessage(data){
   }
   else if(data.type==='monster_move'){
     handleMonsterMove(data);
+  }
+  else if(data.type==='monster_move_batch'){
+    if(data.list)for(var i=0;i<data.list.length;i++)handleMonsterMove(data.list[i]);
   }
   else if(data.type==='monster_respawn'){
     handleMonsterRespawn(data);
@@ -244,19 +247,18 @@ function registerMonstersToServer(){
   monsterMoveTimer=setInterval(sendMonsterPositions,200);
 }
 
-/* 호스트가 몬스터 위치 전송 */
+/* 호스트가 몬스터 위치 전송 (배치로 한번에) */
 function sendMonsterPositions(){
   if(!ws||ws.readyState!==1||!isMonsterHost)return;
+  var batch=[];
   for(var i=0;i<monsters.length;i++){
     var m=monsters[i];
     if(m.deathAnim>=0||m.hp<=0)continue;
     if(m.state==='chasing'||m.state==='returning'){
-      ws.send(JSON.stringify({
-        type:'monster_move',mid:i,
-        x:+m.mesh.position.x.toFixed(1),z:+m.mesh.position.z.toFixed(1)
-      }));
+      batch.push({mid:i,x:+m.mesh.position.x.toFixed(1),z:+m.mesh.position.z.toFixed(1)});
     }
   }
+  if(batch.length>0)ws.send(JSON.stringify({type:'monster_move_batch',list:batch}));
 }
 
 /* 몬스터에 데미지를 서버에 알림 */

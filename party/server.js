@@ -103,6 +103,19 @@ export default {
         type: 'monster_move', mid: data.mid, x: data.x, z: data.z
       }), [conn.id]);
     }
+
+    if (data.type === 'monster_move_batch') {
+      if (data.list) {
+        for (var i = 0; i < data.list.length; i++) {
+          var item = data.list[i];
+          var mm = room.monsterState[item.mid];
+          if (mm) { mm.x = item.x; mm.z = item.z; }
+        }
+        room.broadcast(JSON.stringify({
+          type: 'monster_move_batch', list: data.list
+        }), [conn.id]);
+      }
+    }
   },
 
   onClose(conn, room) {
