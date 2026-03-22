@@ -9,6 +9,7 @@ var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
 var mpKicked=false;
+var mpPingTimer=null;
 
 function connectParty(){
   if(ws&&ws.readyState<=1)return;
@@ -28,6 +29,11 @@ function connectParty(){
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,50);
+    /* 핑으로 연결 유지 */
+    if(mpPingTimer)clearInterval(mpPingTimer);
+    mpPingTimer=setInterval(function(){
+      if(ws&&ws.readyState===1)ws.send(JSON.stringify({type:'ping'}));
+    },15000);
     addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');
   };
 
@@ -40,6 +46,7 @@ function connectParty(){
   ws.onclose=function(e){
     console.log('[MP] disconnected, code:',e.code,'reason:',e.reason);
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
+    if(mpPingTimer){clearInterval(mpPingTimer);mpPingTimer=null;}
     if(monsterMoveTimer){clearInterval(monsterMoveTimer);monsterMoveTimer=null;}
     isMonsterHost=false;
     /* 중복 접속 킥만 재연결 안 함 */

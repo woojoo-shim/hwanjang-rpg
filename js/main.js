@@ -223,6 +223,8 @@ function loop(){
   if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
   checkZone();
   if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
+  /* WS 연결 자동 복구 (10초마다 체크) */
+  if(now%10000<50&&ws&&ws.readyState>1&&!mpKicked){connectParty();}
   /* AFK 체크 */
   if(now-lastActivity>AFK_LIMIT){
     addChat('sys','[시스템]','20분간 활동이 없어 자동 로그아웃됩니다.');
