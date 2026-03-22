@@ -109,6 +109,9 @@ var REMOTE_HEAD_COLOR=0xddcc99;
 
 function spawnRemote(id,name,level,x,z,ry){
   if(remotePlayers[id])return;
+  /* 자기 자신은 원격 플레이어로 생성하지 않음 */
+  var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+  if(id===myUid)return;
   var h=mkHuman(REMOTE_BODY_COLOR,REMOTE_HEAD_COLOR);
   h.group.position.set(x,0,z);
   h.group.rotation.y=ry||0;
