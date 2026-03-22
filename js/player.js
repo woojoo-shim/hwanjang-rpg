@@ -385,6 +385,17 @@ function playerAttack(){
 
   /* 활: 마우스 방향으로 화살 발사 */
   if(isRangedWeapon()){
+    /* 화살 소모 체크 */
+    var arrowSlot=inventory.find(function(s){return s.itemId==='fire_arrow'||s.itemId==='arrow';});
+    if(!arrowSlot){
+      addChat('inf','','화살이 없다! 상점에서 구매하세요.');
+      return;
+    }
+    /* 불화살 우선 사용 */
+    var useFireArrow=arrowSlot.itemId==='fire_arrow';
+    if(useFireArrow)dmg+=5;
+    arrowSlot.qty--;
+    if(arrowSlot.qty<=0){var ai=inventory.indexOf(arrowSlot);if(ai>=0)inventory.splice(ai,1);}
     var dx=mouseWorldX-PL.group.position.x;
     var dz=mouseWorldZ-PL.group.position.z;
     var len=Math.sqrt(dx*dx+dz*dz);

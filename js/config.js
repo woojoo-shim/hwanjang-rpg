@@ -57,6 +57,8 @@ var ITEM_POOL=[
   {id:'moonblade',      name:'달빛 검',          icon:'sword', type:'weapon',  rarity:'epic',     desc:'달이 뜨면 공격력이 2배가 된다.',   stats:{공격력:35,야간공격력:70}},
   {id:'dragonfang',     name:'용의 송곳니',      icon:'dagger',type:'weapon',  rarity:'legendary',desc:'진짜 용의 이빨로 만들었다. 아파.',  stats:{공격력:60,관통:25}},
   {id:'eclipse_blade',  name:'이클립스',         icon:'sword', type:'weapon',  rarity:'legendary',desc:'동양 검사 최고의 검. 어디서 났지?',stats:{공격력:88,발도술:50}},
+  {id:'arrow',          name:'화살',            icon:'feather',type:'consume',rarity:'common',  desc:'활에 사용하는 기본 화살.',            stats:{}},
+  {id:'fire_arrow',     name:'불 화살',         icon:'feather',type:'consume',rarity:'rare',    desc:'불이 붙은 화살. 추가 데미지.',        stats:{추가데미지:5}},
   {id:'badminton_neck', name:'배트민턴 목걸이',  icon:'necklace',type:'etc', rarity:'common',   desc:'상인이 강력 추천했다. 왜인지 모르겠다.',stats:{운:1}},
   {id:'death_scythe',   name:'죽음의 데스 사이드',icon:'axe',  type:'weapon',  rarity:'rare',     desc:'이름이 좀 과한 것 같은 낫.',       stats:{공격력:22,공포:10}},
   // ─ 방어구 ─
@@ -93,6 +95,8 @@ var SHOP_STOCK={
     {id:'ether',         price:150},
     {id:'deer_meat',     price:20},
     {id:'hunting_bow',   price:220},
+    {id:'arrow',         price:5},
+    {id:'fire_arrow',    price:15},
   ],
   '(대장장이) 이태산':[
     {id:'iron_sword',    price:180},
