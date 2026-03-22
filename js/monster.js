@@ -736,20 +736,39 @@ function updMonsters(dt,t){
     /* 로컬 AI — 항상 실행 */
     if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
     if(m.state==='aggro'){
+        var mid=m.def.id;
+        var spd=m.def.spd;
+        /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
+        if(mid==='deer'&&dist>4&&dist<8)spd=m.def.spd*3;
+        /* 독두꺼비: 사거리 더 김 (혀 공격) */
+        var atkRange=(mid==='toad')?3.5:1.8;
         if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
-          m.mesh.position.x+=dx/len*m.def.spd*dt;
-          m.mesh.position.z+=dz2/len*m.def.spd*dt;
+          m.mesh.position.x+=dx/len*spd*dt;
+          m.mesh.position.z+=dz2/len*spd*dt;
           m.mesh.rotation.y=Math.atan2(dx,dz2);
         }
         m.attackTimer-=dt;
-        if(dist<1.8&&m.attackTimer<=0){
+        if(dist<atkRange&&m.attackTimer<=0){
           m.attackTimer=0.8+Math.random()*.4;
           m.isAttacking=true;m.attackAnimT=0.4;
           if(invincibleTimer<=0){
             var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
+            /* 고블린: 데미지 1.5배 */
+            if(mid==='goblin')dmg=Math.floor(dmg*1.5);
             playerHP=Math.max(0,playerHP-dmg);
             updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+            /* 독두꺼비: 독 효과 (3초간 틱 데미지) */
+            if(mid==='toad'&&!playerPoisoned){
+              playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
+              spawnDmgNum('독!','#44ff44');
+              addChat('inf','','독에 걸렸다!');
+            }
+            /* 슬라임: 둔화 (2초) */
+            if(mid==='slime'){
+              playerSlowed=2;
+              spawnDmgNum('둔화!','#22aa22');
+            }
             if(playerHP<=0)playerDied();
             else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
           }

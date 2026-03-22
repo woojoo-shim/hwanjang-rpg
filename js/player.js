@@ -8,6 +8,9 @@
 var PL={group:null,legL:null,legR:null,armL:null,armR:null,armRPivot:null,weaponMesh:null,bobT:0,atkAnim:0,atkPhase:0};
 var playerHP=100,playerMaxHP=100,playerEXP=0,playerLevel=1;
 var attackCooldown=0,invincibleTimer=0;
+/* 상태이상 */
+var playerPoisoned=0,playerPoisonDmg=0;
+var playerSlowed=0;
 
 /* ── 충돌 박스 [x, z, halfW, halfD] ── */
 var COLLIDERS=[
@@ -543,6 +546,16 @@ function checkZone(){
 
 function handleMove(dt){
   tickAtkAnim(dt);
+  /* 상태이상 틱 */
+  if(playerPoisoned>0){
+    playerPoisoned-=dt;
+    if(playerPoisoned<=0){playerPoisoned=0;addChat('inf','','독이 해제되었다.');}
+    else{
+      playerHP=Math.max(1,playerHP-playerPoisonDmg*dt);
+      updPlayerHpBar();
+    }
+  }
+  if(playerSlowed>0)playerSlowed-=dt;
   var dx=0,dz=0;
   if(keys['w']||keys['arrowup']){dx-=Math.sin(cYaw);dz-=Math.cos(cYaw);}
   if(keys['s']||keys['arrowdown']){dx+=Math.sin(cYaw);dz+=Math.cos(cYaw);}
@@ -551,7 +564,9 @@ function handleMove(dt){
   var moving=dx!==0||dz!==0;
   if(moving){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
-    var spd=6.0*(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
+    var spdMul=(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul;
+    if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
+    var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     var wb=WORLD_BOUNDS;
     if(nx>wb[0]&&nx<wb[1]&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
     if(nz>wb[2]&&nz<wb[3]&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
