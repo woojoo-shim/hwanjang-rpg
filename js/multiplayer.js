@@ -79,6 +79,42 @@ function onMpMessage(data){
     var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
     if(data.id!==myUid)removeRemote(data.id);
   }
+  /* 몬스터 HP 동기화 */
+  else if(data.type==='mhp'){
+    /* 접속 시 서버의 몬스터 HP 상태 적용 */
+    if(data.hp){for(var mid in data.hp){
+      var idx=parseInt(mid);
+      if(idx>=0&&idx<monsters.length){
+        var m=monsters[idx];
+        m.hp=data.hp[mid];
+        m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
+        if(m.hp<=0){m.hp=0;m.deathAnim=0;m.state='dead';m.wrap.style.display='none';}
+      }
+    }}
+  }
+  else if(data.type==='mhit'){
+    /* 다른 플레이어가 몬스터를 때림 */
+    var idx=data.mid;
+    if(idx>=0&&idx<monsters.length){
+      var m=monsters[idx];
+      m.hp=data.hp;
+      m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
+      if(data.dead&&m.deathAnim<0){m.deathAnim=0.8;m.state='dead';m.wrap.style.display='none';}
+    }
+  }
+  else if(data.type==='mrespawn'){
+    var idx=data.mid;
+    if(idx>=0&&idx<monsters.length){
+      var m=monsters[idx];
+      m.hp=data.hp;m.maxHp=data.hp;
+      m.mesh.position.set(m.spawnX,0,m.spawnZ);
+      m.deathAnim=-1;m.state='idle';
+      m.mesh.visible=true;m.mesh.scale.set(0,0,0);
+      m.spawnAnim=0.6;
+      m.wrap.style.display='';
+      m.hbf.style.width='100%';
+    }
+  }
 }
 
 /* ── 원격 플레이어 메쉬 ── */

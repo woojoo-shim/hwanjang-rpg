@@ -176,6 +176,9 @@ function playerAttack(){
   attackCooldown=.75;
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
+  /* 몬스터 데미지를 서버에 전송 */
+  var midx=monsters.indexOf(target);
+  if(midx>=0&&ws&&ws.readyState===1)ws.send(JSON.stringify({type:'mhit',mid:midx,dmg:dmg,maxHp:target.maxHp}));
   var ddx=target.mesh.position.x-PL.group.position.x;
   var ddz=target.mesh.position.z-PL.group.position.z;
   PL.group.rotation.y=Math.atan2(ddx,ddz);

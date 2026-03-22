@@ -8,6 +8,11 @@ export default {
       if (st) players[st.uid || c.id] = st;
     }
     conn.send(JSON.stringify({ type: 'init', players: players }));
+
+    /* 몬스터 HP 상태 전송 */
+    if (room._monsterHp) {
+      conn.send(JSON.stringify({ type: 'mhp', hp: room._monsterHp }));
+    }
   },
 
   onMessage(msg, conn, room) {
@@ -16,7 +21,6 @@ export default {
     if (data.type === 'join') {
       var uid = data.uid || conn.id;
       var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
-
       conn.serializeAttachment(state);
       room.broadcast(JSON.stringify({
         type: 'join', id: uid,
@@ -47,6 +51,27 @@ export default {
       room.broadcast(JSON.stringify({
         type: 'attack', id: st ? (st.uid || conn.id) : conn.id
       }), [conn.id]);
+    }
+
+    /* 몬스터 데미지 — HP만 동기화, 위치 안 함 */
+    if (data.type === 'mhit') {
+      if (!room._monsterHp) room._monsterHp = {};
+      var mid = data.mid;
+      if (room._monsterHp[mid] === undefined) room._monsterHp[mid] = data.maxHp;
+      room._monsterHp[mid] = Math.max(0, room._monsterHp[mid] - data.dmg);
+      var dead = room._monsterHp[mid] <= 0;
+      room.broadcast(JSON.stringify({
+        type: 'mhit', mid: mid, hp: room._monsterHp[mid], dead: dead
+      }), [conn.id]);
+      /* 30초 후 리스폰 */
+      if (dead) {
+        setTimeout(function() {
+          room._monsterHp[mid] = data.maxHp;
+          room.broadcast(JSON.stringify({
+            type: 'mrespawn', mid: mid, hp: data.maxHp
+          }));
+        }, 30000);
+      }
     }
   },
 
