@@ -733,9 +733,8 @@ function updMonsters(dt,t){
       m.wrap.style.display='none';
     }
     if(dist<md){md=dist;closestMonster=m;}
-    /* 비호스트 + 서버 위치 있을 때만 보간 */
-    var _isHost=(typeof isMonsterHost==='undefined')||isMonsterHost;
-    if(!_isHost&&m._targetX!==undefined){
+    /* 서버에서 위치를 받은 몬스터만 보간, 나머지는 로컬 AI */
+    if(m._targetX!==undefined){
       m.mesh.position.x+=(m._targetX-m.mesh.position.x)*0.15;
       m.mesh.position.z+=(m._targetZ-m.mesh.position.z)*0.15;
       var tdx=m._targetX-mx,tdz=m._targetZ-mz;
