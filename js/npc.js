@@ -123,35 +123,28 @@ function npcFallback(npcName){
 }
 
 /* ── 전직 선택 ── */
-function showClassSelect(){
+function showSingleClassSelect(classKey,npcName){
   var modal=document.getElementById('class-modal');
   if(!modal)return;
   var grid=document.getElementById('class-grid');
   grid.innerHTML='';
-  var keys=Object.keys(CLASS_DEFS);
-  for(var i=0;i<keys.length;i++){
-    var k=keys[i];
-    if(k==='none')continue;
-    var c=CLASS_DEFS[k];
-    var card=document.createElement('div');
-    card.className='class-card';
-    card.dataset.cls=k;
-    card.innerHTML='<div class="class-icon" style="background:#'+c.color.toString(16).padStart(6,'0')+'"></div>'
-      +'<div class="class-name">'+c.name+'</div>'
-      +'<div class="class-desc">'+c.desc+'</div>'
-      +'<div class="class-stats">'
-      +'HP x'+c.hpMul+' | ATK x'+c.atkMul+'<br>'
-      +'SPD x'+c.spdMul+' | 치명타 '+Math.floor(c.crit*100)+'%'
-      +'</div>'
-      +'<div class="class-weapons">무기: '+c.weapons.join(', ')+'</div>';
-    card.onclick=(function(key){return function(){
-      var prev=grid.querySelector('.class-card.selected');
-      if(prev)prev.classList.remove('selected');
-      this.classList.add('selected');
-      document.getElementById('class-confirm-btn').dataset.cls=key;
-    };})(k);
-    grid.appendChild(card);
-  }
+  var c=CLASS_DEFS[classKey];
+  if(!c)return;
+  /* 타이틀 변경 */
+  modal.querySelector('div').textContent='▣ '+c.name+' 전직 ▣';
+  modal.querySelectorAll('div')[1].textContent=npcName+': "나와 함께 '+c.name+'의 길을 걷겠는가?"';
+  var card=document.createElement('div');
+  card.className='class-card selected';
+  card.innerHTML='<div class="class-icon" style="background:#'+c.color.toString(16).padStart(6,'0')+';width:60px;height:60px;"></div>'
+    +'<div class="class-name" style="font-size:18px;">'+c.name+'</div>'
+    +'<div class="class-desc" style="font-size:13px;">'+c.desc+'</div>'
+    +'<div class="class-stats" style="font-size:12px;">'
+    +'HP x'+c.hpMul+' | ATK x'+c.atkMul+'<br>'
+    +'SPD x'+c.spdMul+' | 치명타 '+Math.floor(c.crit*100)+'%'
+    +'</div>'
+    +'<div class="class-weapons" style="font-size:11px;">무기: '+c.weapons.join(', ')+'</div>';
+  grid.appendChild(card);
+  document.getElementById('class-confirm-btn').dataset.cls=classKey;
   modal.style.display='flex';
 }
 
@@ -174,9 +167,18 @@ function confirmClassSelect(){
 
 /* ── 대화창 ── */
 function talk(n){
-  /* 전직 체크 */
-  if(n.name==='마을 이장'&&playerLevel>=5&&playerClass==='none'){
-    showClassSelect();
+  /* 전직 NPC 체크 */
+  var npcDef=NPC_DEF.find(function(d){return d.name===n.name;});
+  if(npcDef&&npcDef.classNpc){
+    if(playerLevel<5){
+      addChat('npc',n.name,'아직 실력이 부족하군. 레벨 5가 되면 다시 오게.');
+      return;
+    }
+    if(playerClass!=='none'){
+      addChat('npc',n.name,'이미 '+CLASS_DEFS[playerClass].name+'(으)로 전직했군. 대단하네.');
+      return;
+    }
+    showSingleClassSelect(npcDef.classNpc,n.name);
     return;
   }
   /* 상인/대장장이: 상점 + 대화창 동시 */

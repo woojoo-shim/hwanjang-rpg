@@ -213,6 +213,15 @@ var NPC_DEF=[
   {name:'상인',      px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
   {name:'대장장이',  px:7,  pz:-12,bc:0x3a2a1a,hc:0xcc9966},
   {name:'???',       px:8,  pz:0,  bc:0x1a1030,hc:0xaaaacc},
+  /* 전직 NPC — 각 존에 배치 */
+  {name:'전사 교관',  px:20, pz:-5, bc:0x8b0000,hc:0xddcc99,classNpc:'warrior'},
+  {name:'현자',       px:-20,pz:-5, bc:0x1a1a8b,hc:0xaabbee,classNpc:'mage'},
+  {name:'사냥꾼',     px:-50,pz:60, bc:0x2a6a2a,hc:0xddcc99,classNpc:'archer'},
+  {name:'수호기사',   px:50, pz:60, bc:0xccaa33,hc:0xeeddaa,classNpc:'paladin'},
+  {name:'밀정',       px:-120,pz:100,bc:0x3a2a3a,hc:0xccbbaa,classNpc:'rogue'},
+  {name:'무당',       px:120,pz:100,bc:0x336633,hc:0x99cc99,classNpc:'shaman'},
+  {name:'그림자',     px:-80,pz:400,bc:0x1a1a2a,hc:0xbbbbcc,classNpc:'assassin'},
+  {name:'투사',       px:80, pz:400,bc:0x990000,hc:0xdd8866,classNpc:'berserker'},
 ];
 
 /* ════════════ 몬스터 정의 ════════════ */
