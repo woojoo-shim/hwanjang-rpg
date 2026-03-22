@@ -16,6 +16,57 @@ var monsters=[];
 var closestMonster=null;
 var currentZone='village';
 
+/* ════════════ 바닥 장판 시스템 (용암/화염) ════════════ */
+var groundEffects=[];
+var _lavaMat=null,_fireMat=null;
+
+function spawnLavaPool(x,z,radius,duration){
+  if(!_lavaMat)_lavaMat=new THREE.MeshBasicMaterial({color:0xff4400,transparent:true,opacity:0.6,side:THREE.DoubleSide});
+  var geo=new THREE.CircleGeometry(radius,12);
+  var mesh=new THREE.Mesh(geo,_lavaMat.clone());
+  mesh.rotation.x=-Math.PI/2;
+  mesh.position.set(x,0.05,z);
+  scene.add(mesh);
+  groundEffects.push({mesh:mesh,x:x,z:z,radius:radius,life:duration,maxLife:duration,dmg:8,type:'lava'});
+}
+
+function spawnFireBreath(sx,sz,dirX,dirZ,length){
+  if(!_fireMat)_fireMat=new THREE.MeshBasicMaterial({color:0xff6600,transparent:true,opacity:0.5,side:THREE.DoubleSide});
+  /* 직선 불길: 여러 원형 장판을 직선으로 배치 */
+  for(var i=1;i<=4;i++){
+    var d=i*(length/4);
+    var fx=sx+dirX*d,fz=sz+dirZ*d;
+    var geo=new THREE.CircleGeometry(1.5+i*0.3,8);
+    var mesh=new THREE.Mesh(geo,_fireMat.clone());
+    mesh.rotation.x=-Math.PI/2;
+    mesh.position.set(fx,0.05,fz);
+    scene.add(mesh);
+    groundEffects.push({mesh:mesh,x:fx,z:fz,radius:1.5+i*0.3,life:3,maxLife:3,dmg:12,type:'fire'});
+  }
+}
+
+function updateGroundEffects(dt){
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  for(var i=groundEffects.length-1;i>=0;i--){
+    var ef=groundEffects[i];
+    ef.life-=dt;
+    /* 투명도 서서히 감소 */
+    ef.mesh.material.opacity=Math.max(0,0.6*(ef.life/ef.maxLife));
+    /* 플레이어가 장판 위에 있으면 데미지 */
+    var edx=px-ef.x,edz=pz-ef.z;
+    if(Math.sqrt(edx*edx+edz*edz)<ef.radius&&invincibleTimer<=0){
+      playerHP=Math.max(1,Math.floor(playerHP-ef.dmg*dt));
+      updPlayerHpBar();
+    }
+    if(ef.life<=0){
+      scene.remove(ef.mesh);
+      ef.mesh.geometry.dispose();
+      ef.mesh.material.dispose();
+      groundEffects.splice(i,1);
+    }
+  }
+}
+
 function mkMonsterMesh(def){
   var g=new THREE.Group();
   var bm=new THREE.MeshLambertMaterial({color:def.color});
@@ -769,6 +820,18 @@ function updMonsters(dt,t){
             if(mid==='slime'){
               playerSlowed=2;
               spawnDmgNum('둔화!','#22aa22');
+            }
+            /* 용암 골렘: 용암 강타 — 범위 폭발 + 장판 */
+            if(mid==='golem'){
+              spawnLavaPool(mx,mz,6,4);
+              spawnDmgNum('용암 강타!','#ff4400');
+            }
+            /* 파이어드레이크: 화염 브레스 — 직선 불길 */
+            if(mid==='firedrake'){
+              var bdx=px-mx,bdz=pz-mz,blen=Math.sqrt(bdx*bdx+bdz*bdz);
+              if(blen>0.1){bdx/=blen;bdz/=blen;}
+              spawnFireBreath(mx,mz,bdx,bdz,15);
+              spawnDmgNum('화염 브레스!','#ff6600');
             }
             if(playerHP<=0)playerDied();
             else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();

@@ -235,6 +235,7 @@ function loop(){
     else tickAtkAnim(dt);
     updCam();updNpcs(now/1000);chkNpc();
     updMonsters(dt,now/1000);
+    if(typeof updateGroundEffects==='function')updateGroundEffects(dt);
     if(typeof tickDynamicNpcs==='function')tickDynamicNpcs(dt);
     if(typeof updateArrows==='function')updateArrows(dt);
     if(typeof updateSkills==='function')updateSkills(dt);
