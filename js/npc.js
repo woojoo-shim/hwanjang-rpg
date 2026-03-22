@@ -152,7 +152,7 @@ function showClassSelect(){
     };})(k);
     grid.appendChild(card);
   }
-  modal.classList.remove('hidden');
+  modal.style.display='flex';
 }
 
 function confirmClassSelect(){
@@ -166,7 +166,7 @@ function confirmClassSelect(){
   playerHP=playerMaxHP;
   updPlayerHpBar();
   addChat('sys','[시스템]','★ '+def.name+'(으)로 전직하였습니다!');
-  document.getElementById('class-modal').classList.add('hidden');
+  document.getElementById('class-modal').style.display='none';
   /* HUD에 직업 표시 */
   var clsEl=document.getElementById('hclass');
   if(clsEl)clsEl.textContent=def.name;
