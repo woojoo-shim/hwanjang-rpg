@@ -282,12 +282,19 @@ function addShopItem(npcName,itemId,price){
 }
 
 function applyPriceChange(itemName,newPrice,npcName){
-  /* SHOP_STOCK에서 해당 아이템 가격 변경 */
+  /* SHOP_STOCK에서 해당 아이템 가격 변경 — 부분 매칭 지원 */
   var stocks=SHOP_STOCK[npcName];
+  if(!stocks){
+    /* npcName이 안 맞으면 모든 상점에서 검색 */
+    for(var k in SHOP_STOCK){stocks=SHOP_STOCK[k];if(stocks)break;}
+  }
   if(!stocks)return;
+  var target=itemName.replace(/\s/g,'').toLowerCase();
   for(var i=0;i<stocks.length;i++){
     var def=getItemDef(stocks[i].id);
-    if(def&&def.name===itemName){
+    if(!def)continue;
+    var defName=def.name.replace(/\s/g,'').toLowerCase();
+    if(defName===target||defName.indexOf(target)!==-1||target.indexOf(defName)!==-1){
       if(!stocks[i]._origPrice)stocks[i]._origPrice=stocks[i].price;
       stocks[i].price=Math.max(1,newPrice);
       addChat('sys','[시스템]','가격 변동: '+def.name+' → '+newPrice+' 골드');
