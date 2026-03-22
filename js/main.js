@@ -203,6 +203,14 @@ function setupInput(){
   cc.addEventListener('touchend',function(){isDrag=false;},{passive:true});
 }
 
+/* ── AFK 자동 로그아웃 (20분) ── */
+var AFK_LIMIT=20*60*1000;
+var lastActivity=Date.now();
+function resetAfk(){lastActivity=Date.now();}
+['keydown','mousedown','mousemove','touchstart','wheel'].forEach(function(ev){
+  document.addEventListener(ev,resetAfk,{passive:true});
+});
+
 /* ── 게임 루프 ── */
 var lastT=Date.now();
 function loop(){
@@ -212,10 +220,25 @@ function loop(){
   else tickAtkAnim(dt);
   updCam();updNpcs(now/1000);chkNpc();
   updMonsters(dt,now/1000);
+  if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
   checkZone();
   if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
+  /* AFK 체크 */
+  if(now-lastActivity>AFK_LIMIT){
+    addChat('sys','[시스템]','20분간 활동이 없어 자동 로그아웃됩니다.');
+    if(typeof savePlayerData==='function')savePlayerData();
+    setTimeout(function(){
+      if(typeof logout==='function')logout();
+      else location.reload();
+    },2000);
+    lastActivity=now+999999;/* 중복 방지 */
+  }
   updLabels();
-  renderer.render(scene,camera);
+  /* 파티클 + 물 UV 애니메이션 */
+  if(typeof updVisualFX==='function')updVisualFX(now/1000);
+  /* bloom 컴포저 또는 기본 렌더 */
+  if(composer)composer.render();
+  else renderer.render(scene,camera);
 }
 
 /* ── 앱 초기화 ── */

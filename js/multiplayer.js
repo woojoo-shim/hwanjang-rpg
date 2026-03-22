@@ -85,6 +85,18 @@ function onMpMessage(data){
   else if(data.type==='leave'){
     removeRemote(data.id);
   }
+  else if(data.type==='monster_init'){
+    applyMonsterInit(data.monsters);
+  }
+  else if(data.type==='monster_update'){
+    handleMonsterUpdate(data);
+  }
+  else if(data.type==='monster_move'){
+    handleMonsterMove(data);
+  }
+  else if(data.type==='monster_respawn'){
+    handleMonsterRespawn(data);
+  }
 }
 
 /* ── 원격 플레이어 메쉬 ── */
@@ -191,4 +203,124 @@ function sendChatMP(name,text){
 function sendAttackMP(){
   if(!ws||ws.readyState!==1)return;
   ws.send(JSON.stringify({type:'attack'}));
+}
+
+/* ═══════════ 몬스터 동기화 ═══════════ */
+var isMonsterHost=false;
+var monsterMoveTimer=null;
+
+/* 몬스터 스폰 목록을 서버에 등록 (첫 접속자) */
+function registerMonstersToServer(){
+  if(!ws||ws.readyState!==1)return;
+  var list=[];
+  for(var i=0;i<monsters.length;i++){
+    var m=monsters[i];
+    list.push({
+      mid:i,defId:m.def.id,
+      x:+m.mesh.position.x.toFixed(1),z:+m.mesh.position.z.toFixed(1),
+      hp:m.hp,maxHp:m.maxHp
+    });
+  }
+  ws.send(JSON.stringify({type:'monster_register',list:list}));
+  isMonsterHost=true;
+  /* 호스트는 200ms마다 몬스터 위치를 서버로 전송 */
+  if(monsterMoveTimer)clearInterval(monsterMoveTimer);
+  monsterMoveTimer=setInterval(sendMonsterPositions,200);
+}
+
+/* 호스트가 몬스터 위치 전송 */
+function sendMonsterPositions(){
+  if(!ws||ws.readyState!==1||!isMonsterHost)return;
+  for(var i=0;i<monsters.length;i++){
+    var m=monsters[i];
+    if(m.deathAnim>=0||m.hp<=0)continue;
+    if(m.state==='chasing'||m.state==='returning'){
+      ws.send(JSON.stringify({
+        type:'monster_move',mid:i,
+        x:+m.mesh.position.x.toFixed(1),z:+m.mesh.position.z.toFixed(1)
+      }));
+    }
+  }
+}
+
+/* 몬스터에 데미지를 서버에 알림 */
+function sendMonsterHit(monsterIdx,dmg){
+  if(!ws||ws.readyState!==1)return;
+  var uid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+  ws.send(JSON.stringify({type:'monster_hit',mid:monsterIdx,dmg:dmg,uid:uid,respawnMs:30000}));
+}
+
+/* 서버에서 온 몬스터 초기 상태 적용 */
+function applyMonsterInit(serverMonsters){
+  if(!serverMonsters||Object.keys(serverMonsters).length===0){
+    /* 서버에 몬스터가 없으면 내가 호스트 */
+    registerMonstersToServer();
+    return;
+  }
+  /* 서버 상태를 로컬 몬스터에 반영 */
+  for(var mid in serverMonsters){
+    var sm=serverMonsters[mid];
+    var idx=parseInt(mid);
+    if(idx>=0&&idx<monsters.length){
+      var m=monsters[idx];
+      m.hp=sm.hp;
+      m.mesh.position.x=sm.x;
+      m.mesh.position.z=sm.z;
+      if(!sm.alive){
+        m.hp=0;m.deathAnim=1;
+        m.mesh.visible=false;
+        m.wrap.style.display='none';
+      }else{
+        m.hbf.style.width=Math.max(0,(m.hp/m.maxHp)*100)+'%';
+      }
+    }
+  }
+}
+
+/* 서버에서 온 몬스터 업데이트 처리 */
+function handleMonsterUpdate(data){
+  var idx=data.mid;
+  if(idx<0||idx>=monsters.length)return;
+  var m=monsters[idx];
+  m.hp=data.hp;
+  if(!data.alive&&m.deathAnim<0){
+    /* 몬스터 사망 — 킬러가 본인이면 드랍/경험치 처리 */
+    var uid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+    if(data.killerUid===uid){
+      /* 이미 로컬에서 처리됨 */
+    }
+    m.deathAnim=0;
+    m.hp=0;
+  }
+  m.hbf.style.width=Math.max(0,(m.hp/m.maxHp)*100)+'%';
+}
+
+/* 서버에서 온 몬스터 위치 업데이트 (비호스트) */
+function handleMonsterMove(data){
+  if(isMonsterHost)return;/* 호스트는 무시 */
+  var idx=data.mid;
+  if(idx<0||idx>=monsters.length)return;
+  var m=monsters[idx];
+  if(m.hp>0&&m.deathAnim<0){
+    m.mesh.position.x=data.x;
+    m.mesh.position.z=data.z;
+  }
+}
+
+/* 서버에서 온 몬스터 리스폰 */
+function handleMonsterRespawn(data){
+  if(!data.list)return;
+  for(var i=0;i<data.list.length;i++){
+    var sm=data.list[i];
+    var idx=sm.mid;
+    if(idx<0||idx>=monsters.length)continue;
+    var m=monsters[idx];
+    m.hp=sm.maxHp;m.maxHp=sm.maxHp;
+    m.mesh.position.set(sm.x,0,sm.z);
+    m.deathAnim=-1;m.state='idle';
+    m.mesh.visible=true;m.mesh.scale.set(0,0,0);
+    m.spawnAnim=0.6;
+    m.wrap.style.display='';
+    m.hbf.style.width='100%';
+  }
 }

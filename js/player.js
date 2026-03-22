@@ -14,6 +14,31 @@ var COLLIDERS=[
   /* 성 */      [0,-30,7,6],
   /* 분수 */    [0,-8,4.2,4.2],
   /* 상점들 */  [-14,-6,1.5,1],[-14,-13,1.5,1],[14,-6,1.5,1],[14,-13,1.5,1],[-6,-18,1.5,1],[6,-18,1.5,1],
+  /* 시계탑 */  [-8,5,2.2,2.2],
+  /* 주택들 */  [-12,-4,2.5,2],[-10,-16,2.8,2.2],[10,-3,2.2,1.8],[12,-16,2.2,1.6],
+  /* 우물 */    [8,-12,1.2,1.2],
+  /* 게이트 기둥 좌우 */ [-4,-28,1.2,1.2],[4,-28,1.2,1.2],
+  /* ── 초원 장식 ── */
+  /* 표지판 */  [2,22,0.5,0.5],
+  /* 고대 기둥 */[-50,195,1.2,1.2],[-48,198,0.7,0.7],
+  /* ── 숲 장식 ── */
+  /* 숲 신전 */ [-75,430,1.6,1.6],
+  /* 야영지 텐트 */[-30,480,1.8,1.8],
+  /* 속빈 통나무 */[30,365,2.2,1.0],
+  /* ── 늪지 장식 ── */
+  /* 해골 장대 (동) */[95,185,0.5,0.5],
+  /* 해골 장대 (서) */[-95,185,0.5,0.5],
+  /* 부서진 수레 (동) */[165,145,1.2,0.8],
+  /* 부서진 수레 (서) */[-165,145,1.2,0.8],
+  /* ── 화산 장식 ── */
+  /* 우리 */ [-85,660,1.2,1.2],
+  /* 석조 우상들 */[-65,590,0.8,0.8],[70,640,0.8,0.8],[-45,710,0.8,0.8],[0,760,0.8,0.8],
+  /* ── 보스 구역 ── */
+  /* 해골 장식 */[0,788,1.0,1.0],
+  /* 보스 기둥 원 (12개) — 반지름 12, z=800 중심, 개별 박스 */
+  [12,800,0.8,0.8],[-12,800,0.8,0.8],[0,812,0.8,0.8],[0,788,0.8,0.8],
+  [10,809,0.8,0.8],[-10,809,0.8,0.8],[10,791,0.8,0.8],[-10,791,0.8,0.8],
+  [6,811,0.8,0.8],[-6,811,0.8,0.8],[6,789,0.8,0.8],[-6,789,0.8,0.8],
 ];
 function hitCollider(x,z){
   for(var i=0;i<COLLIDERS.length;i++){
@@ -106,16 +131,24 @@ function tickAtkAnim(dt){
 }
 
 function flashMonster(m){
+  /* 피격 애니메이션 상태 트리거 */
+  m.hitFlash=0.35;
+  /* 흰색 플래시 — 이전 orig 있으면 먼저 복원 */
+  if(m._origMats){m._origMats.forEach(function(o){o.mesh.material=o.orig;});m._origMats=null;}
   var mats=[];
   m.mesh.traverse(function(c){
     if(c.isMesh){
       mats.push({mesh:c,orig:c.material});
-      c.material=new THREE.MeshLambertMaterial({color:0xff2200,emissive:new THREE.Color(0xff1100),emissiveIntensity:.8});
+      c.material=new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:1.0});
     }
   });
+  m._origMats=mats;
   setTimeout(function(){
-    mats.forEach(function(o){o.mesh.material=o.orig;});
-  },160);
+    if(m._origMats){
+      m._origMats.forEach(function(o){o.mesh.material=o.orig;});
+      m._origMats=null;
+    }
+  },180);
 }
 
 function playerAttack(){
@@ -143,6 +176,9 @@ function playerAttack(){
   attackCooldown=.75;
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
+  /* 몬스터 데미지를 서버에 전송 */
+  var midx=monsters.indexOf(target);
+  if(midx>=0&&typeof sendMonsterHit==='function')sendMonsterHit(midx,dmg);
   var ddx=target.mesh.position.x-PL.group.position.x;
   var ddz=target.mesh.position.z-PL.group.position.z;
   PL.group.rotation.y=Math.atan2(ddx,ddz);
@@ -153,7 +189,12 @@ function playerAttack(){
 }
 
 function killMonster(m){
-  m.state='dead';m.mesh.visible=false;m.wrap.style.display='none';
+  m.state='dead';
+  /* 사망 애니메이션 시작 (0.8초) */
+  m.deathAnim=0.8;
+  m.wrap.style.display='none';
+  /* 붉은 공격 플래시 재료 복원 후 죽음 색상 적용 */
+  if(m._origMats){m._origMats.forEach(function(o){o.mesh.material=o.orig;});m._origMats=null;}
   playerEXP+=m.def.exp;
   addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+m.def.exp+')');
   checkLevelUp();
@@ -169,8 +210,16 @@ function killMonster(m){
   setTimeout(function(){
     if(!m.mesh)return;
     m.hp=m.def.hp;m.mesh.position.set(m.spawnX,0,m.spawnZ);
+    m.mesh.rotation.set(0,Math.random()*Math.PI*2,0);
+    /* 재료 투명도 리셋 */
+    m.mesh.traverse(function(c){
+      if(c.isMesh&&c.material){c.material.opacity=1;c.material.transparent=false;}
+    });
+    m.mesh.scale.set(0,0,0);
     m.mesh.visible=true;m.wrap.style.display='';m.hbf.style.width='100%';
     m.state='idle';m.attackTimer=0;
+    /* 스폰 애니메이션 재시작 */
+    m.spawnAnim=0.6;m.deathAnim=-1;m.hitFlash=0;m.isAttacking=false;m._origMats=null;
   },30000);
 }
 
@@ -181,7 +230,7 @@ function playerDied(){
   PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
   currentZone='village';
   /* 분위기 복원 */
-  scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);
+  scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);
   var zi=ZONE_INFO['village'];
   document.querySelector('.hloc').textContent='▸ '+zi.name;
 }
@@ -211,20 +260,20 @@ function checkZone(){
   var x=Math.abs(PL.group.position.x);
   var newZone;
   if(z<=20) newZone='village';
-  else if(z<=100&&x>30) newZone='swamp';
-  else if(z<=100) newZone='meadow';
-  else if(z<=180) newZone='darkforest';
+  else if(z<=300&&x>80) newZone='swamp';
+  else if(z<=300) newZone='meadow';
+  else if(z<=560) newZone='darkforest';
   else newZone='volcano';
 
   if(newZone!==currentZone){
     var prevZone=currentZone;
     currentZone=newZone;
     /* 분위기 전환 */
-    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,40,120);scene.background=new THREE.Color(0x0a1510);}
-    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,35,110);scene.background=new THREE.Color(0x1a3010);}
-    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,15,60);scene.background=new THREE.Color(0x050a05);}
-    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,8,45);scene.background=new THREE.Color(0x020202);}
-    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,12,55);scene.background=new THREE.Color(0x100500);}
+    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);}
+    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,100,380);scene.background=new THREE.Color(0x1a3010);}
+    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,40,160);scene.background=new THREE.Color(0x050a05);}
+    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,25,130);scene.background=new THREE.Color(0x020202);}
+    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,35,160);scene.background=new THREE.Color(0x100500);}
 
     /* 배너 표시 */
     var zi=ZONE_INFO[newZone];
