@@ -195,10 +195,10 @@ var NPC_AI={
 
 /* ════════════ NPC 정의 ════════════ */
 var NPC_DEF=[
-  {name:'마을 이장',px:-10,pz:-4, bc:0x7a4a18,hc:0xddaa77},
-  {name:'상인',      px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
-  {name:'대장장이',  px:7,  pz:-12,bc:0x3a2a1a,hc:0xcc9966},
-  {name:'???',       px:10, pz:-4, bc:0x1a1030,hc:0xaaaacc},
+  {name:'마을 이장',px:-6, pz:0,  bc:0x7a4a18,hc:0xddaa77},
+  {name:'상인',      px:-14,pz:-3, bc:0x1a3a8a,hc:0xddcc99},
+  {name:'대장장이',  px:14, pz:-3, bc:0x3a2a1a,hc:0xcc9966},
+  {name:'???',       px:8,  pz:0,  bc:0x1a1030,hc:0xaaaacc},
 ];
 
 /* ════════════ 몬스터 정의 ════════════ */
