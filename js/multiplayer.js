@@ -54,7 +54,7 @@ function connectParty(){
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
     if(monsterPosTmr){clearInterval(monsterPosTmr);monsterPosTmr=null;isMonsterHost=false;}
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
-    mpReconnectTimer=setTimeout(connectParty,5000);
+    mpReconnectTimer=setTimeout(connectParty,15000);
   };
 
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
@@ -163,8 +163,7 @@ var REMOTE_HEAD_COLOR=0xddcc99;
 
 function spawnRemote(id,name,level,x,z,ry){
   if(remotePlayers[id]){
-    /* 이미 존재하면 위치만 갱신 */
-    remotePlayers[id].tx=x;remotePlayers[id].tz=z;remotePlayers[id].try_=ry||0;
+    /* 이미 존재하면 무시 — move 메시지가 더 정확 */
     return;
   }
   var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
