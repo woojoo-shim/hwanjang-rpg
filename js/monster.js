@@ -326,8 +326,8 @@ function buildMeadow(){
   /* 초원: x:-80~80, z:20~300 */
   /* 밝은 녹색 패치들 */
   var patchM=new THREE.MeshLambertMaterial({color:0x4a8a2a});
-  [[-30,50,12,8],[40,90,10,7],[-20,140,14,10],[25,180,12,8],[-45,220,8,6],[15,260,12,9],
-   [60,70,8,6],[-65,120,9,7],[50,200,10,7],[-55,250,8,6],[0,100,10,7],[0,200,12,8]
+  [[-30,80,12,8],[25,160,12,8],[0,240,12,9],
+   [60,110,8,6],[-55,220,8,6]
   ].forEach(function(pp){
     var patch=new THREE.Mesh(new THREE.PlaneGeometry(pp[2],pp[3]),patchM);
     patch.rotation.x=-Math.PI/2;patch.position.set(pp[0],.015,pp[1]);scene.add(patch);
@@ -336,40 +336,31 @@ function buildMeadow(){
   var r1=new THREE.Mesh(new THREE.PlaneGeometry(6,280),new THREE.MeshLambertMaterial({color:0x1e1a10}));
   r1.rotation.x=-Math.PI/2;r1.position.set(0,.013,160);scene.add(r1);
   /* 조명 */
-  var pl1=new THREE.PointLight(0xffcc44,.35,120);pl1.position.set(0,8,160);scene.add(pl1);
-  var pl1b=new THREE.PointLight(0xffaa33,.2,100);pl1b.position.set(-30,6,90);scene.add(pl1b);
-  var pl1c=new THREE.PointLight(0xffcc66,.2,100);pl1c.position.set(30,6,220);scene.add(pl1c);
-  var pl1d=new THREE.PointLight(0xffcc44,.2,100);pl1d.position.set(-40,6,190);scene.add(pl1d);
-  var pl1e=new THREE.PointLight(0xffaa33,.2,80);pl1e.position.set(50,6,270);scene.add(pl1e);
+  var pl1=new THREE.PointLight(0xffcc44,.35,180);pl1.position.set(0,8,160);scene.add(pl1);
   /* 구릉 */
   var hillM=new THREE.MeshLambertMaterial({color:0x3a6a22});
-  [[-40,60,5,1.2],[35,100,6,1.5],[-25,150,5,1.0],[50,180,6,1.3],[-55,110,4,0.8],
-   [65,220,5,1.2],[-30,250,6,1.4],[20,280,4,1.0],[0,130,5,1.1],[-70,170,4,0.9]
+  [[-40,80,5,1.2],[50,160,6,1.3],[65,240,5,1.2],[-30,130,6,1.4]
   ].forEach(function(pp){
     var hill=new THREE.Mesh(new THREE.SphereGeometry(pp[2],10,8),hillM);
     hill.scale.set(1.5,.25,1.5);hill.position.set(pp[0],pp[3]*.25,pp[1]);scene.add(hill);
   });
   /* 야생화 */
   var flowerColors=[0xffee44,0xffffff,0xcc88ff,0xff88aa,0x88ddff];
-  for(var fi=0;fi<120;fi++){
+  for(var fi=0;fi<35;fi++){
     var fx=(Math.random()-.5)*150,fz=25+Math.random()*270;
     var fc=flowerColors[Math.floor(Math.random()*5)];
     var fl=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),new THREE.MeshLambertMaterial({color:fc,emissive:new THREE.Color(fc),emissiveIntensity:.15}));
     fl.position.set(fx,.08,fz);scene.add(fl);
   }
   /* 초원 나무 */
-  [[-60,35],[-65,80],[-55,130],[-70,180],[-60,230],[-75,270],
-   [60,40],[65,85],[55,135],[70,190],[60,240],[75,280],
-   [-40,55],[40,70],[-30,110],[30,150],[-45,200],[45,250],
-   [-20,60],[20,95],[-15,170],[15,210],[-35,255],[35,275],
-   [0,45],[0,125],[0,205],[0,285],
-   [-50,165],[50,165],[-50,95],[50,95]
+  [[-60,55],[-65,130],[-55,200],[-70,270],
+   [60,70],[65,140],[55,210],[75,280],
+   [-40,100],[40,160],[-30,230],[30,285],
+   [0,90],[0,185]
   ].forEach(function(pp){mkTree(pp[0],pp[1],.9+Math.random()*.7,scene);});
   /* 덤불 */
   var bushM=new THREE.MeshLambertMaterial({color:0x224a10});
-  [[-25,35],[18,55],[-35,100],[28,145],[12,195],[-18,240],
-   [50,80],[-50,130],[60,200],[-60,260],[0,155],[0,80],
-   [35,55],[-35,200],[55,270],[-55,170]
+  [[-25,80],[28,145],[-50,200],[55,270]
   ].forEach(function(pp){
     var bush=new THREE.Mesh(new THREE.SphereGeometry(.5+Math.random()*.3,6,6),bushM);
     bush.scale.y=.6;bush.position.set(pp[0],.3,pp[1]);scene.add(bush);
@@ -377,11 +368,9 @@ function buildMeadow(){
   /* 몬스터 스폰 — 월드 좌표 (넓게 분산) */
   var rd=MONSTER_DEFS.find(function(x){return x.id==='rabbit';});
   var dd=MONSTER_DEFS.find(function(x){return x.id==='deer';});
-  if(rd)[[-35,35],[25,60],[-15,90],[45,120],[-55,150],[10,180],
-         [-25,210],[50,245],[-40,270],[15,295],[60,55],[-60,100]
+  if(rd)[[-35,35],[25,90],[-55,150],[50,210]
         ].forEach(function(pp){spawnMonster(rd,pp[0],pp[1],scene);});
-  if(dd)[[55,45],[-45,80],[30,115],[-30,160],[55,200],[-55,230],
-         [15,260],[-20,285],[70,130],[-70,175]
+  if(dd)[[55,45],[-45,160],[30,230],[-20,285]
         ].forEach(function(pp){spawnMonster(dd,pp[0],pp[1],scene);});
 }
 
@@ -389,23 +378,20 @@ function buildSwamp(){
   /* 늪 동쪽: x:80~200, z:20~300 AND 서쪽: x:-200~-80, z:20~300 */
   var swampM=new THREE.MeshLambertMaterial({color:0x0a2a08,emissive:new THREE.Color(0x0a2208),emissiveIntensity:.35,transparent:true,opacity:.85});
 
-  /* 물웅덩이들 — 양쪽 (더 많고 더 넓게) */
-  [[100,35,7,5],[120,70,6,4],[140,55,8,5],[110,110,7,5],[150,145,6,4],[130,180,9,6],[100,220,7,5],[160,255,6,4],[120,280,8,5],
-   [-100,35,7,5],[-120,70,6,4],[-140,55,8,5],[-110,110,7,5],[-150,145,6,4],[-130,180,9,6],[-100,220,7,5],[-160,255,6,4],[-120,280,8,5]
+  /* 물웅덩이들 — 양쪽 (줄인 버전) */
+  [[110,70,6,4],[150,145,6,4],[100,220,7,5],[120,280,8,5],
+   [-110,70,6,4],[-150,145,6,4],[-100,220,7,5],[-120,280,8,5]
   ].forEach(function(pp){
     var pool=new THREE.Mesh(new THREE.PlaneGeometry(pp[2]*2,pp[3]*2),swampM);
     pool.rotation.x=-Math.PI/2;pool.position.set(pp[0],.03,pp[1]);scene.add(pool);
     var poolGlow=new THREE.PointLight(0x22aa22,.3,pp[2]*2);poolGlow.position.set(pp[0],.5,pp[1]);scene.add(poolGlow);
   });
   /* 안개 조명 */
-  var pl2=new THREE.PointLight(0x115511,.2,80);pl2.position.set(140,3,160);scene.add(pl2);
-  var pl2b=new THREE.PointLight(0x115511,.2,80);pl2b.position.set(-140,3,160);scene.add(pl2b);
-  var pl2c=new THREE.PointLight(0x0a3308,.2,80);pl2c.position.set(120,3,80);scene.add(pl2c);
-  var pl2d=new THREE.PointLight(0x0a3308,.2,80);pl2d.position.set(-120,3,250);scene.add(pl2d);
+  var pl2=new THREE.PointLight(0x115511,.25,150);pl2.position.set(0,3,160);scene.add(pl2);
   /* 도깨비불 */
   var wispM=new THREE.MeshBasicMaterial({color:0x44ff66,transparent:true,opacity:.6});
-  for(var wi=0;wi<30;wi++){
-    var side=wi<15?1:-1;
+  for(var wi=0;wi<10;wi++){
+    var side=wi<5?1:-1;
     var wx=side*(85+Math.random()*110),wz=25+Math.random()*270;
     var wisp=new THREE.Mesh(new THREE.SphereGeometry(.08+Math.random()*.06,6,6),wispM);
     wisp.position.set(wx,.8+Math.random()*1.5,wz);scene.add(wisp);
@@ -414,45 +400,30 @@ function buildSwamp(){
   /* 늪 안개 평면 */
   var swampFogM=new THREE.MeshLambertMaterial({color:0x1a3a10,transparent:true,opacity:.08});
   [140,-140].forEach(function(sx){
-    for(var sf=0;sf<8;sf++){
+    for(var sf=0;sf<3;sf++){
       var sfp=new THREE.Mesh(new THREE.PlaneGeometry(18+Math.random()*12,14+Math.random()*8),swampFogM);
-      sfp.rotation.x=-Math.PI/2;sfp.position.set(sx+(Math.random()-.5)*40,.12,35+sf*34);scene.add(sfp);
+      sfp.rotation.x=-Math.PI/2;sfp.position.set(sx+(Math.random()-.5)*40,.12,60+sf*90);scene.add(sfp);
     }
   });
   /* 죽은 나무 */
   var deadM=new THREE.MeshLambertMaterial({color:0x1a1205});
-  [[90,40],[110,75],[130,110],[150,145],[170,180],[190,215],[100,250],[140,280],
-   [-90,40],[-110,75],[-130,110],[-150,145],[-170,180],[-190,215],[-100,250],[-140,280]
+  [[110,75],[150,145],[-170,180],[-100,250],
+   [-110,75],[-150,145],[170,180],[100,250]
   ].forEach(function(pp){
     var tx=pp[0],tz=pp[1];
     var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.15,.3,3.5+Math.random()*2,6),deadM);
     trunk.position.set(tx,1.75,tz);trunk.rotation.z=(Math.random()-.5)*.4;scene.add(trunk);
-    for(var bi=0;bi<2;bi++){
-      var brLen=.8+Math.random()*1.2;
-      var br=new THREE.Mesh(new THREE.CylinderGeometry(.03,.06,brLen,5),deadM);
-      br.position.set(tx+(Math.random()-.5)*1.2,2.5+Math.random()*1.2,tz+(Math.random()-.5)*.5);
-      br.rotation.z=(Math.random()-.5)*1.2;br.rotation.x=(Math.random()-.5)*.6;scene.add(br);
-    }
   });
-  /* 독 버섯 */
-  var mushM=new THREE.MeshLambertMaterial({color:0xaa4444});
-  var mushCapM=new THREE.MeshLambertMaterial({color:0xff6666,emissive:new THREE.Color(0x441111),emissiveIntensity:.3});
-  [[95,50],[115,95],[135,140],[155,185],[175,230],[100,265],
-   [-95,50],[-115,95],[-135,140],[-155,185],[-175,230],[-100,265]
-  ].forEach(function(pp){
-    var mx=pp[0],mz=pp[1];
-    var stem=new THREE.Mesh(new THREE.CylinderGeometry(.07,.1,.4,6),mushM);stem.position.set(mx,.2,mz);scene.add(stem);
-    var cap=new THREE.Mesh(new THREE.SphereGeometry(.22,8,8),mushCapM);cap.scale.y=.55;cap.position.set(mx,.45,mz);scene.add(cap);
-  });
+  /* 독 버섯 — 제거됨 (성능 최적화) */
   /* 몬스터 스폰 — 동서 양쪽 (더 넓게 분산) */
   var sd=MONSTER_DEFS.find(function(x){return x.id==='slime';});
   var td=MONSTER_DEFS.find(function(x){return x.id==='toad';});
   /* 동쪽 늪 */
-  if(sd)[[90,35],[110,70],[135,110],[155,150],[175,185],[100,225],[130,260],[160,290]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
-  if(td)[[100,55],[120,95],[145,135],[165,170],[185,210],[110,250],[150,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
+  if(sd)[[100,60],[150,145],[130,260]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
+  if(td)[[120,100],[165,200],[110,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
   /* 서쪽 늪 */
-  if(sd)[[-90,35],[-110,70],[-135,110],[-155,150],[-175,185],[-100,225],[-130,260],[-160,290]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
-  if(td)[[-100,55],[-120,95],[-145,135],[-165,170],[-185,210],[-110,250],[-150,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
+  if(sd)[[-100,60],[-150,145],[-130,260]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
+  if(td)[[-120,100],[-165,200],[-110,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
 }
 
 function buildDarkForest(){
@@ -461,35 +432,26 @@ function buildDarkForest(){
   var r3=new THREE.Mesh(new THREE.PlaneGeometry(6,260),new THREE.MeshLambertMaterial({color:0x0a0806}));
   r3.rotation.x=-Math.PI/2;r3.position.set(0,.013,430);scene.add(r3);
   /* 조명 */
-  var pl3=new THREE.PointLight(0x441100,.5,100);pl3.position.set(0,6,360);scene.add(pl3);
-  var pl3b=new THREE.PointLight(0x330800,.35,80);pl3b.position.set(-40,5,420);scene.add(pl3b);
-  var pl3c=new THREE.PointLight(0x550011,.35,80);pl3c.position.set(40,5,480);scene.add(pl3c);
-  var pl3d=new THREE.PointLight(0x220500,.25,80);pl3d.position.set(0,4,540);scene.add(pl3d);
-  var pl3e=new THREE.PointLight(0x330800,.3,80);pl3e.position.set(-60,5,380);scene.add(pl3e);
-  var pl3f=new THREE.PointLight(0x550011,.3,80);pl3f.position.set(60,5,460);scene.add(pl3f);
-  var pl3g=new THREE.PointLight(0x220500,.25,80);pl3g.position.set(-20,4,500);scene.add(pl3g);
+  var pl3=new THREE.PointLight(0x441100,.5,200);pl3.position.set(0,6,430);scene.add(pl3);
   /* 붉은 파티클 */
   var redPartM=new THREE.MeshBasicMaterial({color:0xff2200,transparent:true,opacity:.5});
-  for(var rp=0;rp<50;rp++){
+  for(var rp=0;rp<15;rp++){
     var rpx=(Math.random()-.5)*220,rpz=305+Math.random()*250;
     var rpy=1+Math.random()*3;
     var redP=new THREE.Mesh(new THREE.SphereGeometry(.04+Math.random()*.03,4,4),redPartM);
     redP.position.set(rpx,rpy,rpz);scene.add(redP);
   }
   /* 빽빽한 나무 */
-  [[-80,310],[-95,340],[-75,380],[-90,420],[-70,460],[-85,510],[-75,545],
-   [80,315],[95,345],[75,385],[90,425],[70,465],[85,515],[75,550],
-   [-50,320],[50,335],[-45,365],[45,395],[-55,435],[55,455],
-   [-40,480],[40,490],[-50,530],[50,540],
-   [-20,310],[20,330],[-15,360],[15,390],[-25,430],[25,450],
-   [-10,500],[10,520],[-20,545],[20,555],
-   [0,325],[0,400],[0,475],[0,545],
-   [-100,360],[100,400],[-100,440],[100,480],[-100,520],[100,550]
+  [[-80,320],[-90,420],[-70,480],[-75,545],
+   [80,325],[90,425],[70,480],[75,550],
+   [-50,360],[50,395],[-55,450],[55,510],
+   [0,340],[0,430],[0,520],
+   [-100,380],[100,440],[0,560]
   ].forEach(function(pp){mkTree(pp[0],pp[1],1.5+Math.random()*1.0,scene);});
   /* 바위들 */
   var rockM=new THREE.MeshLambertMaterial({color:0x2a2018});
-  [[-25,315,1.4],[18,345,1.1],[-15,380,1.6],[28,415,1.0],[-30,455,1.3],[22,490,1.5],[0,530,1.2],
-   [50,330,1.3],[-50,370,1.5],[70,410,1.1],[-70,450,1.4],[55,505,1.2],[-55,540,1.0]
+  [[-25,340,1.4],[28,415,1.0],[-30,480,1.3],[22,540,1.5],
+   [50,370,1.3],[-70,450,1.4]
   ].forEach(function(pp){
     var rx=pp[0],rz=pp[1],rs=pp[2];
     var rock=new THREE.Mesh(new THREE.DodecahedronGeometry(rs,0),rockM);
@@ -497,9 +459,9 @@ function buildDarkForest(){
   });
   /* 어두운 안개 평면 */
   var darkFogM=new THREE.MeshLambertMaterial({color:0x0a0505,transparent:true,opacity:.1});
-  for(var df=0;df<18;df++){
+  for(var df=0;df<6;df++){
     var dfp=new THREE.Mesh(new THREE.PlaneGeometry(20+Math.random()*12,14+Math.random()*8),darkFogM);
-    dfp.rotation.x=-Math.PI/2;dfp.position.set((Math.random()-.5)*200,.2,305+df*14);scene.add(dfp);
+    dfp.rotation.x=-Math.PI/2;dfp.position.set((Math.random()-.5)*200,.2,315+df*42);scene.add(dfp);
   }
   /* 고블린 캠프 1 */
   var tentM=new THREE.MeshLambertMaterial({color:0x4a3a10});
@@ -519,11 +481,9 @@ function buildDarkForest(){
   /* 몬스터 스폰 */
   var gd=MONSTER_DEFS.find(function(x){return x.id==='goblin';});
   var wd=MONSTER_DEFS.find(function(x){return x.id==='wolf';});
-  if(gd)[[-40,315],[25,345],[-18,385],[50,415],[-55,450],[18,490],[-30,525],[45,555],
-         [80,330],[-80,375],[90,440],[-90,505],[0,365],[0,485]
+  if(gd)[[-40,325],[25,395],[-18,460],[50,530]
         ].forEach(function(pp){spawnMonster(gd,pp[0],pp[1],scene);});
-  if(wd)[[55,325],[-50,360],[35,400],[-25,440],[60,475],[-45,515],[20,550],[-65,340],
-         [75,395],[-75,455],[40,530],[-35,560]
+  if(wd)[[55,345],[-50,400],[35,470],[-25,540]
         ].forEach(function(pp){spawnMonster(wd,pp[0],pp[1],scene);});
 }
 
@@ -531,7 +491,7 @@ function buildVolcano(){
   /* 화산: x:-100~100, z:560~860 */
   /* 지면 균열 */
   var crackLineM=new THREE.MeshBasicMaterial({color:0xff2200,transparent:true,opacity:.4});
-  for(var ci=0;ci<45;ci++){
+  for(var ci=0;ci<12;ci++){
     var cx2=(Math.random()-.5)*180,cz2=565+Math.random()*290;
     var cLen=2+Math.random()*8;
     var crack=new THREE.Mesh(new THREE.PlaneGeometry(.15,cLen),crackLineM);
@@ -540,19 +500,12 @@ function buildVolcano(){
   }
   /* 열 발광 */
   var heatGlowM=new THREE.MeshBasicMaterial({color:0xff1100,transparent:true,opacity:.06});
-  for(var hg=0;hg<18;hg++){
+  for(var hg=0;hg<6;hg++){
     var hgp=new THREE.Mesh(new THREE.PlaneGeometry(12+Math.random()*10,10+Math.random()*8),heatGlowM);
-    hgp.rotation.x=-Math.PI/2;hgp.position.set((Math.random()-.5)*160,.02,575+hg*16);scene.add(hgp);
+    hgp.rotation.x=-Math.PI/2;hgp.position.set((Math.random()-.5)*160,.02,580+hg*48);scene.add(hgp);
   }
   /* 조명 */
-  var pl4=new THREE.PointLight(0xff2200,.8,120);pl4.position.set(0,3,710);scene.add(pl4);
-  var pl4b=new THREE.PointLight(0xff4400,.6,100);pl4b.position.set(-40,2,630);scene.add(pl4b);
-  var pl4c=new THREE.PointLight(0xff1100,.6,100);pl4c.position.set(40,2,760);scene.add(pl4c);
-  var pl4d=new THREE.PointLight(0xff3300,.4,100);pl4d.position.set(0,1,820);scene.add(pl4d);
-  var pl4e=new THREE.PointLight(0xff2200,.5,100);pl4e.position.set(-60,2,580);scene.add(pl4e);
-  var pl4f=new THREE.PointLight(0xff4400,.5,100);pl4f.position.set(60,2,680);scene.add(pl4f);
-  var pl4g=new THREE.PointLight(0xff1100,.4,100);pl4g.position.set(-30,2,780);scene.add(pl4g);
-  var pl4h=new THREE.PointLight(0xff3300,.4,100);pl4h.position.set(30,2,840);scene.add(pl4h);
+  var pl4=new THREE.PointLight(0xff2200,.8,300);pl4.position.set(0,3,710);scene.add(pl4);
   /* 용암 강 */
   var lavaRiverM=new THREE.MeshLambertMaterial({color:0xff4400,emissive:new THREE.Color(0xff2200),emissiveIntensity:.7,transparent:true,opacity:.9});
   var river1=new THREE.Mesh(new THREE.PlaneGeometry(4,200),lavaRiverM);
@@ -564,8 +517,8 @@ function buildVolcano(){
   /* 용암 웅덩이 */
   var lavaM2=new THREE.MeshLambertMaterial({color:0xff3300,emissive:new THREE.Color(0xff1100),emissiveIntensity:.7,transparent:true,opacity:.9});
   var volcM=new THREE.MeshLambertMaterial({color:0x1a0800});
-  [[-40,580,6,4],[25,610,7,5],[-18,645,8,6],[35,680,6,4],[-30,715,7,5],[0,750,9,6],
-   [40,785,6,4],[-35,820,7,5],[15,850,8,5],[-50,600,5,4],[55,640,6,5],[-25,700,7,5],[30,740,5,4]
+  [[-40,600,6,4],[0,700,9,6],[35,800,6,4],
+   [-25,650,7,5],[30,750,5,4],[15,850,8,5]
   ].forEach(function(pp){
     var lava=new THREE.Mesh(new THREE.PlaneGeometry(pp[2]*2,pp[3]*2),lavaM2);
     lava.rotation.x=-Math.PI/2;lava.position.set(pp[0],.05,pp[1]);scene.add(lava);
@@ -573,7 +526,7 @@ function buildVolcano(){
   });
   /* 연기 */
   var smokeM=new THREE.MeshLambertMaterial({color:0x1a0a00,transparent:true,opacity:.25});
-  for(var si=0;si<28;si++){
+  for(var si=0;si<8;si++){
     var sx=(Math.random()-.5)*160,sz=570+Math.random()*285;
     var sy=3+Math.random()*5;
     var sr=.5+Math.random()*.8;
@@ -582,9 +535,8 @@ function buildVolcano(){
   }
   /* 화산 바위 */
   var crackVM=new THREE.MeshLambertMaterial({color:0xff3300,emissive:new THREE.Color(0xff1100),emissiveIntensity:.6});
-  [[-30,575,2],[22,610,1.8],[-40,650,2.5],[18,690,2],[-25,730,1.9],[35,770,2.2],
-   [-45,600,1.8],[50,640,2],[-20,670,2.2],[40,710,1.8],[-35,750,2],[25,800,2.2],
-   [0,580,1.8],[-55,680,2],[55,750,1.8],[-10,820,2]
+  [[-30,600,2],[18,700,2],[-25,760,1.9],[35,820,2.2],
+   [50,650,2],[-35,730,2]
   ].forEach(function(pp){
     var rx=pp[0],rz=pp[1],rs=pp[2];
     var vr=new THREE.Mesh(new THREE.DodecahedronGeometry(rs,0),volcM);
@@ -592,15 +544,11 @@ function buildVolcano(){
     var cr=new THREE.Mesh(new THREE.BoxGeometry(.1,rs*.8,.1),crackVM);cr.position.set(rx,rs*.5,rz);scene.add(cr);
   });
   /* 화산 굴뚝 */
-  [[-70,580],[70,620],[-80,680],[80,740],[-65,800],[65,850],[-40,570],[40,640],[-55,720],[55,790]].forEach(function(pp){
+  [[-70,600],[70,680],[-55,760],[55,840]].forEach(function(pp){
     var cx=pp[0],cz=pp[1];
     var chimney=new THREE.Mesh(new THREE.CylinderGeometry(1,1.4,5,8),volcM);chimney.position.set(cx,2.5,cz);scene.add(chimney);
     var smoke2=new THREE.Mesh(new THREE.CylinderGeometry(.6,.2,2,6),new THREE.MeshLambertMaterial({color:0x220800,emissive:new THREE.Color(0xff2200),emissiveIntensity:.5}));
     smoke2.position.set(cx,6,cz);scene.add(smoke2);
-    for(var smi=0;smi<3;smi++){
-      var smk=new THREE.Mesh(new THREE.SphereGeometry(.4+Math.random()*.4,5,5),smokeM);
-      smk.position.set(cx+(Math.random()-.5),7+smi*1.2,cz+(Math.random()-.5));scene.add(smk);
-    }
     var cl=new THREE.PointLight(0xff2200,1.2,14);cl.position.set(cx,5,cz);scene.add(cl);
   });
   /* 보스 제단 */
@@ -616,11 +564,9 @@ function buildVolcano(){
   /* 몬스터 스폰 (더 넓게 분산) */
   var gld=MONSTER_DEFS.find(function(x){return x.id==='golem';});
   var fdd=MONSTER_DEFS.find(function(x){return x.id==='firedrake';});
-  if(gld)[[-45,575],[35,620],[-25,665],[50,710],[-40,755],[20,800],
-          [60,580],[-65,625],[30,670],[-30,715],[55,760],[-50,810],[0,840]
+  if(gld)[[-45,590],[35,665],[-25,730],[20,800]
          ].forEach(function(pp){spawnMonster(gld,pp[0],pp[1],scene);});
-  if(fdd)[[50,590],[-40,635],[30,680],[-50,725],[40,770],[-30,815],[0,855],
-          [70,600],[-70,650],[25,695],[-25,740],[65,790],[-60,835]
+  if(fdd)[[50,610],[-40,680],[40,755],[0,840]
          ].forEach(function(pp){spawnMonster(fdd,pp[0],pp[1],scene);});
 }
 
