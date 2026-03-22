@@ -465,9 +465,11 @@ function talk(n){
     }
     return;
   }
-  /* 상인/대장장이: 상점 + 대화창 동시 */
+  /* 상인/대장장이: 상점만 열기 (대화는 상점 내 채팅으로) */
   if(n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0){
+    activeNpc=n;
     openShop(n.name);
+    return;
   }
   /* 완료된 퀘스트 수령 체크 */
   var turned=tryTurnInQuests(n.name);
