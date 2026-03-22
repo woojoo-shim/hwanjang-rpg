@@ -60,15 +60,17 @@ function connectParty(){
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
 }
 
+var _lastSentX=0,_lastSentZ=0,_lastSentRy=0,_lastSentMoving=false;
 function sendPosition(){
   if(!ws||ws.readyState!==1||!PL.group)return;
-  ws.send(JSON.stringify({
-    type:'move',
-    x:+PL.group.position.x.toFixed(2),
-    z:+PL.group.position.z.toFixed(2),
-    ry:+PL.group.rotation.y.toFixed(2),
-    moving:!!(keys['w']||keys['s']||keys['a']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright'])
-  }));
+  var x=+PL.group.position.x.toFixed(2);
+  var z=+PL.group.position.z.toFixed(2);
+  var ry=+PL.group.rotation.y.toFixed(2);
+  var mv=!!(keys['w']||keys['s']||keys['a']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright']);
+  /* 변화 없으면 안 보냄 */
+  if(x===_lastSentX&&z===_lastSentZ&&ry===_lastSentRy&&mv===_lastSentMoving)return;
+  _lastSentX=x;_lastSentZ=z;_lastSentRy=ry;_lastSentMoving=mv;
+  ws.send(JSON.stringify({type:'move',x:x,z:z,ry:ry,moving:mv}));
 }
 
 function onMpMessage(data){
