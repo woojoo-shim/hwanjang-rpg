@@ -402,11 +402,21 @@ async function sendShopChat(){
   var log=document.getElementById('shop-chat-log');
   log.innerHTML+='<div style="color:#88aaff;">나: '+msg+'</div>';
   log.scrollTop=log.scrollHeight;
-  /* AI에게 보내기 */
-  var reply=await askAI(currentShopNpc,msg);
+  /* AI에게 현재 상점 상태 컨텍스트 추가 */
+  var ctx='[상점 상태: '+shopTab+'탭';
+  if(shopSelectedItem){
+    if(shopTab==='buy'){
+      var sd=getItemDef(shopSelectedItem.id);
+      if(sd)ctx+=', 선택한 아이템: '+sd.name+' ('+shopSelectedItem.price+'골드)';
+    }else{
+      var sd2=getItemFull(shopSelectedItem.slot);
+      if(sd2)ctx+=', 판매하려는 아이템: '+sd2.name+' (판매가 '+shopSelectedItem.sellP+'골드)';
+    }
+  }
+  ctx+=', 플레이어 골드: '+gold+']';
+  var reply=await askAI(currentShopNpc,ctx+' '+msg);
   log.innerHTML+='<div style="color:#c9a84c;">'+currentShopNpc+': '+reply+'</div>';
   log.scrollTop=log.scrollHeight;
-  /* 가격 변경이 있으면 상점 UI 새로고침 */
   renderShopItems();
   if(shopSelectedItem)renderShopDetail(shopSelectedItem);
 }
