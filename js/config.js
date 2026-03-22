@@ -226,7 +226,7 @@ var MONSTER_DEFS=[
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
-var WORLD_BOUNDS=[-80,80,-32,280]; // minX, maxX, minZ, maxZ
+var WORLD_BOUNDS=[-200,200,-32,860]; // minX, maxX, minZ, maxZ
 var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={
