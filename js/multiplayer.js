@@ -53,10 +53,9 @@ function connectParty(){
     console.log('[MP] disconnected code:',e.code);
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
     if(monsterPosTmr){clearInterval(monsterPosTmr);monsterPosTmr=null;isMonsterHost=false;}
-    /* 중복 킥(4000)이면 1초 후 재연결 (새 연결이 이미 활성) */
-    if(e.code===4000)return;
+    /* 항상 재연결 */
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
-    mpReconnectTimer=setTimeout(connectParty,10000);
+    mpReconnectTimer=setTimeout(connectParty,3000);
   };
 
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
