@@ -152,6 +152,8 @@ function enterGame(){
   updTime();setInterval(updTime,1000);
   /* 멀티플레이 연결 */
   setTimeout(function(){if(typeof connectParty==='function')connectParty();},500);
+  /* 전사 NPC 초기 스폰 (초원 배회) */
+  setTimeout(function(){if(typeof spawnWarrior==='function')spawnWarrior();},3000);
   /* 자동 저장 시작 */
   if(currentUser)startAutoSave();
 }
@@ -233,6 +235,7 @@ function loop(){
     else tickAtkAnim(dt);
     updCam();updNpcs(now/1000);chkNpc();
     updMonsters(dt,now/1000);
+    if(typeof tickDynamicNpcs==='function')tickDynamicNpcs(dt);
     if(typeof updateArrows==='function')updateArrows(dt);
     if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);

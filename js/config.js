@@ -263,15 +263,12 @@ var NPC_DEF=[
   {name:'(상인) 김도윤',px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
   {name:'(대장장이) 이태산',px:7,pz:-12,bc:0x3a2a1a,hc:0xcc9966},
   {name:'(???) 정체불명',px:8, pz:0,  bc:0x1a1030,hc:0xaaaacc},
-  /* 전직 NPC — 각 존에 숨겨진 위치 */
-  {name:'(검술사범) 최무현',px:65, pz:35,  bc:0x8b0000,hc:0xddcc99,classNpc:'warrior'},
+  /* 전직 NPC — 각 존에 숨겨진 위치 (정적) */
   {name:'(현자) 윤서연',   px:-70,pz:280, bc:0x1a1a8b,hc:0xaabbee,classNpc:'mage'},
   {name:'(사냥꾼) 한시우', px:-180,pz:150,bc:0x2a6a2a,hc:0xddcc99,classNpc:'archer'},
   {name:'(성기사) 강예준', px:175, pz:250,bc:0xccaa33,hc:0xeeddaa,classNpc:'paladin'},
-  {name:'(밀정) 서하린',   px:-190,pz:200,bc:0x3a2a3a,hc:0xccbbaa,classNpc:'rogue'},
   {name:'(무당) 오지안',   px:185, pz:180,bc:0x336633,hc:0x99cc99,classNpc:'shaman'},
-  {name:'(그림자) 임카이', px:-110,pz:520,bc:0x1a1a2a,hc:0xbbbbcc,classNpc:'assassin'},
-  {name:'(투사) 백호진',   px:105, pz:480,bc:0x990000,hc:0xdd8866,classNpc:'berserker'},
+  /* 아래 4개는 동적 스폰 — npc.js가 관리: warrior, rogue, assassin, berserker */
 ];
 
 /* ════════════ 몬스터 정의 ════════════ */

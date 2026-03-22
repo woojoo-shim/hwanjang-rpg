@@ -751,6 +751,7 @@ function updMonsters(dt,t){
             playerHP=Math.max(0,playerHP-dmg);
             updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
             if(playerHP<=0)playerDied();
+            else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
           }
         }
         var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
