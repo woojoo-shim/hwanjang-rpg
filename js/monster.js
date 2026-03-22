@@ -733,18 +733,17 @@ function updMonsters(dt,t){
       m.wrap.style.display='none';
     }
     if(dist<md){md=dist;closestMonster=m;}
-    if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
-    if(m.state==='aggro'){
-      if(dist>1.2){
-        var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
-        m.mesh.position.x+=dx/len*m.def.spd*dt;
-        m.mesh.position.z+=dz2/len*m.def.spd*dt;
-        m.mesh.rotation.y=Math.atan2(dx,dz2);
-      }
+    /* 비호스트: 서버에서 받은 위치로 보간 이동 (로컬 AI 안 함) */
+    var _isHost=(typeof isMonsterHost!=='undefined')&&isMonsterHost;
+    if(!_isHost&&m._targetX!==undefined){
+      m.mesh.position.x+=(m._targetX-m.mesh.position.x)*0.15;
+      m.mesh.position.z+=(m._targetZ-m.mesh.position.z)*0.15;
+      var tdx=m._targetX-mx,tdz=m._targetZ-mz;
+      if(tdx*tdx+tdz*tdz>0.01)m.mesh.rotation.y=Math.atan2(tdx,tdz);
+      /* 비호스트도 플레이어 근접 시 데미지는 받음 */
       m.attackTimer-=dt;
       if(dist<1.8&&m.attackTimer<=0){
         m.attackTimer=1.4+Math.random()*.5;
-        /* 공격 애니메이션 트리거 */
         m.isAttacking=true;m.attackAnimT=0.4;
         if(invincibleTimer<=0){
           var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
@@ -753,22 +752,43 @@ function updMonsters(dt,t){
           if(playerHP<=0)playerDied();
         }
       }
-      var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
-      if(spDist>40){
-        /* 너무 멀면 어그로 해제, 걸어서 복귀 */
-        m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
+    }else{
+      /* 호스트 또는 싱글: 로컬 AI */
+      if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
+      if(m.state==='aggro'){
+        if(dist>1.2){
+          var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
+          m.mesh.position.x+=dx/len*m.def.spd*dt;
+          m.mesh.position.z+=dz2/len*m.def.spd*dt;
+          m.mesh.rotation.y=Math.atan2(dx,dz2);
+        }
+        m.attackTimer-=dt;
+        if(dist<1.8&&m.attackTimer<=0){
+          m.attackTimer=1.4+Math.random()*.5;
+          m.isAttacking=true;m.attackAnimT=0.4;
+          if(invincibleTimer<=0){
+            var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
+            playerHP=Math.max(0,playerHP-dmg);
+            updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+            if(playerHP<=0)playerDied();
+          }
+        }
+        var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
+        if(spDist>40){
+          m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
+        }
       }
-    }
-    if(m.state==='returning'){
-      var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
-      var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
-      if(rlen<1){
-        m.state='idle';
-        m.mesh.position.set(m.spawnX,0,m.spawnZ);
-      }else{
-        m.mesh.position.x+=rdx/rlen*m.def.spd*dt;
-        m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
-        m.mesh.rotation.y=Math.atan2(rdx,rdz);
+      if(m.state==='returning'){
+        var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
+        var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
+        if(rlen<1){
+          m.state='idle';
+          m.mesh.position.set(m.spawnX,0,m.spawnZ);
+        }else{
+          m.mesh.position.x+=rdx/rlen*m.def.spd*dt;
+          m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
+          m.mesh.rotation.y=Math.atan2(rdx,rdz);
+        }
       }
     }
   });

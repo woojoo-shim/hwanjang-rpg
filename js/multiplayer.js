@@ -35,8 +35,9 @@ function connectParty(){
           var p=parts[i].split(',');
           var idx=parseInt(p[0]);
           if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
-            monsters[idx].mesh.position.x=parseFloat(p[1]);
-            monsters[idx].mesh.position.z=parseFloat(p[2]);
+            /* 목표 위치 저장 (보간용) */
+            monsters[idx]._targetX=parseFloat(p[1]);
+            monsters[idx]._targetZ=parseFloat(p[2]);
           }
         }
       }
