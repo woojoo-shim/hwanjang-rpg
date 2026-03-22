@@ -328,7 +328,7 @@ function playerDied(){
 }
 
 function checkLevelUp(){
-  var need=playerLevel*180;
+  var need=Math.floor(100*Math.pow(playerLevel,2.2));
   if(playerEXP>=need){
     playerEXP-=need;playerLevel++;playerMaxHP+=12;playerHP=playerMaxHP;
     document.querySelector('.hlv').textContent='Lv.'+playerLevel;
@@ -337,7 +337,7 @@ function checkLevelUp(){
     gold+=20;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
   }
   var ef=document.getElementById('exp-bar-fill');
-  if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*180)*100)+'%';
+  if(ef)ef.style.width=Math.min(100,playerEXP/Math.floor(100*Math.pow(playerLevel,2.2))*100)+'%';
 }
 
 function updPlayerHpBar(){
