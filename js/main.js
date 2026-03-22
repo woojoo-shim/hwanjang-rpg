@@ -150,6 +150,8 @@ function enterGame(){
   cm.forEach(function(c){setTimeout(function(){addChat(c[1],c[2],c[3]);},c[0]);});
   if(!playerData)setTimeout(giveStartItems,500);
   updTime();setInterval(updTime,1000);
+  /* 게임 루프 시작 */
+  loop();
   /* 멀티플레이 연결 */
   setTimeout(function(){if(typeof connectParty==='function')connectParty();},500);
   /* 자동 저장 시작 */
@@ -215,32 +217,33 @@ function resetAfk(){lastActivity=Date.now();}
 /* ── 게임 루프 ── */
 var lastT=Date.now();
 function loop(){
-  var now=Date.now(),dt=Math.min((now-lastT)/1000,.05);lastT=now;
-  var dialogOpen=document.getElementById('dbox').classList.contains('show');
-  if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
-  else tickAtkAnim(dt);
-  updCam();updNpcs(now/1000);chkNpc();
-  updMonsters(dt,now/1000);
-  if(typeof updateArrows==='function')updateArrows(dt);
-  if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
-  checkZone();
-  if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
-  /* AFK 체크 */
-  if(now-lastActivity>AFK_LIMIT){
-    addChat('sys','[시스템]','20분간 활동이 없어 자동 로그아웃됩니다.');
-    if(typeof savePlayerData==='function')savePlayerData();
-    setTimeout(function(){
-      if(typeof logout==='function')logout();
-      else location.reload();
-    },2000);
-    lastActivity=now+999999;/* 중복 방지 */
-  }
-  updLabels();
-  /* 파티클 + 물 UV 애니메이션 */
-  if(typeof updVisualFX==='function')updVisualFX(now/1000);
-  /* bloom 컴포저 또는 기본 렌더 */
-  if(composer)composer.render();
-  else renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+  try{
+    var now=Date.now(),dt=Math.min((now-lastT)/1000,.05);lastT=now;
+    var dialogOpen=document.getElementById('dbox').classList.contains('show');
+    if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
+    else tickAtkAnim(dt);
+    updCam();updNpcs(now/1000);chkNpc();
+    updMonsters(dt,now/1000);
+    if(typeof updateArrows==='function')updateArrows(dt);
+    if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
+    checkZone();
+    if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
+    /* AFK 체크 */
+    if(now-lastActivity>AFK_LIMIT){
+      addChat('sys','[시스템]','20분간 활동이 없어 자동 로그아웃됩니다.');
+      if(typeof savePlayerData==='function')savePlayerData();
+      setTimeout(function(){
+        if(typeof logout==='function')logout();
+        else location.reload();
+      },2000);
+      lastActivity=now+999999;
+    }
+    updLabels();
+    if(typeof updVisualFX==='function')updVisualFX(now/1000);
+    if(composer)composer.render();
+    else renderer.render(scene,camera);
+  }catch(e){console.error('loop error:',e);}
 }
 
 /* ── 앱 초기화 ── */
