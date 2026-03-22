@@ -23,9 +23,26 @@ function connectParty(){
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
     if(!window._mpFirstConnect){window._mpFirstConnect=true;addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');}
+    /* 몬스터 위치 동기화는 서버가 호스트 지정 후 시작 */
   };
 
   ws.onmessage=function(e){
+    /* 몬스터 위치 배치 (경량 문자열 포맷) */
+    if(typeof e.data==='string'&&e.data.indexOf('mp|')===0){
+      if(!isMonsterHost){
+        var parts=e.data.substring(3).split(';');
+        for(var i=0;i<parts.length;i++){
+          var p=parts[i].split(',');
+          var idx=parseInt(p[0]);
+          if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
+            monsters[idx].mesh.position.x=parseFloat(p[1]);
+            monsters[idx].mesh.position.z=parseFloat(p[2]);
+          }
+        }
+      }
+      return;
+    }
+    if(typeof e.data==='string'&&e.data==='host'){startMonsterSync();return;}
     var data;
     try{data=JSON.parse(e.data);}catch(er){return;}
     onMpMessage(data);
@@ -34,6 +51,7 @@ function connectParty(){
   ws.onclose=function(){
     console.log('[MP] disconnected');
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
+    if(monsterPosTmr){clearInterval(monsterPosTmr);monsterPosTmr=null;isMonsterHost=false;}
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
     mpReconnectTimer=setTimeout(connectParty,5000);
   };
@@ -115,6 +133,25 @@ function onMpMessage(data){
       m.hbf.style.width='100%';
     }
   }
+}
+
+/* ── 몬스터 위치 동기화 (호스트만 전송) ── */
+var isMonsterHost=false;
+var monsterPosTmr=null;
+
+function startMonsterSync(){
+  if(monsterPosTmr)clearInterval(monsterPosTmr);
+  isMonsterHost=true;
+  monsterPosTmr=setInterval(function(){
+    if(!ws||ws.readyState!==1)return;
+    var batch=[];
+    for(var i=0;i<monsters.length;i++){
+      var m=monsters[i];
+      if(m.hp<=0||m.deathAnim>=0)continue;
+      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1));
+    }
+    if(batch.length>0)ws.send('mp|'+batch.join(';'));
+  },500);
 }
 
 /* ── 원격 플레이어 메쉬 ── */

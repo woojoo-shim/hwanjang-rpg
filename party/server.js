@@ -13,9 +13,20 @@ export default {
     if (room._monsterHp) {
       conn.send(JSON.stringify({ type: 'mhp', hp: room._monsterHp }));
     }
+
+    /* 첫 접속자가 호스트 (몬스터 위치 전송 담당) */
+    if (!room._hostId) {
+      room._hostId = conn.id;
+      conn.send('host');
+    }
   },
 
   onMessage(msg, conn, room) {
+    /* 몬스터 위치 배치 — 경량 릴레이 */
+    if (typeof msg === 'string' && msg.indexOf('mp|') === 0) {
+      room.broadcast(msg, [conn.id]);
+      return;
+    }
     var data = JSON.parse(msg);
 
     if (data.type === 'join') {
@@ -80,5 +91,17 @@ export default {
     if (!st) return;
     var uid = st.uid || conn.id;
     room.broadcast(JSON.stringify({ type: 'leave', id: uid }));
+
+    /* 호스트가 나가면 다음 사람에게 호스트 위임 */
+    if (room._hostId === conn.id) {
+      room._hostId = null;
+      for (var c of room.getConnections()) {
+        if (c.id !== conn.id) {
+          room._hostId = c.id;
+          c.send('host');
+          break;
+        }
+      }
+    }
   }
 };
