@@ -57,6 +57,7 @@ var ITEM_POOL=[
   {id:'moonblade',      name:'달빛 검',          icon:'sword', type:'weapon',  rarity:'epic',     desc:'달이 뜨면 공격력이 2배가 된다.',   stats:{공격력:35,야간공격력:70}},
   {id:'dragonfang',     name:'용의 송곳니',      icon:'dagger',type:'weapon',  rarity:'legendary',desc:'진짜 용의 이빨로 만들었다. 아파.',  stats:{공격력:60,관통:25}},
   {id:'eclipse_blade',  name:'이클립스',         icon:'sword', type:'weapon',  rarity:'legendary',desc:'동양 검사 최고의 검. 어디서 났지?',stats:{공격력:88,발도술:50}},
+  {id:'tp_scroll',      name:'텔레포트 두루마리',icon:'scroll', type:'consume',rarity:'rare',    desc:'방문했던 장소로 순간이동한다.',       stats:{}},
   {id:'arrow',          name:'화살',            icon:'feather',type:'consume',rarity:'common',  desc:'활에 사용하는 기본 화살.',            stats:{}},
   {id:'fire_arrow',     name:'불 화살',         icon:'feather',type:'consume',rarity:'rare',    desc:'불이 붙은 화살. 추가 데미지.',        stats:{추가데미지:5}},
   {id:'badminton_neck', name:'배트민턴 목걸이',  icon:'necklace',type:'etc', rarity:'common',   desc:'상인이 강력 추천했다. 왜인지 모르겠다.',stats:{운:1}},
@@ -95,6 +96,7 @@ var SHOP_STOCK={
     {id:'ether',         price:150},
     {id:'deer_meat',     price:20},
     {id:'hunting_bow',   price:220},
+    {id:'tp_scroll',     price:100},
     {id:'arrow',         price:5},
     {id:'fire_arrow',    price:15},
   ],
@@ -318,9 +320,12 @@ var WORLD_BOUNDS=[-200,200,-32,860]; // minX, maxX, minZ, maxZ
 var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={
-  village:  {name:'시작 마을',   color:'#c9a84c'},
-  meadow:   {name:'초원',        color:'#4aaa3a'},
-  swamp:    {name:'독 늪',       color:'#44aa44'},
-  darkforest:{name:'어두운 숲',  color:'#aa4422'},
-  volcano:  {name:'화산 지대',   color:'#ff4400'},
+  village:  {name:'시작 마을',   color:'#c9a84c',tp:[0,0]},
+  meadow:   {name:'초원',        color:'#4aaa3a',tp:[0,50]},
+  swamp:    {name:'독 늪',       color:'#44aa44',tp:[100,100]},
+  darkforest:{name:'어두운 숲',  color:'#aa4422',tp:[0,430]},
+  volcano:  {name:'화산 지대',   color:'#ff4400',tp:[0,700]},
 };
+
+/* 방문한 존 기록 */
+var visitedZones={village:true};

@@ -63,6 +63,11 @@ function unequipItem(slot){
 function useItem(slot){
   var it=getItemFull(slot);
   if(it.type!=='consume')return;
+  /* 텔레포트 두루마리: 소모하지 않고 UI 열기 */
+  if(slot.itemId==='tp_scroll'){
+    if(typeof useTpScroll==='function')useTpScroll();
+    return;
+  }
   slot.qty--;
   if(slot.qty<=0)inventory=inventory.filter(function(s){return s!==slot;});
   addChat('sys','[시스템]','['+it.name+']을(를) 사용했습니다.');

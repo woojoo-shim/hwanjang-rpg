@@ -509,6 +509,59 @@ function playerDied(){
   },2500);
 }
 
+/* ═══════════ 텔레포트 두루마리 ═══════════ */
+function useTpScroll(){
+  var slot=inventory.find(function(s){return s.itemId==='tp_scroll';});
+  if(!slot){addChat('inf','','텔레포트 두루마리가 없습니다!');return;}
+  /* 방문한 존 목록으로 UI 표시 */
+  var modal=document.getElementById('tp-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='tp-modal';
+    modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9998;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+    modal.innerHTML='<div style="color:#c9a84c;font-size:20px;letter-spacing:3px;">▣ 텔레포트 ▣</div><div style="color:#aaa;font-size:12px;">이동할 장소를 선택하세요</div><div id="tp-list" style="display:flex;flex-direction:column;gap:8px;min-width:200px;"></div><button onclick="closeTpModal()" style="margin-top:10px;padding:8px 30px;background:#3a3a5a;color:#aaa;border:1px solid #555;cursor:pointer;font-family:inherit;">취소</button>';
+    document.body.appendChild(modal);
+  }
+  var list=document.getElementById('tp-list');
+  list.innerHTML='';
+  for(var zk in ZONE_INFO){
+    var zi=ZONE_INFO[zk];
+    if(!visitedZones[zk])continue;
+    if(zk===currentZone)continue;
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:10px 20px;background:#1a1a2e;border:1px solid '+zi.color+';color:'+zi.color+';cursor:pointer;font-family:inherit;font-size:14px;border-radius:4px;';
+    btn.textContent='◈ '+zi.name;
+    btn.dataset.zone=zk;
+    btn.onclick=function(){doTeleport(this.dataset.zone);};
+    list.appendChild(btn);
+  }
+  if(list.children.length===0){
+    list.innerHTML='<div style="color:#555;font-size:12px;text-align:center;">현재 위치 외에 방문한 장소가 없습니다.</div>';
+  }
+  modal.style.display='flex';
+}
+
+function closeTpModal(){
+  var m=document.getElementById('tp-modal');
+  if(m)m.style.display='none';
+}
+
+function doTeleport(zoneKey){
+  var zi=ZONE_INFO[zoneKey];
+  if(!zi||!zi.tp)return;
+  /* 두루마리 소모 */
+  var slot=inventory.find(function(s){return s.itemId==='tp_scroll';});
+  if(!slot)return;
+  slot.qty--;
+  if(slot.qty<=0){var idx=inventory.indexOf(slot);if(idx>=0)inventory.splice(idx,1);}
+  /* 텔레포트 */
+  PL.group.position.set(zi.tp[0],0,zi.tp[1]);
+  closeTpModal();
+  addChat('sys','[시스템]','★ '+zi.name+'(으)로 텔레포트!');
+  /* 존 전환 트리거 */
+  checkZone();
+}
+
 function checkLevelUp(){
   var need=Math.floor(100*Math.pow(playerLevel,2.2));
   if(playerEXP>=need){
@@ -542,6 +595,7 @@ function checkZone(){
   if(newZone!==currentZone){
     var prevZone=currentZone;
     currentZone=newZone;
+    visitedZones[newZone]=true;
     /* 분위기 전환 */
     if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);}
     else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,100,380);scene.background=new THREE.Color(0x1a3010);}
