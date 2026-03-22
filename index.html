@@ -199,7 +199,11 @@
           <div class="sd-desc" id="sd-desc"></div>
           <div class="sd-stats" id="sd-stats"></div>
           <div class="sd-price-row"><span class="sd-price-label">가격</span><span class="sd-price-val" id="sd-price">0 G</span></div>
-          <button id="shop-buy-btn" onclick="doBuy()">구 매</button>
+          <div style="display:flex;gap:6px;width:100%;">
+            <button id="shop-buy-btn" onclick="doBuy()" style="flex:1;">구 매</button>
+            <button id="shop-haggle-btn" onclick="haggle()" style="flex:1;background:#3a3a5a;color:#c9a84c;border:1px solid #c9a84c44;cursor:pointer;font-family:inherit;font-size:12px;padding:8px 0;">흥 정</button>
+          </div>
+          <div id="haggle-result" style="color:#aaa;font-size:11px;margin-top:6px;min-height:20px;text-align:center;"></div>
         </div>
       </div>
     </div>

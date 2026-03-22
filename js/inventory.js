@@ -254,6 +254,7 @@ function renderShopItems(){
         shopSelectedItem=entry;
         document.querySelectorAll('.shop-item').forEach(function(d){d.classList.remove('selected');});
         div.classList.add('selected');
+        resetHaggle();
         renderShopDetail(entry);
       };
       grid.appendChild(div);
@@ -327,15 +328,67 @@ function doBuy(){
   } else {
     var entry=shopSelectedItem;
     var def=getItemDef(entry.id);if(!def)return;
-    if(gold<entry.price){addChat('inf','','골드가 부족합니다!');return;}
-    gold-=entry.price;
+    var finalPrice=entry._hagglePrice||entry.price;
+    if(gold<finalPrice){addChat('inf','','골드가 부족합니다!');return;}
+    gold-=finalPrice;
     addItem(entry.id,1);
     updShopGold();
     document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
-    addChat('sys','[시스템]','['+def.name+'] 구매 완료! (-'+entry.price+' 골드)');
+    addChat('sys','[시스템]','['+def.name+'] 구매 완료! (-'+finalPrice+' 골드)');
+    delete entry._hagglePrice;resetHaggle();
     renderShopItems();
     renderShopDetail(entry);
   }
+}
+
+/* ════════════ 흥정 시스템 ════════════ */
+var haggleCount=0;
+var haggleDiscount=0;
+
+function haggle(){
+  if(!shopSelectedItem||shopTab!=='buy')return;
+  var entry=shopSelectedItem;
+  var def=getItemDef(entry.id);if(!def)return;
+  var resultEl=document.getElementById('haggle-result');
+  var isBlacksmith=currentShopNpc&&currentShopNpc.indexOf('(대장장이)')===0;
+  var isMerchant=currentShopNpc&&currentShopNpc.indexOf('(상인)')===0;
+  haggleCount++;
+  /* 상인: 잘 안 깎아줌 (20% 확률), 대장장이: 좀 더 깎아줌 (40%) */
+  var chance=isBlacksmith?0.4:isMerchant?0.2:0.3;
+  /* 3번 이상 시도하면 확률 감소 */
+  if(haggleCount>3)chance*=0.5;
+  if(haggleCount>5){
+    resultEl.textContent='"더 이상은 안 돼!" (흥정 실패)';
+    resultEl.style.color='#ff5555';
+    return;
+  }
+  if(Math.random()<chance){
+    /* 성공: 5~20% 할인 */
+    var discountPct=5+Math.floor(Math.random()*16);
+    haggleDiscount=Math.max(haggleDiscount,discountPct);
+    var newPrice=Math.max(1,Math.floor(entry.price*(1-haggleDiscount/100)));
+    entry._hagglePrice=newPrice;
+    resultEl.textContent='"좋아, '+discountPct+'% 깎아줄게!" ('+entry.price+'G → '+newPrice+'G)';
+    resultEl.style.color='#44ff88';
+    document.getElementById('sd-price').textContent=newPrice+' G';
+  }else{
+    /* 실패 */
+    var fails=[
+      '"안 돼, 이건 원가야!"',
+      '"흥, 다른 데서 사든가."',
+      '"더 깎으면 나 손해야!"',
+      '"이 가격이 최선이야."',
+      '"장사가 안 되는데 더 깎으라고?"',
+    ];
+    resultEl.textContent=fails[Math.floor(Math.random()*fails.length)];
+    resultEl.style.color='#ff8844';
+  }
+}
+
+function resetHaggle(){
+  haggleCount=0;haggleDiscount=0;
+  var r=document.getElementById('haggle-result');
+  if(r)r.textContent='';
 }
 
 function flashHiddenItem(name){
