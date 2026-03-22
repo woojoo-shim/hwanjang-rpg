@@ -379,7 +379,7 @@ function buildFireflies(){
   ctx.fillStyle=grad;ctx.fillRect(0,0,32,32);
   var tex=new THREE.CanvasTexture(cvs);
 
-  var COUNT=120;
+  var COUNT=50;
   var pos=new Float32Array(COUNT*3);
   fireflyBaseY=new Float32Array(COUNT);
   fireflyPhases=new Float32Array(COUNT);
@@ -452,7 +452,7 @@ function buildSkydome(){
 function initScene(){
   var canvas=document.getElementById('gc');
   renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 
   /* ── 그림자 활성화 ── */
   renderer.shadowMap.enabled=true;
@@ -542,24 +542,8 @@ function initScene(){
   var lov=document.getElementById('lov');
   var ple=document.createElement('div');ple.className='llabel plr';ple.id='ple';ple.textContent=myName;lov.appendChild(ple);
 
-  /* ── Bloom 포스트프로세싱 ── */
-  try{
-    if(typeof THREE.EffectComposer!=='undefined'&&typeof THREE.UnrealBloomPass!=='undefined'){
-      composer=new THREE.EffectComposer(renderer);
-      var renderPass=new THREE.RenderPass(scene,camera);
-      composer.addPass(renderPass);
-      var bloomPass=new THREE.UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth,window.innerHeight),
-        0.0,    /* strength — disabled */
-        0.4,    /* radius */
-        1.0     /* threshold */
-      );
-      composer.addPass(bloomPass);
-    }
-  }catch(e){
-    console.warn('Bloom post-processing unavailable:',e);
-    composer=null;
-  }
+  /* Bloom 제거 — 성능 최적화 */
+  composer=null;
 
   setupInput();onResize();window.addEventListener('resize',onResize);
 
@@ -600,32 +584,23 @@ function updNpcs(t){
 }
 
 /* ════════════ 파티클 + 물 UV 업데이트 ════════════ */
+var _vfxFrame=0;
 function updVisualFX(t){
-  /* 반딧불 떠오르기 + 펄스 */
-  if(fireflyPoints&&fireflyPositions){
+  _vfxFrame++;
+  /* 반딧불 — 3프레임마다 업데이트 */
+  if(fireflyPoints&&fireflyPositions&&_vfxFrame%3===0){
     var pos=fireflyPositions;
     var COUNT=pos.length/3;
     for(var i=0;i<COUNT;i++){
       pos[i*3+1]=fireflyBaseY[i]+Math.sin(t*1.1+fireflyPhases[i])*0.6;
-      /* 수평 표류 */
-      pos[i*3]+=Math.sin(t*.3+fireflyPhases[i]*2)*.004;
-      pos[i*3+2]+=Math.cos(t*.25+fireflyPhases[i])*.004;
     }
     fireflyPoints.geometry.attributes.position.needsUpdate=true;
-    /* 파티클 크기 펄스 */
-    fireflyPoints.material.size=.28+Math.sin(t*2.2)*.12;
   }
 
-  /* 강물 UV 오프셋 애니메이션 */
-  riverUVOffset+=0.0015;
+  /* 강물 UV 오프셋 애니메이션 (머티리얼 offset 사용 — 빠름) */
   waterMeshes.forEach(function(mesh){
-    if(mesh.geometry&&mesh.geometry.attributes.uv){
-      var uvAttr=mesh.geometry.attributes.uv;
-      for(var j=0;j<uvAttr.count;j++){
-        /* 원본 UV의 v 성분에 오프셋 적용 */
-        uvAttr.setY(j,(uvAttr.getY(j)+0.0015)%1.0);
-      }
-      uvAttr.needsUpdate=true;
+    if(mesh.material&&mesh.material.map){
+      mesh.material.map.offset.y+=0.0015;
     }
   });
 }
