@@ -21,6 +21,7 @@ export default {
         if (c.id === conn.id) continue;
         var oldSt = c.deserializeAttachment();
         if (oldSt && oldSt.uid === uid) {
+          c.serializeAttachment(null);
           c.close();
         }
       }
@@ -60,7 +61,8 @@ export default {
 
   onClose(conn, room) {
     var st = conn.deserializeAttachment();
-    var uid = st ? (st.uid || conn.id) : conn.id;
+    if (!st) return;
+    var uid = st.uid || conn.id;
     room.broadcast(JSON.stringify({ type: 'leave', id: uid }));
   }
 };
