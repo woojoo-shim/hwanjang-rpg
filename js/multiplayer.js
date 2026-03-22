@@ -82,8 +82,9 @@ function onMpMessage(data){
     }
   }
   else if(data.type==='join'){
+    var isNew=!remotePlayers[data.id];
     spawnRemote(data.id,data.name,data.level,data.x,data.z,data.ry);
-    addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
+    if(isNew)addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
   }
   else if(data.type==='move'){
     var r=remotePlayers[data.id];

@@ -29,15 +29,6 @@ export default {
     if (data.type === 'join') {
       var uid = data.uid || conn.id;
       var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
-      /* 같은 uid의 이전 연결 조용히 제거 (leave 안 보냄) */
-      for (var c of room.getConnections()) {
-        if (c.id === conn.id) continue;
-        var oldSt = c.deserializeAttachment();
-        if (oldSt && oldSt.uid === uid) {
-          c.serializeAttachment(null);
-          c.close(4000, 'dup');
-        }
-      }
       conn.serializeAttachment(state);
       room.broadcast(JSON.stringify({
         type: 'join', id: uid,
