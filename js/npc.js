@@ -122,8 +122,63 @@ function npcFallback(npcName){
   return list[Math.floor(Math.random()*list.length)];
 }
 
+/* ── 전직 선택 ── */
+function showClassSelect(){
+  var modal=document.getElementById('class-modal');
+  if(!modal)return;
+  var grid=document.getElementById('class-grid');
+  grid.innerHTML='';
+  var keys=Object.keys(CLASS_DEFS);
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i];
+    if(k==='none')continue;
+    var c=CLASS_DEFS[k];
+    var card=document.createElement('div');
+    card.className='class-card';
+    card.dataset.cls=k;
+    card.innerHTML='<div class="class-icon" style="background:#'+c.color.toString(16).padStart(6,'0')+'"></div>'
+      +'<div class="class-name">'+c.name+'</div>'
+      +'<div class="class-desc">'+c.desc+'</div>'
+      +'<div class="class-stats">'
+      +'HP x'+c.hpMul+' | ATK x'+c.atkMul+'<br>'
+      +'SPD x'+c.spdMul+' | 치명타 '+Math.floor(c.crit*100)+'%'
+      +'</div>'
+      +'<div class="class-weapons">무기: '+c.weapons.join(', ')+'</div>';
+    card.onclick=(function(key){return function(){
+      var prev=grid.querySelector('.class-card.selected');
+      if(prev)prev.classList.remove('selected');
+      this.classList.add('selected');
+      document.getElementById('class-confirm-btn').dataset.cls=key;
+    };})(k);
+    grid.appendChild(card);
+  }
+  modal.classList.remove('hidden');
+}
+
+function confirmClassSelect(){
+  var btn=document.getElementById('class-confirm-btn');
+  var cls=btn.dataset.cls;
+  if(!cls)return;
+  playerClass=cls;
+  var def=CLASS_DEFS[cls];
+  /* 스탯 적용 */
+  playerMaxHP=Math.floor(100*def.hpMul);
+  playerHP=playerMaxHP;
+  updPlayerHpBar();
+  addChat('sys','[시스템]','★ '+def.name+'(으)로 전직하였습니다!');
+  document.getElementById('class-modal').classList.add('hidden');
+  /* HUD에 직업 표시 */
+  var clsEl=document.getElementById('hclass');
+  if(clsEl)clsEl.textContent=def.name;
+}
+
 /* ── 대화창 ── */
 function talk(n){
+  /* 전직 체크 */
+  if(n.name==='마을 이장'&&playerLevel>=5&&playerClass==='none'){
+    showClassSelect();
+    return;
+  }
   /* 상인/대장장이: 상점 + 대화창 동시 */
   if(n.name==='상인'||n.name==='대장장이'){
     openShop(n.name);

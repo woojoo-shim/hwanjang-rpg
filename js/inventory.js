@@ -37,6 +37,15 @@ function isEquipped(slot){
 
 function equipItem(slot){
   var it=getItemFull(slot);
+  /* 클래스 무기 제한 */
+  if(it.type==='weapon'&&playerClass!=='none'){
+    var cls=CLASS_DEFS[playerClass];
+    var def=getItemDef(slot.itemId);
+    if(def&&cls&&cls.weapons.indexOf(def.icon)===-1){
+      addChat('sys','[시스템]',cls.name+'은(는) '+def.name+'을(를) 장착할 수 없습니다.');
+      return;
+    }
+  }
   equipped[it.type]=slot.itemId;
   addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();

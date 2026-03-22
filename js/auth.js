@@ -113,7 +113,8 @@ async function savePlayerData(){
     equipped:equipped,
     position_x:PL.group.position.x,
     position_z:PL.group.position.z,
-    zone:currentZone||'village'
+    zone:currentZone||'village',
+    class:playerClass
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
@@ -129,6 +130,7 @@ function restoreGameState(){
   gold=playerData.gold||0;
   inventory=playerData.inventory||[];
   equipped=playerData.equipped||{weapon:null,armor:null};
+  playerClass=playerData.class||'none';
 }
 
 function startAutoSave(){

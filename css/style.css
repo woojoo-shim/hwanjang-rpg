@@ -274,6 +274,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 .qt-turnin{font-size:10px;color:#f0d060;margin-top:4px;letter-spacing:1px;}
 @keyframes readyBlink{0%,100%{opacity:1;}50%{opacity:.4;}}
 
+/* ─── 직업 선택 ─── */
+.class-card{background:#1a1a2e;border:1px solid #333;padding:12px;cursor:pointer;text-align:center;border-radius:4px;transition:border-color .2s;}
+.class-card:hover{border-color:#c9a84c;}
+.class-card.selected{border-color:#c9a84c;background:#2a2a3e;box-shadow:0 0 10px #c9a84c44;}
+.class-icon{width:40px;height:40px;border-radius:50%;margin:0 auto 8px;}
+.class-name{color:#c9a84c;font-size:14px;font-weight:bold;margin-bottom:4px;}
+.class-desc{color:#aaa;font-size:11px;margin-bottom:6px;line-height:1.3;}
+.class-stats{color:#88cc88;font-size:10px;margin-bottom:4px;}
+.class-weapons{color:#8888cc;font-size:10px;}
+
 /* ─── 퀘스트 완료 ─── */
 #quest-complete{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:#0c0c1eee;border:2px solid #f0d060;padding:16px 30px;color:#f0d060;font-size:16px;font-weight:700;letter-spacing:3px;z-index:200;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;}
 #quest-complete.show{opacity:1;transform:translate(-50%,-50%) scale(1);}

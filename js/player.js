@@ -234,7 +234,12 @@ function playerAttack(){
     var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
     if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
   }
-  var dmg=baseAtk+Math.floor(Math.random()*5);
+  var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
+  var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul);
+  /* 광전사 패시브: HP 낮을수록 ATK 증가 */
+  if(cls.passive==='rage'){var hpRatio=playerHP/playerMaxHP;dmg=Math.floor(dmg*(1+(1-hpRatio)*0.8));}
+  /* 치명타 판정 */
+  if(Math.random()<cls.crit){dmg=Math.floor(dmg*cls.critDmg);}
 
   /* 활: 마우스 방향으로 화살 발사 */
   if(isRangedWeapon()){
@@ -245,7 +250,7 @@ function playerAttack(){
     dx/=len;dz/=len;
     PL.group.rotation.y=Math.atan2(dx,dz);
     shootArrow(dx,dz,dmg);
-    attackCooldown=.5;
+    attackCooldown=.5/cls.spdMul;
     triggerAtkAnim();
     if(typeof sendAttackMP==='function')sendAttackMP();
     return;
@@ -266,7 +271,11 @@ function playerAttack(){
   }
   target.hp=Math.max(0,target.hp-dmg);
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
-  attackCooldown=.75;
+  /* 성기사 패시브: 흡혈 */
+  if(cls.passive==='lifesteal'){var heal=Math.floor(dmg*0.05);playerHP=Math.min(playerMaxHP,playerHP+heal);updPlayerHpBar();}
+  /* 주술사 패시브: 독 */
+  if(cls.passive==='poison'&&target){target._poisonT=3;target._poisonDmg=Math.floor(dmg*0.15);}
+  attackCooldown=.75/cls.spdMul;
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
   var midx=monsters.indexOf(target);
@@ -330,7 +339,7 @@ function playerDied(){
 function checkLevelUp(){
   var need=Math.floor(100*Math.pow(playerLevel,2.2));
   if(playerEXP>=need){
-    playerEXP-=need;playerLevel++;playerMaxHP+=12;playerHP=playerMaxHP;
+    playerEXP-=need;playerLevel++;var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;playerMaxHP+=Math.floor(12*cls.hpMul);playerHP=playerMaxHP;
     document.querySelector('.hlv').textContent='Lv.'+playerLevel;
     updPlayerHpBar();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
@@ -402,7 +411,7 @@ function handleMove(dt){
   var moving=dx!==0||dz!==0;
   if(moving){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
-    var spd=6.0*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
+    var spd=6.0*(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     var wb=WORLD_BOUNDS;
     if(nx>wb[0]&&nx<wb[1]&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
     if(nz>wb[2]&&nz<wb[3]&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
