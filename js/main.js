@@ -129,11 +129,11 @@ function enterGame(){
   setTimeout(function(){
     try{
       initScene();
-      /* 복귀 유저 장비 복원 — 스폰 위치로 이동 */
       if(playerData&&PL.group){
         PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
         refreshWeaponMesh();
       }
+      loop();
     }catch(e){console.error('initScene error',e);}
   },100);
   var t=document.getElementById('toast');
@@ -150,8 +150,6 @@ function enterGame(){
   cm.forEach(function(c){setTimeout(function(){addChat(c[1],c[2],c[3]);},c[0]);});
   if(!playerData)setTimeout(giveStartItems,500);
   updTime();setInterval(updTime,1000);
-  /* 게임 루프 시작 */
-  loop();
   /* 멀티플레이 연결 */
   setTimeout(function(){if(typeof connectParty==='function')connectParty();},500);
   /* 자동 저장 시작 */
