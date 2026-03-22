@@ -159,14 +159,14 @@ var _raycaster=new THREE.Raycaster();
 var _mouseNDC=new THREE.Vector2();
 
 document.addEventListener('mousemove',function(e){
-  _mouseNDC.x=(e.clientX/window.innerWidth)*2-1;
-  _mouseNDC.y=-(e.clientY/window.innerHeight)*2+1;
-  if(typeof camera!=='undefined'&&camera){
-    _raycaster.setFromCamera(_mouseNDC,camera);
-    var hit=new THREE.Vector3();
-    if(_raycaster.ray.intersectPlane(_groundPlane,hit)){
-      mouseWorldX=hit.x;mouseWorldZ=hit.z;
-    }
+  if(typeof camera==='undefined'||!camera||typeof renderer==='undefined'||!renderer)return;
+  var rect=renderer.domElement.getBoundingClientRect();
+  _mouseNDC.x=((e.clientX-rect.left)/rect.width)*2-1;
+  _mouseNDC.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  _raycaster.setFromCamera(_mouseNDC,camera);
+  var hit=new THREE.Vector3();
+  if(_raycaster.ray.intersectPlane(_groundPlane,hit)){
+    mouseWorldX=hit.x;mouseWorldZ=hit.z;
   }
 },{passive:true});
 
