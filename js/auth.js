@@ -116,7 +116,8 @@ async function savePlayerData(){
     position_x:PL.group.position.x,
     position_z:PL.group.position.z,
     zone:currentZone||'village',
-    class:playerClass
+    class:playerClass,
+    visited_zones:visitedZones
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
@@ -133,6 +134,7 @@ function restoreGameState(){
   inventory=playerData.inventory||[];
   equipped=playerData.equipped||{weapon:null,armor:null};
   playerClass=playerData.class||'none';
+  if(playerData.visited_zones)visitedZones=playerData.visited_zones;
 }
 
 function startAutoSave(){
