@@ -733,28 +733,9 @@ function updMonsters(dt,t){
       m.wrap.style.display='none';
     }
     if(dist<md){md=dist;closestMonster=m;}
-    /* 서버에서 위치를 받은 몬스터만 보간, 나머지는 로컬 AI */
-    if(m._targetX!==undefined){
-      m.mesh.position.x+=(m._targetX-m.mesh.position.x)*0.15;
-      m.mesh.position.z+=(m._targetZ-m.mesh.position.z)*0.15;
-      var tdx=m._targetX-mx,tdz=m._targetZ-mz;
-      if(tdx*tdx+tdz*tdz>0.01)m.mesh.rotation.y=Math.atan2(tdx,tdz);
-      /* 비호스트도 플레이어 근접 시 데미지는 받음 */
-      m.attackTimer-=dt;
-      if(dist<1.8&&m.attackTimer<=0){
-        m.attackTimer=1.4+Math.random()*.5;
-        m.isAttacking=true;m.attackAnimT=0.4;
-        if(invincibleTimer<=0){
-          var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
-          playerHP=Math.max(0,playerHP-dmg);
-          updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
-          if(playerHP<=0)playerDied();
-        }
-      }
-    }else{
-      /* 호스트 또는 싱글: 로컬 AI */
-      if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
-      if(m.state==='aggro'){
+    /* 로컬 AI — 항상 실행 */
+    if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
+    if(m.state==='aggro'){
         if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
           m.mesh.position.x+=dx/len*m.def.spd*dt;
@@ -789,7 +770,6 @@ function updMonsters(dt,t){
           m.mesh.rotation.y=Math.atan2(rdx,rdz);
         }
       }
-    }
   });
   var fh=document.getElementById('f-hint');
   if(fh)fh.style.display=(md<7&&currentZone!=='village')?'block':'none';
