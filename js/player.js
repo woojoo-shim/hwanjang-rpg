@@ -570,7 +570,7 @@ function handleMove(dt){
     playerPoisoned-=dt;
     if(playerPoisoned<=0){playerPoisoned=0;addChat('inf','','독이 해제되었다.');}
     else{
-      playerHP=Math.max(1,playerHP-playerPoisonDmg*dt);
+      playerHP=Math.max(1,Math.floor(playerHP-playerPoisonDmg*dt));
       updPlayerHpBar();
     }
   }
