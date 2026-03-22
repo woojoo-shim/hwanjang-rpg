@@ -744,7 +744,7 @@ function updMonsters(dt,t){
         }
         m.attackTimer-=dt;
         if(dist<1.8&&m.attackTimer<=0){
-          m.attackTimer=1.4+Math.random()*.5;
+          m.attackTimer=0.8+Math.random()*.4;
           m.isAttacking=true;m.attackAnimT=0.4;
           if(invincibleTimer<=0){
             var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);

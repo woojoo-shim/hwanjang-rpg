@@ -328,16 +328,16 @@ function playerDied(){
 }
 
 function checkLevelUp(){
-  var need=playerLevel*100;
+  var need=playerLevel*180;
   if(playerEXP>=need){
-    playerEXP-=need;playerLevel++;playerMaxHP+=20;playerHP=playerMaxHP;
+    playerEXP-=need;playerLevel++;playerMaxHP+=12;playerHP=playerMaxHP;
     document.querySelector('.hlv').textContent='Lv.'+playerLevel;
     updPlayerHpBar();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
-    gold+=50;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    gold+=20;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
   }
   var ef=document.getElementById('exp-bar-fill');
-  if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*100)*100)+'%';
+  if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*180)*100)+'%';
 }
 
 function updPlayerHpBar(){

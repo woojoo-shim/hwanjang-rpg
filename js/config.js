@@ -204,25 +204,25 @@ var NPC_DEF=[
 /* ════════════ 몬스터 정의 ════════════ */
 var MONSTER_DEFS=[
   // ── 초원 (z 15~60) ──
-  {id:'rabbit', name:'토끼',   hp:30,  atk:2,  exp:15, spd:2.5, aggro:12, color:0xeeeeee,hc:0xffcccc,
-   drops:[{id:'rabbit_liver',rate:.9,qty:1},{id:'red_potion',rate:.3,qty:1}]},
-  {id:'deer',   name:'사슴',   hp:80,  atk:8,  exp:45, spd:3.5, aggro:12, color:0x8a5a20,hc:0xaa7a30,
-   drops:[{id:'deer_meat',rate:.95,qty:[1,3]},{id:'deer_antler',rate:.6,qty:1}]},
+  {id:'rabbit', name:'토끼',   hp:60,  atk:8,  exp:12, spd:3.2, aggro:14, color:0xeeeeee,hc:0xffcccc,
+   drops:[{id:'rabbit_liver',rate:.7,qty:1},{id:'red_potion',rate:.15,qty:1}]},
+  {id:'deer',   name:'사슴',   hp:150, atk:18, exp:35, spd:4.0, aggro:14, color:0x8a5a20,hc:0xaa7a30,
+   drops:[{id:'deer_meat',rate:.8,qty:[1,2]},{id:'deer_antler',rate:.4,qty:1}]},
   // ── 독 늪 (z 60~120) ──
-  {id:'slime',  name:'슬라임', hp:50,  atk:6,  exp:30, spd:1.8, aggro:14, color:0x22aa22,hc:0x33cc33,
-   drops:[{id:'magic_crystal',rate:.25,qty:1},{id:'blue_potion',rate:.5,qty:1}]},
-  {id:'toad',   name:'독두꺼비', hp:90, atk:12, exp:55, spd:2.2, aggro:14, color:0x446622,hc:0x88cc44,
-   drops:[{id:'magic_crystal',rate:.4,qty:1},{id:'blue_potion',rate:.4,qty:1}]},
+  {id:'slime',  name:'슬라임', hp:120, atk:15, exp:25, spd:2.5, aggro:16, color:0x22aa22,hc:0x33cc33,
+   drops:[{id:'magic_crystal',rate:.15,qty:1},{id:'blue_potion',rate:.3,qty:1}]},
+  {id:'toad',   name:'독두꺼비', hp:200, atk:25, exp:45, spd:3.0, aggro:16, color:0x446622,hc:0x88cc44,
+   drops:[{id:'magic_crystal',rate:.25,qty:1},{id:'blue_potion',rate:.25,qty:1}]},
   // ── 어두운 숲 (z 120~200) ──
-  {id:'goblin', name:'고블린', hp:120, atk:14, exp:80, spd:3.0, aggro:18, color:0x336611,hc:0x448822,
-   drops:[{id:'iron_sword',rate:.1,qty:1},{id:'leather_armor',rate:.15,qty:1},{id:'red_potion',rate:.6,qty:1}]},
-  {id:'wolf',   name:'늑대',   hp:150, atk:18, exp:100,spd:4.5, aggro:20, color:0x555566,hc:0x888899,
-   drops:[{id:'leather_armor',rate:.3,qty:1},{id:'magic_crystal',rate:.2,qty:1}]},
+  {id:'goblin', name:'고블린', hp:280, atk:32, exp:65, spd:3.8, aggro:20, color:0x336611,hc:0x448822,
+   drops:[{id:'iron_sword',rate:.05,qty:1},{id:'leather_armor',rate:.08,qty:1},{id:'red_potion',rate:.4,qty:1}]},
+  {id:'wolf',   name:'늑대',   hp:350, atk:40, exp:85, spd:5.5, aggro:22, color:0x555566,hc:0x888899,
+   drops:[{id:'leather_armor',rate:.15,qty:1},{id:'magic_crystal',rate:.1,qty:1}]},
   // ── 화산 지대 (z 200~280) ──
-  {id:'golem',  name:'용암 골렘', hp:350,atk:28, exp:200,spd:1.5, aggro:16, color:0x883311,hc:0xff4400,
-   drops:[{id:'star_fragment',rate:.3,qty:1},{id:'iron_sword',rate:.2,qty:1},{id:'elixir',rate:.05,qty:1}]},
-  {id:'firedrake',name:'파이어드레이크',hp:500,atk:40,exp:350,spd:3.2,aggro:25,color:0xcc2200,hc:0xff6600,
-   drops:[{id:'dragon_scale',rate:.25,qty:1},{id:'star_fragment',rate:.5,qty:1},{id:'eternal_chain',rate:.03,qty:1}]},
+  {id:'golem',  name:'용암 골렘', hp:800,atk:55, exp:160,spd:2.0, aggro:18, color:0x883311,hc:0xff4400,
+   drops:[{id:'star_fragment',rate:.15,qty:1},{id:'iron_sword',rate:.1,qty:1},{id:'elixir',rate:.02,qty:1}]},
+  {id:'firedrake',name:'파이어드레이크',hp:1200,atk:75,exp:280,spd:4.0,aggro:28,color:0xcc2200,hc:0xff6600,
+   drops:[{id:'dragon_scale',rate:.12,qty:1},{id:'star_fragment',rate:.3,qty:1},{id:'eternal_chain',rate:.01,qty:1}]},
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
