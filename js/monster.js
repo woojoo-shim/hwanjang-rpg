@@ -739,7 +739,7 @@ function updMonsters(dt,t){
         var mid=m.def.id;
         var spd=m.def.spd;
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
-        if(mid==='deer'&&dist>4&&dist<8)spd=m.def.spd*3;
+        if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
         /* 독두꺼비: 사거리 더 김 (혀 공격) */
         var atkRange=(mid==='toad')?3.5:1.8;
         if(dist>1.2){
