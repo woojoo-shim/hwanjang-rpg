@@ -152,8 +152,106 @@ function flashMonster(m){
   },180);
 }
 
+/* ── 마우스 월드 좌표 (레이캐스트) ── */
+var mouseWorldX=0,mouseWorldZ=0;
+var _groundPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+var _raycaster=new THREE.Raycaster();
+var _mouseNDC=new THREE.Vector2();
+
+document.addEventListener('mousemove',function(e){
+  _mouseNDC.x=(e.clientX/window.innerWidth)*2-1;
+  _mouseNDC.y=-(e.clientY/window.innerHeight)*2+1;
+  if(typeof camera!=='undefined'&&camera){
+    _raycaster.setFromCamera(_mouseNDC,camera);
+    var hit=new THREE.Vector3();
+    if(_raycaster.ray.intersectPlane(_groundPlane,hit)){
+      mouseWorldX=hit.x;mouseWorldZ=hit.z;
+    }
+  }
+},{passive:true});
+
+/* ── 화살 시스템 ── */
+var arrows=[];
+var _arrowMat=new THREE.MeshLambertMaterial({color:0x8B4513});
+var _arrowHeadMat=new THREE.MeshLambertMaterial({color:0xaabbcc});
+
+function shootArrow(dirX,dirZ,dmg){
+  var g=new THREE.Group();
+  var shaft=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.6,4),_arrowMat);
+  shaft.rotation.x=Math.PI/2;g.add(shaft);
+  var head=new THREE.Mesh(new THREE.ConeGeometry(.05,.15,4),_arrowHeadMat);
+  head.rotation.x=-Math.PI/2;head.position.set(0,0,.35);g.add(head);
+  g.position.set(PL.group.position.x,1.2,PL.group.position.z);
+  g.rotation.y=Math.atan2(dirX,dirZ);
+  scene.add(g);
+  arrows.push({mesh:g,dx:dirX,dz:dirZ,dmg:dmg,life:2.0,speed:25});
+}
+
+function updateArrows(dt){
+  for(var i=arrows.length-1;i>=0;i--){
+    var a=arrows[i];
+    a.mesh.position.x+=a.dx*a.speed*dt;
+    a.mesh.position.z+=a.dz*a.speed*dt;
+    a.life-=dt;
+    /* 몬스터 충돌 체크 */
+    var hit=false;
+    for(var j=0;j<monsters.length;j++){
+      var m=monsters[j];
+      if(m.state==='dead'||m.hp<=0)continue;
+      var ex=a.mesh.position.x-m.mesh.position.x;
+      var ez=a.mesh.position.z-m.mesh.position.z;
+      if(ex*ex+ez*ez<1.5){
+        m.hp=Math.max(0,m.hp-a.dmg);
+        m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
+        spawnDmgNum('-'+a.dmg,'#ffdd44');
+        flashMonster(m);
+        m.state='aggro';
+        var midx=monsters.indexOf(m);
+        if(midx>=0&&typeof ws!=='undefined'&&ws&&ws.readyState===1)ws.send(JSON.stringify({type:'mhit',mid:midx,dmg:a.dmg,maxHp:m.maxHp}));
+        if(m.hp<=0)killMonster(m);
+        hit=true;break;
+      }
+    }
+    if(hit||a.life<=0){
+      scene.remove(a.mesh);
+      arrows.splice(i,1);
+    }
+  }
+}
+
+/* ── 무기 타입 판별 ── */
+function isRangedWeapon(){
+  if(!equipped.weapon)return false;
+  var def=getItemDef(equipped.weapon);
+  return def&&def.icon==='bow';
+}
+
 function playerAttack(){
   if(attackCooldown>0)return;
+
+  var baseAtk=5;
+  if(equipped.weapon){
+    var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
+    if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
+  }
+  var dmg=baseAtk+Math.floor(Math.random()*5);
+
+  /* 활: 마우스 방향으로 화살 발사 */
+  if(isRangedWeapon()){
+    var dx=mouseWorldX-PL.group.position.x;
+    var dz=mouseWorldZ-PL.group.position.z;
+    var len=Math.sqrt(dx*dx+dz*dz);
+    if(len<0.1){dx=0;dz=1;len=1;}
+    dx/=len;dz/=len;
+    PL.group.rotation.y=Math.atan2(dx,dz);
+    shootArrow(dx,dz,dmg);
+    attackCooldown=.5;
+    triggerAtkAnim();
+    if(typeof sendAttackMP==='function')sendAttackMP();
+    return;
+  }
+
+  /* 근접 무기: 기존 로직 */
   var target=null,bestDist=6.0;
   monsters.forEach(function(m){
     if(m.state==='dead')return;
@@ -166,18 +264,11 @@ function playerAttack(){
     addChat('inf','','근처에 공격할 대상이 없다.');
     return;
   }
-  var baseAtk=5;
-  if(equipped.weapon){
-    var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
-    if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
-  }
-  var dmg=baseAtk+Math.floor(Math.random()*5);
   target.hp=Math.max(0,target.hp-dmg);
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
   attackCooldown=.75;
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
-  /* 몬스터 데미지를 서버에 전송 */
   var midx=monsters.indexOf(target);
   if(midx>=0&&ws&&ws.readyState===1)ws.send(JSON.stringify({type:'mhit',mid:midx,dmg:dmg,maxHp:target.maxHp}));
   var ddx=target.mesh.position.x-PL.group.position.x;

@@ -221,6 +221,7 @@ function loop(){
   else tickAtkAnim(dt);
   updCam();updNpcs(now/1000);chkNpc();
   updMonsters(dt,now/1000);
+  if(typeof updateArrows==='function')updateArrows(dt);
   if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
   checkZone();
   if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
