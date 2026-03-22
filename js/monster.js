@@ -717,7 +717,7 @@ function updMonsters(dt,t){
     if(m.state==='dead')return;
     var mx=m.mesh.position.x,mz=m.mesh.position.z;
     var dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
-    /* 먼 몬스터는 AI+렌더링 전부 스킵 */
+    /* 먼 몬스터는 AI 스킵 */
     if(dist>100){
       m.wrap.style.display='none';
       m.mesh.visible=false;
@@ -725,7 +725,8 @@ function updMonsters(dt,t){
       return;
     }
     m.mesh.visible=true;
-    if(dist<60){
+    /* 이름+HP바: 20유닛 이내만 */
+    if(dist<20){
       posEl(m.wrap,mx,m.mesh.position.y+2.1,mz);
       m.wrap.style.display='';
       m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';

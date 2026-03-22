@@ -249,7 +249,15 @@ function updateRemotePlayers(dt){
       }
     }
 
-    posEl(r.nameEl,r.group.position.x,r.group.position.y+2.4,r.group.position.z);
+    /* 이름표: 30유닛 이내만 표시 */
+    var pdx=PL.group.position.x-r.group.position.x,pdz=PL.group.position.z-r.group.position.z;
+    var pdist=Math.sqrt(pdx*pdx+pdz*pdz);
+    if(pdist<30){
+      r.nameEl.style.display='';
+      posEl(r.nameEl,r.group.position.x,r.group.position.y+2.4,r.group.position.z);
+    }else{
+      r.nameEl.style.display='none';
+    }
   }
 }
 
