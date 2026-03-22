@@ -221,6 +221,7 @@ function openShop(npcName){
 function closeShop(){
   shopOpen=false;
   document.getElementById('shop-overlay').classList.remove('show');
+  var sc=document.getElementById('shop-chat');if(sc)sc.style.display='none';
   shopSelectedItem=null;currentShopNpc=null;
 }
 
@@ -391,6 +392,17 @@ function resetHaggle(){
   haggleCount=0;haggleDiscount=0;
   var r=document.getElementById('haggle-result');
   if(r)r.textContent='';
+}
+
+function toggleShopChat(){
+  var el=document.getElementById('shop-chat');
+  if(!el)return;
+  if(el.style.display==='none'){
+    el.style.display='flex';
+    document.getElementById('shop-chat-input').focus();
+  }else{
+    el.style.display='none';
+  }
 }
 
 /* ════════════ 상점 내 NPC 대화 ════════════ */
