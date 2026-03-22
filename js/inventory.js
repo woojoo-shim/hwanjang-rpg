@@ -213,6 +213,8 @@ function openShop(npcName){
   renderShopDetail(null);
   renderShopItems();
   updShopGold();
+  var cl=document.getElementById('shop-chat-log');
+  if(cl)cl.innerHTML='<div style="color:#c9a84c;">'+npcName+': 어서오세요~ 뭘 도와드릴까요?</div>';
   return true;
 }
 
@@ -389,6 +391,24 @@ function resetHaggle(){
   haggleCount=0;haggleDiscount=0;
   var r=document.getElementById('haggle-result');
   if(r)r.textContent='';
+}
+
+/* ════════════ 상점 내 NPC 대화 ════════════ */
+async function sendShopChat(){
+  var inp=document.getElementById('shop-chat-input');
+  var msg=inp.value.trim();
+  if(!msg||!currentShopNpc)return;
+  inp.value='';
+  var log=document.getElementById('shop-chat-log');
+  log.innerHTML+='<div style="color:#88aaff;">나: '+msg+'</div>';
+  log.scrollTop=log.scrollHeight;
+  /* AI에게 보내기 */
+  var reply=await askAI(currentShopNpc,msg);
+  log.innerHTML+='<div style="color:#c9a84c;">'+currentShopNpc+': '+reply+'</div>';
+  log.scrollTop=log.scrollHeight;
+  /* 가격 변경이 있으면 상점 UI 새로고침 */
+  renderShopItems();
+  if(shopSelectedItem)renderShopDetail(shopSelectedItem);
 }
 
 function flashHiddenItem(name){

@@ -208,6 +208,15 @@
       </div>
     </div>
   </div>
+    <!-- 상점 내 NPC 대화 -->
+    <div id="shop-chat" style="border-top:1px solid #333;padding:8px;display:flex;flex-direction:column;gap:4px;">
+      <div id="shop-chat-log" style="height:60px;overflow-y:auto;font-size:11px;color:#aaa;padding:4px;background:#0a0a15;border:1px solid #222;border-radius:3px;"></div>
+      <div style="display:flex;gap:4px;">
+        <input id="shop-chat-input" type="text" placeholder="NPC에게 말하기... (가격 흥정 가능)" style="flex:1;background:#1a1a2e;border:1px solid #333;color:#ddd;padding:6px 8px;font-size:11px;font-family:inherit;border-radius:3px;" onkeydown="if(event.key==='Enter')sendShopChat()">
+        <button onclick="sendShopChat()" style="background:#c9a84c;color:#1a1a2e;border:none;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;border-radius:3px;">전송</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 전직 선택 모달 -->
