@@ -31,7 +31,7 @@ export default {
         var oldSt = c.deserializeAttachment();
         if (oldSt && oldSt.uid === uid) {
           room.broadcast(JSON.stringify({ type: 'leave', id: uid }), [conn.id]);
-          c.close();
+          c.close(4000, 'duplicate');
         }
       }
 

@@ -8,6 +8,7 @@ var ws=null;
 var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
+var mpKicked=false;
 
 function connectParty(){
   if(ws&&ws.readyState<=1)return;
@@ -36,9 +37,11 @@ function connectParty(){
     onMpMessage(data);
   };
 
-  ws.onclose=function(){
-    console.log('[MP] disconnected');
+  ws.onclose=function(e){
+    console.log('[MP] disconnected, code:',e.code);
     if(mpSendTimer){clearInterval(mpSendTimer);mpSendTimer=null;}
+    /* 서버에서 킥당한 경우(중복 접속) 재연결 안 함 */
+    if(e.code===4000||mpKicked)return;
     /* 5초 후 재연결 */
     if(mpReconnectTimer)clearTimeout(mpReconnectTimer);
     mpReconnectTimer=setTimeout(connectParty,5000);
@@ -83,7 +86,8 @@ function onMpMessage(data){
     if(r)triggerRemoteAttack(r);
   }
   else if(data.type==='leave'){
-    removeRemote(data.id);
+    var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+    if(data.id!==myUid)removeRemote(data.id);
   }
   else if(data.type==='monster_init'){
     applyMonsterInit(data.monsters);
