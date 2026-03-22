@@ -53,9 +53,11 @@ function logout(){
   sbClient.auth.signOut().then(function(){
     currentUser=null;playerData=null;
     if(saveTimer){clearInterval(saveTimer);saveTimer=null;}
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('nick-screen').classList.add('hidden');
-    document.getElementById('login-screen').classList.remove('hidden');
+    /* 게임 상태 초기화 */
+    playerHP=100;playerMaxHP=100;playerEXP=0;playerLevel=1;
+    playerClass='none';gold=50;inventory=[];equipped={weapon:null,armor:null};
+    classQuestState={};
+    location.reload();
   });
 }
 
