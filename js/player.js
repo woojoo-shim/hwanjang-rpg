@@ -468,15 +468,34 @@ function killMonster(m){
 }
 
 function playerDied(){
-  addChat('sys','[시스템]','쓰러졌습니다. 마을로 귀환...');
-  playerHP=Math.floor(playerMaxHP*.4);
-  invincibleTimer=4;updPlayerHpBar();
-  PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
-  currentZone='village';
-  /* 분위기 복원 */
-  scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);
-  var zi=ZONE_INFO['village'];
-  document.querySelector('.hloc').textContent='▸ '+zi.name;
+  /* 사망 오버레이 */
+  var ov=document.getElementById('death-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='death-overlay';
+    ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.8s;';
+    ov.innerHTML='<div style="background:rgba(0,0,0,0.95);width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;">'
+      +'<div id="death-text" style="color:#cc3333;font-size:28px;letter-spacing:5px;font-family:inherit;text-shadow:0 0 20px #ff0000;"></div>'
+      +'</div>';
+    document.body.appendChild(ov);
+  }
+  document.getElementById('death-text').textContent=myName+'님이 사망하셨습니다';
+  ov.style.opacity='1';
+  /* 2초 후 페이드아웃 + 리스폰 */
+  setTimeout(function(){
+    playerHP=Math.floor(playerMaxHP*.4);
+    invincibleTimer=4;updPlayerHpBar();
+    PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
+    currentZone='village';
+    scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);
+    var zi=ZONE_INFO['village'];
+    document.querySelector('.hloc').textContent='▸ '+zi.name;
+    /* 페이드아웃 — 눈 뜨는 느낌 */
+    ov.style.transition='opacity 1.5s';
+    ov.style.opacity='0';
+    addChat('sys','[시스템]','마을로 귀환. HP 일부 회복.');
+    setTimeout(function(){ov.style.transition='opacity 0.8s';},1600);
+  },2500);
 }
 
 function checkLevelUp(){
