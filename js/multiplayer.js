@@ -160,7 +160,11 @@ var REMOTE_BODY_COLOR=0x3a3a8a;
 var REMOTE_HEAD_COLOR=0xddcc99;
 
 function spawnRemote(id,name,level,x,z,ry){
-  if(remotePlayers[id])return;
+  if(remotePlayers[id]){
+    /* 이미 존재하면 위치만 갱신 */
+    remotePlayers[id].tx=x;remotePlayers[id].tz=z;remotePlayers[id].try_=ry||0;
+    return;
+  }
   var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
   if(id===myUid)return;
   var h=mkHuman(REMOTE_BODY_COLOR,REMOTE_HEAD_COLOR);
