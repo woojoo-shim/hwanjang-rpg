@@ -61,22 +61,9 @@ function connectParty(){
 
   ws.onmessage=function(e){
     /* 몬스터 위치 배치 (경량 문자열 포맷) */
-    if(typeof e.data==='string'&&e.data.indexOf('mp|')===0){
-      if(!isMonsterHost){
-        var parts=e.data.substring(3).split(';');
-        for(var i=0;i<parts.length;i++){
-          var p=parts[i].split(',');
-          var idx=parseInt(p[0]);
-          if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
-            monsters[idx]._targetX=parseFloat(p[1]);
-            monsters[idx]._targetZ=parseFloat(p[2]);
-            if(p[3])monsters[idx].state=p[3];
-          }
-        }
-      }
-      return;
-    }
-    if(typeof e.data==='string'&&e.data==='host'){startMonsterSync();return;}
+    /* 위치 동기화 제거 — 각 클라이언트 자체 AI, HP/사망만 동기화 */
+    if(typeof e.data==='string'&&e.data.indexOf('mp|')===0)return;
+    if(typeof e.data==='string'&&e.data==='host')return;
     var data;
     try{data=JSON.parse(e.data);}catch(er){return;}
     onMpMessage(data);
