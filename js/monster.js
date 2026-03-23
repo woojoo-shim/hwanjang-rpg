@@ -1045,22 +1045,28 @@ function updMonsters(dt,t){
     if(dist<md){md=dist;closestMonster=m;}
     var mid=m.def.id;
     var isNH=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
-    /* 비호스트: 호스트 위치로 보간 */
+    /* 비호스트: 어그로 범위 밖이면 호스트 위치 보간, 안이면 로컬 AI */
+    var useLocalAI=true;
     if(isNH){
-      var tx=m._targetX,tz=m._targetZ;
-      var t2=Math.min(1,12*dt);
-      m.mesh.position.x=mx+(tx-mx)*t2;
-      m.mesh.position.z=mz+(tz-mz)*t2;
-      var ddx=tx-mx,ddz=tz-mz;
-      if(ddx*ddx+ddz*ddz>0.001){
-        var tRy=Math.atan2(ddx,ddz);
-        var dR=tRy-m.mesh.rotation.y;
-        while(dR>Math.PI)dR-=Math.PI*2;
-        while(dR<-Math.PI)dR+=Math.PI*2;
-        m.mesh.rotation.y+=dR*Math.min(1,10*dt);
+      if(dist>m.def.aggro*1.5){
+        /* 멀리 있음 → 호스트 위치 따라감 */
+        var tx=m._targetX,tz=m._targetZ;
+        var t2=Math.min(1,12*dt);
+        m.mesh.position.x=mx+(tx-mx)*t2;
+        m.mesh.position.z=mz+(tz-mz)*t2;
+        var ddx=tx-mx,ddz=tz-mz;
+        if(ddx*ddx+ddz*ddz>0.001){
+          var tRy=Math.atan2(ddx,ddz);
+          var dR=tRy-m.mesh.rotation.y;
+          while(dR>Math.PI)dR-=Math.PI*2;
+          while(dR<-Math.PI)dR+=Math.PI*2;
+          m.mesh.rotation.y+=dR*Math.min(1,10*dt);
+        }
+        mx=m.mesh.position.x;mz=m.mesh.position.z;
+        dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
+        useLocalAI=false;
       }
-      mx=m.mesh.position.x;mz=m.mesh.position.z;
-      dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
+      /* 가까이 있음 → 로컬 AI 사용 (호스트 위치 무시) */
     }
     /* 어그로 감지 — 모든 클라이언트 */
     if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
@@ -1070,9 +1076,7 @@ function updMonsters(dt,t){
         if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
         /* 독두꺼비: 사거리 더 김 (혀 공격) */
         var atkRange=(mid==='toad')?3.5:1.8;
-        /* 이동은 호스트만 */
-        if(isNH){/* 비호스트는 이동 스킵 — 위에서 보간 처리 */}
-        else if(dist>1.2){
+        if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
           m.mesh.position.x+=dx/len*spd*dt;
           m.mesh.position.z+=dz2/len*spd*dt;
@@ -1132,26 +1136,22 @@ function updMonsters(dt,t){
             else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
           }
         }
-        if(!isNH){
-          var leash=getLeashRange(mid);
-          var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
-          if(spDist>leash){
-            m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
-          }
+        var leash=getLeashRange(mid);
+        var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
+        if(spDist>leash){
+          m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
         }
       }
       if(m.state==='returning'){
-        if(!isNH){
-          var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
-          var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
-          if(rlen<1){
-            m.state='idle';
-            m.mesh.position.set(m.spawnX,0,m.spawnZ);
-          }else{
-            m.mesh.position.x+=rdx/rlen*m.def.spd*dt;
-            m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
-            m.mesh.rotation.y=Math.atan2(rdx,rdz);
-          }
+        var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
+        var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
+        if(rlen<1){
+          m.state='idle';
+          m.mesh.position.set(m.spawnX,0,m.spawnZ);
+        }else{
+          m.mesh.position.x+=rdx/rlen*m.def.spd*dt;
+          m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
+          m.mesh.rotation.y=Math.atan2(rdx,rdz);
         }
       }
   });
