@@ -623,9 +623,18 @@ function buildJungle(){
   var sp=MONSTER_DEFS.find(function(x){return x.id==='jungle_spider';});
   var sn=MONSTER_DEFS.find(function(x){return x.id==='jungle_snake';});
   var ap=MONSTER_DEFS.find(function(x){return x.id==='jungle_ape';});
-  if(sp)[[95,330],[140,380],[170,450],[110,520]].forEach(function(pp){spawnMonster(sp,pp[0],pp[1],scene);});
-  if(sn)[[120,350],[155,430],[185,500],[100,540]].forEach(function(pp){spawnMonster(sn,pp[0],pp[1],scene);});
-  if(ap)[[130,370],[160,480],[190,540]].forEach(function(pp){spawnMonster(ap,pp[0],pp[1],scene);});
+  if(sp)[[95,330],[140,380],[170,450],[110,520],[155,340],[185,400]].forEach(function(pp){spawnMonster(sp,pp[0],pp[1],scene);});
+  if(sn)[[120,350],[155,430],[185,500],[100,540],[130,310],[175,530]].forEach(function(pp){spawnMonster(sn,pp[0],pp[1],scene);});
+  if(ap)[[130,370],[160,480],[190,540],[100,460]].forEach(function(pp){spawnMonster(ap,pp[0],pp[1],scene);});
+  /* 정글 표범 — 빠르고 치명적 */
+  var pt=MONSTER_DEFS.find(function(x){return x.id==='jungle_panther';});
+  if(pt)[[110,400],[165,500],[190,350],[95,480]].forEach(function(pp){spawnMonster(pt,pp[0],pp[1],scene);});
+  /* 거대 모기 — 빠르고 성가심 */
+  var mq=MONSTER_DEFS.find(function(x){return x.id==='jungle_mosquito';});
+  if(mq)[[90,360],[135,420],[175,470],[115,550],[160,320],[195,520]].forEach(function(pp){spawnMonster(mq,pp[0],pp[1],scene);});
+  /* 나무 정령 — 느리지만 강력 */
+  var tr=MONSTER_DEFS.find(function(x){return x.id==='jungle_treant';});
+  if(tr)[[125,390],[155,510],[185,440]].forEach(function(pp){spawnMonster(tr,pp[0],pp[1],scene);});
 }
 
 function buildVolcano(){
@@ -916,6 +925,23 @@ function updMonsters(dt,t){
             if(mid==='golem'){
               spawnLavaPool(mx,mz,6,4);
               spawnDmgNum('용암 강타!','#ff4400');
+            }
+            /* 정글 표범: 연속 공격 (2연타) */
+            if(mid==='jungle_panther'){
+              m.attackTimer=0.3; /* 빠른 재공격 */
+              spawnDmgNum('연속!','#ffaa00');
+            }
+            /* 거대 모기: 흡혈 (데미지의 50% 회복) */
+            if(mid==='jungle_mosquito'){
+              var heal=Math.floor(dmg*0.5);
+              m.hp=Math.min(m.def.hp,m.hp+heal);
+              spawnDmgNum('흡혈!','#ff00aa');
+            }
+            /* 나무 정령: 공격 시 둔화 + 뿌리 속박 (3초) */
+            if(mid==='jungle_treant'){
+              playerSlowed=3;
+              spawnDmgNum('속박!','#228833');
+              addChat('inf','','뿌리에 발이 묶였다!');
             }
             /* 파이어드레이크: 화염 브레스 — 직선 불길 */
             if(mid==='firedrake'){

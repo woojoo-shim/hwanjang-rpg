@@ -315,6 +315,12 @@ var MONSTER_DEFS=[
    drops:[{id:'blue_potion',rate:.35,qty:1},{id:'leather_armor',rate:.1,qty:1}]},
   {id:'jungle_ape',name:'숲 유인원',hp:500,atk:50,exp:110,spd:3.5,aggro:22,color:0x5a3a1a,hc:0x8a6a3a,
    drops:[{id:'iron_sword',rate:.08,qty:1},{id:'star_fragment',rate:.08,qty:1},{id:'red_potion',rate:.25,qty:1}]},
+  {id:'jungle_panther',name:'정글 표범',hp:420,atk:48,exp:95,spd:6.5,aggro:24,color:0x1a1a1a,hc:0x333333,
+   drops:[{id:'leather_armor',rate:.15,qty:1},{id:'red_potion',rate:.3,qty:1}]},
+  {id:'jungle_mosquito',name:'거대 모기',hp:180,atk:22,exp:50,spd:5.8,aggro:25,color:0x554400,hc:0x887700,
+   drops:[{id:'red_potion',rate:.4,qty:1},{id:'blue_potion',rate:.2,qty:1}]},
+  {id:'jungle_treant',name:'나무 정령',hp:700,atk:42,exp:130,spd:1.8,aggro:15,color:0x2a4a10,hc:0x4a7a20,
+   drops:[{id:'star_fragment',rate:.12,qty:1},{id:'elixir',rate:.03,qty:1},{id:'magic_crystal',rate:.3,qty:1}]},
   // ── 화산 지대 (z 200~280) ──
   {id:'golem',  name:'용암 골렘', hp:800,atk:55, exp:160,spd:2.0, aggro:18, color:0x883311,hc:0xff4400,
    drops:[{id:'star_fragment',rate:.15,qty:1},{id:'iron_sword',rate:.1,qty:1},{id:'elixir',rate:.02,qty:1}]},
