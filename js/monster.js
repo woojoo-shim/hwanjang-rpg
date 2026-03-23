@@ -1077,7 +1077,7 @@ function updMonsters(dt,t){
         /* 몬스터별 공격 범위 + 공격 속도 */
         var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5};
         var atkRange=atkRanges[mid]||1.8;
-        var atkSpd={jungle_panther:0.3,wolf:0.5,jungle_mosquito:0.4,goblin:0.6,firedrake:1.2,golem:1.5};
+        var atkSpd={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0};
         var atkCooldown=atkSpd[mid]||(0.8+Math.random()*.4);
         if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
