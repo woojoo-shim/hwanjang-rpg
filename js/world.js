@@ -1116,7 +1116,7 @@ function buildMeadowDecor(){
   ];
   boulderDefs.forEach(function(bd){
     var rock=new THREE.Mesh(new THREE.DodecahedronGeometry(bd[2],1),stoneM);
-    rock.position.set(bd[0],bd[2]*.4,bd[2]);
+    rock.position.set(bd[0],bd[2]*.4,bd[1]);
     rock.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*.5);
     rock.castShadow=true;rock.receiveShadow=true;scene.add(rock);
   });
@@ -1408,7 +1408,7 @@ function buildForestDecor(){
   [[-75,320,1.2],[60,405,1.5],[-35,470,1.0],[85,540,1.3],[-65,380,1.1]
   ].forEach(function(rd){
     var rock=new THREE.Mesh(new THREE.DodecahedronGeometry(rd[2],1),stoneM);
-    rock.position.set(rd[0],rd[2]*.35,rd[2]);
+    rock.position.set(rd[0],rd[2]*.35,rd[1]);
     rock.rotation.set(Math.random()*.8,Math.random()*Math.PI,.2);
     rock.castShadow=true;rock.receiveShadow=true;scene.add(rock);
   });

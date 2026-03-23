@@ -910,7 +910,7 @@ function buildSwamp(){
   /* 늪 동쪽: x:80~200, z:20~300 AND 서쪽: x:-200~-80, z:20~300 */
   var swampM=new THREE.MeshLambertMaterial({color:0x0a2a08,emissive:new THREE.Color(0x0a2208),emissiveIntensity:.35,transparent:true,opacity:.85});
 
-  /* 물웅덩이들 — 양쪽 (줄인 버전) */
+  /* ── 물웅덩이 (머드풀) ── */
   [[110,70,6,4],[150,145,6,4],[100,220,7,5],[120,280,8,5],
    [-110,70,6,4],[-150,145,6,4],[-100,220,7,5],[-120,280,8,5]
   ].forEach(function(pp){
@@ -918,36 +918,240 @@ function buildSwamp(){
     pool.rotation.x=-Math.PI/2;pool.position.set(pp[0],.03,pp[1]);scene.add(pool);
     var poolGlow=new THREE.PointLight(0x22aa22,.3,pp[2]*2);poolGlow.position.set(pp[0],.5,pp[1]);scene.add(poolGlow);
   });
-  /* 안개 조명 */
-  var pl2=new THREE.PointLight(0x115511,.25,150);pl2.position.set(0,3,160);scene.add(pl2);
-  /* 도깨비불 */
-  var wispM=new THREE.MeshBasicMaterial({color:0x44ff66,transparent:true,opacity:.6});
-  for(var wi=0;wi<10;wi++){
-    var side=wi<5?1:-1;
-    var wx=side*(85+Math.random()*110),wz=25+Math.random()*270;
-    var wisp=new THREE.Mesh(new THREE.SphereGeometry(.08+Math.random()*.06,6,6),wispM);
-    wisp.position.set(wx,.8+Math.random()*1.5,wz);scene.add(wisp);
-    var wl=new THREE.PointLight(0x33ff44,.25,6);wl.position.set(wx,.8+Math.random()*1.5,wz);scene.add(wl);
-  }
-  /* 늪 안개 평면 */
-  var swampFogM=new THREE.MeshLambertMaterial({color:0x1a3a10,transparent:true,opacity:.08});
-  [140,-140].forEach(function(sx){
-    for(var sf=0;sf<3;sf++){
-      var sfp=new THREE.Mesh(new THREE.PlaneGeometry(18+Math.random()*12,14+Math.random()*8),swampFogM);
-      sfp.rotation.x=-Math.PI/2;sfp.position.set(sx+(Math.random()-.5)*40,.12,60+sf*90);scene.add(sfp);
+
+  /* ── 버블링 머드풀 (거품 방울) ── */
+  var bubbleM=new THREE.MeshBasicMaterial({color:0x2a4a10,transparent:true,opacity:.5});
+  [[110,70],[150,145],[100,220],[-110,70],[-150,145],[-100,220],
+   [130,160],[-130,160],[95,120],[-95,120]
+  ].forEach(function(bp){
+    for(var bi=0;bi<5;bi++){
+      var bx=bp[0]+(Math.random()-.5)*6;
+      var bz=bp[1]+(Math.random()-.5)*4;
+      var br=.08+Math.random()*.12;
+      var bubble=new THREE.Mesh(new THREE.SphereGeometry(br,6,6),bubbleM);
+      bubble.position.set(bx,.04+Math.random()*.08,bz);
+      scene.add(bubble);
     }
   });
-  /* 죽은 나무 */
+
+  /* ── 안개 조명 (더 어둡고 으스스하게) ── */
+  var pl2=new THREE.PointLight(0x0a3308,.2,150);pl2.position.set(0,3,160);scene.add(pl2);
+  var pl2b=new THREE.PointLight(0x082208,.15,120);pl2b.position.set(130,2,200);scene.add(pl2b);
+  var pl2c=new THREE.PointLight(0x082208,.15,120);pl2c.position.set(-130,2,200);scene.add(pl2c);
+
+  /* ── 도깨비불 / 늪 가스 위스프 ── */
+  var wispM=new THREE.MeshBasicMaterial({color:0x44ff66,transparent:true,opacity:.6});
+  var wispM2=new THREE.MeshBasicMaterial({color:0x88ff44,transparent:true,opacity:.35});
+  for(var wi=0;wi<18;wi++){
+    var side=wi<9?1:-1;
+    var wx=side*(85+Math.random()*110),wz=25+Math.random()*270;
+    var wy=.8+Math.random()*1.5;
+    var wisp=new THREE.Mesh(new THREE.SphereGeometry(.08+Math.random()*.06,6,6),wispM);
+    wisp.position.set(wx,wy,wz);scene.add(wisp);
+    var wl=new THREE.PointLight(0x33ff44,.25,6);wl.position.set(wx,wy,wz);scene.add(wl);
+  }
+  /* 추가 늪 가스 위스프 (더 크고 희미한 버전) */
+  for(var gi=0;gi<12;gi++){
+    var gside=gi<6?1:-1;
+    var gx=gside*(90+Math.random()*100),gz=30+Math.random()*260;
+    var gy=.3+Math.random()*.6;
+    var gasWisp=new THREE.Mesh(new THREE.SphereGeometry(.15+Math.random()*.1,6,6),wispM2);
+    gasWisp.position.set(gx,gy,gz);scene.add(gasWisp);
+  }
+
+  /* ── 늪 안개 평면 (더 많고 두꺼운 지면 커버) ── */
+  var swampFogM=new THREE.MeshLambertMaterial({color:0x1a3a10,transparent:true,opacity:.08});
+  var swampFogM2=new THREE.MeshLambertMaterial({color:0x0a2008,transparent:true,opacity:.12});
+  var swampFogM3=new THREE.MeshLambertMaterial({color:0x152a0a,transparent:true,opacity:.06});
+  [140,-140].forEach(function(sx){
+    for(var sf=0;sf<6;sf++){
+      var fm=sf%2===0?swampFogM:swampFogM2;
+      var sfp=new THREE.Mesh(new THREE.PlaneGeometry(22+Math.random()*16,18+Math.random()*10),fm);
+      sfp.rotation.x=-Math.PI/2;sfp.position.set(sx+(Math.random()-.5)*60,.12,30+sf*48);scene.add(sfp);
+    }
+  });
+  /* 중앙 안개 레이어 */
+  for(var cf=0;cf<4;cf++){
+    var cfp=new THREE.Mesh(new THREE.PlaneGeometry(30+Math.random()*20,20+Math.random()*15),swampFogM3);
+    cfp.rotation.x=-Math.PI/2;cfp.position.set((Math.random()-.5)*40,.08,50+cf*65);scene.add(cfp);
+  }
+
+  /* ── 죽은 나무 (트위스트 형태, 더 많이) ── */
   var deadM=new THREE.MeshLambertMaterial({color:0x1a1205});
+  var deadM2=new THREE.MeshLambertMaterial({color:0x120e04});
   [[110,75],[150,145],[-170,180],[-100,250],
-   [-110,75],[-150,145],[170,180],[100,250]
+   [-110,75],[-150,145],[170,180],[100,250],
+   [130,110],[-130,110],[160,230],[-160,230],
+   [95,180],[-95,180],[180,120],[-180,120],
+   [105,55],[-105,55],[140,270],[-140,270]
   ].forEach(function(pp){
     var tx=pp[0],tz=pp[1];
-    var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.15,.3,3.5+Math.random()*2,6),deadM);
-    trunk.position.set(tx,1.75,tz);trunk.rotation.z=(Math.random()-.5)*.4;scene.add(trunk);
+    var th=3.5+Math.random()*2.5;
+    var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.12,.35,th,6),deadM);
+    trunk.position.set(tx,th/2,tz);
+    trunk.rotation.z=(Math.random()-.5)*.5;
+    trunk.rotation.x=(Math.random()-.5)*.15;
+    scene.add(trunk);
+    /* 뒤틀린 가지들 */
+    for(var bi=0;bi<2+Math.floor(Math.random()*3);bi++){
+      var bLen=1+Math.random()*1.8;
+      var branch=new THREE.Mesh(new THREE.CylinderGeometry(.03,.08,bLen,4),deadM2);
+      var bh=th*.4+Math.random()*th*.5;
+      branch.position.set(tx+(Math.random()-.5)*1.2,bh,tz+(Math.random()-.5)*1.2);
+      branch.rotation.z=(Math.random()-.5)*1.5;
+      branch.rotation.x=(Math.random()-.5)*1.2;
+      scene.add(branch);
+    }
   });
-  /* 독 버섯 — 제거됨 (성능 최적화) */
-  /* 몬스터 스폰 — 동서 양쪽 (더 넓게 분산) */
+
+  /* ── 이끼/덩굴 (나무에서 늘어지는) ── */
+  var mossM=new THREE.MeshLambertMaterial({color:0x1a3a0a,transparent:true,opacity:.7});
+  var vineSwampM=new THREE.MeshLambertMaterial({color:0x0a2a06,transparent:true,opacity:.6});
+  [[110,75],[150,145],[-170,180],[-100,250],
+   [-110,75],[-150,145],[170,180],[100,250],
+   [130,110],[-130,110],[160,230],[-160,230]
+  ].forEach(function(pp){
+    for(var vi=0;vi<2+Math.floor(Math.random()*3);vi++){
+      var vLen=1.5+Math.random()*2.5;
+      var vine=new THREE.Mesh(new THREE.CylinderGeometry(.015,.025,vLen,3),vineSwampM);
+      vine.position.set(pp[0]+(Math.random()-.5)*1.5,2+Math.random()*2,pp[1]+(Math.random()-.5)*1.5);
+      scene.add(vine);
+    }
+    /* 이끼 덩어리 */
+    if(Math.random()<.6){
+      var moss=new THREE.Mesh(new THREE.SphereGeometry(.3+Math.random()*.3,5,4),mossM);
+      moss.position.set(pp[0]+(Math.random()-.5)*.8,2.5+Math.random()*1.5,pp[1]+(Math.random()-.5)*.8);
+      moss.scale.set(1,.4,1);
+      scene.add(moss);
+    }
+  });
+
+  /* ── 발광 버섯 ── */
+  var shroomCapColors=[0x44ff88,0x22dd66,0x66ffaa,0x88ffcc,0x33ee55];
+  var shroomStemM=new THREE.MeshLambertMaterial({color:0x2a2a1a});
+  for(var si=0;si<30;si++){
+    var sside=si<15?1:-1;
+    var sx=sside*(85+Math.random()*110),sz=25+Math.random()*270;
+    var capColor=shroomCapColors[Math.floor(Math.random()*shroomCapColors.length)];
+    var capM=new THREE.MeshLambertMaterial({color:capColor,emissive:new THREE.Color(capColor),emissiveIntensity:.4});
+    var capR=.1+Math.random()*.15;
+    var stemH=.1+Math.random()*.15;
+    var stem=new THREE.Mesh(new THREE.CylinderGeometry(.02,.03,stemH,4),shroomStemM);
+    stem.position.set(sx,stemH/2,sz);scene.add(stem);
+    var cap=new THREE.Mesh(new THREE.SphereGeometry(capR,6,4),capM);
+    cap.position.set(sx,stemH+capR*.3,sz);cap.scale.y=.5;scene.add(cap);
+    /* 일부 버섯에 은은한 빛 */
+    if(Math.random()<.3){
+      var sl=new THREE.PointLight(capColor,.15,3);sl.position.set(sx,stemH+.1,sz);scene.add(sl);
+    }
+  }
+
+  /* ── 해골/뼈 장식 ── */
+  var boneM=new THREE.MeshLambertMaterial({color:0xccccaa});
+  var skullM=new THREE.MeshLambertMaterial({color:0xbbbb99});
+  [[120,90],[-140,160],[160,250],[-110,200],[100,150],[-170,100],
+   [170,270],[-130,280],[95,40],[-95,40]
+  ].forEach(function(bp){
+    if(Math.random()<.5){
+      /* 해골 */
+      var skull=new THREE.Mesh(new THREE.SphereGeometry(.15,6,5),skullM);
+      skull.position.set(bp[0],.15,bp[1]);skull.scale.set(1,.85,.9);scene.add(skull);
+      /* 눈 구멍 */
+      var eyeM=new THREE.MeshBasicMaterial({color:0x000000});
+      var eye1=new THREE.Mesh(new THREE.SphereGeometry(.03,4,4),eyeM);
+      eye1.position.set(bp[0]-.05,.18,bp[1]-.12);scene.add(eye1);
+      var eye2=new THREE.Mesh(new THREE.SphereGeometry(.03,4,4),eyeM);
+      eye2.position.set(bp[0]+.05,.18,bp[1]-.12);scene.add(eye2);
+    } else {
+      /* 뼈다귀 */
+      for(var bn=0;bn<2+Math.floor(Math.random()*3);bn++){
+        var bone=new THREE.Mesh(new THREE.CylinderGeometry(.02,.025,.3+Math.random()*.3,4),boneM);
+        bone.position.set(bp[0]+(Math.random()-.5)*.5,.04,bp[1]+(Math.random()-.5)*.5);
+        bone.rotation.z=Math.random()*Math.PI;bone.rotation.x=Math.PI/2;
+        scene.add(bone);
+      }
+    }
+  });
+
+  /* ── 부서진 나무 다리/판자길 ── */
+  var plankM=new THREE.MeshLambertMaterial({color:0x2a1a08});
+  var plankDarkM=new THREE.MeshLambertMaterial({color:0x1a0e04});
+  /* 동쪽 다리 */
+  (function(){
+    var bx=115,bz=130;
+    for(var pi=0;pi<8;pi++){
+      var plank=new THREE.Mesh(new THREE.BoxGeometry(1.8,.08,.3),pi%3===0?plankDarkM:plankM);
+      plank.position.set(bx,.06,bz+pi*.4);
+      plank.rotation.y=(Math.random()-.5)*.15;
+      if(pi===3||pi===6){plank.position.y=-.02;plank.rotation.z=(Math.random()-.5)*.3;}
+      scene.add(plank);
+    }
+    /* 지지대 */
+    var sup1=new THREE.Mesh(new THREE.CylinderGeometry(.04,.06,.5,4),plankDarkM);
+    sup1.position.set(bx-.7,.15,bz);scene.add(sup1);
+    var sup2=new THREE.Mesh(new THREE.CylinderGeometry(.04,.06,.5,4),plankDarkM);
+    sup2.position.set(bx+.7,.15,bz+2.8);scene.add(sup2);
+  })();
+  /* 서쪽 부서진 다리 */
+  (function(){
+    var bx=-125,bz=200;
+    for(var pi=0;pi<10;pi++){
+      var plank=new THREE.Mesh(new THREE.BoxGeometry(1.6,.08,.28),pi%2===0?plankM:plankDarkM);
+      plank.position.set(bx,.05,bz+pi*.38);
+      plank.rotation.y=(Math.random()-.5)*.2;
+      if(pi===2||pi===5||pi===8){plank.position.y=-.03;plank.rotation.z=(Math.random()-.5)*.4;}
+      scene.add(plank);
+    }
+    var sup3=new THREE.Mesh(new THREE.CylinderGeometry(.04,.06,.4,4),plankDarkM);
+    sup3.position.set(bx-.6,.12,bz+1);sup3.rotation.z=.3;scene.add(sup3);
+  })();
+
+  /* ── 작은 섬/흙 언덕 ── */
+  var moundM=new THREE.MeshLambertMaterial({color:0x1a2a0a});
+  var moundM2=new THREE.MeshLambertMaterial({color:0x152208});
+  [[130,95,2.5],[160,200,3],[-120,140,2.8],[-160,250,2.2],
+   [100,180,2],[-100,90,2.3],[170,150,1.8],[-170,220,2.0]
+  ].forEach(function(mp){
+    var mound=new THREE.Mesh(new THREE.SphereGeometry(mp[2],8,5),Math.random()<.5?moundM:moundM2);
+    mound.position.set(mp[0],mp[2]*.15,mp[1]);
+    mound.scale.set(1,.2,1);
+    scene.add(mound);
+    /* 언덕 위에 풀이나 작은 식물 */
+    if(Math.random()<.6){
+      var grassTuft=new THREE.Mesh(new THREE.ConeGeometry(.15,.4,4),new THREE.MeshLambertMaterial({color:0x1a3a08}));
+      grassTuft.position.set(mp[0]+(Math.random()-.5)*.8,mp[2]*.3+.15,mp[1]+(Math.random()-.5)*.8);
+      scene.add(grassTuft);
+    }
+  });
+
+  /* ── 거미줄 (나무 사이) ── */
+  var webM=new THREE.MeshBasicMaterial({color:0xaaaaaa,transparent:true,opacity:.08,side:THREE.DoubleSide});
+  [[110,75,130,110],[-150,145,-130,110],[-170,180,-160,230],[170,180,160,230]
+  ].forEach(function(wp){
+    var web=new THREE.Mesh(new THREE.PlaneGeometry(3+Math.random()*2,2+Math.random()*1.5),webM);
+    var mx=(wp[0]+wp[2])/2,mz=(wp[1]+wp[3])/2;
+    web.position.set(mx,2.5+Math.random(),mz);
+    web.rotation.y=Math.atan2(wp[3]-wp[1],wp[2]-wp[0]);
+    web.rotation.x=(Math.random()-.5)*.3;
+    scene.add(web);
+  });
+
+  /* ── 썩은 통나무 ── */
+  var rotLogM=new THREE.MeshLambertMaterial({color:0x0e0a02});
+  [[135,85,.8],[155,175,1.0],[-115,110,.7],[-145,240,.9],
+   [100,260,.6],[-180,150,.8]
+  ].forEach(function(rl){
+    var log=new THREE.Mesh(new THREE.CylinderGeometry(.2,.3,2+Math.random()*1.5,6),rotLogM);
+    log.rotation.z=Math.PI/2;log.rotation.y=rl[2];
+    log.position.set(rl[0],.18,rl[1]);
+    scene.add(log);
+    /* 로그 위에 이끼 */
+    var logMoss=new THREE.Mesh(new THREE.SphereGeometry(.2+Math.random()*.15,5,3),mossM);
+    logMoss.position.set(rl[0],.35,rl[1]);logMoss.scale.set(2,.3,1);
+    scene.add(logMoss);
+  });
+
+  /* ── 몬스터 스폰 — 동서 양쪽 (더 넓게 분산) ── */
   var sd=MONSTER_DEFS.find(function(x){return x.id==='slime';});
   var td=MONSTER_DEFS.find(function(x){return x.id==='toad';});
   /* 동쪽 늪 */
