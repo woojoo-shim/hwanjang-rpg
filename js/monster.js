@@ -529,7 +529,7 @@ function spawnMonster(def,x,z,parent){
   wrap.style.cssText='position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;';
   var ntag=document.createElement('div');ntag.className='llabel npc';
   if(def.elite){
-    ntag.style.cssText+=';background:#2a1a00ee;border-color:#ffaa00;color:#ffdd44;font-size:11px;text-shadow:0 0 6px #ffaa00;';
+    ntag.style.cssText+=';background:#2a1a00ee;border:2px solid #ffaa00;color:#ffdd44;font-size:13px;font-weight:bold;text-shadow:0 0 8px #ffaa00,0 0 16px #ff8800;padding:3px 8px;letter-spacing:1px;';
   }else{
     ntag.style.cssText+=';background:#1a0808ee;border-color:#883333;color:#ff8888;font-size:10px;';
   }
@@ -1058,9 +1058,10 @@ function updMonsters(dt,t){
       return;
     }
     m.mesh.visible=true;
-    /* 이름+HP바: 20유닛 이내만 */
-    if(dist<20){
-      posEl(m.wrap,mx,m.mesh.position.y+2.1,mz);
+    /* 이름+HP바: 일반 20유닛, 엘리트 50유닛 */
+    var showDist=m.def.elite?50:20;
+    if(dist<showDist){
+      posEl(m.wrap,mx,m.mesh.position.y+(m.def.elite?3.5:2.1),mz);
       m.wrap.style.display='';
       m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
     } else {
