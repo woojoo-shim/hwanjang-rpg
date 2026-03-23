@@ -61,6 +61,35 @@ export default {
       }), [conn.id]);
     }
 
+    /* ── 파티 메시지: 대상에게 직접 전달 ── */
+    if (data.type === 'party_invite' || data.type === 'party_accept' || data.type === 'party_reject' || data.type === 'party_kick') {
+      var st = conn.deserializeAttachment();
+      var fromUid = st ? (st.uid || conn.id) : conn.id;
+      var targetUid = data.target;
+      for (var c of room.getConnections()) {
+        var cst = c.deserializeAttachment();
+        if (cst && (cst.uid || c.id) === targetUid) {
+          var fwd = JSON.parse(JSON.stringify(data));
+          fwd.from = fromUid;
+          c.send(JSON.stringify(fwd));
+          break;
+        }
+      }
+    }
+
+    /* 파티 업데이트/탈퇴/HP/채팅: 같은 partyId 멤버 전체에게 */
+    if (data.type === 'party_update' || data.type === 'party_leave' || data.type === 'party_hp' || data.type === 'party_chat') {
+      var st = conn.deserializeAttachment();
+      var fromUid = st ? (st.uid || conn.id) : conn.id;
+      var fwd = JSON.parse(JSON.stringify(data));
+      fwd.from = fromUid;
+      room.broadcast(JSON.stringify(fwd), [conn.id]);
+    }
+
+    if (data.type === 'mdmg') {
+      room.broadcast(JSON.stringify(data), [conn.id]);
+    }
+
     if (data.type === 'mhit') {
       var mid = data.mid;
       if (room._monsterHp[mid] === undefined) room._monsterHp[mid] = data.maxHp;

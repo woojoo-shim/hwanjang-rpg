@@ -799,6 +799,20 @@ document.addEventListener('keydown',function(e){
 function sendChat(){
   var ci=document.getElementById('cin'),v=ci.value.trim();if(!v)return;
   ci.value='';
+  /* 파티 채팅: /p 로 시작하면 파티원에게만 */
+  if(v.indexOf('/p ')=== 0||v.indexOf('/ㅔ ')===0){
+    var ptxt=v.substring(3);
+    if(!ptxt)return;
+    if(typeof partyId==='undefined'||!partyId){addChat('sys','[시스템]','파티에 소속되어 있지 않습니다.');ci.focus();return;}
+    addChat('plr','[파티] '+myName,ptxt);
+    if(typeof sendPartyChatMP==='function')sendPartyChatMP(myName,ptxt);
+    ci.focus();return;
+  }
+  /* /leave — 파티 탈퇴 커맨드 */
+  if(v==='/leave'||v==='/탈퇴'){
+    if(typeof leaveParty==='function')leaveParty();
+    ci.focus();return;
+  }
   addChat('plr',myName,v);
   if(typeof sendChatMP==='function')sendChatMP(myName,v);
   ci.focus();

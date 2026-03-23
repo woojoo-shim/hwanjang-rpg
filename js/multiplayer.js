@@ -253,6 +253,23 @@ function onMpMessage(data){
       }
     }
   }
+  /* ── 파티 메시지 ── */
+  else if(data.type==='party_invite'){onPartyInvite(data);}
+  else if(data.type==='party_accept'){onPartyAccept(data);}
+  else if(data.type==='party_reject'){onPartyReject(data);}
+  else if(data.type==='party_update'){
+    if(data.disband){
+      if(data.partyId===partyId){
+        addChat('sys','[파티]','파티가 해산되었습니다.');
+        partyId=null;partyLeader=null;partyMembers=[];
+        updatePartyUI();
+      }
+    }else{onPartyUpdate(data);}
+  }
+  else if(data.type==='party_kick'){onPartyKick(data);}
+  else if(data.type==='party_leave'){onPartyLeave(data);}
+  else if(data.type==='party_hp'){onPartyHp(data);}
+  else if(data.type==='party_chat'){onPartyChat(data);}
 }
 
 /* 호스트 → 비호스트: 몬스터가 원격 플레이어를 공격했음을 알림 */
@@ -394,4 +411,270 @@ function sendChatMP(name,text){
 function sendAttackMP(){
   if(!ws||ws.readyState!==1)return;
   ws.send(JSON.stringify({type:'attack'}));
+}
+
+/* ════════════ 파티 시스템 ════════════ */
+var partyId=null;
+var partyMembers=[];   /* [{uid,name,level,hp,maxHp}] */
+var partyLeader=null;
+var PARTY_MAX=4;
+var _pendingInvite=null; /* {from,fromName,partyId} */
+var _partyInviteTimeout=null;
+
+function getMyUid(){
+  return (typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+}
+
+/* 가장 가까운 원격 플레이어 찾기 (15유닛 이내) */
+function findClosestRemotePlayer(){
+  if(!PL||!PL.group)return null;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  var best=null,bestD=Infinity;
+  for(var id in remotePlayers){
+    var rp=remotePlayers[id];
+    if(!rp||!rp.group)continue;
+    var dx=rp.group.position.x-px,dz=rp.group.position.z-pz;
+    var d=Math.sqrt(dx*dx+dz*dz);
+    if(d<15&&d<bestD){bestD=d;best={uid:id,name:rp.name,level:rp.level,dist:d};}
+  }
+  return best;
+}
+
+/* V키 — 가까운 플레이어 파티 초대 */
+function inviteToParty(){
+  if(partyMembers.length>=PARTY_MAX){addChat('sys','[파티]','파티가 가득 찼습니다. (최대 '+PARTY_MAX+'명)');return;}
+  var target=findClosestRemotePlayer();
+  if(!target){addChat('sys','[파티]','근처에 초대할 플레이어가 없습니다.');return;}
+  /* 이미 파티원인지 확인 */
+  for(var i=0;i<partyMembers.length;i++){
+    if(partyMembers[i].uid===target.uid){addChat('sys','[파티]',target.name+'은(는) 이미 파티원입니다.');return;}
+  }
+  /* 파티가 없으면 생성 */
+  var myUid=getMyUid();
+  if(!partyId){
+    partyId=myUid+'_'+Date.now();
+    partyLeader=myUid;
+    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
+    updatePartyUI();
+  }
+  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
+  /* 초대 전송 */
+  if(!ws||ws.readyState!==1){addChat('sys','[파티]','서버에 연결되어 있지 않습니다.');return;}
+  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:partyId,fromName:myName}));
+  addChat('sys','[파티]',target.name+'에게 파티 초대를 보냈습니다.');
+}
+
+/* 파티 초대 수신 */
+function onPartyInvite(data){
+  /* data: {from, fromName, partyId} */
+  if(partyId&&partyMembers.length>0){return;} /* 이미 파티 중 */
+  _pendingInvite={from:data.from,fromName:data.fromName,partyId:data.partyId};
+  showPartyInviteNotif(data.fromName);
+}
+
+function showPartyInviteNotif(fromName){
+  var el=document.getElementById('party-invite-notif');
+  document.getElementById('party-invite-name').textContent=fromName+'님이 파티 초대';
+  el.classList.add('show');
+  if(_partyInviteTimeout)clearTimeout(_partyInviteTimeout);
+  _partyInviteTimeout=setTimeout(function(){rejectPartyInvite();},15000);
+}
+
+function acceptPartyInvite(){
+  if(!_pendingInvite)return;
+  document.getElementById('party-invite-notif').classList.remove('show');
+  if(_partyInviteTimeout){clearTimeout(_partyInviteTimeout);_partyInviteTimeout=null;}
+  if(!ws||ws.readyState!==1)return;
+  ws.send(JSON.stringify({type:'party_accept',partyId:_pendingInvite.partyId,target:_pendingInvite.from,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}));
+  partyId=_pendingInvite.partyId;
+  partyLeader=_pendingInvite.from;
+  addChat('sys','[파티]',_pendingInvite.fromName+'의 파티에 참가했습니다.');
+  _pendingInvite=null;
+}
+
+function rejectPartyInvite(){
+  if(!_pendingInvite)return;
+  document.getElementById('party-invite-notif').classList.remove('show');
+  if(_partyInviteTimeout){clearTimeout(_partyInviteTimeout);_partyInviteTimeout=null;}
+  if(ws&&ws.readyState===1){
+    ws.send(JSON.stringify({type:'party_reject',target:_pendingInvite.from,name:myName}));
+  }
+  _pendingInvite=null;
+}
+
+/* 파티 수락 수신 (리더가 받음) */
+function onPartyAccept(data){
+  /* data: {from, name, level, hp, maxHp, partyId} */
+  if(data.partyId!==partyId)return;
+  if(partyMembers.length>=PARTY_MAX)return;
+  /* 중복 체크 */
+  for(var i=0;i<partyMembers.length;i++){if(partyMembers[i].uid===data.from)return;}
+  partyMembers.push({uid:data.from,name:data.name,level:data.level,hp:data.hp||100,maxHp:data.maxHp||100});
+  addChat('sys','[파티]',data.name+'이(가) 파티에 참가했습니다.');
+  broadcastPartyUpdate();
+}
+
+/* 파티 거절 수신 */
+function onPartyReject(data){
+  addChat('sys','[파티]',data.name+'이(가) 파티 초대를 거절했습니다.');
+}
+
+/* 파티 상태 브로드캐스트 (리더 → 전체) */
+function broadcastPartyUpdate(){
+  if(!ws||ws.readyState!==1)return;
+  ws.send(JSON.stringify({type:'party_update',partyId:partyId,leader:partyLeader,members:partyMembers}));
+  updatePartyUI();
+}
+
+/* 파티 업데이트 수신 */
+function onPartyUpdate(data){
+  /* data: {partyId, leader, members:[{uid,name,level,hp,maxHp}]} */
+  partyId=data.partyId;
+  partyLeader=data.leader;
+  partyMembers=data.members;
+  updatePartyUI();
+}
+
+/* 파티 탈퇴 */
+function leaveParty(){
+  if(!partyId)return;
+  var myUid=getMyUid();
+  if(ws&&ws.readyState===1){
+    ws.send(JSON.stringify({type:'party_leave',partyId:partyId,name:myName}));
+  }
+  addChat('sys','[파티]','파티에서 탈퇴했습니다.');
+  /* 리더가 나가면 파티 해산 */
+  if(partyLeader===myUid){
+    if(ws&&ws.readyState===1){
+      ws.send(JSON.stringify({type:'party_update',partyId:partyId,leader:null,members:[],disband:true}));
+    }
+  }
+  partyId=null;partyLeader=null;partyMembers=[];
+  updatePartyUI();
+}
+
+/* 파티원 추방 (리더만) */
+function kickPartyMember(uid){
+  var myUid=getMyUid();
+  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 추방할 수 있습니다.');return;}
+  if(uid===myUid)return;
+  /* 멤버 제거 */
+  var kicked=null;
+  partyMembers=partyMembers.filter(function(m){if(m.uid===uid){kicked=m;return false;}return true;});
+  if(kicked){
+    addChat('sys','[파티]',kicked.name+'을(를) 파티에서 추방했습니다.');
+    if(ws&&ws.readyState===1){
+      ws.send(JSON.stringify({type:'party_kick',partyId:partyId,target:uid,name:kicked.name}));
+    }
+    broadcastPartyUpdate();
+  }
+}
+
+/* 추방 수신 */
+function onPartyKick(data){
+  var myUid=getMyUid();
+  if(data.target===myUid){
+    addChat('sys','[파티]','파티에서 추방되었습니다.');
+    partyId=null;partyLeader=null;partyMembers=[];
+    updatePartyUI();
+  }
+}
+
+/* 파티 탈퇴 수신 */
+function onPartyLeave(data){
+  /* data: {from, name, partyId} */
+  if(data.partyId!==partyId)return;
+  partyMembers=partyMembers.filter(function(m){return m.uid!==data.from;});
+  addChat('sys','[파티]',data.name+'이(가) 파티를 떠났습니다.');
+  /* 파티원이 1명 이하면 해산 */
+  if(partyMembers.length<=1){
+    addChat('sys','[파티]','파티가 해산되었습니다.');
+    partyId=null;partyLeader=null;partyMembers=[];
+  }else{
+    broadcastPartyUpdate();
+  }
+  updatePartyUI();
+}
+
+/* 파티 UI 갱신 */
+function updatePartyUI(){
+  var panel=document.getElementById('party-panel');
+  var list=document.getElementById('party-members');
+  if(!partyId||partyMembers.length===0){
+    panel.style.display='none';
+    return;
+  }
+  panel.style.display='block';
+  var myUid=getMyUid();
+  var html='';
+  for(var i=0;i<partyMembers.length;i++){
+    var m=partyMembers[i];
+    var isMe=m.uid===myUid;
+    var isLeader=m.uid===partyLeader;
+    var hpPct=Math.max(0,Math.min(100,(m.hp/m.maxHp)*100));
+    html+='<div class="party-member'+(isMe?' me':'')+'">';
+    html+='<div class="pm-top">';
+    if(isLeader)html+='<span class="pm-crown">★</span>';
+    html+='<span class="pm-name">'+m.name+'</span>';
+    html+='<span class="pm-lv">Lv.'+m.level+'</span>';
+    if(!isMe&&partyLeader===myUid)html+='<span class="pm-kick" onclick="kickPartyMember(\''+m.uid+'\')">✕</span>';
+    html+='</div>';
+    html+='<div class="pm-hpbar"><div class="pm-hpfill" style="width:'+hpPct+'%"></div></div>';
+    html+='</div>';
+  }
+  list.innerHTML=html;
+}
+
+/* 주기적으로 파티원 HP 전송 (500ms마다) */
+var _partyHpTimer=null;
+function startPartyHpSync(){
+  if(_partyHpTimer)clearInterval(_partyHpTimer);
+  _partyHpTimer=setInterval(function(){
+    if(!partyId||!ws||ws.readyState!==1)return;
+    ws.send(JSON.stringify({type:'party_hp',partyId:partyId,hp:playerHP,maxHp:playerMaxHP,level:playerLevel}));
+  },500);
+}
+startPartyHpSync();
+
+/* 파티원 HP 수신 */
+function onPartyHp(data){
+  if(data.partyId!==partyId)return;
+  for(var i=0;i<partyMembers.length;i++){
+    if(partyMembers[i].uid===data.from){
+      partyMembers[i].hp=data.hp;
+      partyMembers[i].maxHp=data.maxHp;
+      partyMembers[i].level=data.level;
+      break;
+    }
+  }
+  /* 내 HP도 갱신 */
+  var myUid=getMyUid();
+  for(var i=0;i<partyMembers.length;i++){
+    if(partyMembers[i].uid===myUid){
+      partyMembers[i].hp=playerHP;
+      partyMembers[i].maxHp=playerMaxHP;
+      partyMembers[i].level=playerLevel;
+      break;
+    }
+  }
+  updatePartyUI();
+}
+
+/* 파티 EXP 분배: 파티원 수로 나누되 보너스 10% */
+function getPartyExpShare(baseExp){
+  if(!partyId||partyMembers.length<=1)return baseExp;
+  var share=Math.ceil(baseExp/partyMembers.length*1.1);
+  return share;
+}
+
+/* 파티 채팅 전송 */
+function sendPartyChatMP(name,text){
+  if(!ws||ws.readyState!==1||!partyId)return;
+  ws.send(JSON.stringify({type:'party_chat',partyId:partyId,name:name,text:text}));
+}
+
+/* 파티 채팅 수신 */
+function onPartyChat(data){
+  if(data.partyId!==partyId)return;
+  addChat('plr','[파티] '+data.name,data.text);
 }

@@ -449,8 +449,12 @@ function killMonster(m){
   m.wrap.style.display='none';
   /* 붉은 공격 플래시 재료 복원 후 죽음 색상 적용 */
   if(m._origMats){m._origMats.forEach(function(o){o.mesh.material=o.orig;});m._origMats=null;}
-  playerEXP+=m.def.exp;
-  addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+m.def.exp+')');
+  var _expGain=m.def.exp;
+  if(typeof getPartyExpShare==='function')_expGain=getPartyExpShare(_expGain);
+  playerEXP+=_expGain;
+  if(typeof partyId!=='undefined'&&partyId&&typeof partyMembers!=='undefined'&&partyMembers.length>1)
+    addChat('sys','[파티]',m.def.name+' 처치! (EXP +'+_expGain+' / '+partyMembers.length+'명 분배)');
+  else addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+_expGain+')');
   checkLevelUp();
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
