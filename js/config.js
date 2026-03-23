@@ -352,5 +352,5 @@ var ZONE_INFO={
 var visitedZones={village:true};
 
 /* 개발자 계정 ID */
-var DEV_UIDS=['be38b6ea-8890-4ef0-b809-9b46303fc629'];
+var DEV_UIDS=['be38b6ea-8890-4ef0-b809-9b46303fc629','e22cc8db-ad55-4f97-8bb5-2d633c65bf8b'];
 function isDev(){return currentUser&&DEV_UIDS.indexOf(currentUser.id)!==-1;}
