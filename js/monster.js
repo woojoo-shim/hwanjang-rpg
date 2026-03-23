@@ -355,6 +355,143 @@ function mkMonsterMesh(def){
     var tail2=new THREE.Mesh(new THREE.BoxGeometry(.14,.14,.4),scaleM);tail2.position.set(0,.68,-.98);g.add(tail2);
     var tailTip=new THREE.Mesh(new THREE.ConeGeometry(.1,.22,4),hornM);tailTip.position.set(0,.62,-1.2);tailTip.rotation.x=Math.PI/2;g.add(tailTip);
     var fireLight=new THREE.PointLight(0xff4400,2,8);fireLight.position.set(0,1.2,0);g.add(fireLight);
+
+  } else if(def.id==='jungle_spider'){
+    /* 거미 — 8다리 */
+    var spBody=new THREE.MeshLambertMaterial({color:0x2a1a00});
+    var spEye=new THREE.MeshBasicMaterial({color:0xff0000});
+    var ab=new THREE.Mesh(new THREE.SphereGeometry(.4,8,6),spBody);ab.scale.set(1,.7,1.2);ab.position.set(0,.4,-.25);g.add(ab);
+    var ceph=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),spBody);ceph.position.set(0,.45,.2);g.add(ceph);
+    for(var si=0;si<4;si++){[-1,1].forEach(function(side){
+      var ang=(-0.6+si*0.4);
+      var leg=new THREE.Mesh(new THREE.CylinderGeometry(.025,.02,.7,4),spBody);
+      leg.position.set(side*(.2+si*.05),.5,.1-si*.12);leg.rotation.z=side*(.4+si*.15);leg.rotation.x=ang;g.add(leg);
+    });}
+    [-0.08,0.08].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),spEye);eye.position.set(ex,.52,.42);g.add(eye);
+    });
+    /* 독니 */
+    [-0.06,0.06].forEach(function(fx){
+      var fang=new THREE.Mesh(new THREE.ConeGeometry(.02,.12,4),new THREE.MeshLambertMaterial({color:0x444400}));
+      fang.position.set(fx,.38,.42);fang.rotation.x=Math.PI;g.add(fang);
+    });
+
+  } else if(def.id==='jungle_snake'){
+    /* 독사 — 구불구불한 몸 */
+    var snM=new THREE.MeshLambertMaterial({color:0x225511});
+    var snM2=new THREE.MeshLambertMaterial({color:0x33aa22});
+    var snEye=new THREE.MeshBasicMaterial({color:0xffff00});
+    for(var seg=0;seg<6;seg++){
+      var sz=.15-.01*seg;
+      var sp2=new THREE.Mesh(new THREE.SphereGeometry(sz,6,6),seg%2===0?snM:snM2);
+      sp2.position.set(Math.sin(seg*.8)*.15,.15,seg*-.18);sp2.scale.y=.7;g.add(sp2);
+    }
+    var head2=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),snM);head2.position.set(0,.2,.15);head2.scale.set(1,.7,1.3);g.add(head2);
+    [-0.07,0.07].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.035,5,5),snEye);eye.position.set(ex,.26,.32);g.add(eye);
+    });
+    /* 혀 */
+    var tongue=new THREE.Mesh(new THREE.BoxGeometry(.02,.01,.15),new THREE.MeshBasicMaterial({color:0xff2222}));
+    tongue.position.set(0,.18,.38);g.add(tongue);
+
+  } else if(def.id==='jungle_ape'){
+    /* 유인원 — 큰 근육질 */
+    var apeM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
+    var apeDM=new THREE.MeshLambertMaterial({color:0x3a2210});
+    var apeEye=new THREE.MeshBasicMaterial({color:0x221100});
+    var body2=new THREE.Mesh(new THREE.BoxGeometry(.7,.8,.5),apeM);body2.position.set(0,.8,0);g.add(body2);
+    var chest=new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.35),apeDM);chest.position.set(0,.85,.1);g.add(chest);
+    var head3=new THREE.Mesh(new THREE.SphereGeometry(.3,8,8),apeM);head3.position.set(0,1.5,0);g.add(head3);
+    var jaw=new THREE.Mesh(new THREE.BoxGeometry(.28,.15,.2),apeDM);jaw.position.set(0,1.32,.18);g.add(jaw);
+    [-0.12,0.12].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.05,6,6),apeEye);eye.position.set(ex,1.55,.25);g.add(eye);
+    });
+    /* 팔 — 길고 굵음 */
+    [-1,1].forEach(function(side){
+      var arm=new THREE.Mesh(new THREE.BoxGeometry(.22,.9,.2),apeM);arm.position.set(side*.5,.7,0);g.add(arm);
+      var fist=new THREE.Mesh(new THREE.SphereGeometry(.14,6,6),apeDM);fist.position.set(side*.5,.2,0);g.add(fist);
+    });
+    [-0.18,0.18].forEach(function(lx){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.2,.45,.2),apeM);leg.position.set(lx,.22,0);g.add(leg);
+    });
+
+  } else if(def.id==='jungle_panther'){
+    /* 표범 — 검은 빠른 고양이 */
+    var panM=new THREE.MeshLambertMaterial({color:0x1a1a1a});
+    var panEM=new THREE.MeshBasicMaterial({color:0x44ff44});
+    var body3=new THREE.Mesh(new THREE.BoxGeometry(.4,.35,.85),panM);body3.position.set(0,.5,0);g.add(body3);
+    var head4=new THREE.Mesh(new THREE.BoxGeometry(.32,.28,.3),panM);head4.position.set(0,.72,.42);g.add(head4);
+    [-0.1,0.1].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),panEM);eye.position.set(ex,.78,.54);g.add(eye);
+    });
+    [-0.12,0.12].forEach(function(ex){
+      var ear=new THREE.Mesh(new THREE.ConeGeometry(.05,.12,4),panM);ear.position.set(ex,.9,.38);g.add(ear);
+    });
+    [[-0.15,.35],[-0.15,-.35],[.15,.35],[.15,-.35]].forEach(function(p){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.1,.35,.1),panM);leg.position.set(p[0],.18,p[1]);g.add(leg);
+    });
+    var tail2=new THREE.Mesh(new THREE.CylinderGeometry(.03,.02,.7,5),panM);
+    tail2.position.set(0,.55,-.62);tail2.rotation.x=.6;g.add(tail2);
+
+  } else if(def.id==='jungle_mosquito'){
+    /* 거대 모기 — 날개 달린 곤충 */
+    var mqM=new THREE.MeshLambertMaterial({color:0x554400});
+    var mqWing=new THREE.MeshLambertMaterial({color:0xaaddff,transparent:true,opacity:.4});
+    var mqBody=new THREE.Mesh(new THREE.CylinderGeometry(.06,.12,.5,6),mqM);
+    mqBody.position.set(0,.8,0);mqBody.rotation.x=.3;g.add(mqBody);
+    var mqHead=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),mqM);mqHead.position.set(0,.95,.15);g.add(mqHead);
+    [-0.08,0.08].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),new THREE.MeshBasicMaterial({color:0xff0000}));
+      eye.position.set(ex,.98,.22);g.add(eye);
+    });
+    /* 침 */
+    var needle=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.25,4),new THREE.MeshLambertMaterial({color:0x333333}));
+    needle.position.set(0,.92,.32);needle.rotation.x=Math.PI/2;g.add(needle);
+    /* 날개 */
+    [-1,1].forEach(function(side){
+      var wing=new THREE.Mesh(new THREE.PlaneGeometry(.4,.2),mqWing);
+      wing.position.set(side*.25,.95,-.05);wing.rotation.y=side*.3;g.add(wing);
+    });
+    /* 다리 */
+    for(var li=0;li<3;li++){[-1,1].forEach(function(side){
+      var mleg=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,.35,3),mqM);
+      mleg.position.set(side*.1,.65+li*.08,-.02);mleg.rotation.z=side*.5;g.add(mleg);
+    });}
+
+  } else if(def.id==='jungle_treant'){
+    /* 나무 정령 — 나무 형태 */
+    var trunkM=new THREE.MeshLambertMaterial({color:0x3a2a10});
+    var leafM=new THREE.MeshLambertMaterial({color:0x1a6622});
+    var eyeGM=new THREE.MeshBasicMaterial({color:0x88ff44});
+    var trunk2=new THREE.Mesh(new THREE.CylinderGeometry(.25,.35,1.4,8),trunkM);trunk2.position.set(0,.7,0);g.add(trunk2);
+    /* 가지 팔 */
+    [-1,1].forEach(function(side){
+      var arm2=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.8,5),trunkM);
+      arm2.position.set(side*.45,1.1,0);arm2.rotation.z=side*.6;g.add(arm2);
+      var fingers=new THREE.Mesh(new THREE.SphereGeometry(.12,5,5),trunkM);
+      fingers.position.set(side*.85,.9,0);g.add(fingers);
+    });
+    /* 잎 머리 */
+    var crown=new THREE.Mesh(new THREE.SphereGeometry(.5,8,6),leafM);crown.position.set(0,1.7,0);crown.scale.y=.7;g.add(crown);
+    var crown2=new THREE.Mesh(new THREE.SphereGeometry(.35,6,5),new THREE.MeshLambertMaterial({color:0x228833}));
+    crown2.position.set(.15,2.0,.1);crown2.scale.y=.6;g.add(crown2);
+    /* 눈 — 나무 구멍에서 빛나는 */
+    [-0.1,0.1].forEach(function(ex){
+      var hole=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),new THREE.MeshBasicMaterial({color:0x111100}));
+      hole.position.set(ex,1.2,.26);g.add(hole);
+      var glow=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),eyeGM);
+      glow.position.set(ex,1.2,.28);g.add(glow);
+    });
+    /* 뿌리 다리 */
+    [-0.15,0,0.15].forEach(function(rx){
+      var root=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.3,5),trunkM);
+      root.position.set(rx,.1,rx===0?-.1:0);g.add(root);
+    });
+
+  } else {
+    /* fallback — 기본 박스 몬스터 */
+    var fb=new THREE.Mesh(new THREE.BoxGeometry(.5,.7,.4),bm);fb.position.set(0,.5,0);g.add(fb);
+    var fh=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,.35),hm);fh.position.set(0,1.05,0);g.add(fh);
   }
   return g;
 }
