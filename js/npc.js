@@ -758,6 +758,7 @@ document.addEventListener('keydown',function(e){
   /* ESC — 모든 창 닫기 (최우선) */
   if(k==='Escape'||e.code==='Escape'){
     e.preventDefault();
+    if(typeof partyInvitePanelOpen!=='undefined'&&partyInvitePanelOpen){closePartyInvitePanel();return;}
     if(document.getElementById('dbox').classList.contains('show')){closeDialog();return;}
     if(shopOpen){closeShop();return;}
     if(invOpen){closeInv();return;}
@@ -789,9 +790,14 @@ document.addEventListener('keydown',function(e){
     var mm=document.getElementById('minimap');
     if(mm)mm.classList.toggle('hidden');
   }
-  /* P — 개발자 텔레포트 */
-  if(k==='p'&&!isInput&&typeof isDev==='function'&&isDev()){
-    if(typeof useTpScroll==='function')useTpScroll();
+  /* P — 개발자 텔레포트 / 파티 초대 패널 */
+  if(k==='p'&&!isInput){
+    if(typeof isDev==='function'&&isDev()){
+      if(typeof useTpScroll==='function')useTpScroll();
+    }else{
+      e.preventDefault();
+      if(typeof togglePartyInvitePanel==='function')togglePartyInvitePanel();
+    }
   }
 });
 
