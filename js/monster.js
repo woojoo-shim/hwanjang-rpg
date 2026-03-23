@@ -533,7 +533,7 @@ function spawnMonster(def,x,z,parent){
   }else{
     ntag.style.cssText+=';background:#1a0808ee;border-color:#883333;color:#ff8888;font-size:10px;';
   }
-  ntag.textContent=def.name;
+  ntag.textContent=def.name+(def.lv?' Lv.'+def.lv:'');
   var hbw=document.createElement('div');
   if(def.elite){
     hbw.style.cssText='width:72px;height:7px;background:#2a1a00;border:1px solid #ffaa00;overflow:hidden;';
