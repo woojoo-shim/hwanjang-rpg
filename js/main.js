@@ -133,6 +133,7 @@ function enterGame(){
         PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
         refreshWeaponMesh();
       }
+      if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
       loop();
     }catch(e){console.error('initScene error',e);}
   },100);

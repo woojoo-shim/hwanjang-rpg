@@ -454,6 +454,7 @@ function killMonster(m){
   checkLevelUp();
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
+  if(typeof onMonsterKillForShaman==='function')onMonsterKillForShaman();
   m.def.drops.forEach(function(drop){
     if(Math.random()<drop.rate){
       var qty=Array.isArray(drop.qty)?drop.qty[0]+Math.floor(Math.random()*(drop.qty[1]-drop.qty[0]+1)):drop.qty;

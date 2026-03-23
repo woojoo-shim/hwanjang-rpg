@@ -214,11 +214,150 @@ function checkChiefRogueHint(npcName){
   return null;
 }
 
+/* ════════════ 5. 현자/마법사 — "(현자) 윤서연" ════════════ */
+/* 룬 조각 3개를 모아야 마법탑 문이 열림 */
+var runeCount=0;
+var mageNpcSpawned=false;
+var mageNpc=null;
+var runeGlows=[];/* 룬 조각 3D 오브젝트 */
+
+function spawnRuneFragments(){
+  /* 맵 곳곳에 빛나는 룬 조각 3개 배치 */
+  var positions=[[-50,80],[60,200],[-100,350]];
+  var runeM=new THREE.MeshBasicMaterial({color:0x6644ff,transparent:true,opacity:.8});
+  positions.forEach(function(p,i){
+    var rune=new THREE.Mesh(new THREE.OctahedronGeometry(.4,0),runeM);
+    rune.position.set(p[0],1.5,p[1]);
+    scene.add(rune);
+    var light=new THREE.PointLight(0x6644ff,.8,8);light.position.copy(rune.position);scene.add(light);
+    runeGlows.push({mesh:rune,light:light,x:p[0],z:p[1],collected:false,idx:i});
+  });
+}
+
+function tickRuneCollect(){
+  if(mageNpcSpawned||!PL.group)return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  runeGlows.forEach(function(r){
+    if(r.collected)return;
+    var dx=px-r.x,dz=pz-r.z;
+    if(dx*dx+dz*dz<4){
+      r.collected=true;runeCount++;
+      scene.remove(r.mesh);scene.remove(r.light);
+      addChat('sys','[시스템]','✦ 룬 조각 획득! ('+runeCount+'/3)');
+      spawnDmgNum('룬 조각!','#6644ff');
+      if(runeCount>=3)spawnMageNpc();
+    }
+  });
+  /* 회전 애니 */
+  runeGlows.forEach(function(r){
+    if(!r.collected)r.mesh.rotation.y+=0.03;
+  });
+}
+
+function spawnMageNpc(){
+  mageNpcSpawned=true;
+  mageNpc=spawnDynamicNpc('(현자) 윤서연',-70,280,0x1a1a8b,0xaabbee,'mage');
+  addChat('sys','[시스템]','★ 룬의 힘이 모여 마법탑의 문이 열렸다! 현자가 기다리고 있다...');
+}
+
+/* ════════════ 6. 사냥꾼/궁수 — "(사냥꾼) 한시우" ════════════ */
+/* 초원에 화살이 박힌 나무를 따라가면 숲 깊은 곳에서 만남 */
+var arrowTrailStep=0;
+var archerNpcSpawned=false;
+var archerNpc=null;
+var arrowMarkers=[];
+
+function spawnArrowTrail(){
+  /* 화살이 박힌 나무 5개 — 초원→숲 경로를 따라 배치 */
+  var trail=[[20,50],[10,100],[-20,180],[-40,280],[-80,380]];
+  var arrowM=new THREE.MeshLambertMaterial({color:0x8a6a3a});
+  var featherM=new THREE.MeshLambertMaterial({color:0xff4444});
+  trail.forEach(function(p,i){
+    var shaft=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.6,4),arrowM);
+    shaft.position.set(p[0]+2,1.2,p[1]);shaft.rotation.z=0.4;scene.add(shaft);
+    var tip=new THREE.Mesh(new THREE.ConeGeometry(.04,.12,4),new THREE.MeshLambertMaterial({color:0x888888}));
+    tip.position.set(p[0]+2.2,1.5,p[1]);tip.rotation.z=0.4;scene.add(tip);
+    var feather=new THREE.Mesh(new THREE.PlaneGeometry(.08,.2),featherM);
+    feather.position.set(p[0]+1.7,1.0,p[1]);scene.add(feather);
+    arrowMarkers.push({x:p[0],z:p[1],visited:false,idx:i,shaft:shaft,tip:tip,feather:feather});
+  });
+}
+
+function tickArrowTrail(){
+  if(archerNpcSpawned||!PL.group)return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  arrowMarkers.forEach(function(a){
+    if(a.visited||a.idx!==arrowTrailStep)return;
+    var dx=px-a.x,dz=pz-a.z;
+    if(dx*dx+dz*dz<25){
+      a.visited=true;arrowTrailStep++;
+      addChat('sys','[시스템]','🏹 화살 흔적 발견! ('+arrowTrailStep+'/5) 다음 흔적을 찾아라...');
+      if(arrowTrailStep>=5)spawnArcherNpc();
+    }
+  });
+}
+
+function spawnArcherNpc(){
+  archerNpcSpawned=true;
+  archerNpc=spawnDynamicNpc('(사냥꾼) 한시우',-80,400,0x2a6a2a,0xddcc99,'archer');
+  addChat('sys','[시스템]','★ 숲 속에서 사냥꾼을 발견했다!');
+}
+
+/* ════════════ 7. 성기사 — "(성기사) 강예준" ════════════ */
+/* 밤에만 등장 (게임 내 시간 기준) — 늪 지역 폐허 성당 */
+var paladinNpcSpawned=false;
+var paladinNpc=null;
+
+function tickPaladin(){
+  if(!PL.group)return;
+  /* 게임 내 시간 (실제 시간의 분을 기준으로 낮/밤 순환) */
+  var mins=new Date().getMinutes();
+  var isNight=mins%10>=5;/* 5분 주기로 낮/밤 */
+  var inSwamp=currentZone==='swamp';
+
+  if(isNight&&inSwamp&&!paladinNpcSpawned){
+    paladinNpcSpawned=true;
+    paladinNpc=spawnDynamicNpc('(성기사) 강예준',175,250,0xccaa33,0xeeddaa,'paladin');
+    addChat('sys','[시스템]','★ 어둠 속에서 성스러운 빛이 보인다... 폐허 성당에 누군가 있다.');
+  }
+  if(!isNight&&paladinNpcSpawned){
+    despawnDynamicNpc(paladinNpc);
+    paladinNpc=null;
+    paladinNpcSpawned=false;
+    addChat('sys','[시스템]','날이 밝아지자 성기사의 기운이 사라졌다...');
+  }
+}
+
+/* ════════════ 8. 무당/주술사 — "(무당) 오지안" ════════════ */
+/* 몬스터 30마리 이상 처치하면 묘지에 등장 + 영혼 질문 */
+var totalKillCount=0;
+var shamanNpcSpawned=false;
+var shamanNpc=null;
+
+function onMonsterKillForShaman(){
+  totalKillCount++;
+  if(totalKillCount>=30&&!shamanNpcSpawned){
+    shamanNpcSpawned=true;
+    shamanNpc=spawnDynamicNpc('(무당) 오지안',185,180,0x336633,0x99cc99,'shaman');
+    addChat('sys','[시스템]','★ 죽인 영혼들의 기운이 한곳으로 모인다... 늪 깊은 곳에서 무당이 나타났다.');
+  }
+}
+
+/* ── 특수 NPC 초기화 (initScene 후 호출) ── */
+function initSpecialClassNpcs(){
+  spawnRuneFragments();
+  spawnArrowTrail();
+  spawnWarrior();
+}
+
 /* 모든 동적 NPC tick (게임 루프에서 호출) */
 function tickDynamicNpcs(dt){
   tickBerserker(dt);
   tickAssassin(dt);
   tickWarrior(dt);
+  tickRuneCollect();
+  tickArrowTrail();
+  tickPaladin();
 }
 
 /* 몬스터 킬 시 전직 퀘스트 진행 체크 */
