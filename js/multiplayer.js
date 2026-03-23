@@ -5,21 +5,38 @@ var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
 
-/* Tab — 접속 중인 플레이어 리스트 표시 */
+/* Tab — 마크 스타일 플레이어 리스트 (누르고 있는 동안 표시) */
+var playerListEl=null;
 function showPlayerList(){
-  var names=[];
+  if(!playerListEl){
+    playerListEl=document.createElement('div');
+    playerListEl.id='player-list-overlay';
+    playerListEl.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);border:1px solid #c9a84c44;padding:16px 28px;z-index:9990;min-width:180px;display:none;border-radius:4px;';
+    document.body.appendChild(playerListEl);
+  }
+  var html='<div style="color:#c9a84c;font-size:14px;text-align:center;margin-bottom:10px;letter-spacing:2px;">접속 중인 플레이어</div>';
   /* 자기 자신 */
-  names.push(myName+' (나) Lv.'+playerLevel);
+  html+='<div style="color:#55ff55;font-size:13px;padding:3px 0;">▸ '+myName+' <span style="color:#888;">Lv.'+playerLevel+'</span> <span style="color:#555;">(나)</span></div>';
   /* 원격 플레이어 */
+  var count=1;
   for(var id in remotePlayers){
     var rp=remotePlayers[id];
-    if(rp&&rp.name)names.push(rp.name+' Lv.'+(rp.level||'?'));
+    if(rp&&rp.name){
+      html+='<div style="color:#ddd;font-size:13px;padding:3px 0;">▸ '+rp.name+' <span style="color:#888;">Lv.'+(rp.level||'?')+'</span></div>';
+      count++;
+    }
   }
-  addChat('sys','[시스템]','━━ 접속 중 ('+names.length+'명) ━━');
-  for(var i=0;i<names.length;i++){
-    addChat('sys','[시스템]','  '+names[i]);
-  }
+  html+='<div style="color:#666;font-size:11px;text-align:center;margin-top:8px;border-top:1px solid #333;padding-top:6px;">'+count+'명 접속 중</div>';
+  playerListEl.innerHTML=html;
+  playerListEl.style.display='block';
 }
+function hidePlayerList(){
+  if(playerListEl)playerListEl.style.display='none';
+}
+/* keyup에서 Tab 떼면 숨김 */
+document.addEventListener('keyup',function(e){
+  if(e.key==='Tab')hidePlayerList();
+});
 
 function connectParty(){
   if(ws&&ws.readyState<=1)return;
