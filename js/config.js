@@ -308,6 +308,13 @@ var MONSTER_DEFS=[
    drops:[{id:'iron_sword',rate:.05,qty:1},{id:'leather_armor',rate:.08,qty:1},{id:'red_potion',rate:.4,qty:1}]},
   {id:'wolf',   name:'늑대',   hp:350, atk:40, exp:85, spd:5.5, aggro:22, color:0x555566,hc:0x888899,
    drops:[{id:'leather_armor',rate:.15,qty:1},{id:'magic_crystal',rate:.1,qty:1}]},
+  // ── 정글 (x>80, z 300~560) ──
+  {id:'jungle_spider',name:'정글 거미',hp:320,atk:35,exp:70,spd:4.5,aggro:20,color:0x2a1a00,hc:0x553300,
+   drops:[{id:'magic_crystal',rate:.2,qty:1},{id:'red_potion',rate:.3,qty:1}]},
+  {id:'jungle_snake',name:'독사',hp:260,atk:45,exp:80,spd:5.0,aggro:18,color:0x225511,hc:0x33aa22,
+   drops:[{id:'blue_potion',rate:.35,qty:1},{id:'leather_armor',rate:.1,qty:1}]},
+  {id:'jungle_ape',name:'숲 유인원',hp:500,atk:50,exp:110,spd:3.5,aggro:22,color:0x5a3a1a,hc:0x8a6a3a,
+   drops:[{id:'iron_sword',rate:.08,qty:1},{id:'star_fragment',rate:.08,qty:1},{id:'red_potion',rate:.25,qty:1}]},
   // ── 화산 지대 (z 200~280) ──
   {id:'golem',  name:'용암 골렘', hp:800,atk:55, exp:160,spd:2.0, aggro:18, color:0x883311,hc:0xff4400,
    drops:[{id:'star_fragment',rate:.15,qty:1},{id:'iron_sword',rate:.1,qty:1},{id:'elixir',rate:.02,qty:1}]},
@@ -324,6 +331,7 @@ var ZONE_INFO={
   meadow:   {name:'초원',        color:'#4aaa3a',tp:[0,50]},
   swamp:    {name:'독 늪',       color:'#44aa44',tp:[100,100]},
   darkforest:{name:'어두운 숲',  color:'#aa4422',tp:[0,430]},
+  jungle:   {name:'정글',        color:'#11aa44',tp:[120,430]},
   volcano:  {name:'화산 지대',   color:'#ff4400',tp:[0,700]},
 };
 

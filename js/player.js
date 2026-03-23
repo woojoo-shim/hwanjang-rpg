@@ -589,6 +589,7 @@ function checkZone(){
   if(z<=20) newZone='village';
   else if(z<=300&&x>80) newZone='swamp';
   else if(z<=300) newZone='meadow';
+  else if(z<=560&&x>80) newZone='jungle';
   else if(z<=560) newZone='darkforest';
   else newZone='volcano';
 
@@ -601,6 +602,7 @@ function checkZone(){
     else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,100,380);scene.background=new THREE.Color(0x1a3010);}
     else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,40,160);scene.background=new THREE.Color(0x050a05);}
     else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,25,130);scene.background=new THREE.Color(0x020202);}
+    else if(newZone==='jungle'){scene.fog=new THREE.Fog(0x0a2010,30,150);scene.background=new THREE.Color(0x0a2010);}
     else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,35,160);scene.background=new THREE.Color(0x100500);}
 
     /* 배너 표시 */
@@ -616,6 +618,7 @@ function checkZone(){
       meadow:'초원 진입. 토끼와 사슴이 있습니다.',
       swamp:'독 늪 진입! 슬라임과 독두꺼비가 나타납니다.',
       darkforest:'어두운 숲 진입! 고블린과 늑대를 조심하세요!',
+      jungle:'정글 진입! 거미, 독사, 유인원이 서식합니다!',
       volcano:'화산 지대 진입!! 용암 골렘과 드레이크가 기다립니다!!',
       village:'마을로 귀환. HP 일부 회복.',
     };
