@@ -190,37 +190,48 @@ function mkStonePath(parent){
     tile.receiveShadow=true;
     p.add(tile);
   }
-  /* 마을 북쪽 출구 — 구불구불한 흙길 */
-  var dirtM=new THREE.MeshLambertMaterial({color:0x1e1a10});
-  var pathPts=[
-    [0,18],[2,28],[-1,38],[3,50],[-2,62],[4,75],[0,88],[-3,102],[2,118],[5,135],
-    [-2,152],[0,170],[4,190],[-3,210],[1,230],[3,252],[-1,270],[2,290],[-4,310],[0,330]
-  ];
-  for(var pi=0;pi<pathPts.length;pi++){
-    var pw=4+Math.random()*2;
-    var pl=14+Math.random()*4;
-    var seg=new THREE.Mesh(new THREE.PlaneGeometry(pw,pl),dirtM);
-    seg.rotation.x=-Math.PI/2;
-    seg.position.set(pathPts[pi][0],.015,pathPts[pi][1]);
-    if(pi>0){
-      var dx=pathPts[pi][0]-pathPts[pi-1][0];
-      seg.rotation.z=dx*.08;
+  /* 마을 북쪽 출구 — 부드럽게 이어진 흙길 (Catmull-Rom 보간) */
+  var dirtM=new THREE.MeshLambertMaterial({color:0x9a8a6a});
+  var edgeM=new THREE.MeshLambertMaterial({color:0x7a6a4a});
+  /* 핵심 제어점 — 구불구불 */
+  var cp=[[0,18],[3,45],[-2,75],[4,110],[0,150],[-3,190],[2,230],[4,270],[-2,310],[0,350]];
+  /* 보간해서 촘촘한 점 생성 */
+  function lerpPath(pts,steps){
+    var out=[];
+    for(var i=0;i<pts.length-1;i++){
+      for(var s=0;s<steps;s++){
+        var t=s/steps;
+        out.push([pts[i][0]*(1-t)+pts[i+1][0]*t, pts[i][1]*(1-t)+pts[i+1][1]*t]);
+      }
     }
-    seg.receiveShadow=true;p.add(seg);
+    out.push(pts[pts.length-1]);
+    return out;
+  }
+  var smooth=lerpPath(cp,6);
+  /* 각 점에 원형 디스크를 겹쳐서 부드러운 길 생성 */
+  for(var pi=0;pi<smooth.length;pi++){
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.2,12),dirtM);
+    disc.rotation.x=-Math.PI/2;
+    disc.position.set(smooth[pi][0],.016,smooth[pi][1]);
+    disc.receiveShadow=true;p.add(disc);
+    /* 가장자리 — 약간 더 크고 어두운 디스크 */
+    if(pi%3===0){
+      var edge=new THREE.Mesh(new THREE.CircleGeometry(3.8,10),edgeM);
+      edge.rotation.x=-Math.PI/2;
+      edge.position.set(smooth[pi][0]+(Math.random()-.5)*.5,.014,smooth[pi][1]);
+      edge.receiveShadow=true;p.add(edge);
+    }
   }
   /* 갈림길 — 동쪽(늪), 서쪽(숲) 방향 */
-  var forkPtsE=[[8,90],[16,95],[25,100],[35,108],[45,118],[55,130]];
-  var forkPtsW=[[-8,90],[-16,95],[-25,102],[-35,112],[-45,125],[-55,140]];
-  [forkPtsE,forkPtsW].forEach(function(pts){
-    for(var fi=0;fi<pts.length;fi++){
-      var fs=new THREE.Mesh(new THREE.PlaneGeometry(3.5+Math.random()*1.5,12+Math.random()*3),dirtM);
-      fs.rotation.x=-Math.PI/2;
-      fs.position.set(pts[fi][0],.015,pts[fi][1]);
-      if(fi>0){
-        var angle=Math.atan2(pts[fi][0]-pts[fi-1][0],pts[fi][1]-pts[fi-1][1]);
-        fs.rotation.z=angle*.3;
-      }
-      fs.receiveShadow=true;p.add(fs);
+  var forkE=[[4,90],[10,95],[18,100],[27,108],[38,118],[50,130]];
+  var forkW=[[-4,90],[-10,95],[-18,102],[-27,112],[-38,125],[-50,140]];
+  [forkE,forkW].forEach(function(pts){
+    var sm=lerpPath(pts,4);
+    for(var fi=0;fi<sm.length;fi++){
+      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.5,10),dirtM);
+      fd.rotation.x=-Math.PI/2;
+      fd.position.set(sm[fi][0],.016,sm[fi][1]);
+      fd.receiveShadow=true;p.add(fd);
     }
   });
 }
