@@ -343,3 +343,7 @@ var ZONE_INFO={
 
 /* 방문한 존 기록 */
 var visitedZones={village:true};
+
+/* 개발자 계정 ID */
+var DEV_UIDS=['be38b6ea-8890-4ef0-b809-9b46303fc629'];
+function isDev(){return currentUser&&DEV_UIDS.indexOf(currentUser.id)!==-1;}

@@ -511,8 +511,9 @@ function playerDied(){
 
 /* ═══════════ 텔레포트 두루마리 ═══════════ */
 function useTpScroll(){
+  var dev=isDev();
   var slot=inventory.find(function(s){return s.itemId==='tp_scroll';});
-  if(!slot){addChat('inf','','텔레포트 두루마리가 없습니다!');return;}
+  if(!slot&&!dev){addChat('inf','','텔레포트 두루마리가 없습니다!');return;}
   /* 방문한 존 목록으로 UI 표시 */
   var modal=document.getElementById('tp-modal');
   if(!modal){
@@ -526,7 +527,7 @@ function useTpScroll(){
   list.innerHTML='';
   for(var zk in ZONE_INFO){
     var zi=ZONE_INFO[zk];
-    if(!visitedZones[zk])continue;
+    if(!visitedZones[zk]&&!dev)continue;
     if(zk===currentZone)continue;
     var btn=document.createElement('button');
     btn.style.cssText='padding:10px 20px;background:#1a1a2e;border:1px solid '+zi.color+';color:'+zi.color+';cursor:pointer;font-family:inherit;font-size:14px;border-radius:4px;';
@@ -549,11 +550,13 @@ function closeTpModal(){
 function doTeleport(zoneKey){
   var zi=ZONE_INFO[zoneKey];
   if(!zi||!zi.tp)return;
-  /* 두루마리 소모 */
-  var slot=inventory.find(function(s){return s.itemId==='tp_scroll';});
-  if(!slot)return;
-  slot.qty--;
-  if(slot.qty<=0){var idx=inventory.indexOf(slot);if(idx>=0)inventory.splice(idx,1);}
+  /* 두루마리 소모 (개발자는 무소모) */
+  if(!isDev()){
+    var slot2=inventory.find(function(s){return s.itemId==='tp_scroll';});
+    if(!slot2)return;
+    slot2.qty--;
+    if(slot2.qty<=0){var idx=inventory.indexOf(slot2);if(idx>=0)inventory.splice(idx,1);}
+  }
   /* 텔레포트 */
   PL.group.position.set(zi.tp[0],0,zi.tp[1]);
   closeTpModal();
