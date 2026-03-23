@@ -1043,7 +1043,18 @@ function updMonsters(dt,t){
       m.wrap.style.display='none';
     }
     if(dist<md){md=dist;closestMonster=m;}
-    /* 로컬 AI — 항상 실행 */
+    /* 비호스트: 서버에서 받은 위치로 보간 이동 */
+    if(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined){
+      var tx=m._targetX,tz=m._targetZ;
+      var lerpSpd=8*dt;/* 부드러운 보간 */
+      m.mesh.position.x+=(tx-mx)*Math.min(1,lerpSpd);
+      m.mesh.position.z+=(tz-mz)*Math.min(1,lerpSpd);
+      /* 이동 방향으로 회전 */
+      var ddx=tx-mx,ddz=tz-mz;
+      if(ddx*ddx+ddz*ddz>0.01)m.mesh.rotation.y=Math.atan2(ddx,ddz);
+      return;/* 비호스트는 로컬 AI 실행 안 함 */
+    }
+    /* 로컬 AI (호스트 또는 싱글) */
     if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
     if(m.state==='aggro'){
         var mid=m.def.id;
