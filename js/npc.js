@@ -749,7 +749,7 @@ function closeDialog(){
 document.getElementById('dmsg').addEventListener('keydown',function(e){if(e.key==='Enter')sendToNpc();});
 document.addEventListener('keydown',function(e){
   /* e.code 기반 — 한/영 상관없이 작동 */
-  var CODE_MAP={KeyI:'i',KeyM:'m',KeyP:'p'};
+  var CODE_MAP={KeyI:'i',KeyM:'m',KeyP:'p',KeyH:'h'};
   var k=CODE_MAP[e.code]||e.key;
   if(!k)return;
   var gHidden=document.getElementById('game-screen').classList.contains('hidden');
@@ -790,13 +790,15 @@ document.addEventListener('keydown',function(e){
     var mm=document.getElementById('minimap');
     if(mm)mm.classList.toggle('hidden');
   }
-  /* P — 개발자 텔레포트 / 파티 초대 패널 */
+  /* P — 파티 초대 패널 */
   if(k==='p'&&!isInput){
+    e.preventDefault();
+    if(typeof togglePartyInvitePanel==='function')togglePartyInvitePanel();
+  }
+  /* H — 텔레포트 (개발자 전용) */
+  if(k==='h'&&!isInput){
     if(typeof isDev==='function'&&isDev()){
       if(typeof useTpScroll==='function')useTpScroll();
-    }else{
-      e.preventDefault();
-      if(typeof togglePartyInvitePanel==='function')togglePartyInvitePanel();
     }
   }
 });
