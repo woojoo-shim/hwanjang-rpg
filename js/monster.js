@@ -1046,12 +1046,19 @@ function updMonsters(dt,t){
     /* 비호스트: 위치만 호스트에서 받아 보간, 어그로/공격은 로컬 */
     if(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined){
       var tx=m._targetX,tz=m._targetZ;
-      var lerpSpd=8*dt;
-      m.mesh.position.x+=(tx-mx)*Math.min(1,lerpSpd);
-      m.mesh.position.z+=(tz-mz)*Math.min(1,lerpSpd);
+      var t=Math.min(1,12*dt);/* 부드러운 보간 (12/s) */
+      m.mesh.position.x=mx+(tx-mx)*t;
+      m.mesh.position.z=mz+(tz-mz)*t;
+      /* 부드러운 회전 보간 */
       var ddx=tx-mx,ddz=tz-mz;
-      if(ddx*ddx+ddz*ddz>0.01)m.mesh.rotation.y=Math.atan2(ddx,ddz);
-      /* 위치 갱신 후 공격 판정은 아래 로컬 AI에서 처리 */
+      if(ddx*ddx+ddz*ddz>0.001){
+        var targetRy=Math.atan2(ddx,ddz);
+        var curRy=m.mesh.rotation.y;
+        var diff=targetRy-curRy;
+        while(diff>Math.PI)diff-=Math.PI*2;
+        while(diff<-Math.PI)diff+=Math.PI*2;
+        m.mesh.rotation.y+=diff*Math.min(1,10*dt);
+      }
       mx=m.mesh.position.x;mz=m.mesh.position.z;
       dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
     }

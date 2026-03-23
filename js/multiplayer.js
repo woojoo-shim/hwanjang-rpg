@@ -189,7 +189,7 @@ function startMonsterSync(){
       batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1));
     }
     if(batch.length>0)ws.send('mp|'+batch.join(';'));
-  },500);
+  },200);
 }
 
 /* ── 원격 플레이어 메쉬 ── */
