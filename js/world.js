@@ -178,7 +178,6 @@ function mkStonePath(parent){
   var plaza=new THREE.Mesh(new THREE.CylinderGeometry(8,8,.05,32),pathM);
   plaza.position.set(0,.02,-8);plaza.receiveShadow=true;p.add(plaza);
   /* 마을 → 초원 → 숲까지 이어지는 부드러운 흙길 */
-  var edgeM=new THREE.MeshLambertMaterial({color:0x907858});
   var cp=[[0,-8],[0,5],[1,20],[3,40],[1,60],[-2,85],[2,115],[-1,150],[3,190],[0,230],[-2,270],[1,310],[0,350]];
   function lerpPath(pts,steps){
     var out=[];
@@ -191,29 +190,22 @@ function mkStonePath(parent){
     out.push(pts[pts.length-1]);
     return out;
   }
-  var smooth=lerpPath(cp,10);
+  var smooth=lerpPath(cp,15);
   for(var pi=0;pi<smooth.length;pi++){
-    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.5,16),pathM);
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.5,32),pathM);
     disc.rotation.x=-Math.PI/2;
     disc.position.set(smooth[pi][0],.016,smooth[pi][1]);
     disc.receiveShadow=true;p.add(disc);
-    var edge=new THREE.Mesh(new THREE.CircleGeometry(4.2,14),edgeM);
-    edge.rotation.x=-Math.PI/2;
-    edge.position.set(smooth[pi][0],.013,smooth[pi][1]);
-    edge.receiveShadow=true;p.add(edge);
   }
   /* 갈림길 */
   var forkE=[[4,60],[12,65],[22,72],[34,82],[48,95],[60,112]];
   var forkW=[[-4,60],[-12,65],[-22,72],[-34,82],[-48,95],[-60,112]];
   [forkE,forkW].forEach(function(pts){
-    var sm=lerpPath(pts,8);
+    var sm=lerpPath(pts,10);
     for(var fi=0;fi<sm.length;fi++){
-      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.8,14),pathM);
+      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.8,32),pathM);
       fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.016,sm[fi][1]);
       fd.receiveShadow=true;p.add(fd);
-      var fe=new THREE.Mesh(new THREE.CircleGeometry(3.4,12),edgeM);
-      fe.rotation.x=-Math.PI/2;fe.position.set(sm[fi][0],.013,sm[fi][1]);
-      fe.receiveShadow=true;p.add(fe);
     }
   });
 }
