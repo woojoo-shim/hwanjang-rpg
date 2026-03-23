@@ -68,9 +68,37 @@ function useItem(slot){
     if(typeof useTpScroll==='function')useTpScroll();
     return;
   }
+  /* 아이템 효과 적용 */
+  var msg='';
+  if(it.stats.회복){
+    if(it.stats.회복==='전체'){
+      playerHP=playerMaxHP;
+      msg='HP/MP 전부 회복!';
+    }else{
+      var heal=parseInt(it.stats.회복)||0;
+      playerHP=Math.min(playerMaxHP,playerHP+heal);
+      msg='HP '+heal+' 회복!';
+    }
+    if(typeof updPlayerHpBar==='function')updPlayerHpBar();
+    if(typeof spawnDmgNum==='function')spawnDmgNum('+'+it.stats.회복,'#44ff44');
+  }
+  if(it.stats.마나회복){
+    var mheal=parseInt(it.stats.마나회복)||0;
+    msg+=(msg?' ':'')+'MP '+mheal+' 회복!';
+  }
+  if(it.stats.체력){
+    var sheal=parseInt(it.stats.체력)||0;
+    playerHP=Math.min(playerMaxHP,playerHP+sheal);
+    msg='HP '+sheal+' 회복!';
+    if(typeof updPlayerHpBar==='function')updPlayerHpBar();
+    if(typeof spawnDmgNum==='function')spawnDmgNum('+'+sheal,'#44ff44');
+  }
+  if(it.stats.부활){
+    msg='부활 효과가 부여되었습니다!';
+  }
   slot.qty--;
   if(slot.qty<=0)inventory=inventory.filter(function(s){return s!==slot;});
-  addChat('sys','[시스템]','['+it.name+']을(를) 사용했습니다.');
+  addChat('sys','[시스템]','['+it.name+'] 사용! '+(msg||''));
   renderInv();
   document.getElementById('inv-detail-empty').style.display='block';
   document.getElementById('inv-detail-content').style.display='none';
