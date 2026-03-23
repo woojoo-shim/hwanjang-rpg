@@ -1062,13 +1062,15 @@ function updMonsters(dt,t){
       mx=m.mesh.position.x;mz=m.mesh.position.z;
       dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
     }
-    /* 어그로 감지 + 공격 판정은 전원 */
+    /* 어그로 + 공격 판정 — 모든 클라이언트 */
+    var mid=m.def.id;
+    var isNonHost=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
     if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
-    if(m.state!=='aggro'&&m.state!=='returning'&&dist<m.def.aggro){m.state='aggro';}
-    if(m.state==='aggro'){
-        var mid=m.def.id;
+    /* 비호스트: 호스트 상태가 idle이어도 자기 근처면 로컬 어그로 */
+    var localAggro=(dist<m.def.aggro&&m.hp>0);
+    if(m.state==='aggro'||localAggro){
+        if(m.state!=='aggro')m.state='aggro';
         var spd=m.def.spd;
-        var isNonHost=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
         if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
         /* 독두꺼비: 사거리 더 김 (혀 공격) */
