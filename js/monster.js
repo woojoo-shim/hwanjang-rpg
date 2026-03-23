@@ -1586,7 +1586,7 @@ function buildDarkForest(){
         ].forEach(function(pp){spawnMonster(wd,pp[0],pp[1],scene);});
   /* ★ 엘리트: 늑대 대장 */
   var ew=MONSTER_DEFS.find(function(x){return x.id==='elite_wolf';});
-  if(ew)spawnMonster(ew,0,430,scene);
+  if(ew)spawnMonster(ew,-100,540,scene);
 }
 
 function buildJungle(){
