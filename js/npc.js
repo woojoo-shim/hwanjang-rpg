@@ -629,6 +629,10 @@ document.addEventListener('keydown',function(e){
     var mm=document.getElementById('minimap');
     if(mm)mm.classList.toggle('hidden');
   }
+  /* P — 개발자 텔레포트 */
+  if(k.toLowerCase()==='p'&&!isInput&&typeof isDev==='function'&&isDev()){
+    if(typeof useTpScroll==='function')useTpScroll();
+  }
 });
 
 /* ── 채팅 (플레이어 전용) ── */
