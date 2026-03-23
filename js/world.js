@@ -173,29 +173,13 @@ function mkFountain(parent){
 
 function mkStonePath(parent){
   var p=parent||scene;
+  /* 광장 */
   var pathM=new THREE.MeshLambertMaterial({color:0xb8a880});
-  var darkM=new THREE.MeshLambertMaterial({color:0x907858});
-  var mainPath=new THREE.Mesh(new THREE.PlaneGeometry(6,50),pathM);
-  mainPath.rotation.x=-Math.PI/2;mainPath.position.set(0,.02,-8);mainPath.receiveShadow=true;p.add(mainPath);
   var plaza=new THREE.Mesh(new THREE.CylinderGeometry(8,8,.05,32),pathM);
   plaza.position.set(0,.02,-8);plaza.receiveShadow=true;p.add(plaza);
-  var crossL=new THREE.Mesh(new THREE.PlaneGeometry(10,5),pathM);
-  crossL.rotation.x=-Math.PI/2;crossL.position.set(-11,.02,-8);crossL.receiveShadow=true;p.add(crossL);
-  var crossR=new THREE.Mesh(new THREE.PlaneGeometry(10,5),pathM);
-  crossR.rotation.x=-Math.PI/2;crossR.position.set(11,.02,-8);crossR.receiveShadow=true;p.add(crossR);
-  for(var i=0;i<10;i++){
-    var tile=new THREE.Mesh(new THREE.PlaneGeometry(.8+Math.random()*.4,.8+Math.random()*.4),darkM);
-    tile.rotation.x=-Math.PI/2;
-    tile.position.set((Math.random()-.5)*5,.025,-2-i*4.5);
-    tile.receiveShadow=true;
-    p.add(tile);
-  }
-  /* 마을 북쪽 출구 — 부드럽게 이어진 흙길 (Catmull-Rom 보간) */
-  var dirtM=new THREE.MeshLambertMaterial({color:0x9a8a6a});
-  var edgeM=new THREE.MeshLambertMaterial({color:0x7a6a4a});
-  /* 핵심 제어점 — 구불구불 */
-  var cp=[[0,18],[3,45],[-2,75],[4,110],[0,150],[-3,190],[2,230],[4,270],[-2,310],[0,350]];
-  /* 보간해서 촘촘한 점 생성 */
+  /* 마을 → 초원 → 숲까지 이어지는 부드러운 흙길 */
+  var edgeM=new THREE.MeshLambertMaterial({color:0x907858});
+  var cp=[[0,-8],[0,5],[1,20],[3,40],[1,60],[-2,85],[2,115],[-1,150],[3,190],[0,230],[-2,270],[1,310],[0,350]];
   function lerpPath(pts,steps){
     var out=[];
     for(var i=0;i<pts.length-1;i++){
@@ -207,31 +191,29 @@ function mkStonePath(parent){
     out.push(pts[pts.length-1]);
     return out;
   }
-  var smooth=lerpPath(cp,6);
-  /* 각 점에 원형 디스크를 겹쳐서 부드러운 길 생성 */
+  var smooth=lerpPath(cp,10);
   for(var pi=0;pi<smooth.length;pi++){
-    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.2,12),dirtM);
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.5,16),pathM);
     disc.rotation.x=-Math.PI/2;
     disc.position.set(smooth[pi][0],.016,smooth[pi][1]);
     disc.receiveShadow=true;p.add(disc);
-    /* 가장자리 — 약간 더 크고 어두운 디스크 */
-    if(pi%3===0){
-      var edge=new THREE.Mesh(new THREE.CircleGeometry(3.8,10),edgeM);
-      edge.rotation.x=-Math.PI/2;
-      edge.position.set(smooth[pi][0]+(Math.random()-.5)*.5,.014,smooth[pi][1]);
-      edge.receiveShadow=true;p.add(edge);
-    }
+    var edge=new THREE.Mesh(new THREE.CircleGeometry(4.2,14),edgeM);
+    edge.rotation.x=-Math.PI/2;
+    edge.position.set(smooth[pi][0],.013,smooth[pi][1]);
+    edge.receiveShadow=true;p.add(edge);
   }
-  /* 갈림길 — 동쪽(늪), 서쪽(숲) 방향 */
-  var forkE=[[4,90],[10,95],[18,100],[27,108],[38,118],[50,130]];
-  var forkW=[[-4,90],[-10,95],[-18,102],[-27,112],[-38,125],[-50,140]];
+  /* 갈림길 */
+  var forkE=[[4,60],[12,65],[22,72],[34,82],[48,95],[60,112]];
+  var forkW=[[-4,60],[-12,65],[-22,72],[-34,82],[-48,95],[-60,112]];
   [forkE,forkW].forEach(function(pts){
-    var sm=lerpPath(pts,4);
+    var sm=lerpPath(pts,8);
     for(var fi=0;fi<sm.length;fi++){
-      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.5,10),dirtM);
-      fd.rotation.x=-Math.PI/2;
-      fd.position.set(sm[fi][0],.016,sm[fi][1]);
+      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.8,14),pathM);
+      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.016,sm[fi][1]);
       fd.receiveShadow=true;p.add(fd);
+      var fe=new THREE.Mesh(new THREE.CircleGeometry(3.4,12),edgeM);
+      fe.rotation.x=-Math.PI/2;fe.position.set(sm[fi][0],.013,sm[fi][1]);
+      fe.receiveShadow=true;p.add(fe);
     }
   });
 }
