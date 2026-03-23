@@ -15,6 +15,28 @@
 var monsters=[];
 var closestMonster=null;
 var currentZone='village';
+var targetedMonster=null;
+
+/* Tab 타겟팅 — 가장 가까운 살아있는 몬스터 선택 */
+function targetNearestMonster(){
+  if(!PL.group)return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  var best=null,bestD=Infinity;
+  for(var i=0;i<monsters.length;i++){
+    var m=monsters[i];
+    if(m.hp<=0||!m.mesh)continue;
+    var dx=m.mesh.position.x-px,dz=m.mesh.position.z-pz;
+    var d=dx*dx+dz*dz;
+    if(d<bestD){bestD=d;best=m;}
+  }
+  if(best&&bestD<80*80){
+    targetedMonster=best;
+    addChat('sys','[시스템]','🎯 '+best.def.name+' 타겟!');
+  }else{
+    targetedMonster=null;
+    addChat('sys','[시스템]','주변에 몬스터가 없습니다.');
+  }
+}
 
 /* ════════════ 바닥 장판 시스템 (용암/화염) ════════════ */
 var groundEffects=[];

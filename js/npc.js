@@ -587,12 +587,47 @@ function closeDialog(){
 
 document.getElementById('dmsg').addEventListener('keydown',function(e){if(e.key==='Enter')sendToNpc();});
 document.addEventListener('keydown',function(e){
-  if(e.code==='Space'&&document.getElementById('dbox').classList.contains('show')&&document.activeElement!==document.getElementById('dmsg')){
+  if(!e.key)return;
+  var k=e.key;
+  var gHidden=document.getElementById('game-screen').classList.contains('hidden');
+  var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin')||document.activeElement===document.getElementById('ni')||document.activeElement===document.getElementById('login-email')||document.activeElement===document.getElementById('login-pw');
+
+  /* ESC — 모든 창 닫기 (최우선) */
+  if(k==='Escape'){
+    e.preventDefault();
+    if(document.getElementById('dbox').classList.contains('show')){closeDialog();return;}
+    if(shopOpen){closeShop();return;}
+    if(invOpen){closeInv();return;}
+    /* 텔레포트 UI 닫기 */
+    var tpUI=document.getElementById('teleport-ui');
+    if(tpUI&&!tpUI.classList.contains('hidden')){tpUI.classList.add('hidden');return;}
+    /* 퀘스트 알림 닫기 */
+    var qn=document.getElementById('quest-notif');
+    if(qn&&!qn.classList.contains('hidden')){qn.classList.add('hidden');return;}
+    return;
+  }
+
+  /* 게임 화면 아니면 이후 키 무시 */
+  if(gHidden)return;
+
+  /* Space — NPC 대화 닫기 */
+  if(e.code==='Space'&&document.getElementById('dbox').classList.contains('show')&&!isInput){
     e.preventDefault();closeDialog();
   }
-  if(e.key&&e.key.toLowerCase()==='i'&&!document.getElementById('game-screen').classList.contains('hidden')&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')&&document.activeElement!==document.getElementById('ni')){
+  /* I — 인벤토리 토글 */
+  if(k.toLowerCase()==='i'&&!isInput){
     e.preventDefault();
     if(invOpen)closeInv();else openInv();
+  }
+  /* Tab — 가장 가까운 몬스터 타겟팅 */
+  if(k==='Tab'&&!isInput){
+    e.preventDefault();
+    if(typeof targetNearestMonster==='function')targetNearestMonster();
+  }
+  /* M — 미니맵 토글 (있으면) */
+  if(k.toLowerCase()==='m'&&!isInput){
+    var mm=document.getElementById('minimap');
+    if(mm)mm.classList.toggle('hidden');
   }
 });
 
