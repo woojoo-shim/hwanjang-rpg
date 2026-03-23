@@ -322,6 +322,17 @@ var MONSTER_DEFS=[
    drops:[{id:'star_fragment',rate:.15,qty:1},{id:'iron_sword',rate:.1,qty:1},{id:'elixir',rate:.02,qty:1}]},
   {id:'firedrake',name:'파이어드레이크',hp:1200,atk:75,exp:280,spd:4.0,aggro:28,color:0xcc2200,hc:0xff6600,
    drops:[{id:'dragon_scale',rate:.12,qty:1},{id:'star_fragment',rate:.3,qty:1},{id:'eternal_chain',rate:.01,qty:1}]},
+  // ── 엘리트 몬스터 (지역별 1마리) ──
+  {id:'elite_stag',name:'★ 황금 사슴왕',hp:800,atk:55,exp:300,spd:5.5,aggro:25,color:0xddaa00,hc:0xffdd44,elite:true,
+   drops:[{id:'moonblade',rate:.08,qty:1},{id:'elixir',rate:.3,qty:1},{id:'star_fragment',rate:.5,qty:1}]},
+  {id:'elite_toad',name:'★ 독왕 두꺼비',hp:1200,atk:65,exp:450,spd:3.5,aggro:22,color:0x225500,hc:0x66ff00,elite:true,
+   drops:[{id:'fire_staff',rate:.1,qty:1},{id:'elixir',rate:.4,qty:1},{id:'magic_crystal',rate:.8,qty:1}]},
+  {id:'elite_wolf',name:'★ 늑대 대장',hp:1800,atk:85,exp:650,spd:6.0,aggro:30,color:0x222233,hc:0xaaaadd,elite:true,
+   drops:[{id:'moonblade',rate:.12,qty:1},{id:'dragon_scale',rate:.05,qty:1},{id:'elixir',rate:.5,qty:1}]},
+  {id:'elite_ape',name:'★ 정글의 왕',hp:2500,atk:100,exp:800,spd:4.0,aggro:28,color:0x3a1a00,hc:0xff8844,elite:true,
+   drops:[{id:'dragonfang',rate:.06,qty:1},{id:'star_fragment',rate:.6,qty:1},{id:'elixir',rate:.5,qty:1}]},
+  {id:'elite_dragon',name:'★ 고대 화염룡',hp:5000,atk:150,exp:2000,spd:3.5,aggro:35,color:0x880000,hc:0xff2200,elite:true,
+   drops:[{id:'eclipse_blade',rate:.03,qty:1},{id:'dragon_scale',rate:.4,qty:1},{id:'immortal_potion',rate:.1,qty:1},{id:'eternal_chain',rate:.08,qty:1}]},
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */

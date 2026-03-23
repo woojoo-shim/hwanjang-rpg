@@ -519,6 +519,7 @@ function mkMonsterMesh(def){
 
 function spawnMonster(def,x,z,parent){
   var mesh=mkMonsterMesh(def);
+  if(def.elite){mesh.scale.set(1.8,1.8,1.8);}
   mesh.position.set(x,0,z);
   mesh.rotation.y=Math.random()*Math.PI*2;
   var p=parent||scene;
@@ -527,11 +528,19 @@ function spawnMonster(def,x,z,parent){
   var wrap=document.createElement('div');
   wrap.style.cssText='position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;';
   var ntag=document.createElement('div');ntag.className='llabel npc';
-  ntag.style.cssText+=';background:#1a0808ee;border-color:#883333;color:#ff8888;font-size:10px;';
+  if(def.elite){
+    ntag.style.cssText+=';background:#2a1a00ee;border-color:#ffaa00;color:#ffdd44;font-size:11px;text-shadow:0 0 6px #ffaa00;';
+  }else{
+    ntag.style.cssText+=';background:#1a0808ee;border-color:#883333;color:#ff8888;font-size:10px;';
+  }
   ntag.textContent=def.name;
   var hbw=document.createElement('div');
-  hbw.style.cssText='width:56px;height:5px;background:#2a0808;border:1px solid #551111;overflow:hidden;';
-  var hbf=document.createElement('div');hbf.style.cssText='height:100%;background:#cc2222;width:100%;transition:width .15s;';
+  if(def.elite){
+    hbw.style.cssText='width:72px;height:7px;background:#2a1a00;border:1px solid #ffaa00;overflow:hidden;';
+  }else{
+    hbw.style.cssText='width:56px;height:5px;background:#2a0808;border:1px solid #551111;overflow:hidden;';
+  }
+  var hbf=document.createElement('div');hbf.style.cssText='height:100%;background:'+(def.elite?'#ffaa00':'#cc2222')+';width:100%;transition:width .15s;';
   hbw.appendChild(hbf);wrap.appendChild(ntag);wrap.appendChild(hbw);lov.appendChild(wrap);
   /* 애니메이션 상태 초기화 */
   var m={def:def,mesh:mesh,hp:def.hp,maxHp:def.hp,wrap:wrap,hbf:hbf,state:'idle',attackTimer:0,bobOff:Math.random()*Math.PI*2,spawnX:x,spawnZ:z,
@@ -603,6 +612,9 @@ function buildMeadow(){
         ].forEach(function(pp){spawnMonster(rd,pp[0],pp[1],scene);});
   if(dd)[[55,45],[-45,160],[30,230],[-20,285]
         ].forEach(function(pp){spawnMonster(dd,pp[0],pp[1],scene);});
+  /* ★ 엘리트: 황금 사슴왕 */
+  var es=MONSTER_DEFS.find(function(x){return x.id==='elite_stag';});
+  if(es)spawnMonster(es,0,200,scene);
 }
 
 function buildSwamp(){
@@ -655,6 +667,9 @@ function buildSwamp(){
   /* 서쪽 늪 */
   if(sd)[[-100,60],[-150,145],[-130,260]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
   if(td)[[-120,100],[-165,200],[-110,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
+  /* ★ 엘리트: 독왕 두꺼비 */
+  var et=MONSTER_DEFS.find(function(x){return x.id==='elite_toad';});
+  if(et)spawnMonster(et,150,200,scene);
 }
 
 function buildDarkForest(){
@@ -716,6 +731,9 @@ function buildDarkForest(){
         ].forEach(function(pp){spawnMonster(gd,pp[0],pp[1],scene);});
   if(wd)[[55,345],[-50,400],[35,470],[-25,540]
         ].forEach(function(pp){spawnMonster(wd,pp[0],pp[1],scene);});
+  /* ★ 엘리트: 늑대 대장 */
+  var ew=MONSTER_DEFS.find(function(x){return x.id==='elite_wolf';});
+  if(ew)spawnMonster(ew,0,430,scene);
 }
 
 function buildJungle(){
@@ -793,6 +811,9 @@ function buildJungle(){
   /* 나무 정령 — 느리지만 강력 */
   var tr=MONSTER_DEFS.find(function(x){return x.id==='jungle_treant';});
   if(tr)[[125,390],[155,510],[185,440]].forEach(function(pp){spawnMonster(tr,pp[0],pp[1],scene);});
+  /* ★ 엘리트: 정글의 왕 */
+  var ea=MONSTER_DEFS.find(function(x){return x.id==='elite_ape';});
+  if(ea)spawnMonster(ea,140,470,scene);
 }
 
 function buildVolcano(){
@@ -876,6 +897,9 @@ function buildVolcano(){
          ].forEach(function(pp){spawnMonster(gld,pp[0],pp[1],scene);});
   if(fdd)[[50,610],[-40,680],[40,755],[0,840]
          ].forEach(function(pp){spawnMonster(fdd,pp[0],pp[1],scene);});
+  /* ★ 엘리트: 고대 화염룡 */
+  var ed=MONSTER_DEFS.find(function(x){return x.id==='elite_dragon';});
+  if(ed)spawnMonster(ed,0,800,scene);
 }
 
 /* ════════════ 전체 오픈 월드 빌드 ════════════ */
@@ -1075,9 +1099,9 @@ function updMonsters(dt,t){
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
         if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
         /* 몬스터별 공격 범위 + 공격 속도 */
-        var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5};
+        var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0};
         var atkRange=atkRanges[mid]||1.8;
-        var atkSpd={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0};
+        var atkSpd={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5};
         var atkCooldown=atkSpd[mid]||(0.8+Math.random()*.4);
         if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
