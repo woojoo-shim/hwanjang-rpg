@@ -517,9 +517,46 @@ function mkMonsterMesh(def){
   return g;
 }
 
+function addEliteEffects(g,def){
+  /* 왕관 */
+  var crownM=new THREE.MeshBasicMaterial({color:0xffdd00});
+  var crownBase=new THREE.Mesh(new THREE.CylinderGeometry(.25,.3,.12,8),crownM);
+  var crownTop=g.children.length>0?2.2:1.5;
+  /* 가장 높은 y 찾기 */
+  g.traverse(function(c){if(c.position&&c.position.y+.5>crownTop)crownTop=c.position.y+.5;});
+  crownBase.position.set(0,crownTop,0);g.add(crownBase);
+  /* 왕관 뾰족이 */
+  var spikeM=new THREE.MeshBasicMaterial({color:0xffaa00});
+  for(var ci=0;ci<5;ci++){
+    var angle=ci/5*Math.PI*2;
+    var spike=new THREE.Mesh(new THREE.ConeGeometry(.06,.18,4),spikeM);
+    spike.position.set(Math.cos(angle)*.2,crownTop+.15,Math.sin(angle)*.2);g.add(spike);
+  }
+  /* 보석 */
+  var gemM=new THREE.MeshBasicMaterial({color:0xff0044});
+  var gem=new THREE.Mesh(new THREE.OctahedronGeometry(.08,0),gemM);
+  gem.position.set(0,crownTop+.18,0);g.add(gem);
+  /* 발광 오라 링 */
+  var oraColor=def.id==='elite_dragon'?0xff4400:def.id==='elite_wolf'?0x8888ff:def.id==='elite_toad'?0x44ff00:def.id==='elite_ape'?0xff8844:0xffdd00;
+  var oraM=new THREE.MeshBasicMaterial({color:oraColor,transparent:true,opacity:.3,side:THREE.DoubleSide});
+  var ora=new THREE.Mesh(new THREE.RingGeometry(.8,1.2,24),oraM);
+  ora.rotation.x=-Math.PI/2;ora.position.set(0,.05,0);g.add(ora);
+  /* 두 번째 오라 링 (위) */
+  var ora2=new THREE.Mesh(new THREE.RingGeometry(.5,.8,24),oraM);
+  ora2.rotation.x=-Math.PI/2;ora2.position.set(0,crownTop-.3,0);g.add(ora2);
+  /* 파티클 구체들 (주변 떠다니는 빛) */
+  var pM=new THREE.MeshBasicMaterial({color:oraColor,transparent:true,opacity:.6});
+  for(var pi=0;pi<6;pi++){
+    var pa=pi/6*Math.PI*2;
+    var particle=new THREE.Mesh(new THREE.SphereGeometry(.06,6,6),pM);
+    particle.position.set(Math.cos(pa)*.9,crownTop*.5+Math.sin(pa*2)*.3,Math.sin(pa)*.9);
+    particle._eliteOrbit=pa;g.add(particle);
+  }
+}
+
 function spawnMonster(def,x,z,parent){
   var mesh=mkMonsterMesh(def);
-  if(def.elite){mesh.scale.set(1.8,1.8,1.8);}
+  if(def.elite){mesh.scale.set(1.8,1.8,1.8);addEliteEffects(mesh,def);}
   mesh.position.set(x,0,z);
   mesh.rotation.y=Math.random()*Math.PI*2;
   var p=parent||scene;
@@ -1011,8 +1048,25 @@ function updateMonsterAnims(dt){
       } else if(id!=='golem'){
         /* 숨쉬기 스케일 */
         var breath=1+Math.sin(m.animTime*1.4+m.bobOff)*0.02;
-        m.mesh.scale.set(breath,breath,breath);
+        if(!m.def.elite)m.mesh.scale.set(breath,breath,breath);
       }
+    }
+    /* 엘리트 파티클 회전 + 오라 펄스 */
+    if(m.def.elite){
+      var es=1.8+Math.sin(m.animTime*1.5)*.06;
+      m.mesh.scale.set(es,es,es);
+      m.mesh.traverse(function(c){
+        if(c._eliteOrbit!==undefined){
+          c._eliteOrbit+=dt*1.5;
+          c.position.x=Math.cos(c._eliteOrbit)*.9;
+          c.position.z=Math.sin(c._eliteOrbit)*.9;
+          c.position.y=1.2+Math.sin(c._eliteOrbit*2+m.animTime)*.4;
+        }
+        if(c.material&&c.material.opacity&&c.geometry&&c.geometry.type==='RingGeometry'){
+          c.material.opacity=.2+Math.sin(m.animTime*2)*.15;
+          c.rotation.z+=dt*.5;
+        }
+      });
     }
 
     /* ── 6. 이동(추적) 애니메이션 ── */
