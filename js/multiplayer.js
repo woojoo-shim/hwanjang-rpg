@@ -68,9 +68,9 @@ function connectParty(){
           var p=parts[i].split(',');
           var idx=parseInt(p[0]);
           if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
-            /* 목표 위치 저장 (보간용) */
             monsters[idx]._targetX=parseFloat(p[1]);
             monsters[idx]._targetZ=parseFloat(p[2]);
+            if(p[3])monsters[idx].state=p[3];
           }
         }
       }
@@ -186,7 +186,7 @@ function startMonsterSync(){
     for(var i=0;i<monsters.length;i++){
       var m=monsters[i];
       if(m.hp<=0||m.deathAnim>=0)continue;
-      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1));
+      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1)+','+m.state);
     }
     if(batch.length>0)ws.send('mp|'+batch.join(';'));
   },200);

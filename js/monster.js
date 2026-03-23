@@ -1062,8 +1062,9 @@ function updMonsters(dt,t){
       mx=m.mesh.position.x;mz=m.mesh.position.z;
       dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
     }
-    /* 로컬 AI (이동은 호스트만, 공격 판정은 전원) */
+    /* 어그로 감지 + 공격 판정은 전원 */
     if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
+    if(m.state!=='aggro'&&m.state!=='returning'&&dist<m.def.aggro){m.state='aggro';}
     if(m.state==='aggro'){
         var mid=m.def.id;
         var spd=m.def.spd;
