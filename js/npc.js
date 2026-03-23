@@ -587,27 +587,26 @@ function closeDialog(){
 
 document.getElementById('dmsg').addEventListener('keydown',function(e){if(e.key==='Enter')sendToNpc();});
 document.addEventListener('keydown',function(e){
-  if(!e.key)return;
-  var k=e.key;
+  /* e.code 기반 — 한/영 상관없이 작동 */
+  var CODE_MAP={KeyI:'i',KeyM:'m',KeyP:'p'};
+  var k=CODE_MAP[e.code]||e.key;
+  if(!k)return;
   var gHidden=document.getElementById('game-screen').classList.contains('hidden');
   var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin')||document.activeElement===document.getElementById('ni')||document.activeElement===document.getElementById('login-email')||document.activeElement===document.getElementById('login-pw');
 
   /* ESC — 모든 창 닫기 (최우선) */
-  if(k==='Escape'){
+  if(k==='Escape'||e.code==='Escape'){
     e.preventDefault();
     if(document.getElementById('dbox').classList.contains('show')){closeDialog();return;}
     if(shopOpen){closeShop();return;}
     if(invOpen){closeInv();return;}
-    /* 텔레포트 UI 닫기 */
-    var tpUI=document.getElementById('teleport-ui');
-    if(tpUI&&!tpUI.classList.contains('hidden')){tpUI.classList.add('hidden');return;}
-    /* 퀘스트 알림 닫기 */
+    var tpM=document.getElementById('tp-modal');
+    if(tpM&&tpM.style.display==='flex'){closeTpModal();return;}
     var qn=document.getElementById('quest-notif');
     if(qn&&!qn.classList.contains('hidden')){qn.classList.add('hidden');return;}
     return;
   }
 
-  /* 게임 화면 아니면 이후 키 무시 */
   if(gHidden)return;
 
   /* Space — NPC 대화 닫기 */
@@ -615,22 +614,22 @@ document.addEventListener('keydown',function(e){
     e.preventDefault();closeDialog();
   }
   /* I — 인벤토리 토글 */
-  if(k.toLowerCase()==='i'&&!isInput){
+  if(k==='i'&&!isInput){
     e.preventDefault();
     if(invOpen)closeInv();else openInv();
   }
-  /* Tab — 접속 중인 플레이어 리스트 */
-  if(k==='Tab'&&!isInput){
+  /* Tab — 플레이어 리스트 */
+  if(e.code==='Tab'&&!isInput){
     e.preventDefault();
     if(typeof showPlayerList==='function')showPlayerList();
   }
-  /* M — 미니맵 토글 (있으면) */
-  if(k.toLowerCase()==='m'&&!isInput){
+  /* M — 미니맵 토글 */
+  if(k==='m'&&!isInput){
     var mm=document.getElementById('minimap');
     if(mm)mm.classList.toggle('hidden');
   }
   /* P — 개발자 텔레포트 */
-  if(k.toLowerCase()==='p'&&!isInput&&typeof isDev==='function'&&isDev()){
+  if(k==='p'&&!isInput&&typeof isDev==='function'&&isDev()){
     if(typeof useTpScroll==='function')useTpScroll();
   }
 });

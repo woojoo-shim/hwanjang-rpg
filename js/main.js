@@ -166,24 +166,35 @@ function updTime(){
 var keys={},cYaw=0,cPitch=0.75,isDrag=false,lmx=0,lmy=0;
 
 function setupInput(){
+  /* e.code 기반 키 매핑 — 한/영 상관없이 작동 */
+  var CODE_TO_KEY={
+    KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',
+    KeyE:'e',KeyF:'f',KeyI:'i',KeyQ:'q',KeyR:'r',KeyT:'t',
+    KeyP:'p',KeyM:'m'
+  };
   document.addEventListener('keydown',function(e){
-    /* 게임 화면이 아니면 키 입력 무시 */
     if(document.getElementById('game-screen').classList.contains('hidden'))return;
-    if(!e.key)return;
-    keys[e.key.toLowerCase()]=true;
-    if(e.key.toLowerCase()==='e'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
+    var k=CODE_TO_KEY[e.code]||(e.key?e.key.toLowerCase():null);
+    if(!k)return;
+    keys[k]=true;
+    var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin');
+    if(k==='e'&&!isInput){
+      e.preventDefault();
       if(closestNpc&&!document.getElementById('dbox').classList.contains('show'))talk(closestNpc);
     }
-    if(e.key.toLowerCase()==='f'&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin'))
-      playerAttack();
+    if(k==='f'&&!isInput){e.preventDefault();playerAttack();}
     /* 스킬 키: Q=0, R=1, T=2 */
     var skillMap={'q':0,'r':1,'t':2};
-    var sk=skillMap[e.key.toLowerCase()];
-    if(sk!==undefined&&document.activeElement!==document.getElementById('dmsg')&&document.activeElement!==document.getElementById('cin')){
+    var sk=skillMap[k];
+    if(sk!==undefined&&!isInput){
+      e.preventDefault();
       if(typeof useSkill==='function')useSkill(sk);
     }
   });
-  document.addEventListener('keyup',function(e){if(e.key)keys[e.key.toLowerCase()]=false;});
+  document.addEventListener('keyup',function(e){
+    var k=CODE_TO_KEY[e.code]||(e.key?e.key.toLowerCase():null);
+    if(k)keys[k]=false;
+  });
 
   var cc=document.getElementById('cc');
   cc.addEventListener('contextmenu',function(e){e.preventDefault();});
