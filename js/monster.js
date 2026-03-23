@@ -1074,8 +1074,11 @@ function updMonsters(dt,t){
         var spd=m.def.spd;
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
         if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
-        /* 독두꺼비: 사거리 더 김 (혀 공격) */
-        var atkRange=(mid==='toad')?3.5:1.8;
+        /* 몬스터별 공격 범위 + 공격 속도 */
+        var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5};
+        var atkRange=atkRanges[mid]||1.8;
+        var atkSpd={jungle_panther:0.3,wolf:0.5,jungle_mosquito:0.4,goblin:0.6,firedrake:1.2,golem:1.5};
+        var atkCooldown=atkSpd[mid]||(0.8+Math.random()*.4);
         if(dist>1.2){
           var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
           m.mesh.position.x+=dx/len*spd*dt;
@@ -1084,7 +1087,7 @@ function updMonsters(dt,t){
         }
         m.attackTimer-=dt;
         if(dist<atkRange&&m.attackTimer<=0){
-          m.attackTimer=0.8+Math.random()*.4;
+          m.attackTimer=atkCooldown;
           m.isAttacking=true;m.attackAnimT=0.4;
           if(invincibleTimer<=0){
             var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
