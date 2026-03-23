@@ -17,6 +17,27 @@ var closestMonster=null;
 var currentZone='village';
 var targetedMonster=null;
 
+/* 몬스터별 추적 범위 (서식지 크기) */
+function getLeashRange(mid){
+  var ranges={
+    rabbit:200,       /* 초원 전체 */
+    deer:150,         /* 초원 넓게 */
+    slime:80,         /* 늪 중간 */
+    toad:80,          /* 늪 중간 */
+    goblin:120,       /* 어두운 숲 넓게 */
+    wolf:150,         /* 어두운 숲 전체 */
+    jungle_spider:100,/* 정글 넓게 */
+    jungle_snake:90,  /* 정글 중간 */
+    jungle_ape:110,   /* 정글 넓게 */
+    jungle_panther:160,/* 정글 전체 — 빠르니까 */
+    jungle_mosquito:130,/* 정글 넓게 */
+    jungle_treant:50, /* 느려서 좁게 */
+    golem:60,         /* 화산 중간 */
+    firedrake:120,    /* 화산 넓게 */
+  };
+  return ranges[mid]||40;
+}
+
 /* Tab 타겟팅 — 가장 가까운 살아있는 몬스터 선택 */
 function targetNearestMonster(){
   if(!PL.group)return;
@@ -1091,8 +1112,10 @@ function updMonsters(dt,t){
             else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
           }
         }
+        /* 서식지 범위 — 존 전체를 돌아다님 (토끼는 초원 전체) */
+        var leash=getLeashRange(mid);
         var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
-        if(spDist>40){
+        if(spDist>leash){
           m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
         }
       }
