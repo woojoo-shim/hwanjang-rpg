@@ -1352,131 +1352,154 @@ function updMonsters(dt,t){
   attackCooldown=Math.max(0,attackCooldown-dt);
   invincibleTimer=Math.max(0,invincibleTimer-dt);
   closestMonster=null;var md=20.0;
-  monsters.forEach(function(m){
+
+  /* 호스트: 모든 플레이어 위치 갱신 (몬스터가 모든 플레이어 추적) */
+  var isHost=(typeof isMonsterHost!=='undefined'&&isMonsterHost);
+  if(isHost&&typeof updateAllPlayerPositions==='function')updateAllPlayerPositions();
+
+  monsters.forEach(function(m,mIdx){
     if(m.state==='dead')return;
     var mx=m.mesh.position.x,mz=m.mesh.position.z;
-    var dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
-    /* 먼 몬스터는 AI 스킵 */
-    if(dist>100){
+    var distToLocal=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
+
+    /* 호스트: 모든 플레이어 중 가장 가까운 대상 찾기 */
+    var chasePx=px,chasePz=pz,chaseDist=distToLocal,chaseLocal=true,chaseId='';
+    if(isHost&&typeof findClosestPlayer==='function'){
+      var cp=findClosestPlayer(mx,mz);
+      if(cp){chasePx=cp.x;chasePz=cp.z;chaseDist=cp.dist;chaseLocal=cp.local;chaseId=cp.id;}
+    }
+
+    /* 먼 몬스터 — 호스트는 가장 가까운 플레이어 기준, 비호스트는 로컬 기준 */
+    var visDist=isHost?chaseDist:distToLocal;
+    if(visDist>100&&distToLocal>100){
       m.wrap.style.display='none';
       m.mesh.visible=false;
-      if(m.state==='aggro'){m.state='idle';m.mesh.position.set(m.spawnX,0,m.spawnZ);}
+      if(m.state==='aggro'){m.state='idle';m.mesh.position.set(m.spawnX,0,m.spawnZ);m._chaseTargetId='';}
       return;
     }
     m.mesh.visible=true;
     /* 이름+HP바: 일반 20유닛, 엘리트 50유닛 */
     var showDist=m.def.elite?50:20;
-    if(dist<showDist){
+    if(distToLocal<showDist){
       posEl(m.wrap,mx,m.mesh.position.y+(m.def.elite?3.5:2.1),mz);
       m.wrap.style.display='';
       m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
     } else {
       m.wrap.style.display='none';
     }
-    if(dist<md){md=dist;closestMonster=m;}
+    if(distToLocal<md){md=distToLocal;closestMonster=m;}
     var mid=m.def.id;
     var isNH=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
-    /* 비호스트: 어그로 범위 밖이면 호스트 위치 보간, 안이면 로컬 AI */
-    var useLocalAI=true;
+
+    /* ── 비호스트: 호스트 위치로 보간 ── */
     if(isNH){
-      if(dist>m.def.aggro*1.5){
-        /* 멀리 있음 → 호스트 위치 따라감 */
-        var tx=m._targetX,tz=m._targetZ;
-        var t2=Math.min(1,12*dt);
-        m.mesh.position.x=mx+(tx-mx)*t2;
-        m.mesh.position.z=mz+(tz-mz)*t2;
-        var ddx=tx-mx,ddz=tz-mz;
-        if(ddx*ddx+ddz*ddz>0.001){
-          var tRy=Math.atan2(ddx,ddz);
-          var dR=tRy-m.mesh.rotation.y;
-          while(dR>Math.PI)dR-=Math.PI*2;
-          while(dR<-Math.PI)dR+=Math.PI*2;
-          m.mesh.rotation.y+=dR*Math.min(1,10*dt);
-        }
-        mx=m.mesh.position.x;mz=m.mesh.position.z;
-        dist=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
-        useLocalAI=false;
+      var tx=m._targetX,tz=m._targetZ;
+      var lerpF=0.15;
+      m.mesh.position.x=mx+(tx-mx)*lerpF;
+      m.mesh.position.z=mz+(tz-mz)*lerpF;
+      var ddx=tx-mx,ddz=tz-mz;
+      if(ddx*ddx+ddz*ddz>0.001){
+        var tRy=Math.atan2(ddx,ddz);
+        var dR=tRy-m.mesh.rotation.y;
+        while(dR>Math.PI)dR-=Math.PI*2;
+        while(dR<-Math.PI)dR+=Math.PI*2;
+        m.mesh.rotation.y+=dR*Math.min(1,10*dt);
       }
-      /* 가까이 있음 → 로컬 AI 사용 (호스트 위치 무시) */
+      /* 비호스트: 동기화된 상태 반영 */
+      if(m._syncState)m.state=m._syncState;
+      /* 비호스트: 몬스터가 나를 타겟하고 있으면 어그로 알림 */
+      var myUid3=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+      if(m._targetPlayerId===myUid3&&m.state==='aggro'&&!m._aggroNotified){
+        addChat('inf','',m.def.name+'이(가) 달려온다!');
+        m._aggroNotified=true;
+      }
+      if(m.state!=='aggro')m._aggroNotified=false;
+      /* 데미지는 호스트의 mdmg 메시지로 처리 — 비호스트는 로컬 AI 안 돌림 */
+      return;
     }
-    /* 어그로 감지 — 모든 클라이언트 */
-    if(m.state==='idle'&&dist<m.def.aggro){m.state='aggro';addChat('inf','',m.def.name+'이(가) 달려온다!');}
+
+    /* ── 호스트 (또는 솔로): 몬스터 AI ── */
+    /* 어그로 감지 — 가장 가까운 플레이어 기준 */
+    if(m.state==='idle'&&chaseDist<m.def.aggro){
+      m.state='aggro';
+      m._chaseTargetId=chaseId;
+      if(chaseLocal)addChat('inf','',m.def.name+'이(가) 달려온다!');
+    }
     if(m.state==='aggro'){
+        /* 추적 대상 갱신 — 더 가까운 플레이어가 있으면 스위치 */
+        m._chaseTargetId=chaseId;
         var spd=m.def.spd;
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
-        if(mid==='deer'&&dist>4&&dist<15)spd=m.def.spd*3;
+        if(mid==='deer'&&chaseDist>4&&chaseDist<15)spd=m.def.spd*3;
         /* 몬스터별 공격 범위 + 공격 속도 */
         var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0};
         var atkRange=atkRanges[mid]||1.8;
         var atkSpd={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5};
         var atkCooldown=atkSpd[mid]||(0.8+Math.random()*.4);
-        if(dist>1.2){
-          var dx=px-mx,dz2=pz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
+        /* 이동 — 가장 가까운 플레이어 쪽으로 */
+        if(chaseDist>1.2){
+          var dx=chasePx-mx,dz2=chasePz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
           m.mesh.position.x+=dx/len*spd*dt;
           m.mesh.position.z+=dz2/len*spd*dt;
           m.mesh.rotation.y=Math.atan2(dx,dz2);
         }
         m.attackTimer-=dt;
-        if(dist<atkRange&&m.attackTimer<=0){
+        if(chaseDist<atkRange&&m.attackTimer<=0){
           m.attackTimer=atkCooldown;
           m.isAttacking=true;m.attackAnimT=0.4;
-          if(invincibleTimer<=0){
-            var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
-            /* 고블린: 데미지 1.5배 */
-            if(mid==='goblin')dmg=Math.floor(dmg*1.5);
-            playerHP=Math.max(0,playerHP-dmg);
-            updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
-            /* 독두꺼비: 독 효과 (3초간 틱 데미지) */
-            if((mid==='toad'||mid==='jungle_snake')&&!playerPoisoned){
-              playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
-              spawnDmgNum('독!','#44ff44');
-              addChat('inf','','독에 걸렸다!');
+          var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
+          /* 고블린: 데미지 1.5배 */
+          if(mid==='goblin')dmg=Math.floor(dmg*1.5);
+          /* 특수 효과 수집 */
+          var effects=[];
+          if((mid==='toad'||mid==='jungle_snake'))effects.push({type:'poison',val:Math.floor(dmg*0.3)});
+          if(mid==='slime')effects.push({type:'slow',val:2});
+          if(mid==='golem')effects.push({type:'lava',val:0});
+          if(mid==='jungle_panther'){effects.push({type:'combo',val:0});m.attackTimer=0.3;}
+          if(mid==='jungle_mosquito'){
+            var heal=Math.floor(dmg*0.5);
+            m.hp=Math.min(m.def.hp,m.hp+heal);
+            effects.push({type:'drain',val:heal});
+          }
+          if(mid==='jungle_treant')effects.push({type:'root',val:3});
+          if(mid==='firedrake')effects.push({type:'breath',val:0});
+
+          if(chaseLocal){
+            /* 로컬 플레이어가 타겟 → 직접 데미지 */
+            if(invincibleTimer<=0){
+              playerHP=Math.max(0,playerHP-dmg);
+              updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+              if((mid==='toad'||mid==='jungle_snake')&&!playerPoisoned){
+                playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
+                spawnDmgNum('독!','#44ff44');addChat('inf','','독에 걸렸다!');
+              }
+              if(mid==='slime'){playerSlowed=2;spawnDmgNum('둔화!','#22aa22');}
+              if(mid==='golem'){spawnLavaPool(mx,mz,6,4);spawnDmgNum('용암 강타!','#ff4400');}
+              if(mid==='jungle_panther')spawnDmgNum('연속!','#ffaa00');
+              if(mid==='jungle_mosquito')spawnDmgNum('흡혈!','#ff00aa');
+              if(mid==='jungle_treant'){playerSlowed=3;spawnDmgNum('속박!','#228833');addChat('inf','','뿌리에 발이 묶였다!');}
+              if(mid==='firedrake'){
+                var bdx=chasePx-mx,bdz=chasePz-mz,blen=Math.sqrt(bdx*bdx+bdz*bdz);
+                if(blen>0.1){bdx/=blen;bdz/=blen;}
+                spawnFireBreath(mx,mz,bdx,bdz,15);
+                spawnDmgNum('화염 브레스!','#ff6600');
+              }
+              if(playerHP<=0)playerDied();
+              else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
             }
-            /* 슬라임: 둔화 (2초) */
-            if(mid==='slime'){
-              playerSlowed=2;
-              spawnDmgNum('둔화!','#22aa22');
-            }
-            /* 용암 골렘: 용암 강타 — 범위 폭발 + 장판 */
-            if(mid==='golem'){
-              spawnLavaPool(mx,mz,6,4);
-              spawnDmgNum('용암 강타!','#ff4400');
-            }
-            /* 정글 표범: 연속 공격 (2연타) */
-            if(mid==='jungle_panther'){
-              m.attackTimer=0.3; /* 빠른 재공격 */
-              spawnDmgNum('연속!','#ffaa00');
-            }
-            /* 거대 모기: 흡혈 (데미지의 50% 회복) */
-            if(mid==='jungle_mosquito'){
-              var heal=Math.floor(dmg*0.5);
-              m.hp=Math.min(m.def.hp,m.hp+heal);
-              spawnDmgNum('흡혈!','#ff00aa');
-            }
-            /* 나무 정령: 공격 시 둔화 + 뿌리 속박 (3초) */
-            if(mid==='jungle_treant'){
-              playerSlowed=3;
-              spawnDmgNum('속박!','#228833');
-              addChat('inf','','뿌리에 발이 묶였다!');
-            }
-            /* 파이어드레이크: 화염 브레스 — 직선 불길 */
-            if(mid==='firedrake'){
-              var bdx=px-mx,bdz=pz-mz,blen=Math.sqrt(bdx*bdx+bdz*bdz);
-              if(blen>0.1){bdx/=blen;bdz/=blen;}
-              spawnFireBreath(mx,mz,bdx,bdz,15);
-              spawnDmgNum('화염 브레스!','#ff6600');
-            }
-            if(playerHP<=0)playerDied();
-            else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
+          }else{
+            /* 원격 플레이어가 타겟 → WebSocket으로 데미지 전송 */
+            if(typeof sendMonsterDamage==='function')sendMonsterDamage(chaseId,mIdx,dmg,effects);
           }
         }
         var leash=getLeashRange(mid);
         var spDist=Math.sqrt((mx-m.spawnX)*(mx-m.spawnX)+(mz-m.spawnZ)*(mz-m.spawnZ));
         if(spDist>leash){
-          m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';
+          m.state='returning';m.hp=m.maxHp;m.hbf.style.width='100%';m._chaseTargetId='';
         }
       }
       if(m.state==='returning'){
+        m._chaseTargetId='';
         var rdx=m.spawnX-mx,rdz=m.spawnZ-mz;
         var rlen=Math.sqrt(rdx*rdx+rdz*rdz);
         if(rlen<1){

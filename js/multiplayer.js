@@ -5,6 +5,39 @@ var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
 
+/* ── 모든 플레이어 위치 (몬스터 AI용) ── */
+/* 호스트가 몬스터 AI 계산 시 모든 플레이어 위치를 고려하기 위한 배열 */
+var allPlayerPositions=[];
+
+/* 매 프레임 호출 — 로컬 + 원격 플레이어 위치를 배열로 수집 */
+function updateAllPlayerPositions(){
+  allPlayerPositions=[];
+  /* 로컬 플레이어 */
+  if(PL&&PL.group){
+    var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+    allPlayerPositions.push({id:myUid,x:PL.group.position.x,z:PL.group.position.z,local:true});
+  }
+  /* 원격 플레이어 — 보간된 실제 위치 사용 */
+  for(var id in remotePlayers){
+    var rp=remotePlayers[id];
+    if(rp&&rp.group){
+      allPlayerPositions.push({id:id,x:rp.group.position.x,z:rp.group.position.z,local:false});
+    }
+  }
+}
+
+/* 몬스터 위치에서 가장 가까운 플레이어 찾기 (호스트 AI용) */
+function findClosestPlayer(mx,mz){
+  var best=null,bestD=Infinity;
+  for(var i=0;i<allPlayerPositions.length;i++){
+    var p=allPlayerPositions[i];
+    var dx=p.x-mx,dz=p.z-mz;
+    var d=dx*dx+dz*dz;
+    if(d<bestD){bestD=d;best=p;}
+  }
+  return best?{id:best.id,x:best.x,z:best.z,dist:Math.sqrt(bestD),local:best.local}:null;
+}
+
 /* Tab — 마크 스타일 플레이어 리스트 (누르고 있는 동안 표시) */
 var playerListEl=null;
 function showPlayerList(){
@@ -67,7 +100,7 @@ function connectParty(){
 
   ws.onmessage=function(e){
     /* 몬스터 위치 배치 (경량 문자열 포맷) */
-    /* 호스트 몬스터 위치 수신 */
+    /* 호스트 몬스터 위치 수신: idx,x,z,state,targetId */
     if(typeof e.data==='string'&&e.data.indexOf('mp|')===0){
       receivedMpData=true;
       if(!isMonsterHost){
@@ -78,6 +111,8 @@ function connectParty(){
           if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
             monsters[idx]._targetX=parseFloat(p[1]);
             monsters[idx]._targetZ=parseFloat(p[2]);
+            monsters[idx]._syncState=p[3]||'idle';
+            monsters[idx]._targetPlayerId=p[4]||'';
           }
         }
       }
@@ -181,6 +216,49 @@ function onMpMessage(data){
       m.hbf.style.width='100%';
     }
   }
+  /* 호스트가 보낸 몬스터→플레이어 데미지 (비호스트가 받음) */
+  else if(data.type==='mdmg'){
+    /* data: {target, mid, dmg, effects:[{type,val}]} */
+    var myUid2=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
+    if(!isMonsterHost&&data.target===myUid2&&data.mid>=0&&data.mid<monsters.length){
+      var m=monsters[data.mid];
+      if(m&&m.hp>0&&invincibleTimer<=0){
+        var dmg=data.dmg||0;
+        playerHP=Math.max(0,playerHP-dmg);
+        updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+        /* 특수 효과 적용 */
+        if(data.effects){
+          for(var ei=0;ei<data.effects.length;ei++){
+            var eff=data.effects[ei];
+            if(eff.type==='poison'&&!playerPoisoned){
+              playerPoisoned=3;playerPoisonDmg=eff.val;
+              spawnDmgNum('독!','#44ff44');addChat('inf','','독에 걸렸다!');
+            }
+            if(eff.type==='slow'){playerSlowed=eff.val;spawnDmgNum('둔화!','#22aa22');}
+            if(eff.type==='lava'){spawnLavaPool(m.mesh.position.x,m.mesh.position.z,6,4);spawnDmgNum('용암 강타!','#ff4400');}
+            if(eff.type==='combo'){spawnDmgNum('연속!','#ffaa00');}
+            if(eff.type==='drain'){spawnDmgNum('흡혈!','#ff00aa');}
+            if(eff.type==='root'){playerSlowed=3;spawnDmgNum('속박!','#228833');addChat('inf','','뿌리에 발이 묶였다!');}
+            if(eff.type==='breath'){
+              var bdx=PL.group.position.x-m.mesh.position.x,bdz=PL.group.position.z-m.mesh.position.z;
+              var blen=Math.sqrt(bdx*bdx+bdz*bdz);
+              if(blen>0.1){bdx/=blen;bdz/=blen;}
+              spawnFireBreath(m.mesh.position.x,m.mesh.position.z,bdx,bdz,15);
+              spawnDmgNum('화염 브레스!','#ff6600');
+            }
+          }
+        }
+        if(playerHP<=0)playerDied();
+        else if(typeof checkBerserkerSpawn==='function')checkBerserkerSpawn();
+      }
+    }
+  }
+}
+
+/* 호스트 → 비호스트: 몬스터가 원격 플레이어를 공격했음을 알림 */
+function sendMonsterDamage(targetId,monsterIdx,dmg,effects){
+  if(!ws||ws.readyState!==1)return;
+  ws.send(JSON.stringify({type:'mdmg',target:targetId,mid:monsterIdx,dmg:dmg,effects:effects||[]}));
 }
 
 /* ── 몬스터 위치 동기화 (호스트만 전송) ── */
@@ -197,10 +275,12 @@ function startMonsterSync(){
     for(var i=0;i<monsters.length;i++){
       var m=monsters[i];
       if(m.hp<=0||m.deathAnim>=0)continue;
-      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1)+','+m.state);
+      /* 포맷: idx,x,z,state,targetPlayerId */
+      var tid=m._chaseTargetId||'';
+      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1)+','+m.state+','+tid);
     }
     if(batch.length>0)ws.send('mp|'+batch.join(';'));
-  },200);
+  },250);
 }
 
 /* ── 원격 플레이어 메쉬 ── */
