@@ -464,6 +464,30 @@ function inviteToParty(){
   addChat('sys','[파티]',target.name+'에게 파티 초대를 보냈습니다.');
 }
 
+/* 닉네임으로 파티 초대 */
+function inviteByName(targetName){
+  if(partyMembers.length>=PARTY_MAX){addChat('sys','[파티]','파티가 가득 찼습니다.');return;}
+  var target=null;
+  for(var uid in remotePlayers){
+    if(remotePlayers[uid]&&remotePlayers[uid].name===targetName){target={uid:uid,name:targetName};break;}
+  }
+  if(!target){addChat('sys','[파티]','\''+targetName+'\' 플레이어를 찾을 수 없습니다.');return;}
+  for(var i=0;i<partyMembers.length;i++){
+    if(partyMembers[i].uid===target.uid){addChat('sys','[파티]',target.name+'은(는) 이미 파티원입니다.');return;}
+  }
+  var myUid=getMyUid();
+  if(!partyId){
+    partyId=myUid+'_'+Date.now();
+    partyLeader=myUid;
+    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
+    updatePartyUI();
+  }
+  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
+  if(!ws||ws.readyState!==1){addChat('sys','[파티]','서버에 연결되어 있지 않습니다.');return;}
+  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:partyId,fromName:myName}));
+  addChat('sys','[파티]',target.name+'에게 파티 초대를 보냈습니다.');
+}
+
 /* 파티 초대 수신 */
 function onPartyInvite(data){
   /* data: {from, fromName, partyId} */

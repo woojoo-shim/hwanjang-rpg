@@ -808,6 +808,13 @@ function sendChat(){
     if(typeof sendPartyChatMP==='function')sendPartyChatMP(myName,ptxt);
     ci.focus();return;
   }
+  /* /invite 닉네임 — 파티 초대 */
+  if(v.indexOf('/invite ')===0||v.indexOf('/초대 ')===0||v.indexOf('/ㅑㅜ퍄ㅅㄷ ')===0){
+    var targetName=v.split(' ').slice(1).join(' ').trim();
+    if(!targetName){addChat('sys','[시스템]','사용법: /invite 닉네임');ci.focus();return;}
+    if(typeof inviteByName==='function')inviteByName(targetName);
+    ci.focus();return;
+  }
   /* /leave — 파티 탈퇴 커맨드 */
   if(v==='/leave'||v==='/탈퇴'){
     if(typeof leaveParty==='function')leaveParty();
