@@ -366,6 +366,16 @@ function checkClassQuestKill(monsterName){
     var cq=classQuestState[k];
     if(cq.state==='active'&&cq.target===monsterName){
       cq.progress++;
+      /* 퀘스트 트래커 동기화 */
+      var tq=activeQuests.find(function(q){return q.id==='class_'+k;});
+      if(tq){
+        tq.progress=cq.progress;
+        if(cq.progress>=cq.count){
+          tq.ready=true;
+          tq.desc='전직 NPC에게 돌아가세요!';
+        }
+        renderQuestTracker();
+      }
       addChat('sys','[전직 퀘스트] '+monsterName+' 처치 ('+cq.progress+'/'+cq.count+')');
       if(cq.progress>=cq.count){
         cq.state='done';
@@ -609,6 +619,15 @@ function talk(n){
       addChat('npc',n.name,'[전직 퀘스트] '+q.desc);
       classQuestState[ck]={state:'active',progress:0,target:q.target,count:q.count};
       addChat('sys','[시스템]','전직 퀘스트 수락: '+q.desc);
+      /* 퀘스트 트래커에도 추가 */
+      var tq={
+        id:'class_'+ck,name:'[전직] '+CLASS_DEFS[ck].name,desc:q.desc,
+        type:'kill',target:q.target,count:q.count,progress:0,
+        rewardType:'exp',rewardAmount:'0',npc:n.name,ready:false,
+        isClassQuest:true,classKey:ck
+      };
+      activeQuests.push(tq);
+      renderQuestTracker();
       /* 광전사/암살자: 대화 후 디스폰 */
       if(n===berserkerNpc){despawnDynamicNpc(berserkerNpc);berserkerNpc=null;berserkerSpawned=false;}
       if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
@@ -624,6 +643,9 @@ function talk(n){
     }
     /* 퀘스트 완료 — 전직 가능 */
     if(cq.state==='done'){
+      /* 트래커에서 전직 퀘스트 제거 */
+      activeQuests=activeQuests.filter(function(q){return q.id!=='class_'+ck;});
+      renderQuestTracker();
       showSingleClassSelect(ck,n.name);
       if(n===berserkerNpc){despawnDynamicNpc(berserkerNpc);berserkerNpc=null;berserkerSpawned=false;}
       if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
