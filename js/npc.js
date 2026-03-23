@@ -619,10 +619,10 @@ document.addEventListener('keydown',function(e){
     e.preventDefault();
     if(invOpen)closeInv();else openInv();
   }
-  /* Tab — 가장 가까운 몬스터 타겟팅 */
+  /* Tab — 접속 중인 플레이어 리스트 */
   if(k==='Tab'&&!isInput){
     e.preventDefault();
-    if(typeof targetNearestMonster==='function')targetNearestMonster();
+    if(typeof showPlayerList==='function')showPlayerList();
   }
   /* M — 미니맵 토글 (있으면) */
   if(k.toLowerCase()==='m'&&!isInput){

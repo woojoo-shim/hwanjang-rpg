@@ -5,6 +5,22 @@ var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
 
+/* Tab — 접속 중인 플레이어 리스트 표시 */
+function showPlayerList(){
+  var names=[];
+  /* 자기 자신 */
+  names.push(myName+' (나) Lv.'+playerLevel);
+  /* 원격 플레이어 */
+  for(var id in remotePlayers){
+    var rp=remotePlayers[id];
+    if(rp&&rp.name)names.push(rp.name+' Lv.'+(rp.level||'?'));
+  }
+  addChat('sys','[시스템]','━━ 접속 중 ('+names.length+'명) ━━');
+  for(var i=0;i<names.length;i++){
+    addChat('sys','[시스템]','  '+names[i]);
+  }
+}
+
 function connectParty(){
   if(ws&&ws.readyState<=1)return;
   try{
