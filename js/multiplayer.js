@@ -56,11 +56,12 @@ function connectParty(){
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
     if(!window._mpFirstConnect){window._mpFirstConnect=true;addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');}
-    /* 3초 후 호스트 메시지 안 오면 자동으로 호스트 전환 */
+    /* 5초 후 호스트 메시지도 mp|데이터도 안 오면 자동 호스트 */
+    receivedMpData=false;
     if(!isMonsterHost){
       window._hostFallbackTmr=setTimeout(function(){
-        if(!isMonsterHost){startMonsterSync();console.log('[MP] self-host fallback');}
-      },3000);
+        if(!isMonsterHost&&!receivedMpData){startMonsterSync();console.log('[MP] self-host fallback');}
+      },5000);
     }
   };
 
@@ -68,6 +69,7 @@ function connectParty(){
     /* 몬스터 위치 배치 (경량 문자열 포맷) */
     /* 호스트 몬스터 위치 수신 */
     if(typeof e.data==='string'&&e.data.indexOf('mp|')===0){
+      receivedMpData=true;
       if(!isMonsterHost){
         var parts=e.data.substring(3).split(';');
         for(var i=0;i<parts.length;i++){
@@ -184,6 +186,7 @@ function onMpMessage(data){
 /* ── 몬스터 위치 동기화 (호스트만 전송) ── */
 var isMonsterHost=false;
 var monsterPosTmr=null;
+var receivedMpData=false;/* mp| 메시지를 받은 적 있는지 */
 
 function startMonsterSync(){
   if(monsterPosTmr)clearInterval(monsterPosTmr);
