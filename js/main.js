@@ -255,6 +255,7 @@ function loop(){
     if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
     checkZone();
+    if(typeof checkBuildingDoors==='function')checkBuildingDoors();
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
     /* AFK 체크 */
     if(now-lastActivity>AFK_LIMIT){

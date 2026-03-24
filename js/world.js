@@ -13,6 +13,172 @@ var npcs=[];
 var portalMeshes=[];
 var closestPortal=null;
 
+/* ════════════ 건물 내부 시스템 ════════════ */
+var BUILDING_DOORS=[]; /* [{x,z,name,interiorY,exitX,exitZ}] */
+var insideBuilding=null; /* 현재 들어가있는 건물 이름 */
+var _savedOutdoorPos={x:0,z:0}; /* 나갈 때 복귀 위치 */
+var _interiorBuilt={}; /* 이미 내부를 빌드했는지 */
+
+function registerDoor(x,z,name){
+  BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-100-(BUILDING_DOORS.length*50)});
+}
+
+function checkBuildingDoors(){
+  if(!PL||!PL.group||typeof fadeOverlay==='undefined')return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  /* 건물 내부에 있을 때 — 나가기 체크 */
+  if(insideBuilding){
+    if(Math.abs(px)<1.5&&pz>6){
+      exitBuilding();
+    }
+    return;
+  }
+  /* 밖에서 — 입장 체크 */
+  for(var i=0;i<BUILDING_DOORS.length;i++){
+    var d=BUILDING_DOORS[i];
+    var dx=px-d.x,dz=pz-d.z;
+    if(dx*dx+dz*dz<4){/* 반경 2 이내 */
+      enterBuilding(d);
+      return;
+    }
+  }
+}
+
+function enterBuilding(door){
+  insideBuilding=door.name;
+  _savedOutdoorPos.x=PL.group.position.x;
+  _savedOutdoorPos.z=PL.group.position.z;
+  /* 페이드아웃 */
+  fadeOverlay.style.opacity='1';
+  fadeOverlay.style.background='#000';
+  setTimeout(function(){
+    /* 내부 빌드 (한 번만) */
+    if(!_interiorBuilt[door.name]){
+      buildInterior(door.name,door.interiorY);
+      _interiorBuilt[door.name]=true;
+    }
+    /* 플레이어 이동 */
+    PL.group.position.set(0,door.interiorY+1,0);
+    /* 카메라 따라가기 */
+    addChat('sys','[시스템]',door.name+'에 입장했습니다.');
+    /* 페이드인 */
+    setTimeout(function(){fadeOverlay.style.opacity='0';},200);
+  },600);
+}
+
+function exitBuilding(){
+  if(!insideBuilding)return;
+  fadeOverlay.style.opacity='1';
+  fadeOverlay.style.background='#000';
+  setTimeout(function(){
+    PL.group.position.set(_savedOutdoorPos.x,0,_savedOutdoorPos.z);
+    addChat('sys','[시스템]','밖으로 나왔습니다.');
+    insideBuilding=null;
+    setTimeout(function(){fadeOverlay.style.opacity='0';},200);
+  },600);
+}
+
+function buildInterior(name,baseY){
+  var floorM=new THREE.MeshLambertMaterial({color:0x8a7050});
+  var wallM=new THREE.MeshLambertMaterial({color:0xc4a870});
+  var ceilM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
+
+  /* 바닥 */
+  var floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),floorM);
+  floor.rotation.x=-Math.PI/2;floor.position.set(0,baseY,0);floor.receiveShadow=true;scene.add(floor);
+  /* 벽 4면 */
+  var wallGeo=new THREE.PlaneGeometry(16,5);
+  var w1=new THREE.Mesh(wallGeo,wallM);w1.position.set(0,baseY+2.5,-8);scene.add(w1);
+  var w2=new THREE.Mesh(wallGeo,wallM);w2.position.set(0,baseY+2.5,8);w2.rotation.y=Math.PI;scene.add(w2);
+  var w3=new THREE.Mesh(new THREE.PlaneGeometry(16,5),wallM);w3.rotation.y=Math.PI/2;w3.position.set(-8,baseY+2.5,0);scene.add(w3);
+  var w4=new THREE.Mesh(new THREE.PlaneGeometry(16,5),wallM);w4.rotation.y=-Math.PI/2;w4.position.set(8,baseY+2.5,0);scene.add(w4);
+  /* 천장 */
+  var ceil=new THREE.Mesh(new THREE.PlaneGeometry(16,16),ceilM);
+  ceil.rotation.x=Math.PI/2;ceil.position.set(0,baseY+5,0);scene.add(ceil);
+  /* 조명 */
+  var light=new THREE.PointLight(0xffaa44,1.2,20);light.position.set(0,baseY+4,0);scene.add(light);
+  var ambient=new THREE.AmbientLight(0x333322,.5);scene.add(ambient);
+
+  /* 나가기 문 표시 (빨간 카펫) */
+  var exitM=new THREE.MeshLambertMaterial({color:0xaa2222});
+  var exitMat=new THREE.Mesh(new THREE.PlaneGeometry(2,2),exitM);
+  exitMat.rotation.x=-Math.PI/2;exitMat.position.set(0,baseY+.01,7);scene.add(exitMat);
+  /* 나가기 표지판 */
+  var exitLabel=document.createElement('div');
+  exitLabel.className='nlabel';exitLabel.textContent='[ 나가기 ]';exitLabel.style.color='#ff4444';
+  document.getElementById('cc').appendChild(exitLabel);
+  /* 나가기 트리거 등록 */
+  BUILDING_DOORS.push({x:0,z:7,name:'__exit__',interiorY:baseY,isExit:true,exitLabel:exitLabel});
+
+  /* 건물별 가구 배치 */
+  if(name==='여관'){
+    /* 침대 2개 */
+    var bedM=new THREE.MeshLambertMaterial({color:0x884422});
+    var blanketM=new THREE.MeshLambertMaterial({color:0xcc4444});
+    for(var bi=0;bi<2;bi++){
+      var bx=-4+bi*8;
+      var bed=new THREE.Mesh(new THREE.BoxGeometry(2.5,.4,4),bedM);bed.position.set(bx,baseY+.2,-5);scene.add(bed);
+      var blanket=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,3),blanketM);blanket.position.set(bx,baseY+.45,-5);scene.add(blanket);
+      var pillow=new THREE.Mesh(new THREE.BoxGeometry(1.2,.2,0.8),new THREE.MeshLambertMaterial({color:0xeeeeee}));pillow.position.set(bx,baseY+.5,-6.5);scene.add(pillow);
+    }
+    /* 카운터 */
+    var counter=new THREE.Mesh(new THREE.BoxGeometry(6,.8,1.5),new THREE.MeshLambertMaterial({color:0x6a4a2a}));counter.position.set(0,baseY+.4,3);scene.add(counter);
+    /* 의자 */
+    for(var ci=0;ci<3;ci++){
+      var chair=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.6),bedM);chair.position.set(-2+ci*2,baseY+.3,1.5);scene.add(chair);
+    }
+  }else if(name==='무기 상점'){
+    /* 무기 진열대 */
+    var rackM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
+    var rack=new THREE.Mesh(new THREE.BoxGeometry(1,.1,10),rackM);rack.position.set(-6,baseY+2,0);scene.add(rack);
+    /* 검 여러개 */
+    var swordM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
+    for(var si=0;si<5;si++){
+      var sw=new THREE.Mesh(new THREE.BoxGeometry(.1,1.8,.15),swordM);sw.position.set(-6,baseY+2.8,-4+si*2);scene.add(sw);
+      var hilt=new THREE.Mesh(new THREE.BoxGeometry(.3,.3,.15),new THREE.MeshLambertMaterial({color:0x8a6a3a}));hilt.position.set(-6,baseY+1.9,-4+si*2);scene.add(hilt);
+    }
+    /* 카운터 */
+    var wc=new THREE.Mesh(new THREE.BoxGeometry(4,.8,1.5),rackM);wc.position.set(2,baseY+.4,0);scene.add(wc);
+  }else if(name==='도서관'){
+    /* 책장 */
+    var shelfM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
+    for(var shi=0;shi<3;shi++){
+      var shelf=new THREE.Mesh(new THREE.BoxGeometry(4,4,.8),shelfM);shelf.position.set(-5+shi*5,baseY+2,-7);scene.add(shelf);
+      /* 책들 */
+      var bookColors=[0xcc2222,0x2244cc,0x22aa44,0xccaa22,0x8822aa];
+      for(var bk=0;bk<5;bk++){
+        var book=new THREE.Mesh(new THREE.BoxGeometry(.3,1,.6),new THREE.MeshLambertMaterial({color:bookColors[bk%5]}));
+        book.position.set(-6+shi*5+bk*.5,baseY+1+Math.floor(bk/3)*1.5,-7);scene.add(book);
+      }
+    }
+    /* 테이블 */
+    var table=new THREE.Mesh(new THREE.BoxGeometry(5,.1,3),shelfM);table.position.set(0,baseY+1.2,2);scene.add(table);
+    var tleg=new THREE.MeshLambertMaterial({color:0x4a3a1a});
+    [[-2,1],[-2,3],[2,1],[2,3]].forEach(function(lp){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.2,1.2,.2),tleg);leg.position.set(lp[0],baseY+.6,lp[1]);scene.add(leg);
+    });
+  }else if(name==='모험가 길드'){
+    /* 게시판 */
+    var boardM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
+    var board=new THREE.Mesh(new THREE.BoxGeometry(6,4,.3),boardM);board.position.set(0,baseY+3,-7);scene.add(board);
+    /* 퀘스트 종이들 */
+    var paperM=new THREE.MeshLambertMaterial({color:0xeeddbb});
+    for(var pi=0;pi<8;pi++){
+      var paper=new THREE.Mesh(new THREE.PlaneGeometry(.8,1),paperM);
+      paper.position.set(-2+Math.random()*4,baseY+2+Math.random()*2,-6.8);scene.add(paper);
+    }
+    /* 긴 테이블 */
+    var gtable=new THREE.Mesh(new THREE.BoxGeometry(10,.1,2),boardM);gtable.position.set(0,baseY+1,3);scene.add(gtable);
+    /* 벤치 */
+    var benchM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
+    var bench1=new THREE.Mesh(new THREE.BoxGeometry(8,.4,.6),benchM);bench1.position.set(0,baseY+.5,1.5);scene.add(bench1);
+    var bench2=new THREE.Mesh(new THREE.BoxGeometry(8,.4,.6),benchM);bench2.position.set(0,baseY+.5,4.5);scene.add(bench2);
+  }else{
+    /* 기본 내부: 테이블 + 의자 */
+    var defTable=new THREE.Mesh(new THREE.BoxGeometry(3,.1,2),new THREE.MeshLambertMaterial({color:0x6a5a3a}));defTable.position.set(0,baseY+1,0);scene.add(defTable);
+  }
+}
+
 /* ── 심플 노이즈 (버텍스 변위용) ── */
 function simpleNoise(x,z){
   var v=Math.sin(x*0.03)*Math.cos(z*0.04)*3 + Math.sin(x*0.08+z*0.06)*1.5 + Math.cos(z*0.02)*2;
@@ -518,6 +684,13 @@ function buildBorderMountains(){
 /* ════════════ 마을 빌드 ════════════ */
 function buildVillage(){
   var VX=-350,VZ=-350; /* 마을 중심 */
+
+  /* ── 건물 문 등록 (문 앞 좌표) ── */
+  registerDoor(VX-38, VZ-10, '여관');
+  registerDoor(VX+38, VZ-10, '무기 상점');
+  registerDoor(VX+38, VZ-32, '방어구 상점');
+  registerDoor(VX+50, VZ+16, '도서관');
+  registerDoor(VX-8,  VZ-66, '모험가 길드');
 
   /* 지면 디테일 — 확장된 영역에 더 많이 */
   scatterGroundDetail(scene,60,100,100,'grass',VX,VZ);
