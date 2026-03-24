@@ -1604,6 +1604,83 @@ function buildMeadowDecor(){
     signPost(-35,250,[['늪',0,-1,-.1],['초원',0,1,.1]],getTerrainY(-35,250));
     signPost(5,500,[['숲',0,1,.1],['마을',0,-1,-.1]],getTerrainY(5,500));
     signPost(-5,750,[['어두운 숲',0,1,.05],['정글',0,1,.15]],getTerrainY(-5,750));
+    /* 추가 표지판 */
+    signPost(40,130,[['늪 →',0,1,.05],['마을 ←',0,-1,-.05]],getTerrainY(40,130));
+    signPost(-20,420,[['초원',0,1,.05],['← 강',0,-1,.1]],getTerrainY(-20,420));
+    signPost(10,640,[['정글 →',0,1,.05],['↑ 숲',0,1,.05]],getTerrainY(10,640));
+  })();
+
+  /* ── 추가 나무 (20그루) ── */
+  [[-40,90],[40,140],[-110,310],[110,370],[-70,430],[70,490],
+   [-140,610],[140,660],[-50,700],[50,760],[-160,820],[160,870],
+   [-90,160],[90,240],[-120,560],[120,530],[0,360],[-180,450],[180,640],[0,860]
+  ].forEach(function(pp){mkTree(pp[0],pp[1],.8+Math.random()*.7,scene);});
+
+  /* ── 추가 목재 울타리/돌담 ── */
+  (function(){
+    var fencePostM=new THREE.MeshLambertMaterial({color:0x7a5a30});
+    var fenceRailM=new THREE.MeshLambertMaterial({color:0x6a4a20});
+    function woodFence(x1,z1,x2,z2){
+      var dx=x2-x1,dz=z2-z1;
+      var len=Math.sqrt(dx*dx+dz*dz);
+      var ang=Math.atan2(dx,dz);
+      var nPosts=Math.max(2,Math.floor(len/2.5));
+      for(var fp=0;fp<nPosts;fp++){
+        var t=fp/(nPosts-1);
+        var px=x1+dx*t,pz=z1+dz*t;
+        var py=getTerrainY(px,pz);
+        var post=new THREE.Mesh(new THREE.BoxGeometry(.15,.15,1.4),fencePostM);
+        post.position.set(px,py+.7,pz);post.castShadow=true;scene.add(post);
+      }
+      var rail=new THREE.Mesh(new THREE.BoxGeometry(len,.08,.1),fenceRailM);
+      var mx=(x1+x2)/2,mz=(z1+z2)/2;
+      var my=getTerrainY(mx,mz);
+      rail.position.set(mx,my+.9,mz);rail.rotation.y=ang;rail.castShadow=true;scene.add(rail);
+      var rail2=new THREE.Mesh(new THREE.BoxGeometry(len,.08,.1),fenceRailM);
+      rail2.position.set(mx,my+.55,mz);rail2.rotation.y=ang;scene.add(rail2);
+    }
+    /* 초원 곳곳 울타리 */
+    woodFence(-100,310,-140,370);
+    woodFence(80,480,120,540);
+    woodFence(-50,680,-80,730);
+    woodFence(60,180,100,230);
+    woodFence(-130,810,-160,850);
+  })();
+
+  /* ── 추가 벤치 (2개) ── */
+  (function(){
+    var benchM=new THREE.MeshLambertMaterial({color:0x8a6a30});
+    var benchDarkM=new THREE.MeshLambertMaterial({color:0x5a3a10});
+    [[30,220,.2],[120,580,-.3]].forEach(function(bp){
+      var g=new THREE.Group();
+      /* 좌석 */
+      var seat=new THREE.Mesh(new THREE.BoxGeometry(2.2,.14,.6),benchM);
+      seat.position.set(0,.55,0);seat.castShadow=true;seat.receiveShadow=true;g.add(seat);
+      /* 등받이 */
+      var back=new THREE.Mesh(new THREE.BoxGeometry(2.2,.5,.1),benchM);
+      back.position.set(0,.9,-.25);back.castShadow=true;g.add(back);
+      /* 다리 4개 */
+      [[-0.8,.22],[0.8,.22],[-0.8,-.22],[0.8,-.22]].forEach(function(lp){
+        var leg=new THREE.Mesh(new THREE.BoxGeometry(.12,.55,.12),benchDarkM);
+        leg.position.set(lp[0],.27,lp[1]);leg.castShadow=true;g.add(leg);
+      });
+      var ty=getTerrainY(bp[0],bp[1]);
+      g.position.set(bp[0],ty,bp[1]);g.rotation.y=bp[2];scene.add(g);
+    });
+  })();
+
+  /* ── 초원 바위/볼더 (산재) ── */
+  (function(){
+    var rockMat=new THREE.MeshLambertMaterial({color:0x777060});
+    [[30,95,1.0],[-90,210,1.3],[140,380,0.9],[-50,520,1.1],[110,660,1.2],
+     [-130,780,0.8],[70,840,1.0],[-20,460,1.4],[190,290,0.8],[-170,700,1.1]
+    ].forEach(function(rd){
+      var rock=new THREE.Mesh(new THREE.SphereGeometry(rd[2],6,5),rockMat);
+      rock.scale.set(1+Math.random()*.4,.7+Math.random()*.3,1+Math.random()*.4);
+      rock.position.set(rd[0],getTerrainY(rd[0],rd[1])+rd[2]*.3,rd[1]);
+      rock.rotation.y=Math.random()*Math.PI;
+      rock.castShadow=true;rock.receiveShadow=true;scene.add(rock);
+    });
   })();
 }
 
@@ -1969,6 +2046,95 @@ function buildForestDecor(){
       });
     });
   })();
+
+  /* ── 추가 쓰러진 통나무 8개 ── */
+  [[-250,1020,0.9],[240,1160,2.4],[-130,1350,0.2],
+   [80,1480,1.6],[-170,1580,0.7],[220,1200,3.0],
+   [-50,1100,1.1],[160,1620,2.8]
+  ].forEach(function(ld){
+    var llen=4+Math.random()*5;
+    var log2=new THREE.Mesh(new THREE.CylinderGeometry(.28,.38,llen,7),logM);
+    log2.rotation.z=Math.PI/2;log2.rotation.y=ld[2];
+    log2.position.set(ld[0],getTerrainY(ld[0],ld[1])+.3,ld[1]);
+    log2.castShadow=true;log2.receiveShadow=true;scene.add(log2);
+  });
+
+  /* ── 추가 버섯 클러스터 4개 ── */
+  (function(){
+    var mColors=[[0xcc2200,0xff6644],[0x440088,0xaa44ff],[0x004422,0x00cc66],[0x885500,0xffcc00]];
+    [[-300,1080],[260,1340],[-220,1510],[300,1200]].forEach(function(mg,mi){
+      var col=mColors[mi%mColors.length];
+      var smM=new THREE.MeshLambertMaterial({color:col[0]});
+      var cmM=new THREE.MeshLambertMaterial({color:col[1]});
+      var msh=.45+Math.random()*.4;
+      var mstem=new THREE.Mesh(new THREE.CylinderGeometry(.1,.15,msh,6),smM);
+      mstem.position.set(mg[0],getTerrainY(mg[0],mg[1])+msh/2,mg[1]);mstem.castShadow=true;scene.add(mstem);
+      var mcap=new THREE.Mesh(new THREE.SphereGeometry(.3+Math.random()*.1,8,6),cmM);
+      mcap.scale.y=.55;mcap.position.set(mg[0],getTerrainY(mg[0],mg[1])+msh+.1,mg[1]);
+      mcap.castShadow=true;scene.add(mcap);
+      /* 작은 주변 버섯 */
+      for(var si=0;si<3;si++){
+        var sx=mg[0]+(Math.random()-.5)*2,sz=mg[1]+(Math.random()-.5)*2;
+        var ssh=.2+Math.random()*.25;
+        var ss=new THREE.Mesh(new THREE.CylinderGeometry(.05,.08,ssh,5),smM);
+        ss.position.set(sx,getTerrainY(sx,sz)+ssh/2,sz);scene.add(ss);
+        var sc=new THREE.Mesh(new THREE.SphereGeometry(.15,6,5),cmM);
+        sc.scale.y=.55;sc.position.set(sx,getTerrainY(sx,sz)+ssh+.05,sz);scene.add(sc);
+      }
+    });
+  })();
+
+  /* ── 추가 거미줄 구조체 3개 ── */
+  (function(){
+    var extraWebM=new THREE.MeshLambertMaterial({color:0xddddbb,transparent:true,opacity:.35,side:THREE.DoubleSide});
+    [[-300,1200],[280,1470],[-250,1630]].forEach(function(wp){
+      for(var wi=0;wi<5;wi++){
+        var wa=wi/5*Math.PI*2;
+        var strand=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,3,4),extraWebM);
+        strand.rotation.z=Math.PI/2;strand.rotation.y=wa;
+        strand.position.set(wp[0]+Math.cos(wa)*1.5,3+Math.sin(wa)*1.5*.25,wp[1]);
+        scene.add(strand);
+      }
+      var ring=new THREE.Mesh(new THREE.TorusGeometry(1.2,.018,4,10),extraWebM);
+      ring.position.set(wp[0],3.5,wp[1]);ring.rotation.x=.3;scene.add(ring);
+    });
+  })();
+
+  /* ── 숲 추가 나무 15그루 ── */
+  (function(){
+    var fTrunkM=new THREE.MeshLambertMaterial({color:0x1a0e05});
+    var fLeafM=new THREE.MeshLambertMaterial({color:0x1a4a12});
+    var fLeaf2M=new THREE.MeshLambertMaterial({color:0x150a20});
+    [[-300,930],[300,980],[-280,1130],[280,1180],[0,1060],
+     [-310,1310],[310,1370],[-290,1520],[290,1560],[0,1460],
+     [-320,1660],[320,1640],[-250,1270],[250,1390],[0,1560]
+    ].forEach(function(pp){
+      var th=5+Math.random()*4;
+      var ts=1.1+Math.random()*.9;
+      var ty=getTerrainY(pp[0],pp[1]);
+      var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.32,th,6),fTrunkM);
+      trunk.scale.set(ts,1,ts);trunk.position.set(pp[0],ty+th/2,pp[1]);trunk.castShadow=true;scene.add(trunk);
+      var lr=1.6*ts+Math.random()*.8;
+      var lm=Math.random()<.5?fLeafM:fLeaf2M;
+      var leaf=new THREE.Mesh(new THREE.ConeGeometry(lr,2.5*ts,7),lm);
+      leaf.position.set(pp[0],ty+th+lr*.3,pp[1]);leaf.castShadow=true;scene.add(leaf);
+    });
+  })();
+
+  /* ── 숲 바위/볼더 산재 ── */
+  (function(){
+    var fRockM=new THREE.MeshLambertMaterial({color:0x2a2018});
+    [[-270,1000,1.1],[230,1140,1.3],[-200,1360,0.9],[320,1520,1.4],
+     [-50,1270,1.0],[270,1430,1.2],[-300,1580,0.9],[180,1660,1.1],
+     [0,1100,1.3],[-240,1480,1.0]
+    ].forEach(function(rd){
+      var rk=new THREE.Mesh(new THREE.SphereGeometry(rd[2],6,5),fRockM);
+      rk.scale.set(1+Math.random()*.3,.65+Math.random()*.3,1+Math.random()*.3);
+      rk.position.set(rd[0],getTerrainY(rd[0],rd[1])+rd[2]*.3,rd[1]);
+      rk.rotation.y=Math.random()*Math.PI;
+      rk.castShadow=true;rk.receiveShadow=true;scene.add(rk);
+    });
+  })();
 }
 
 /* ════════════ 늪지 장식 ════════════ */
@@ -2220,6 +2386,22 @@ function buildSwampDecor(){
     })();
 
   }); /* end side loop */
+
+  /* ── 늪 추가 바위/볼더 산재 (양쪽) ── */
+  (function(){
+    var swampRockM=new THREE.MeshLambertMaterial({color:0x333322});
+    [
+      [280,180,0.9],[380,400,1.1],[470,280,0.8],[540,600,1.0],[310,780,1.2],
+      [-280,180,0.9],[-380,400,1.1],[-470,280,0.8],[-540,600,1.0],[-310,780,1.2],
+      [430,500,0.7],[-430,500,0.7],[520,750,1.0],[-520,750,1.0],[260,500,1.1]
+    ].forEach(function(rd){
+      var rk=new THREE.Mesh(new THREE.SphereGeometry(rd[2],5,4),swampRockM);
+      rk.scale.set(1+Math.random()*.3,.6+Math.random()*.3,1+Math.random()*.3);
+      rk.position.set(rd[0],getTerrainY(rd[0],rd[1])+rd[2]*.25,rd[1]);
+      rk.rotation.y=Math.random()*Math.PI;
+      rk.castShadow=true;rk.receiveShadow=true;scene.add(rk);
+    });
+  })();
 }
 
 /* ════════════ 화산 장식 ════════════ */
@@ -2539,6 +2721,21 @@ function buildVolcanoDecor(){
       /* 점광 */
       var dL=new THREE.PointLight(0x880000,.6,10);dL.position.set(0,4.5,0);g.add(dL);
       g.position.set(sp[0],getTerrainY(sp[0],sp[1]),sp[1]);g.rotation.y=(Math.random()-.5)*.5;scene.add(g);
+    });
+  })();
+
+  /* ── 화산 추가 바위/볼더 산재 ── */
+  (function(){
+    var volcRockM=new THREE.MeshLambertMaterial({color:0x1a0a04});
+    [[130,1720,1.2],[-200,1840,1.5],[50,1970,1.1],[220,2060,1.8],
+     [-170,2160,1.3],[100,2280,1.0],[240,2380,1.6],[-130,2490,1.4],
+     [-60,1790,1.2],[180,2140,1.3],[0,2450,1.7],[-220,2030,1.1]
+    ].forEach(function(rd){
+      var rk=new THREE.Mesh(new THREE.SphereGeometry(rd[2],6,5),volcRockM);
+      rk.scale.set(1+Math.random()*.5,.7+Math.random()*.4,1+Math.random()*.5);
+      rk.position.set(rd[0],rd[2]*.4,rd[1]);
+      rk.rotation.y=Math.random()*Math.PI;
+      rk.castShadow=true;rk.receiveShadow=true;scene.add(rk);
     });
   })();
 }
