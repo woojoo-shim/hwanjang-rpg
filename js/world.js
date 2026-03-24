@@ -194,7 +194,7 @@ function mkStonePath(parent){
   for(var pi=0;pi<smooth.length;pi++){
     var disc=new THREE.Mesh(new THREE.CircleGeometry(4,32),pathM);
     disc.rotation.x=-Math.PI/2;
-    disc.position.set(smooth[pi][0],.02,smooth[pi][1]);
+    disc.position.set(smooth[pi][0],.05,smooth[pi][1]);
     p.add(disc);
   }
   /* 갈림길 */
@@ -204,7 +204,7 @@ function mkStonePath(parent){
     var sm=lerpPath(pts,12);
     for(var fi=0;fi<sm.length;fi++){
       var fd=new THREE.Mesh(new THREE.CircleGeometry(3.2,32),pathM);
-      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.02,sm[fi][1]);
+      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.05,sm[fi][1]);
       p.add(fd);
     }
   });
