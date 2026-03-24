@@ -714,11 +714,17 @@ function handleMove(dt){
     PL.legR.rotation.x=-Math.sin(PL.bobT)*wa;
     PL.armL.rotation.x=-Math.sin(PL.bobT)*wa*.5;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x=Math.sin(PL.bobT)*wa*.5;
-    if(!_inWater)PL.group.position.y=Math.abs(Math.sin(PL.bobT))*.06;
+    if(!_inWater){
+      var _ty=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
+      PL.group.position.y=_ty+Math.abs(Math.sin(PL.bobT))*.06;
+    }
   }else{
     PL.legL.rotation.x*=.8;PL.legR.rotation.x*=.8;PL.armL.rotation.x*=.8;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x*=.8;
-    if(!_inWater)PL.group.position.y*=.8;
+    if(!_inWater){
+      var _ty2=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
+      PL.group.position.y=_ty2+(PL.group.position.y-_ty2)*.8;
+    }
   }
 }
 var _waterDmgTimer=0;
