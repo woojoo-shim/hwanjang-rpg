@@ -369,7 +369,7 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
     var ly=pos.getY(vi);  /* 로컬 y → 월드 -z (rotation.x=-PI/2 이후) */
     var wx=lx+worldCX;
     var wz=-ly+worldCZ;   /* 부호 반전: PlaneGeometry Y축이 Z축으로 매핑 */
-    var dy=simpleNoise(wx,wz);
+    var dy=(wz>25)?simpleNoise(wx,wz):0;
     pos.setZ(vi,dy);      /* 로컬 z → 회전 후 월드 y (높이) */
   }
   geo.computeVertexNormals();
