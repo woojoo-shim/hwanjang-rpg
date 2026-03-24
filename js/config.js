@@ -279,10 +279,10 @@ var activeBuffs={};
 
 /* ════════════ NPC 정의 ════════════ */
 var NPC_DEF=[
-  {name:'(이장) 박건호',px:-6, pz:0,  bc:0x7a4a18,hc:0xddaa77},
-  {name:'(상인) 김도윤',px:-7, pz:-12,bc:0x1a3a8a,hc:0xddcc99},
-  {name:'(대장장이) 이태산',px:7,pz:-12,bc:0x3a2a1a,hc:0xcc9966},
-  {name:'(???) 정체불명',px:8, pz:0,  bc:0x1a1030,hc:0xaaaacc},
+  {name:'(이장) 박건호',px:-356, pz:-350,  bc:0x7a4a18,hc:0xddaa77},
+  {name:'(상인) 김도윤',px:-357, pz:-362,bc:0x1a3a8a,hc:0xddcc99},
+  {name:'(대장장이) 이태산',px:-343,pz:-362,bc:0x3a2a1a,hc:0xcc9966},
+  {name:'(???) 정체불명',px:-342, pz:-350,  bc:0x1a1030,hc:0xaaaacc},
   /* 전직 NPC — 동적 스폰으로 이동 (npc.js에서 관리) */
   /* 아래 4개는 동적 스폰 — npc.js가 관리: warrior, rogue, assassin, berserker */
 ];
@@ -336,28 +336,39 @@ var MONSTER_DEFS=[
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
-/* 맵 3x 확장: 기존 z좌표 × 3 */
-/* 원형 경계 — 섬 느낌 */
-var WORLD_BOUNDS=[-600,600,-32,2600]; // 하위 호환 (직사각형 fallback)
-/* 타원형 섬 경계: 중심 (cx, cz), 반경 (rx, rz) — 섬 모양 */
+/* 섬형 맵: 1200x1200, 중심 (0,0) — 존이 사방으로 분산 */
+var WORLD_BOUNDS=[-650,650,-550,650]; // 직사각형 fallback
+/* 원형 섬 경계: 중심 (cx, cz), 반경 (rx, rz) */
 var ISLAND_CENTER_X=0;
-var ISLAND_CENTER_Z=1280;  /* 맵 세로 중심 */
-var ISLAND_RADIUS_X=620;   /* 동서 방향 반경 */
-var ISLAND_RADIUS_Z=1340;  /* 남북 방향 반경 */
-var WORLD_SPAWN=[5,-3]; // 분수 옆
+var ISLAND_CENTER_Z=50;   /* 맵 세로 중심 */
+var ISLAND_RADIUS_X=660;  /* 동서 방향 반경 */
+var ISLAND_RADIUS_Z=660;  /* 남북 방향 반경 */
+var WORLD_SPAWN=[-345,-345]; // 마을 분수 옆
 
-var ZONE_INFO={
-  village:  {name:'시작 마을',   color:'#c9a84c',tp:[0,0]},
-  meadow:   {name:'초원',        color:'#4aaa3a',tp:[0,150]},
-  swamp:    {name:'독 늪',       color:'#44aa44',tp:[240,300]},
-  darkforest:{name:'어두운 숲',  color:'#aa4422',tp:[0,1250]},
-  jungle:   {name:'정글',        color:'#11aa44',tp:[280,1250]},
-  volcano:  {name:'화산 지대',   color:'#ff4400',tp:[0,2100]},
+/* ── 존 중심 좌표 (거리 기반 존 감지에 사용) ── */
+var ZONE_CENTERS={
+  village:  {cx:-350,cz:-350,r:130},
+  meadow:   {cx:300, cz:-300,r:220},
+  swamp:    {cx:-400,cz:100, r:220},
+  jungle:   {cx:400, cz:100, r:220},
+  darkforest:{cx:-300,cz:350, r:220},
+  volcano:  {cx:350, cz:400, r:200},
+  boss:     {cx:0,   cz:550, r:90},
 };
 
-/* 강 x좌표 (water physics 기준) */
-var RIVER_X_LEFT=-165;
-var RIVER_X_RIGHT=165;
+var ZONE_INFO={
+  village:   {name:'시작 마을',   color:'#c9a84c',tp:[-350,-350]},
+  meadow:    {name:'초원/구릉',   color:'#4aaa3a',tp:[300,-300]},
+  swamp:     {name:'늪지대',      color:'#44aa44',tp:[-400,100]},
+  darkforest:{name:'어두운 숲',   color:'#aa4422',tp:[-300,350]},
+  jungle:    {name:'정글',        color:'#11aa44',tp:[400,100]},
+  volcano:   {name:'화산 지대',   color:'#ff4400',tp:[350,400]},
+  boss:      {name:'마왕성',      color:'#880000',tp:[0,550]},
+};
+
+/* 강 — 중앙 남북 (z=0 부근, x=-10~10) + 동서 분기 */
+var RIVER_CENTER_X=0;
+var RIVER_HALF_W=8;
 
 /* 방문한 존 기록 */
 var visitedZones={village:true};

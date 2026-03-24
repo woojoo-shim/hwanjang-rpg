@@ -13,34 +13,19 @@ var playerPoisoned=0,playerPoisonDmg=0;
 var playerSlowed=0;
 
 /* ── 충돌 박스 [x, z, halfW, halfD] ── */
+/* 모든 마을 건물은 (-350,-350) 중심으로 이동 */
 var COLLIDERS=[
-  /* 성 */      [0,-30,7,6],
-  /* 분수 */    [0,-8,4.2,4.2],
-  /* 상점들 */  [-14,-6,1.5,1],[-14,-13,1.5,1],[14,-6,1.5,1],[14,-13,1.5,1],[-6,-18,1.5,1],[6,-18,1.5,1],
-  /* 시계탑 */  [-8,5,2.2,2.2],
-  /* 주택들 */  [-12,-4,2.5,2],[-10,-16,2.8,2.2],[10,-3,2.2,1.8],[12,-16,2.2,1.6],
-  /* 우물 */    [8,-12,1.2,1.2],
-  /* 게이트 기둥 좌우 */ [-4,-28,1.2,1.2],[4,-28,1.2,1.2],
-  /* ── 초원 장식 ── */
-  /* 표지판 */  [2,22,0.5,0.5],
-  /* 고대 기둥 */[-50,585,1.2,1.2],[-48,594,0.7,0.7],
-  /* ── 숲 장식 ── */
-  /* 숲 신전 */ [-75,1290,1.6,1.6],
-  /* 야영지 텐트 */[-30,1440,1.8,1.8],
-  /* 속빈 통나무 */[30,1095,2.2,1.0],
-  /* ── 늪지 장식 ── */
-  /* 해골 장대 (동) */[420,555,0.5,0.5],
-  /* 해골 장대 (서) */[-420,555,0.5,0.5],
-  /* 부서진 수레 (동) */[495,435,1.2,0.8],
-  /* 부서진 수레 (서) */[-495,435,1.2,0.8],
-  /* ── 화산 장식 ── */
-  /* 우리 */ [-85,1980,1.2,1.2],
-  /* 석조 우상들 */[-65,1770,0.8,0.8],[70,1920,0.8,0.8],[-45,2130,0.8,0.8],[0,2280,0.8,0.8],
+  /* 성 */      [-350,-380,7,6],
+  /* 분수 */    [-350,-358,4.2,4.2],
+  /* 상점들 */  [-364,-356,1.5,1],[-364,-363,1.5,1],[-336,-356,1.5,1],[-336,-363,1.5,1],[-356,-368,1.5,1],[-344,-368,1.5,1],
+  /* 시계탑 */  [-358,-345,2.2,2.2],
+  /* 주택들 */  [-362,-354,2.5,2],[-360,-366,2.8,2.2],[-340,-353,2.2,1.8],[-338,-366,2.2,1.6],
+  /* 우물 */    [-342,-362,1.2,1.2],
+  /* 게이트 기둥 좌우 */ [-354,-378,1.2,1.2],[-346,-378,1.2,1.2],
   /* ── 보스 구역 ── */
-  /* 해골 장식 */[0,2388,1.0,1.0],
-  /* 보스 기둥 원 (8개) — 반지름 12, z=2400 중심, 개별 박스 */
-  [12,2400,0.8,0.8],[-12,2400,0.8,0.8],[0,2412,0.8,0.8],[0,2388,0.8,0.8],
-  [10,2409,0.8,0.8],[-10,2409,0.8,0.8],[10,2391,0.8,0.8],[-10,2391,0.8,0.8],
+  /* 보스 기둥 원 (8개) — 반지름 12, z=550 중심 */
+  [12,550,0.8,0.8],[-12,550,0.8,0.8],[0,562,0.8,0.8],[0,538,0.8,0.8],
+  [10,559,0.8,0.8],[-10,559,0.8,0.8],[10,541,0.8,0.8],[-10,541,0.8,0.8],
 ];
 function hitCollider(x,z){
   for(var i=0;i<COLLIDERS.length;i++){
@@ -503,7 +488,7 @@ function playerDied(){
     invincibleTimer=4;updPlayerHpBar();
     PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
     currentZone='village';
-    scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);
+    scene.fog=new THREE.Fog(0x0a1510,120,500);scene.background=new THREE.Color(0x0a1510);
     var zi=ZONE_INFO['village'];
     document.querySelector('.hloc').textContent='▸ '+zi.name;
     /* 페이드아웃 — 눈 뜨는 느낌 */
@@ -589,29 +574,40 @@ function updPlayerHpBar(){
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }
 
-/* checkZone — 오픈 월드 위치 기반 존 감지 + 분위기 전환 (3x 확장 맵) */
+/* checkZone — 거리 기반 존 감지 (섬형 맵) + 분위기 전환 */
 function checkZone(){
-  var z=PL.group.position.z;
-  var x=Math.abs(PL.group.position.x);
-  var newZone;
-  if(z<=20) newZone='village';
-  else if(z<=900&&x>240) newZone='swamp';
-  else if(z<=900) newZone='meadow';
-  else if(z<=1680&&x>240) newZone='jungle';
-  else if(z<=1680) newZone='darkforest';
-  else newZone='volcano';
+  var px=PL.group.position.x;
+  var pz=PL.group.position.z;
+  var newZone='meadow'; /* 기본값 */
+  var bestDist=Infinity;
+  for(var zk in ZONE_CENTERS){
+    var zc=ZONE_CENTERS[zk];
+    var dx=px-zc.cx,dz=pz-zc.cz;
+    var d=Math.sqrt(dx*dx+dz*dz);
+    if(d<zc.r&&d<bestDist){bestDist=d;newZone=zk;}
+  }
+  /* 존에 해당하지 않으면 가장 가까운 존으로 */
+  if(bestDist===Infinity){
+    for(var zk2 in ZONE_CENTERS){
+      var zc2=ZONE_CENTERS[zk2];
+      var dx2=px-zc2.cx,dz2=pz-zc2.cz;
+      var d2=Math.sqrt(dx2*dx2+dz2*dz2);
+      if(d2<bestDist){bestDist=d2;newZone=zk2;}
+    }
+  }
 
   if(newZone!==currentZone){
     var prevZone=currentZone;
     currentZone=newZone;
     visitedZones[newZone]=true;
-    /* 분위기 전환 (3x 확장 맵 — 안개 거리 늘림) */
+    /* 분위기 전환 */
     if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,120,500);scene.background=new THREE.Color(0x0a1510);}
     else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,180,700);scene.background=new THREE.Color(0x1a3010);}
     else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,80,350);scene.background=new THREE.Color(0x050a05);}
     else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,60,280);scene.background=new THREE.Color(0x020202);}
     else if(newZone==='jungle'){scene.fog=new THREE.Fog(0x0a2010,70,300);scene.background=new THREE.Color(0x0a2010);}
     else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,80,350);scene.background=new THREE.Color(0x100500);}
+    else if(newZone==='boss'){scene.fog=new THREE.Fog(0x080000,60,250);scene.background=new THREE.Color(0x080000);}
 
     /* 배너 표시 */
     var zi=ZONE_INFO[newZone];
@@ -624,10 +620,11 @@ function checkZone(){
     /* 시스템 메시지 */
     var msgs={
       meadow:'초원 진입. 토끼와 사슴이 있습니다.',
-      swamp:'독 늪 진입! 슬라임과 독두꺼비가 나타납니다.',
+      swamp:'늪지대 진입! 슬라임과 독두꺼비가 나타납니다.',
       darkforest:'어두운 숲 진입! 고블린과 늑대를 조심하세요!',
       jungle:'정글 진입! 거미, 독사, 유인원이 서식합니다!',
       volcano:'화산 지대 진입!! 용암 골렘과 드레이크가 기다립니다!!',
+      boss:'마왕성 진입!!! 고대 화염룡이 기다리고 있다!!!',
       village:'마을로 귀환. HP 일부 회복.',
     };
     if(msgs[newZone])addChat('sys','[시스템]',msgs[newZone]);
@@ -644,11 +641,11 @@ var _inWater=false;
 var _waterDepth=0;/* 0=지상, 양수=물에 잠긴 깊이 */
 
 function isOverWater(x,z){
-  /* 강은 z:20~2700 범위, x=-165±3 또는 x=165±3 */
-  if(z<20||z>2700)return false;
-  var rl=Math.abs(x-RIVER_X_LEFT);
-  var rr=Math.abs(x-RIVER_X_RIGHT);
-  return rl<9||rr<9;/* 강 폭 18 */
+  /* 중앙 남북 강: x≈0, z:-400~500 */
+  if(z>-400&&z<500&&Math.abs(x-RIVER_CENTER_X)<RIVER_HALF_W)return true;
+  /* 동서 분기: z≈0 부근, x:-400~-10 또는 x:10~400 */
+  if(Math.abs(z)<RIVER_HALF_W&&(Math.abs(x)>10&&Math.abs(x)<400))return true;
+  return false;
 }
 
 function handleMove(dt){
@@ -701,7 +698,7 @@ function handleMove(dt){
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
     if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    /* 타원형 섬 경계 체크 — 자연스러운 해안선 느낌 */
+    /* 원형 섬 경계 체크 */
     var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
     var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;
     var _exN=(nx-_icx)/_irx,_ezN=(PL.group.position.z-_icz)/_irz;
