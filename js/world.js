@@ -384,31 +384,30 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
 
 /* ════════════ 바이옴 지면 빌드 (3x 확장) ════════════ */
 function buildGroundPlanes(){
-  /* 기본 바닥 딥 — 전체 월드 (평탄, 그림자 받는 베이스) */
-  var baseGndDeep=new THREE.Mesh(new THREE.PlaneGeometry(1260,2730),new THREE.MeshLambertMaterial({color:0x1a3a0e}));
-  baseGndDeep.rotation.x=-Math.PI/2;baseGndDeep.position.set(0,-.04,1270);scene.add(baseGndDeep);
+  /* 기본 바닥 딥 — 전체 월드 (displacement 적용, 틈 방지) */
+  makeDisplacedGround(1400,2900,96,96,0x1a3a0e, 0,-0.15,1270);
 
   /* 마을: 평탄하게 유지 (건물이 올라가야 함) x:-22~22, z:-32~20 */
   var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshLambertMaterial({color:0x2a5a1a}));
   villGnd.rotation.x=-Math.PI/2;villGnd.position.set(0,.01,-6);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원: 버텍스 변위 적용 x:-240~240, z:20~900 — 밝은 녹색 */
-  makeDisplacedGround(480,880,64,64,0x3a7a1a, 0,0.01,460);
+  makeDisplacedGround(520,920,64,64,0x3a7a1a, 0,0.01,460);
 
   /* 늪 서쪽: x:-600~-240, z:20~900 */
-  makeDisplacedGround(360,880,48,64,0x1a3a0a, -420,0.01,460);
+  makeDisplacedGround(400,920,48,64,0x1a3a0a, -420,0.01,460);
 
   /* 늪 동쪽: x:240~600, z:20~900 */
-  makeDisplacedGround(360,880,48,64,0x1a3a0a, 420,0.01,460);
+  makeDisplacedGround(400,920,48,64,0x1a3a0a, 420,0.01,460);
 
   /* 어두운 숲: x:-360~360, z:900~1680 */
-  makeDisplacedGround(720,780,64,64,0x0a1a08, 0,0.01,1290);
+  makeDisplacedGround(760,820,64,64,0x0a1a08, 0,0.01,1290);
 
   /* 정글: x:240~600, z:900~1680 */
-  makeDisplacedGround(360,780,48,64,0x0a2a0a, 420,0.01,1290);
+  makeDisplacedGround(400,820,48,64,0x0a2a0a, 420,0.01,1290);
 
   /* 화산: x:-300~300, z:1680~2600 */
-  makeDisplacedGround(600,920,48,64,0x1a0a05, 0,0.01,2140);
+  makeDisplacedGround(660,980,48,64,0x1a0a05, 0,0.01,2140);
 
   /* ── 바이옴 전환 스트립 (평탄) ── */
   var trans1M=new THREE.MeshLambertMaterial({color:0x305a18});
