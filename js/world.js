@@ -15,7 +15,8 @@ var closestPortal=null;
 
 /* ── 심플 노이즈 (버텍스 변위용) ── */
 function simpleNoise(x,z){
-  return Math.sin(x*0.03)*Math.cos(z*0.04)*3 + Math.sin(x*0.08+z*0.06)*1.5 + Math.cos(z*0.02)*2;
+  var v=Math.sin(x*0.03)*Math.cos(z*0.04)*3 + Math.sin(x*0.08+z*0.06)*1.5 + Math.cos(z*0.02)*2;
+  return Math.max(0,v+3.5)*0.7;/* 항상 0 이상, 최대 약 7 */
 }
 
 /* ── 포스트프로세싱 컴포저 (bloom) ── */
@@ -227,7 +228,7 @@ function mkStonePath(parent){
   var smooth=lerpPath(cp,20);
   for(var pi=0;pi<smooth.length;pi++){
     var _px=smooth[pi][0],_pz=smooth[pi][1];
-    var _py=(_pz>22?simpleNoise(_px,_pz):0)+.08;
+    var _py=(_pz>22?simpleNoise(_px,_pz):0)+.15;
     var disc=new THREE.Mesh(new THREE.CircleGeometry(5,32),pathM);
     disc.rotation.x=-Math.PI/2;
     disc.position.set(_px,_py,_pz);
