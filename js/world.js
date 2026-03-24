@@ -1114,6 +1114,15 @@ function onResize(){
 
 function updCam(){
   var p=PL.group.position;
+  if(insideBuilding){
+    /* 건물 내부: 탑다운 고정 카메라 */
+    var itx=p.x,ity=p.y+18,itz=p.z+8;
+    camera.position.x+=(itx-camera.position.x)*.2;
+    camera.position.y+=(ity-camera.position.y)*.2;
+    camera.position.z+=(itz-camera.position.z)*.2;
+    camera.lookAt(p.x,p.y,p.z);
+    return;
+  }
   var tx=p.x+14*Math.sin(cYaw)*Math.cos(cPitch);
   var ty=p.y+14*Math.sin(cPitch)+2.5;
   var tz=p.z+14*Math.cos(cYaw)*Math.cos(cPitch);
