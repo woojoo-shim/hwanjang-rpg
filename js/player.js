@@ -584,6 +584,7 @@ function updPlayerHpBar(){
 
 /* checkZone — 거리 기반 존 감지 (섬형 맵) + 분위기 전환 */
 function checkZone(){
+  if(typeof insideBuilding!=='undefined'&&insideBuilding)return;
   var px=PL.group.position.x;
   var pz=PL.group.position.z;
   var newZone='meadow'; /* 기본값 */
