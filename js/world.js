@@ -83,9 +83,9 @@ function mkHuman(bc,hc){
 var _treeTrunkMat=null,_treeLeafMat1=null,_treeLeafMat2=null;
 function _getTreeMats(){
   if(!_treeTrunkMat){
-    _treeTrunkMat=new THREE.MeshLambertMaterial({color:0x3a2008});
-    _treeLeafMat1=new THREE.MeshLambertMaterial({color:0x1a3a08});
-    _treeLeafMat2=new THREE.MeshLambertMaterial({color:0x224a10});
+    _treeTrunkMat=new THREE.MeshLambertMaterial({color:0x5a3a1a});
+    _treeLeafMat1=new THREE.MeshLambertMaterial({color:0x3a7a2a});
+    _treeLeafMat2=new THREE.MeshLambertMaterial({color:0x4a8a3a});
   }
 }
 function mkTree(x,z,s,parent){
@@ -131,7 +131,7 @@ function mkBldg(x,z,w,h,d,bc,rc,parent){
 function mkStall(x,z,rotY,color,roofColor,label,parent){
   var g=new THREE.Group();
   var p=parent||scene;
-  var postM=new THREE.MeshStandardMaterial({color:0x5a3a10,roughness:0.8,metalness:0.0});
+  var postM=new THREE.MeshStandardMaterial({color:0x6a4a2a,roughness:0.8,metalness:0.0});
   var postG=new THREE.BoxGeometry(.15,2.2,.15);
   [[-1.1,0,-0.65],[1.1,0,-0.65],[-1.1,0,.65],[1.1,0,.65]].forEach(function(pp){
     var post=new THREE.Mesh(postG,postM);post.position.set(pp[0],1.1,pp[2]);post.castShadow=true;g.add(post);
@@ -154,8 +154,8 @@ function mkStall(x,z,rotY,color,roofColor,label,parent){
 function mkCastle(parent){
   var g=new THREE.Group();
   var p=parent||scene;
-  var wallM=new THREE.MeshStandardMaterial({color:0x8a8870,roughness:0.9,metalness:0.05});
-  var roofM=new THREE.MeshStandardMaterial({color:0x4488cc,roughness:0.7,metalness:0.1});
+  var wallM=new THREE.MeshStandardMaterial({color:0x8a8878,roughness:0.9,metalness:0.05});
+  var roofM=new THREE.MeshStandardMaterial({color:0x3a6aaa,roughness:0.7,metalness:0.1});
   var gateM=new THREE.MeshStandardMaterial({color:0x2a1800,roughness:0.3,metalness:0.7});
 
   var main=new THREE.Mesh(new THREE.BoxGeometry(12,8,10),wallM);main.position.set(0,4,0);main.castShadow=true;main.receiveShadow=true;g.add(main);
@@ -169,12 +169,12 @@ function mkCastle(parent){
     var tr=new THREE.Mesh(new THREE.ConeGeometry(1.8,3.5,8),roofM);tr.position.set(pp[0],8,pp[2]);tr.castShadow=true;g.add(tr);
   });
   var ct=new THREE.Mesh(new THREE.CylinderGeometry(1,1.2,4,8),wallM);ct.position.set(0,10,0);ct.castShadow=true;g.add(ct);
-  var ctr=new THREE.Mesh(new THREE.ConeGeometry(1.4,3,8),new THREE.MeshStandardMaterial({color:0x66aaff,roughness:0.7,metalness:0.15}));ctr.position.set(0,13.5,0);ctr.castShadow=true;g.add(ctr);
+  var ctr=new THREE.Mesh(new THREE.ConeGeometry(1.4,3,8),new THREE.MeshStandardMaterial({color:0x3a6aaa,roughness:0.7,metalness:0.15}));ctr.position.set(0,13.5,0);ctr.castShadow=true;g.add(ctr);
   var gate=new THREE.Mesh(new THREE.BoxGeometry(3,4,.3),gateM);gate.position.set(0,2,5.15);g.add(gate);
-  var archM=new THREE.MeshStandardMaterial({color:0x6a6050,roughness:0.9,metalness:0.05});
+  var archM=new THREE.MeshStandardMaterial({color:0x6a6858,roughness:0.9,metalness:0.05});
   var arch=new THREE.Mesh(new THREE.TorusGeometry(1.5,.3,8,12,.5*Math.PI),archM);
   arch.position.set(0,4,5.15);arch.rotation.z=Math.PI;g.add(arch);
-  var merlonM=new THREE.MeshStandardMaterial({color:0x7a7860,roughness:0.9,metalness:0.05});
+  var merlonM=new THREE.MeshStandardMaterial({color:0x7a7868,roughness:0.9,metalness:0.05});
   for(var mx=-5;mx<=5;mx+=2){
     var ml=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),merlonM);ml.position.set(mx,8.4,5);ml.castShadow=true;g.add(ml);
   }
@@ -190,7 +190,7 @@ function mkFountain(parent){
   var g=new THREE.Group();
   var p=parent||scene;
   var stoneM=new THREE.MeshStandardMaterial({color:0x888070,roughness:0.9,metalness:0.05});
-  var waterM=new THREE.MeshStandardMaterial({color:0x2288cc,transparent:true,opacity:0.65,roughness:0.1,metalness:0.3});
+  var waterM=new THREE.MeshStandardMaterial({color:0x3399cc,transparent:true,opacity:0.65,roughness:0.1,metalness:0.3});
   var outer=new THREE.Mesh(new THREE.CylinderGeometry(4,4.2,.6,16),stoneM);outer.position.set(0,.3,0);outer.castShadow=true;outer.receiveShadow=true;g.add(outer);
   var water=new THREE.Mesh(new THREE.CylinderGeometry(3.6,3.6,.3,16),waterM);water.position.set(0,.45,0);g.add(water);
   var pillar=new THREE.Mesh(new THREE.CylinderGeometry(.3,.4,2.5,8),stoneM);pillar.position.set(0,1.25,0);pillar.castShadow=true;g.add(pillar);
@@ -211,7 +211,7 @@ function mkFountain(parent){
 function mkStonePath(parent){
   var p=parent||scene;
   /* 광장 */
-  var pathM=new THREE.MeshStandardMaterial({color:0xb8a880,roughness:0.9,metalness:0.0});
+  var pathM=new THREE.MeshStandardMaterial({color:0xc4a872,roughness:0.9,metalness:0.0});
   var plaza=new THREE.Mesh(new THREE.CylinderGeometry(8,8,.05,32),pathM);
   plaza.position.set(0,.02,-8);plaza.receiveShadow=true;p.add(plaza);
   /* 마을 → 초원 → 숲까지 이어지는 부드러운 흙길 (3x 확장) */
@@ -257,7 +257,7 @@ function mkStonePath(parent){
 function mkWaterRiver(parent){
   var p=parent||scene;
   /* animated water material — store mesh for UV update */
-  var riverM=new THREE.MeshStandardMaterial({color:0x2288cc,transparent:true,opacity:0.65,roughness:0.1,metalness:0.3});
+  var riverM=new THREE.MeshStandardMaterial({color:0x3399cc,transparent:true,opacity:0.65,roughness:0.1,metalness:0.3});
   /* rivers run the full length of expanded world (village+meadow+forest ~1680 units) */
   /* x positions from RIVER_X_LEFT / RIVER_X_RIGHT = ±165 */
   var riverLen=1680;
@@ -394,34 +394,34 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
 /* ════════════ 바이옴 지면 빌드 (3x 확장) ════════════ */
 function buildGroundPlanes(){
   /* 기본 바닥 딥 — 전체 월드 (displacement 적용, 틈 방지) */
-  makeDisplacedGround(1400,2900,96,96,0x1a3a0e, 0,-0.02,1270);
+  makeDisplacedGround(1400,2900,96,96,0x2a5a1a, 0,-0.02,1270);
 
   /* 마을: 평탄하게 유지 (건물이 올라가야 함) x:-22~22, z:-32~20 */
-  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshStandardMaterial({color:0x2a5a1a,roughness:0.95,metalness:0.0}));
+  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshStandardMaterial({color:0x4a8a3a,roughness:0.95,metalness:0.0}));
   villGnd.rotation.x=-Math.PI/2;villGnd.position.set(0,.01,-6);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원: 버텍스 변위 적용 x:-240~240, z:20~900 — 밝은 녹색 */
-  makeDisplacedGround(520,920,64,64,0x3a7a1a, 0,0.01,460);
+  makeDisplacedGround(520,920,64,64,0x5a9a3a, 0,0.01,460);
 
   /* 늪 서쪽: x:-600~-240, z:20~900 */
-  makeDisplacedGround(400,920,48,64,0x1a3a0a, -420,0.01,460);
+  makeDisplacedGround(400,920,48,64,0x3a5a2a, -420,0.01,460);
 
   /* 늪 동쪽: x:240~600, z:20~900 */
-  makeDisplacedGround(400,920,48,64,0x1a3a0a, 420,0.01,460);
+  makeDisplacedGround(400,920,48,64,0x3a5a2a, 420,0.01,460);
 
   /* 어두운 숲: x:-360~360, z:900~1680 */
-  makeDisplacedGround(760,820,64,64,0x0a1a08, 0,0.01,1290);
+  makeDisplacedGround(760,820,64,64,0x1a3a12, 0,0.01,1290);
 
   /* 정글: x:240~600, z:900~1680 */
-  makeDisplacedGround(400,820,48,64,0x0a2a0a, 420,0.01,1290);
+  makeDisplacedGround(400,820,48,64,0x2a6a1a, 420,0.01,1290);
 
   /* 화산: x:-300~300, z:1680~2600 */
-  makeDisplacedGround(660,980,48,64,0x1a0a05, 0,0.01,2140);
+  makeDisplacedGround(660,980,48,64,0x2a1208, 0,0.01,2140);
 
   /* ── 바이옴 전환 스트립 (평탄) ── */
-  var trans1M=new THREE.MeshLambertMaterial({color:0x305a18});
-  var trans2M=new THREE.MeshLambertMaterial({color:0x152a0c});
-  var trans3M=new THREE.MeshLambertMaterial({color:0x120a04});
+  var trans1M=new THREE.MeshLambertMaterial({color:0x4a8a3a});
+  var trans2M=new THREE.MeshLambertMaterial({color:0x2a5a2a});
+  var trans3M=new THREE.MeshLambertMaterial({color:0x2a1a10});
   /* 마을-초원 */
   var t1=new THREE.Mesh(new THREE.PlaneGeometry(480,8),trans1M);t1.rotation.x=-Math.PI/2;t1.position.set(0,.012,20);scene.add(t1);
   /* 초원-숲 */
@@ -429,8 +429,8 @@ function buildGroundPlanes(){
   /* 숲-화산 */
   var t3=new THREE.Mesh(new THREE.PlaneGeometry(720,8),trans3M);t3.rotation.x=-Math.PI/2;t3.position.set(0,.012,1680);scene.add(t3);
   /* 초원-늪 좌우 */
-  var t4=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x285018}));t4.rotation.x=-Math.PI/2;t4.position.set(-240,.012,460);scene.add(t4);
-  var t5=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x285018}));t5.rotation.x=-Math.PI/2;t5.position.set(240,.012,460);scene.add(t5);
+  var t4=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x4a8a3a}));t4.rotation.x=-Math.PI/2;t4.position.set(-240,.012,460);scene.add(t4);
+  var t5=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x4a8a3a}));t5.rotation.x=-Math.PI/2;t5.position.set(240,.012,460);scene.add(t5);
 }
 
 /* ════════════ 경계 산맥 빌드 (시각적 장벽) ════════════ */
@@ -512,7 +512,7 @@ function buildVillage(){
 
   /* 횃불 */
   var torchPos=[[-7,-1,1],[7,-1,1],[-7,-15,1],[7,-15,1],[-1,-19,1],[1,-19,1]];
-  var poleMat=new THREE.MeshLambertMaterial({color:0x3a2a10});
+  var poleMat=new THREE.MeshLambertMaterial({color:0x5a3a1a});
   var fireMat=new THREE.MeshBasicMaterial({color:0xff8820});
   torchPos.forEach(function(tp){
     var pl=new THREE.PointLight(0xff8830,2.0,14);pl.position.set(tp[0],2.2,tp[2]);scene.add(pl);
@@ -602,8 +602,8 @@ function buildSkydome(){
   /* top: deep night blue, bottom: dark purple-blue horizon */
   var skyMat=new THREE.ShaderMaterial({
     uniforms:{
-      topColor:{value:new THREE.Color(0x1a6abf)},
-      horizonColor:{value:new THREE.Color(0xc8dff0)},
+      topColor:{value:new THREE.Color(0x3a8fd8)},
+      horizonColor:{value:new THREE.Color(0xa8d8ea)},
       offset:{value:0.25},
       exponent:{value:0.5}
     },
@@ -648,10 +648,10 @@ function initScene(){
 
   /* scene 배경은 스카이돔이 대신하므로 투명하게 */
   scene=new THREE.Scene();
-  scene.background=new THREE.Color(0xc8dff0);
+  scene.background=new THREE.Color(0x87CEEB);
 
   /* ── 대기 안개 — 부드러운 블루-화이트 안개로 깊이감 강화 ── */
-  scene.fog=new THREE.FogExp2(0xc8d8e8,.0015);
+  scene.fog=new THREE.FogExp2(0xa8d8ea,.0015);
 
   camera=new THREE.PerspectiveCamera(60,1,.1,1200);
   camera.position.set(0,10,18);

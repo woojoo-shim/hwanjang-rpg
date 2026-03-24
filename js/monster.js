@@ -891,7 +891,7 @@ function buildMeadow(){
    [0,200],[0,480],[0,750],[-160,300],[160,400],[-180,620],[180,720]
   ].forEach(function(pp){mkTree(pp[0],pp[1],.9+Math.random()*.8,scene);});
   /* 덤불 */
-  var bushM=new THREE.MeshLambertMaterial({color:0x224a10});
+  var bushM=new THREE.MeshLambertMaterial({color:0x4a8a3a});
   [[-60,200],[80,380],[-130,500],[140,650],[-70,780],[90,860],
    [-180,280],[180,420],[-150,700],[150,800]
   ].forEach(function(pp){
@@ -1186,9 +1186,9 @@ function buildDarkForest(){
   /* ═══ 공유 머티리얼 (성능 최적화) ═══ */
   var darkTrunkM=new THREE.MeshLambertMaterial({color:0x1a0e05});
   var darkTrunk2M=new THREE.MeshLambertMaterial({color:0x0d0804});
-  var darkLeafM=new THREE.MeshLambertMaterial({color:0x0a1a08});
+  var darkLeafM=new THREE.MeshLambertMaterial({color:0x1a4a12});
   var purpleLeafM=new THREE.MeshLambertMaterial({color:0x150a20});
-  var darkLeaf2M=new THREE.MeshLambertMaterial({color:0x081510});
+  var darkLeaf2M=new THREE.MeshLambertMaterial({color:0x0a3a0a});
   var stoneM=new THREE.MeshLambertMaterial({color:0x2a2a2a});
   var darkStoneM=new THREE.MeshLambertMaterial({color:0x1a1a1a});
   var mossStoneM=new THREE.MeshLambertMaterial({color:0x1a2a18});
@@ -1621,7 +1621,7 @@ function buildDarkForest(){
 function buildJungle(){
   /* 정글: x:240~600, z:900~1680 (3x 확장) */
   /* 지면 — 진한 초록 */
-  var jGround=new THREE.Mesh(new THREE.PlaneGeometry(360,780),new THREE.MeshLambertMaterial({color:0x0a3a0a}));
+  var jGround=new THREE.Mesh(new THREE.PlaneGeometry(360,780),new THREE.MeshLambertMaterial({color:0x2a6a1a}));
   jGround.rotation.x=-Math.PI/2;jGround.position.set(420,.005,1290);scene.add(jGround);
   /* 조명 — 초록빛 */
   var jl=new THREE.PointLight(0x22aa44,.5,400);jl.position.set(400,8,1290);scene.add(jl);
@@ -1634,11 +1634,11 @@ function buildJungle(){
     var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.25+Math.random()*.2,.4+Math.random()*.3,th,6),jTrunkM);
     trunk.position.set(tx,th/2,tz);scene.add(trunk);
     var lr=2+Math.random()*2;
-    var leaves=new THREE.Mesh(new THREE.SphereGeometry(lr,6,5),new THREE.MeshLambertMaterial({color:0x0a5515+Math.floor(Math.random()*0x115511)}));
+    var leaves=new THREE.Mesh(new THREE.SphereGeometry(lr,6,5),new THREE.MeshLambertMaterial({color:0x1a5a15+Math.floor(Math.random()*0x102a0a)}));
     leaves.position.set(tx,th+lr*.4,tz);leaves.scale.y=.5+Math.random()*.3;scene.add(leaves);
     if(Math.random()<.4){
       var lr2=1.5+Math.random()*1.2;
-      var leaves2=new THREE.Mesh(new THREE.SphereGeometry(lr2,5,4),new THREE.MeshLambertMaterial({color:0x117722+Math.floor(Math.random()*0x114400)}));
+      var leaves2=new THREE.Mesh(new THREE.SphereGeometry(lr2,5,4),new THREE.MeshLambertMaterial({color:0x2a6a20+Math.floor(Math.random()*0x103a08)}));
       leaves2.position.set(tx+Math.random()-.5,th+lr*.2,tz+Math.random()-.5);leaves2.scale.y=.5;scene.add(leaves2);
     }
   }
