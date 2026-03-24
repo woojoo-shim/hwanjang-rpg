@@ -916,7 +916,7 @@ function buildMeadow(){
   }
   /* ★ 엘리트: 황금 사슴왕 */
   var es=MONSTER_DEFS.find(function(x){return x.id==='elite_stag';});
-  if(es)spawnMonster(es,MX,MZ,scene);
+  if(es)spawnMonster(es,MX+150,MZ-150,scene);
 }
 
 function buildSwamp(){
@@ -1178,7 +1178,7 @@ function buildSwamp(){
   }
   /* ★ 엘리트: 독왕 두꺼비 */
   var et=MONSTER_DEFS.find(function(x){return x.id==='elite_toad';});
-  if(et)spawnMonster(et,SX,SZ,scene);
+  if(et)spawnMonster(et,SX-120,SZ+120,scene);
 }
 
 function buildDarkForest(){
@@ -1625,7 +1625,7 @@ function buildDarkForest(){
   }
   /* ★ 엘리트: 늑대 대장 */
   var ew=MONSTER_DEFS.find(function(x){return x.id==='elite_wolf';});
-  if(ew)spawnMonster(ew,DFX,DFZ,scene);
+  if(ew)spawnMonster(ew,DFX-130,DFZ+130,scene);
 }
 
 function buildJungle(){
@@ -1693,7 +1693,7 @@ function buildJungle(){
   _jSpawn(sp,15);_jSpawn(sn,15);_jSpawn(ap,12);_jSpawn(pt,10);_jSpawn(mq,12);_jSpawn(tr,8);
   /* ★ 엘리트: 정글의 왕 */
   var ea=MONSTER_DEFS.find(function(x){return x.id==='elite_ape';});
-  if(ea)spawnMonster(ea,JX,JZ,scene);
+  if(ea)spawnMonster(ea,JX+140,JZ+120,scene);
 
   /* ── 고대 사원 폐허 ── */
   (function(){
