@@ -13,6 +13,11 @@ var npcs=[];
 var portalMeshes=[];
 var closestPortal=null;
 
+/* ── 심플 노이즈 (버텍스 변위용) ── */
+function simpleNoise(x,z){
+  return Math.sin(x*0.03)*Math.cos(z*0.04)*3 + Math.sin(x*0.08+z*0.06)*1.5 + Math.cos(z*0.02)*2;
+}
+
 /* ── 포스트프로세싱 컴포저 (bloom) ── */
 var composer=null;
 
@@ -27,22 +32,13 @@ var waterMeshes=[];
 var riverUVOffset=0;
 
 /* ── 지형 높이 헬퍼 ── */
-/* 특정 x,z가 언덕 위인지 체크 (부드러운 높이 반환) */
+/* simpleNoise 기반 — 버텍스 변위와 동일한 함수 사용 */
 function getTerrainY(x,z){
-  /* 언덕 목록 [cx, cz, radius, height] — buildHills 에서 채움 */
-  var h=0;
-  if(typeof TERRAIN_HILLS==='undefined')return 0;
-  for(var i=0;i<TERRAIN_HILLS.length;i++){
-    var hill=TERRAIN_HILLS[i];
-    var dx=x-hill[0],dz=z-hill[1];
-    var d=Math.sqrt(dx*dx+dz*dz);
-    if(d<hill[2]){
-      var t=1-d/hill[2];
-      h+=hill[3]*t*t;
-    }
-  }
-  return h;
+  /* 마을 구역 (z < 22) 은 평탄하게 유지 */
+  if(z<22)return 0;
+  return simpleNoise(x,z);
 }
+/* TERRAIN_HILLS 호환성용 빈 배열 (더 이상 사용 안 함) */
 var TERRAIN_HILLS=[];
 
 function mkHuman(bc,hc){
@@ -357,158 +353,110 @@ function buildOcean(){
   sandW.rotation.x=-Math.PI/2;sandW.position.set(-640,-.1,1280);scene.add(sandW);
 }
 
+/* ════════════ 버텍스 변위 지면 헬퍼 ════════════ */
+/* PlaneGeometry(w,h,segW,segH) — rotation.x=-PI/2 후 버텍스 Y 변위 적용 */
+/* PlaneGeometry 버텍스: 로컬 x→월드 x, 로컬 y→월드 -z (회전 전) */
+/* offX, offZ: 이 플레인의 월드 중심 좌표 */
+function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
+  var geo=new THREE.PlaneGeometry(w,h,segW,segH);
+  var pos=geo.attributes.position;
+  for(var vi=0;vi<pos.count;vi++){
+    var lx=pos.getX(vi);  /* 로컬 x → 월드 x (평면 회전 후) */
+    var ly=pos.getY(vi);  /* 로컬 y → 월드 -z (rotation.x=-PI/2 이후) */
+    var wx=lx+worldCX;
+    var wz=-ly+worldCZ;   /* 부호 반전: PlaneGeometry Y축이 Z축으로 매핑 */
+    var dy=simpleNoise(wx,wz);
+    pos.setZ(vi,dy);      /* 로컬 z → 회전 후 월드 y (높이) */
+  }
+  geo.computeVertexNormals();
+  var mat=new THREE.MeshLambertMaterial({color:color});
+  var mesh=new THREE.Mesh(geo,mat);
+  mesh.rotation.x=-Math.PI/2;
+  mesh.position.set(worldCX,worldCY,worldCZ);
+  mesh.receiveShadow=true;
+  scene.add(mesh);
+  return mesh;
+}
+
 /* ════════════ 바이옴 지면 빌드 (3x 확장) ════════════ */
 function buildGroundPlanes(){
-  /* 기본 바닥 — 전체 월드 (3x) */
+  /* 기본 바닥 딥 — 전체 월드 (평탄, 그림자 받는 베이스) */
   var baseGndDeep=new THREE.Mesh(new THREE.PlaneGeometry(1260,2730),new THREE.MeshLambertMaterial({color:0x1a3a0e}));
   baseGndDeep.rotation.x=-Math.PI/2;baseGndDeep.position.set(0,-.04,1270);scene.add(baseGndDeep);
 
-  var baseGnd=new THREE.Mesh(new THREE.PlaneGeometry(1260,2730),new THREE.MeshLambertMaterial({color:0x2a5a1a}));
-  baseGnd.rotation.x=-Math.PI/2;baseGnd.position.set(0,0,1270);baseGnd.receiveShadow=true;scene.add(baseGnd);
-
-  /* 바이옴별 컬러 오버레이 (y=0.01) */
-  /* 마을: x:-22~22, z:-32~20 */
+  /* 마을: 평탄하게 유지 (건물이 올라가야 함) x:-22~22, z:-32~20 */
   var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshLambertMaterial({color:0x2a5a1a}));
   villGnd.rotation.x=-Math.PI/2;villGnd.position.set(0,.01,-6);villGnd.receiveShadow=true;scene.add(villGnd);
 
-  /* 초원: x:-240~240, z:20~900 — 밝은 녹색 */
-  var meadGnd=new THREE.Mesh(new THREE.PlaneGeometry(480,880),new THREE.MeshLambertMaterial({color:0x3a7a1a}));
-  meadGnd.rotation.x=-Math.PI/2;meadGnd.position.set(0,.01,460);meadGnd.receiveShadow=true;scene.add(meadGnd);
+  /* 초원: 버텍스 변위 적용 x:-240~240, z:20~900 — 밝은 녹색 */
+  makeDisplacedGround(480,880,64,64,0x3a7a1a, 0,0.01,460);
 
   /* 늪 서쪽: x:-600~-240, z:20~900 */
-  var swWGnd=new THREE.Mesh(new THREE.PlaneGeometry(360,880),new THREE.MeshLambertMaterial({color:0x1a3a0a}));
-  swWGnd.rotation.x=-Math.PI/2;swWGnd.position.set(-420,.01,460);swWGnd.receiveShadow=true;scene.add(swWGnd);
+  makeDisplacedGround(360,880,48,64,0x1a3a0a, -420,0.01,460);
 
   /* 늪 동쪽: x:240~600, z:20~900 */
-  var swEGnd=new THREE.Mesh(new THREE.PlaneGeometry(360,880),new THREE.MeshLambertMaterial({color:0x1a3a0a}));
-  swEGnd.rotation.x=-Math.PI/2;swEGnd.position.set(420,.01,460);swEGnd.receiveShadow=true;scene.add(swEGnd);
+  makeDisplacedGround(360,880,48,64,0x1a3a0a, 420,0.01,460);
 
   /* 어두운 숲: x:-360~360, z:900~1680 */
-  var dkGnd=new THREE.Mesh(new THREE.PlaneGeometry(720,780),new THREE.MeshLambertMaterial({color:0x0a1a08}));
-  dkGnd.rotation.x=-Math.PI/2;dkGnd.position.set(0,.01,1290);dkGnd.receiveShadow=true;scene.add(dkGnd);
+  makeDisplacedGround(720,780,64,64,0x0a1a08, 0,0.01,1290);
 
   /* 정글: x:240~600, z:900~1680 */
-  var jgGnd=new THREE.Mesh(new THREE.PlaneGeometry(360,780),new THREE.MeshLambertMaterial({color:0x0a2a0a}));
-  jgGnd.rotation.x=-Math.PI/2;jgGnd.position.set(420,.01,1290);jgGnd.receiveShadow=true;scene.add(jgGnd);
+  makeDisplacedGround(360,780,48,64,0x0a2a0a, 420,0.01,1290);
 
   /* 화산: x:-300~300, z:1680~2600 */
-  var vlGnd=new THREE.Mesh(new THREE.PlaneGeometry(600,920),new THREE.MeshLambertMaterial({color:0x1a0a05}));
-  vlGnd.rotation.x=-Math.PI/2;vlGnd.position.set(0,.01,2140);vlGnd.receiveShadow=true;scene.add(vlGnd);
+  makeDisplacedGround(600,920,48,64,0x1a0a05, 0,0.01,2140);
 
-  /* ── 바이옴 전환 스트립 ── */
+  /* ── 바이옴 전환 스트립 (평탄) ── */
   var trans1M=new THREE.MeshLambertMaterial({color:0x305a18});
   var trans2M=new THREE.MeshLambertMaterial({color:0x152a0c});
   var trans3M=new THREE.MeshLambertMaterial({color:0x120a04});
-  /* 마을-초원 (z=18~22) */
+  /* 마을-초원 */
   var t1=new THREE.Mesh(new THREE.PlaneGeometry(480,8),trans1M);t1.rotation.x=-Math.PI/2;t1.position.set(0,.012,20);scene.add(t1);
-  /* 초원-숲 (z=898~902) */
+  /* 초원-숲 */
   var t2=new THREE.Mesh(new THREE.PlaneGeometry(720,8),trans2M);t2.rotation.x=-Math.PI/2;t2.position.set(0,.012,900);scene.add(t2);
-  /* 숲-화산 (z=1678~1682) */
+  /* 숲-화산 */
   var t3=new THREE.Mesh(new THREE.PlaneGeometry(720,8),trans3M);t3.rotation.x=-Math.PI/2;t3.position.set(0,.012,1680);scene.add(t3);
-  /* 초원-늪 좌 (x=-242~-238) */
+  /* 초원-늪 좌우 */
   var t4=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x285018}));t4.rotation.x=-Math.PI/2;t4.position.set(-240,.012,460);scene.add(t4);
-  /* 초원-늪 우 (x=238~242) */
   var t5=new THREE.Mesh(new THREE.PlaneGeometry(8,880),new THREE.MeshLambertMaterial({color:0x285018}));t5.rotation.x=-Math.PI/2;t5.position.set(240,.012,460);scene.add(t5);
 }
 
-/* ════════════ 지형 언덕 + 산맥 빌드 ════════════ */
-function buildHills(){
-  var hillM=new THREE.MeshLambertMaterial({color:0x3a6a22});
-  var hillDarkM=new THREE.MeshLambertMaterial({color:0x2a5a18});
+/* ════════════ 경계 산맥 빌드 (시각적 장벽) ════════════ */
+/* 구체 언덕 제거 — 버텍스 변위 지면으로 대체됨 */
+/* 산맥 원뿔(ConeGeometry)은 유지 — 경계 역할 */
+function buildBorderMountains(){
   var mountainM=new THREE.MeshLambertMaterial({color:0x556044});
   var mountainPeakM=new THREE.MeshLambertMaterial({color:0x8a9080});
   var snowM=new THREE.MeshLambertMaterial({color:0xeeeeff});
-  var rockM=new THREE.MeshLambertMaterial({color:0x6a6050});
 
-  /* ── 초원 구릉 (z:20~900) — 높이 대폭 증가 ── */
-  var meadowHillDefs=[
-    [-120,150,55,18],[-200,300,50,15],[100,250,45,14],
-    [-70,420,65,22],[140,500,50,16],[-170,620,55,20],
-    [80,700,48,15],[-100,820,52,17],[180,380,42,13],
-    [-140,550,44,14],[50,680,50,16],[-200,750,40,12],
-    [200,150,60,20],[-250,450,48,15],[250,650,55,18],
-    [-30,200,70,25],[160,850,45,14],[-280,700,50,16]
-  ];
-  meadowHillDefs.forEach(function(hd){
-    TERRAIN_HILLS.push(hd);
-    /* 구릉 본체 — 납작한 구체 반구 */
-    var hill=new THREE.Mesh(new THREE.SphereGeometry(hd[2],16,8),hillM);
-    hill.scale.set(1,hd[3]/hd[2],1);
-    hill.position.set(hd[0],hd[3]*.5,hd[1]);
-    hill.castShadow=true;hill.receiveShadow=true;scene.add(hill);
-    /* 언덕 위 짙은 풀 */
-    var grassTop=new THREE.Mesh(new THREE.SphereGeometry(hd[2]*.6,12,6),hillDarkM);
-    grassTop.scale.set(1,hd[3]/hd[2]*.5,1);
-    grassTop.position.set(hd[0],hd[3]*.9,hd[1]);
-    scene.add(grassTop);
-  });
-
-  /* ── 초원 변두리 작은 돌덩이 (지면 울퉁불퉁) ── */
-  for(var bi=0;bi<30;bi++){
-    var bx=(Math.random()-.5)*420,bz=30+Math.random()*860;
-    if(Math.abs(bx)<50)continue;/* 중앙 길 비우기 */
-    var bs=0.5+Math.random()*1.5;
-    var bump=new THREE.Mesh(new THREE.SphereGeometry(bs,8,5),rockM);
-    bump.scale.set(1+Math.random()*.5,0.2+Math.random()*.2,1+Math.random()*.5);
-    bump.position.set(bx,bs*.1,bz);
-    bump.castShadow=true;bump.receiveShadow=true;scene.add(bump);
-  }
-
-  /* ── 초원 경계 산맥 (동서 양쪽 경계) ── */
-  /* 서쪽 산맥 x:-580~-440, z:50~900 */
-  /* 동쪽 산맥 x:440~580, z:50~900 */
+  /* 초원 경계 산맥 (동서 양쪽) */
   [[-510,120],[-550,280],[-520,450],[-490,600],[-540,780],
    [510,120],[550,280],[520,450],[490,600],[540,780]
   ].forEach(function(mp){
     var mh=35+Math.random()*25;
     var mr=30+Math.random()*18;
-    /* 산 기반 원뿔 */
     var mtBase=new THREE.Mesh(new THREE.ConeGeometry(mr,mh,8),mountainM);
     mtBase.position.set(mp[0],mh/2,mp[1]);mtBase.castShadow=true;mtBase.receiveShadow=true;scene.add(mtBase);
-    /* 산 정상 */
     var mtPeak=new THREE.Mesh(new THREE.ConeGeometry(mr*.35,mh*.4,6),mountainPeakM);
     mtPeak.position.set(mp[0],mh*.85,mp[1]);mtPeak.castShadow=true;scene.add(mtPeak);
-    /* 눈 덮인 봉우리 (높은 산만) */
     if(mh>24){
       var snow=new THREE.Mesh(new THREE.ConeGeometry(mr*.2,mh*.22,5),snowM);
       snow.position.set(mp[0],mh*1.02,mp[1]);snow.castShadow=true;scene.add(snow);
     }
   });
 
-  /* ── 어두운 숲 구릉 (z:900~1680) — 높이 대폭 증가 ── */
-  var darkHillDefs=[
-    [-100,1000,55,20],[-200,1150,60,22],
-    [90,1200,50,18],[140,1380,55,20],
-    [-120,1500,52,19],[180,1600,45,16],
-    [0,1050,40,15],[-170,1300,48,17],
-    [220,1100,50,18],[-250,1450,55,20],
-    [50,1550,45,16],[-80,1650,50,18]
-  ];
-  var darkHillM=new THREE.MeshLambertMaterial({color:0x101a08});
-  darkHillDefs.forEach(function(hd){
-    TERRAIN_HILLS.push(hd);
-    var hill=new THREE.Mesh(new THREE.SphereGeometry(hd[2],14,8),darkHillM);
-    hill.scale.set(1,hd[3]/hd[2],1);
-    hill.position.set(hd[0],hd[3]*.5,hd[1]);
-    hill.castShadow=true;hill.receiveShadow=true;scene.add(hill);
-  });
-
-  /* ── 화산 지대 산맥 (z:1680~2600) ── */
+  /* 화산 지대 산맥 (z:1680~2600) */
   var volcanoMountainM=new THREE.MeshLambertMaterial({color:0x1a0a04});
-  var lavaVentM=new THREE.MeshLambertMaterial({color:0xff3300,transparent:true,opacity:.7});
   [
     [-200,1800,40,30],[-280,2000,48,38],[150,1900,36,28],
     [240,2100,44,34],[-180,2200,38,30],[0,1750,50,42],
     [200,2350,42,32],[-240,2400,46,36],[80,2500,38,28]
   ].forEach(function(vp){
-    /* 화산 원뿔 */
     var vc=new THREE.Mesh(new THREE.ConeGeometry(vp[2],vp[3],8),volcanoMountainM);
     vc.position.set(vp[0],vp[3]/2,vp[1]);vc.castShadow=true;vc.receiveShadow=true;scene.add(vc);
-    /* 분화구 (원뿔 위 오목한 구체) */
     var craterM=new THREE.MeshLambertMaterial({color:0x0a0404});
     var crater=new THREE.Mesh(new THREE.CylinderGeometry(vp[2]*.25,vp[2]*.3,vp[3]*.08,8),craterM);
     crater.position.set(vp[0],vp[3]*.95,vp[1]);scene.add(crater);
-    /* 용암 빛 */
     if(Math.random()<.5){
       var lavaGlow=new THREE.PointLight(0xff3300,.8,vp[2]*1.5);
       lavaGlow.position.set(vp[0],vp[3]*.9,vp[1]);scene.add(lavaGlow);
@@ -734,11 +682,11 @@ function initScene(){
   /* 바다/해양 경계 (지면보다 먼저 렌더) */
   buildOcean();
 
-  /* 바이옴 지면 */
+  /* 바이옴 지면 (버텍스 변위 적용) */
   buildGroundPlanes();
 
-  /* 지형 언덕 + 산맥 */
-  buildHills();
+  /* 경계 산맥 (원뿔 — 시각적 장벽) */
+  buildBorderMountains();
 
   /* 마을 건물/NPC */
   buildVillage();
