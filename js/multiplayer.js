@@ -145,13 +145,14 @@ var _lastSentX=0,_lastSentZ=0,_lastSentRy=0,_lastSentMoving=false;
 function sendPosition(){
   if(!ws||ws.readyState!==1||!PL.group)return;
   var x=+PL.group.position.x.toFixed(2);
+  var y=+PL.group.position.y.toFixed(2);
   var z=+PL.group.position.z.toFixed(2);
   var ry=+PL.group.rotation.y.toFixed(2);
   var mv=!!(keys['w']||keys['s']||keys['a']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright']);
   /* 변화 없으면 안 보냄 */
   if(x===_lastSentX&&z===_lastSentZ&&ry===_lastSentRy&&mv===_lastSentMoving)return;
   _lastSentX=x;_lastSentZ=z;_lastSentRy=ry;_lastSentMoving=mv;
-  ws.send(JSON.stringify({type:'move',x:x,z:z,ry:ry,moving:mv}));
+  ws.send(JSON.stringify({type:'move',x:x,y:y,z:z,ry:ry,moving:mv}));
 }
 
 function onMpMessage(data){
@@ -169,7 +170,7 @@ function onMpMessage(data){
   else if(data.type==='move'){
     var r=remotePlayers[data.id];
     if(!r)return;
-    r.tx=data.x;r.tz=data.z;r.try_=data.ry;r.moving=data.moving;
+    r.tx=data.x;r.ty=(data.y!==undefined?data.y:0);r.tz=data.z;r.try_=data.ry;r.moving=data.moving;
   }
   else if(data.type==='chat'){
     addChat('plr',data.name,data.text);
@@ -330,7 +331,7 @@ function spawnRemote(id,name,level,x,z,ry){
     group:h.group,legL:h.legL,legR:h.legR,
     armL:h.armL,armRPivot:h.armRPivot,
     nameEl:ne,
-    tx:x,tz:z,try_:ry||0,
+    tx:x,ty:0,tz:z,try_:ry||0,
     bobT:0,moving:false,
     atkPhase:0,atkTimer:0
   };
@@ -360,6 +361,8 @@ function updateRemotePlayers(dt){
     if(dRot<-Math.PI)dRot+=Math.PI*2;
     r.group.rotation.y+=dRot*0.1;
 
+    var baseY=(r.ty||0);
+    r.group.position.y+=(baseY-r.group.position.y)*0.15;
     if(r.moving){
       r.bobT+=dt*9;
       var wa=0.32;
@@ -367,12 +370,10 @@ function updateRemotePlayers(dt){
       r.legR.rotation.x=-Math.sin(r.bobT)*wa;
       r.armL.rotation.x=-Math.sin(r.bobT)*wa*0.5;
       if(r.atkPhase===0)r.armRPivot.rotation.x=Math.sin(r.bobT)*wa*0.5;
-      r.group.position.y=Math.abs(Math.sin(r.bobT))*0.06;
     }else{
       r.legL.rotation.x*=0.8;r.legR.rotation.x*=0.8;
       r.armL.rotation.x*=0.8;
       if(r.atkPhase===0)r.armRPivot.rotation.x*=0.8;
-      r.group.position.y*=0.8;
     }
 
     if(r.atkPhase>0){

@@ -813,7 +813,7 @@ function addEliteEffects(g,def){
 function spawnMonster(def,x,z,parent){
   var mesh=mkMonsterMesh(def);
   if(def.elite){mesh.scale.set(1.8,1.8,1.8);addEliteEffects(mesh,def);}
-  var _spawnBaseY=(z>22)?simpleNoise(x,z):0;
+  var _spawnBaseY=(typeof getTerrainY==='function')?getTerrainY(x,z):0;
   mesh.position.set(x,_spawnBaseY,z);
   mesh.rotation.y=Math.random()*Math.PI*2;
   var p=parent||scene;
@@ -2125,6 +2125,8 @@ function updMonsters(dt,t){
   monsters.forEach(function(m,mIdx){
     if(m.state==='dead')return;
     var mx=m.mesh.position.x,mz=m.mesh.position.z;
+    /* 이동 중 지형 높이 업데이트 */
+    if(typeof getTerrainY==='function')m.baseY=getTerrainY(mx,mz);
     var distToLocal=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
 
     /* 호스트: 모든 플레이어 중 가장 가까운 대상 찾기 */
