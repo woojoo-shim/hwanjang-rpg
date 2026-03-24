@@ -181,10 +181,8 @@ function setupInput(){
     var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin');
     if(k==='e'&&!isInput){
       e.preventDefault();
-      /* 건물 입장 우선 체크 */
-      if(typeof tryEnterBuilding==='function'&&nearestDoor&&!closestNpc){
-        tryEnterBuilding();
-      }else if(insideBuilding){
+      /* 건물 내부 → 나가기 최우선 */
+      if(typeof insideBuilding!=='undefined'&&insideBuilding){
         exitBuilding();
       }else if(closestNpc&&!document.getElementById('dbox').classList.contains('show')){
         talk(closestNpc);
