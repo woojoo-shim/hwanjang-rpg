@@ -225,9 +225,11 @@ function mkStonePath(parent){
   }
   var smooth=lerpPath(cp,20);
   for(var pi=0;pi<smooth.length;pi++){
+    var _px=smooth[pi][0],_pz=smooth[pi][1];
+    var _py=(_pz>22?simpleNoise(_px,_pz):0)+.08;
     var disc=new THREE.Mesh(new THREE.CircleGeometry(5,32),pathM);
     disc.rotation.x=-Math.PI/2;
-    disc.position.set(smooth[pi][0],.05,smooth[pi][1]);
+    disc.position.set(_px,_py,_pz);
     p.add(disc);
   }
   /* 갈림길 — 더 멀리 뻗도록 (x: ±240까지) */
@@ -236,8 +238,10 @@ function mkStonePath(parent){
   [forkE,forkW].forEach(function(pts){
     var sm=lerpPath(pts,12);
     for(var fi=0;fi<sm.length;fi++){
+      var _fx=sm[fi][0],_fz=sm[fi][1];
+      var _fy=(_fz>22?simpleNoise(_fx,_fz):0)+.08;
       var fd=new THREE.Mesh(new THREE.CircleGeometry(4,32),pathM);
-      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.05,sm[fi][1]);
+      fd.rotation.x=-Math.PI/2;fd.position.set(_fx,_fy,_fz);
       p.add(fd);
     }
   });
