@@ -718,8 +718,9 @@ function handleMove(dt){
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     /* 건물 내부에서는 벽 안으로 제한 */
     if(typeof insideBuilding!=='undefined'&&insideBuilding){
-      if(nx>-9&&nx<9)PL.group.position.x=nx;
-      if(nz>-9&&nz<9)PL.group.position.z=nz;
+      var _iw=insideBuilding==='모험가 길드'?14:9;
+      if(nx>-_iw&&nx<_iw)PL.group.position.x=nx;
+      if(nz>-_iw&&nz<_iw)PL.group.position.z=nz;
     }else{
       var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
       var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;

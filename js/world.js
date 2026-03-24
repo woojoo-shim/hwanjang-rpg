@@ -128,8 +128,34 @@ function exitBuilding(){
   },600);
 }
 
+/* 실내 NPC 생성 헬퍼 */
+function mkInteriorNpc(nx,nz,baseY,bodyColor,npcName){
+  var g=new THREE.Group();
+  /* 몸 */
+  var body=new THREE.Mesh(new THREE.BoxGeometry(.8,1.2,.5),new THREE.MeshLambertMaterial({color:bodyColor}));
+  body.position.y=.6;g.add(body);
+  /* 머리 */
+  var head=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.6),new THREE.MeshLambertMaterial({color:0xf5d4a0}));
+  head.position.y=1.5;g.add(head);
+  g.position.set(nx,baseY,nz);
+  scene.add(g);
+  /* 이름표 */
+  var label=document.createElement('div');
+  label.className='nlabel';
+  label.textContent=npcName;
+  label.style.color='#ffcc44';
+  label.style.fontSize='11px';
+  document.getElementById('cc').appendChild(label);
+  /* 라벨 업데이트용 저장 */
+  if(!window._interiorNpcs)window._interiorNpcs=[];
+  window._interiorNpcs.push({group:g,label:label,baseY:baseY});
+  return g;
+}
+
 function buildInterior(name,baseY){
-  var W=20,D=20,H=6;
+  var W=(name==='모험가 길드')?30:20;
+  var D=(name==='모험가 길드')?30:20;
+  var H=6;
   /* ── 바닥 (단일 평면) ── */
   var floorM=new THREE.MeshLambertMaterial({color:0xb08858});
   var floor=new THREE.Mesh(new THREE.PlaneGeometry(W,D),floorM);
@@ -199,6 +225,8 @@ function buildInterior(name,baseY){
     /* 화로 (벽난로) */
     var fireplace=new THREE.Mesh(new THREE.BoxGeometry(3,3,.5),new THREE.MeshLambertMaterial({color:0x555555}));fireplace.position.set(0,baseY+1.5,-9.8);scene.add(fireplace);
     var fireLight=new THREE.PointLight(0xff6622,.8,10);fireLight.position.set(0,baseY+1,-9);scene.add(fireLight);
+    /* 여관 주인 NPC */
+    mkInteriorNpc(5,baseY,-6,0xaa5533,'(여관주인) 마리아');
   }else if(name==='무기 상점'){
     /* 벽 진열대 (북쪽 벽) */
     var rackM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
@@ -219,6 +247,8 @@ function buildInterior(name,baseY){
     for(var shi=0;shi<3;shi++){
       var shield=new THREE.Mesh(new THREE.CircleGeometry(.8,6),shieldM);shield.rotation.y=Math.PI/2;shield.position.set(-9.7,baseY+2.5,-5+shi*4);scene.add(shield);
     }
+    /* 무기 상인 NPC */
+    mkInteriorNpc(0,baseY,1,0x6a4a2a,'(무기상인) 발두르');
   }else if(name==='도서관'){
     /* 책장 (북쪽+동쪽+서쪽 벽) */
     var shelfM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
@@ -238,24 +268,49 @@ function buildInterior(name,baseY){
     var candleM=new THREE.MeshLambertMaterial({color:0xeeeeaa});
     var candle=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,.5,8),candleM);candle.position.set(0,baseY+1.55,0);scene.add(candle);
     var candleLight=new THREE.PointLight(0xffcc44,.5,8);candleLight.position.set(0,baseY+2,0);scene.add(candleLight);
+    /* 사서 NPC */
+    mkInteriorNpc(-3,baseY,-5,0x4a5a8a,'(사서) 엘리노어');
   }else if(name==='모험가 길드'){
     /* 게시판 (북쪽 벽 대형) */
     var boardM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
-    var board=new THREE.Mesh(new THREE.BoxGeometry(10,5,.3),boardM);board.position.set(0,baseY+3,-9.7);scene.add(board);
+    var board=new THREE.Mesh(new THREE.BoxGeometry(16,6,.3),boardM);board.position.set(0,baseY+3.5,-14.7);scene.add(board);
     /* 퀘스트 종이 */
     var paperM=new THREE.MeshLambertMaterial({color:0xeeddbb});
-    for(var qi=0;qi<12;qi++){
+    for(var qi=0;qi<20;qi++){
       var paper=new THREE.Mesh(new THREE.PlaneGeometry(.7,.9),paperM);
-      paper.position.set(-4+Math.random()*8,baseY+1.5+Math.random()*3,-9.5);scene.add(paper);
+      paper.position.set(-6+Math.random()*12,baseY+1.5+Math.random()*4,-14.5);scene.add(paper);
     }
-    /* 긴 테이블 */
-    var guildTable=new THREE.Mesh(new THREE.BoxGeometry(14,.12,3),woodM);guildTable.position.set(0,baseY+1,3);scene.add(guildTable);
-    /* 벤치 양쪽 */
+    /* 긴 테이블 2개 */
+    var guildTable1=new THREE.Mesh(new THREE.BoxGeometry(18,.12,3),woodM);guildTable1.position.set(0,baseY+1,3);scene.add(guildTable1);
+    var guildTable2=new THREE.Mesh(new THREE.BoxGeometry(18,.12,3),woodM);guildTable2.position.set(0,baseY+1,-5);scene.add(guildTable2);
+    /* 벤치 */
     var benchM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
-    var bench1=new THREE.Mesh(new THREE.BoxGeometry(12,.5,.6),benchM);bench1.position.set(0,baseY+.5,1);scene.add(bench1);
-    var bench2=new THREE.Mesh(new THREE.BoxGeometry(12,.5,.6),benchM);bench2.position.set(0,baseY+.5,5);scene.add(bench2);
+    [1.5,4.5,-3.5,-6.5].forEach(function(bz){
+      var bench=new THREE.Mesh(new THREE.BoxGeometry(16,.5,.6),benchM);bench.position.set(0,baseY+.5,bz);scene.add(bench);
+    });
     /* 접수 카운터 (서쪽) */
-    var gCounter=new THREE.Mesh(new THREE.BoxGeometry(2,1.2,6),woodM);gCounter.position.set(-8,baseY+.6,-3);scene.add(gCounter);
+    var gCounter=new THREE.Mesh(new THREE.BoxGeometry(2.5,1.2,10),woodM);gCounter.position.set(-12,baseY+.6,-3);scene.add(gCounter);
+    /* 트로피/배너 (동쪽 벽) */
+    var bannerM=new THREE.MeshLambertMaterial({color:0xcc2222});
+    for(var bni=0;bni<3;bni++){
+      var banner=new THREE.Mesh(new THREE.PlaneGeometry(2,4),bannerM);
+      banner.rotation.y=-Math.PI/2;banner.position.set(14.7,baseY+3.5,-8+bni*8);scene.add(banner);
+    }
+    /* 길드 마스터 NPC */
+    mkInteriorNpc(-12,baseY,-3,0x7a3a1a,'(길드마스터) 아르투스');
+    /* 접수원 NPC */
+    mkInteriorNpc(-12,baseY,3,0x5a8a5a,'(접수원) 리나');
+  }else if(name==='방어구 상점'){
+    /* 방어구 진열 */
+    var armorM=new THREE.MeshLambertMaterial({color:0x888888});
+    for(var ai=0;ai<4;ai++){
+      var stand=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,1.5,8),woodM);stand.position.set(-5+ai*3.5,baseY+.75,-7);scene.add(stand);
+      var armor=new THREE.Mesh(new THREE.BoxGeometry(1,1.5,.4),armorM);armor.position.set(-5+ai*3.5,baseY+2.2,-7);scene.add(armor);
+    }
+    /* 카운터 */
+    var aC=new THREE.Mesh(new THREE.BoxGeometry(8,1,2),woodM);aC.position.set(0,baseY+.5,3);scene.add(aC);
+    /* 방어구 상인 NPC */
+    mkInteriorNpc(0,baseY,1,0x5a5a7a,'(방어구상인) 헥토르');
   }else{
     /* 기본 내부 */
     var defTable=new THREE.Mesh(new THREE.BoxGeometry(4,.1,3),woodM);defTable.position.set(0,baseY+1,0);scene.add(defTable);
@@ -1146,6 +1201,23 @@ function updNpcs(t){
     var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
     if(Math.sqrt(dx*dx+dz*dz)<10){var tr=Math.atan2(dx,dz);n.mesh.rotation.y+=(tr-n.mesh.rotation.y)*.04;}
   });
+  /* 내부 NPC 라벨 업데이트 */
+  if(window._interiorNpcs&&insideBuilding){
+    window._interiorNpcs.forEach(function(in_){
+      var pos=in_.group.position.clone();
+      pos.y+=2.2;
+      pos.project(camera);
+      var cc=document.getElementById('cc');
+      if(cc){
+        var hw=cc.clientWidth/2,hh=cc.clientHeight/2;
+        in_.label.style.left=(pos.x*hw+hw)+'px';
+        in_.label.style.top=(-pos.y*hh+hh)+'px';
+        in_.label.style.display=insideBuilding?'block':'none';
+      }
+    });
+  }else if(window._interiorNpcs){
+    window._interiorNpcs.forEach(function(in_){in_.label.style.display='none';});
+  }
 }
 
 /* ════════════ LOD (거리 기반 장식 표시/숨김) ════════════ */
