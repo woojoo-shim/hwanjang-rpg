@@ -2125,8 +2125,11 @@ function updMonsters(dt,t){
   monsters.forEach(function(m,mIdx){
     if(m.state==='dead')return;
     var mx=m.mesh.position.x,mz=m.mesh.position.z;
-    /* 이동 중 지형 높이 업데이트 */
-    if(typeof getTerrainY==='function')m.baseY=getTerrainY(mx,mz);
+    /* 이동 중 지형 높이 업데이트 — 매 프레임 강제 적용 */
+    if(typeof getTerrainY==='function'){
+      m.baseY=getTerrainY(mx,mz);
+      m.mesh.position.y=m.baseY;
+    }
     var distToLocal=Math.sqrt((px-mx)*(px-mx)+(pz-mz)*(pz-mz));
 
     /* 호스트: 모든 플레이어 중 가장 가까운 대상 찾기 */
