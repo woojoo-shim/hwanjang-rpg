@@ -37,7 +37,7 @@ function checkBuildingDoors(){
   for(var i=0;i<BUILDING_DOORS.length;i++){
     var d=BUILDING_DOORS[i];
     var dx=px-d.x,dz=pz-d.z;
-    if(dx*dx+dz*dz<4){/* 반경 2 이내 */
+    if(dx*dx+dz*dz<9){/* 반경 3 이내 */
       enterBuilding(d);
       return;
     }
@@ -685,12 +685,12 @@ function buildBorderMountains(){
 function buildVillage(){
   var VX=-350,VZ=-350; /* 마을 중심 */
 
-  /* ── 건물 문 등록 (문 앞 좌표) ── */
-  registerDoor(VX-38, VZ-10, '여관');
-  registerDoor(VX+38, VZ-10, '무기 상점');
-  registerDoor(VX+38, VZ-32, '방어구 상점');
-  registerDoor(VX+50, VZ+16, '도서관');
-  registerDoor(VX-8,  VZ-66, '모험가 길드');
+  /* ── 건물 문 등록 (건물 정면 바깥 좌표) ── */
+  registerDoor(VX-38, VZ-8,  '여관');       /* 여관 남쪽 앞 */
+  registerDoor(VX+38, VZ-8,  '무기 상점');  /* 무기상점 남쪽 앞 */
+  registerDoor(VX+38, VZ-30, '방어구 상점');/* 방어구 남쪽 앞 */
+  registerDoor(VX+50, VZ+20, '도서관');     /* 도서관 남쪽 앞 */
+  registerDoor(VX-8,  VZ-64, '모험가 길드');/* 길드 북쪽 앞 */
 
   /* 지면 디테일 — 확장된 영역에 더 많이 */
   scatterGroundDetail(scene,60,100,100,'grass',VX,VZ);
