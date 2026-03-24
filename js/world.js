@@ -22,7 +22,7 @@ var _savedOutdoorPos={x:0,z:0}; /* 나갈 때 복귀 위치 */
 var _interiorBuilt={}; /* 이미 내부를 빌드했는지 */
 
 function registerDoor(x,z,name){
-  BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-100-(BUILDING_DOORS.length*50)});
+  BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-500-(BUILDING_DOORS.length*80)});
 }
 
 var nearestDoor=null;
@@ -31,7 +31,7 @@ function checkBuildingDoors(){
   var px=PL.group.position.x,pz=PL.group.position.z;
   /* 건물 내부에 있을 때 — 나가기 체크 */
   if(insideBuilding){
-    if(Math.abs(px)<1.5&&pz>6){
+    if(Math.abs(px)<2&&pz>8){
       exitBuilding();
     }
     return;
@@ -112,103 +112,147 @@ function exitBuilding(){
 }
 
 function buildInterior(name,baseY){
-  var floorM=new THREE.MeshLambertMaterial({color:0x8a7050});
-  var wallM=new THREE.MeshLambertMaterial({color:0xc4a870});
-  var ceilM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
+  var W=20,D=20,H=6;
+  /* ── 바닥 (체크무늬 타일) ── */
+  var tileA=new THREE.MeshLambertMaterial({color:0xb89870});
+  var tileB=new THREE.MeshLambertMaterial({color:0xa08058});
+  for(var tx=-W/2;tx<W/2;tx+=2){
+    for(var tz=-D/2;tz<D/2;tz+=2){
+      var isA=((tx+tz)/2)%2===0;
+      var tile=new THREE.Mesh(new THREE.PlaneGeometry(2,2),isA?tileA:tileB);
+      tile.rotation.x=-Math.PI/2;tile.position.set(tx+1,baseY,tz+1);scene.add(tile);
+    }
+  }
+  /* ── 벽 (두꺼운 박스) ── */
+  var wallM=new THREE.MeshLambertMaterial({color:0xd4c4a0});
+  var wallDarkM=new THREE.MeshLambertMaterial({color:0x8a7a5a});
+  var wallThk=.4;
+  /* 북 */var wN=new THREE.Mesh(new THREE.BoxGeometry(W,H,wallThk),wallM);wN.position.set(0,baseY+H/2,-D/2);scene.add(wN);
+  /* 남 (문 구멍 — 왼쪽+오른쪽 나눠서) */
+  var wSL=new THREE.Mesh(new THREE.BoxGeometry(W/2-1.5,H,wallThk),wallM);wSL.position.set(-W/4-.75,baseY+H/2,D/2);scene.add(wSL);
+  var wSR=new THREE.Mesh(new THREE.BoxGeometry(W/2-1.5,H,wallThk),wallM);wSR.position.set(W/4+.75,baseY+H/2,D/2);scene.add(wSR);
+  var wST=new THREE.Mesh(new THREE.BoxGeometry(3,H-3,wallThk),wallM);wST.position.set(0,baseY+H-1.5,D/2);scene.add(wST);
+  /* 동서 */
+  var wE=new THREE.Mesh(new THREE.BoxGeometry(wallThk,H,D),wallM);wE.position.set(W/2,baseY+H/2,0);scene.add(wE);
+  var wW=new THREE.Mesh(new THREE.BoxGeometry(wallThk,H,D),wallM);wW.position.set(-W/2,baseY+H/2,0);scene.add(wW);
+  /* 벽 하단 띠 */
+  var trimM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
+  [[-D/2],[D/2]].forEach(function(zz){
+    var trim=new THREE.Mesh(new THREE.BoxGeometry(W,.3,wallThk+.1),trimM);trim.position.set(0,baseY+.15,zz[0]);scene.add(trim);
+  });
+  /* ── 천장 ── */
+  var ceilM=new THREE.MeshLambertMaterial({color:0x7a6a4a});
+  var ceil=new THREE.Mesh(new THREE.PlaneGeometry(W,D),ceilM);
+  ceil.rotation.x=Math.PI/2;ceil.position.set(0,baseY+H,0);scene.add(ceil);
+  /* ── 조명 (밝고 따뜻한) ── */
+  var mainLight=new THREE.PointLight(0xffcc88,1.5,30);mainLight.position.set(0,baseY+H-.5,0);scene.add(mainLight);
+  var fillL=new THREE.PointLight(0xffaa66,.4,18);fillL.position.set(-6,baseY+H-.5,-5);scene.add(fillL);
+  var fillR=new THREE.PointLight(0xffaa66,.4,18);fillR.position.set(6,baseY+H-.5,5);scene.add(fillR);
+  /* 검은색 바닥 아래 박스 (아래가 보이지 않도록) */
+  var underM=new THREE.MeshBasicMaterial({color:0x000000});
+  var under=new THREE.Mesh(new THREE.BoxGeometry(W+4,2,D+4),underM);under.position.set(0,baseY-1,0);scene.add(under);
 
-  /* 바닥 */
-  var floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),floorM);
-  floor.rotation.x=-Math.PI/2;floor.position.set(0,baseY,0);floor.receiveShadow=true;scene.add(floor);
-  /* 벽 4면 */
-  var wallGeo=new THREE.PlaneGeometry(16,5);
-  var w1=new THREE.Mesh(wallGeo,wallM);w1.position.set(0,baseY+2.5,-8);scene.add(w1);
-  var w2=new THREE.Mesh(wallGeo,wallM);w2.position.set(0,baseY+2.5,8);w2.rotation.y=Math.PI;scene.add(w2);
-  var w3=new THREE.Mesh(new THREE.PlaneGeometry(16,5),wallM);w3.rotation.y=Math.PI/2;w3.position.set(-8,baseY+2.5,0);scene.add(w3);
-  var w4=new THREE.Mesh(new THREE.PlaneGeometry(16,5),wallM);w4.rotation.y=-Math.PI/2;w4.position.set(8,baseY+2.5,0);scene.add(w4);
-  /* 천장 */
-  var ceil=new THREE.Mesh(new THREE.PlaneGeometry(16,16),ceilM);
-  ceil.rotation.x=Math.PI/2;ceil.position.set(0,baseY+5,0);scene.add(ceil);
-  /* 조명 */
-  var light=new THREE.PointLight(0xffaa44,1.2,20);light.position.set(0,baseY+4,0);scene.add(light);
-  var ambient=new THREE.AmbientLight(0x333322,.5);scene.add(ambient);
+  /* ── 나가기 매트 ── */
+  var exitM=new THREE.MeshLambertMaterial({color:0xcc3333});
+  var exitMat=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.5),exitM);
+  exitMat.rotation.x=-Math.PI/2;exitMat.position.set(0,baseY+.02,D/2-1);scene.add(exitMat);
 
-  /* 나가기 문 표시 (빨간 카펫) */
-  var exitM=new THREE.MeshLambertMaterial({color:0xaa2222});
-  var exitMat=new THREE.Mesh(new THREE.PlaneGeometry(2,2),exitM);
-  exitMat.rotation.x=-Math.PI/2;exitMat.position.set(0,baseY+.01,7);scene.add(exitMat);
-  /* 나가기 표지판 */
-  var exitLabel=document.createElement('div');
-  exitLabel.className='nlabel';exitLabel.textContent='[ 나가기 ]';exitLabel.style.color='#ff4444';
-  document.getElementById('cc').appendChild(exitLabel);
-  /* 나가기 트리거 등록 */
-  BUILDING_DOORS.push({x:0,z:7,name:'__exit__',interiorY:baseY,isExit:true,exitLabel:exitLabel});
+  /* ── 건물별 가구 ── */
+  var woodM=new THREE.MeshLambertMaterial({color:0x6a4a2a});
+  var darkWoodM=new THREE.MeshLambertMaterial({color:0x4a3018});
 
-  /* 건물별 가구 배치 */
   if(name==='여관'){
-    /* 침대 2개 */
-    var bedM=new THREE.MeshLambertMaterial({color:0x884422});
-    var blanketM=new THREE.MeshLambertMaterial({color:0xcc4444});
-    for(var bi=0;bi<2;bi++){
-      var bx=-4+bi*8;
-      var bed=new THREE.Mesh(new THREE.BoxGeometry(2.5,.4,4),bedM);bed.position.set(bx,baseY+.2,-5);scene.add(bed);
-      var blanket=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,3),blanketM);blanket.position.set(bx,baseY+.45,-5);scene.add(blanket);
-      var pillow=new THREE.Mesh(new THREE.BoxGeometry(1.2,.2,0.8),new THREE.MeshLambertMaterial({color:0xeeeeee}));pillow.position.set(bx,baseY+.5,-6.5);scene.add(pillow);
+    /* 침대 3개 (왼쪽 벽) */
+    var bedM=new THREE.MeshLambertMaterial({color:0x7a4420});
+    var blanketColors=[0xcc4444,0x4444cc,0x44cc44];
+    for(var bi=0;bi<3;bi++){
+      var bz=-7+bi*5;
+      var frame=new THREE.Mesh(new THREE.BoxGeometry(3,.5,4),bedM);frame.position.set(-7.5,baseY+.25,bz);scene.add(frame);
+      var mattress=new THREE.Mesh(new THREE.BoxGeometry(2.6,.15,3.6),new THREE.MeshLambertMaterial({color:0xeeeecc}));mattress.position.set(-7.5,baseY+.55,bz);scene.add(mattress);
+      var blanket=new THREE.Mesh(new THREE.BoxGeometry(2.4,.08,2.5),new THREE.MeshLambertMaterial({color:blanketColors[bi]}));blanket.position.set(-7.5,baseY+.65,bz+.3);scene.add(blanket);
+      var pillow=new THREE.Mesh(new THREE.BoxGeometry(1.4,.15,.6),new THREE.MeshLambertMaterial({color:0xffffff}));pillow.position.set(-7.5,baseY+.7,bz-1.5);scene.add(pillow);
     }
-    /* 카운터 */
-    var counter=new THREE.Mesh(new THREE.BoxGeometry(6,.8,1.5),new THREE.MeshLambertMaterial({color:0x6a4a2a}));counter.position.set(0,baseY+.4,3);scene.add(counter);
-    /* 의자 */
-    for(var ci=0;ci<3;ci++){
-      var chair=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.6),bedM);chair.position.set(-2+ci*2,baseY+.3,1.5);scene.add(chair);
+    /* 카운터 (오른쪽) */
+    var counter=new THREE.Mesh(new THREE.BoxGeometry(8,1,2),woodM);counter.position.set(5,baseY+.5,-7);scene.add(counter);
+    /* 카운터 위 접시/컵 */
+    var plateM=new THREE.MeshLambertMaterial({color:0xdddddd});
+    for(var pi=0;pi<4;pi++){
+      var plate=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.05,12),plateM);plate.position.set(2.5+pi*1.5,baseY+1.05,-7);scene.add(plate);
     }
+    /* 테이블+의자 세트 (중앙) */
+    var table=new THREE.Mesh(new THREE.BoxGeometry(4,.1,3),woodM);table.position.set(3,baseY+1,2);scene.add(table);
+    [[1.5,0],[4.5,0],[1.5,3.5],[4.5,3.5]].forEach(function(cp){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.2,1,.2),darkWoodM);leg.position.set(cp[0],baseY+.5,cp[1]);scene.add(leg);
+    });
+    for(var ci=0;ci<4;ci++){
+      var cx=[1.5,4.5,1.5,4.5][ci],cz=[-.5,-.5,4,4][ci];
+      var chairSeat=new THREE.Mesh(new THREE.BoxGeometry(.8,.08,.8),woodM);chairSeat.position.set(cx,baseY+.6,cz);scene.add(chairSeat);
+      var chairBack=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.08),woodM);chairBack.position.set(cx,baseY+1,cz+(ci<2?-.4:.4));scene.add(chairBack);
+    }
+    /* 화로 (벽난로) */
+    var fireplace=new THREE.Mesh(new THREE.BoxGeometry(3,3,.5),new THREE.MeshLambertMaterial({color:0x555555}));fireplace.position.set(0,baseY+1.5,-9.8);scene.add(fireplace);
+    var fireLight=new THREE.PointLight(0xff6622,.8,10);fireLight.position.set(0,baseY+1,-9);scene.add(fireLight);
   }else if(name==='무기 상점'){
-    /* 무기 진열대 */
+    /* 벽 진열대 (북쪽 벽) */
     var rackM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
-    var rack=new THREE.Mesh(new THREE.BoxGeometry(1,.1,10),rackM);rack.position.set(-6,baseY+2,0);scene.add(rack);
-    /* 검 여러개 */
-    var swordM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
-    for(var si=0;si<5;si++){
-      var sw=new THREE.Mesh(new THREE.BoxGeometry(.1,1.8,.15),swordM);sw.position.set(-6,baseY+2.8,-4+si*2);scene.add(sw);
-      var hilt=new THREE.Mesh(new THREE.BoxGeometry(.3,.3,.15),new THREE.MeshLambertMaterial({color:0x8a6a3a}));hilt.position.set(-6,baseY+1.9,-4+si*2);scene.add(hilt);
+    var rack=new THREE.Mesh(new THREE.BoxGeometry(16,3,.4),rackM);rack.position.set(0,baseY+2,-9.5);scene.add(rack);
+    /* 검/도끼/창 진열 */
+    var metalM=new THREE.MeshLambertMaterial({color:0xbbbbbb});
+    var hiltM=new THREE.MeshLambertMaterial({color:0x8a6a3a});
+    for(var wi=0;wi<7;wi++){
+      var wx=-6+wi*2;
+      /* 검 */
+      var blade=new THREE.Mesh(new THREE.BoxGeometry(.12,2,.08),metalM);blade.position.set(wx,baseY+2.5,-9.5);scene.add(blade);
+      var hilt=new THREE.Mesh(new THREE.BoxGeometry(.4,.25,.12),hiltM);hilt.position.set(wx,baseY+1.5,-9.5);scene.add(hilt);
     }
     /* 카운터 */
-    var wc=new THREE.Mesh(new THREE.BoxGeometry(4,.8,1.5),rackM);wc.position.set(2,baseY+.4,0);scene.add(wc);
-  }else if(name==='도서관'){
-    /* 책장 */
-    var shelfM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
+    var wc=new THREE.Mesh(new THREE.BoxGeometry(10,1,2),woodM);wc.position.set(0,baseY+.5,3);scene.add(wc);
+    /* 방패 (서쪽 벽) */
+    var shieldM=new THREE.MeshLambertMaterial({color:0x4466aa});
     for(var shi=0;shi<3;shi++){
-      var shelf=new THREE.Mesh(new THREE.BoxGeometry(4,4,.8),shelfM);shelf.position.set(-5+shi*5,baseY+2,-7);scene.add(shelf);
-      /* 책들 */
-      var bookColors=[0xcc2222,0x2244cc,0x22aa44,0xccaa22,0x8822aa];
-      for(var bk=0;bk<5;bk++){
-        var book=new THREE.Mesh(new THREE.BoxGeometry(.3,1,.6),new THREE.MeshLambertMaterial({color:bookColors[bk%5]}));
-        book.position.set(-6+shi*5+bk*.5,baseY+1+Math.floor(bk/3)*1.5,-7);scene.add(book);
+      var shield=new THREE.Mesh(new THREE.CircleGeometry(.8,6),shieldM);shield.rotation.y=Math.PI/2;shield.position.set(-9.7,baseY+2.5,-5+shi*4);scene.add(shield);
+    }
+  }else if(name==='도서관'){
+    /* 책장 (북쪽+동쪽+서쪽 벽) */
+    var shelfM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
+    var bookColors=[0xcc2222,0x2244cc,0x22aa44,0xccaa22,0x8822aa,0xcc6622,0x228888];
+    /* 북쪽 벽 */
+    for(var si=0;si<4;si++){
+      var shelf=new THREE.Mesh(new THREE.BoxGeometry(4,4.5,.6),shelfM);shelf.position.set(-7+si*4.5,baseY+2.25,-9.5);scene.add(shelf);
+      for(var bk=0;bk<6;bk++){
+        var bh=.6+Math.random()*.4;
+        var book=new THREE.Mesh(new THREE.BoxGeometry(.25,bh,.45),new THREE.MeshLambertMaterial({color:bookColors[(si*6+bk)%7]}));
+        book.position.set(-8.5+si*4.5+bk*.55,baseY+.5+Math.floor(bk/6)*1.8,-9.3);scene.add(book);
       }
     }
-    /* 테이블 */
-    var table=new THREE.Mesh(new THREE.BoxGeometry(5,.1,3),shelfM);table.position.set(0,baseY+1.2,2);scene.add(table);
-    var tleg=new THREE.MeshLambertMaterial({color:0x4a3a1a});
-    [[-2,1],[-2,3],[2,1],[2,3]].forEach(function(lp){
-      var leg=new THREE.Mesh(new THREE.BoxGeometry(.2,1.2,.2),tleg);leg.position.set(lp[0],baseY+.6,lp[1]);scene.add(leg);
-    });
+    /* 읽기 테이블 (중앙) */
+    var bigTable=new THREE.Mesh(new THREE.BoxGeometry(8,.12,4),woodM);bigTable.position.set(0,baseY+1.2,0);scene.add(bigTable);
+    /* 촛대 */
+    var candleM=new THREE.MeshLambertMaterial({color:0xeeeeaa});
+    var candle=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,.5,8),candleM);candle.position.set(0,baseY+1.55,0);scene.add(candle);
+    var candleLight=new THREE.PointLight(0xffcc44,.5,8);candleLight.position.set(0,baseY+2,0);scene.add(candleLight);
   }else if(name==='모험가 길드'){
-    /* 게시판 */
+    /* 게시판 (북쪽 벽 대형) */
     var boardM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
-    var board=new THREE.Mesh(new THREE.BoxGeometry(6,4,.3),boardM);board.position.set(0,baseY+3,-7);scene.add(board);
-    /* 퀘스트 종이들 */
+    var board=new THREE.Mesh(new THREE.BoxGeometry(10,5,.3),boardM);board.position.set(0,baseY+3,-9.7);scene.add(board);
+    /* 퀘스트 종이 */
     var paperM=new THREE.MeshLambertMaterial({color:0xeeddbb});
-    for(var pi=0;pi<8;pi++){
-      var paper=new THREE.Mesh(new THREE.PlaneGeometry(.8,1),paperM);
-      paper.position.set(-2+Math.random()*4,baseY+2+Math.random()*2,-6.8);scene.add(paper);
+    for(var qi=0;qi<12;qi++){
+      var paper=new THREE.Mesh(new THREE.PlaneGeometry(.7,.9),paperM);
+      paper.position.set(-4+Math.random()*8,baseY+1.5+Math.random()*3,-9.5);scene.add(paper);
     }
     /* 긴 테이블 */
-    var gtable=new THREE.Mesh(new THREE.BoxGeometry(10,.1,2),boardM);gtable.position.set(0,baseY+1,3);scene.add(gtable);
-    /* 벤치 */
+    var guildTable=new THREE.Mesh(new THREE.BoxGeometry(14,.12,3),woodM);guildTable.position.set(0,baseY+1,3);scene.add(guildTable);
+    /* 벤치 양쪽 */
     var benchM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
-    var bench1=new THREE.Mesh(new THREE.BoxGeometry(8,.4,.6),benchM);bench1.position.set(0,baseY+.5,1.5);scene.add(bench1);
-    var bench2=new THREE.Mesh(new THREE.BoxGeometry(8,.4,.6),benchM);bench2.position.set(0,baseY+.5,4.5);scene.add(bench2);
+    var bench1=new THREE.Mesh(new THREE.BoxGeometry(12,.5,.6),benchM);bench1.position.set(0,baseY+.5,1);scene.add(bench1);
+    var bench2=new THREE.Mesh(new THREE.BoxGeometry(12,.5,.6),benchM);bench2.position.set(0,baseY+.5,5);scene.add(bench2);
+    /* 접수 카운터 (서쪽) */
+    var gCounter=new THREE.Mesh(new THREE.BoxGeometry(2,1.2,6),woodM);gCounter.position.set(-8,baseY+.6,-3);scene.add(gCounter);
   }else{
-    /* 기본 내부: 테이블 + 의자 */
-    var defTable=new THREE.Mesh(new THREE.BoxGeometry(3,.1,2),new THREE.MeshLambertMaterial({color:0x6a5a3a}));defTable.position.set(0,baseY+1,0);scene.add(defTable);
+    /* 기본 내부 */
+    var defTable=new THREE.Mesh(new THREE.BoxGeometry(4,.1,3),woodM);defTable.position.set(0,baseY+1,0);scene.add(defTable);
+    var defChair=new THREE.Mesh(new THREE.BoxGeometry(.8,.6,.8),woodM);defChair.position.set(2,baseY+.3,0);scene.add(defChair);
   }
 }
 
