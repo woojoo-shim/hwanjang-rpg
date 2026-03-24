@@ -14,6 +14,8 @@ var portalMeshes=[];
 var closestPortal=null;
 
 /* ════════════ 건물 내부 시스템 ════════════ */
+var fadeOverlay=null;
+function initFadeOverlay(){fadeOverlay=document.getElementById('fade-overlay');}
 var BUILDING_DOORS=[]; /* [{x,z,name,interiorY,exitX,exitZ}] */
 var insideBuilding=null; /* 현재 들어가있는 건물 이름 */
 var _savedOutdoorPos={x:0,z:0}; /* 나갈 때 복귀 위치 */
@@ -923,6 +925,7 @@ function buildSkydome(){
 
 /* ════════════ initScene ════════════ */
 function initScene(){
+  initFadeOverlay();
   var canvas=document.getElementById('gc');
   renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
