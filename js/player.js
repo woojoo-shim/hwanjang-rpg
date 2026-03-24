@@ -669,10 +669,11 @@ function handleMove(dt){
   }
   if(playerSlowed>0)playerSlowed-=dt;
 
-  /* ── 물 물리 ── */
+  /* ── 물 물리 (건물 내부에서는 스킵) ── */
+  if(typeof insideBuilding!=='undefined'&&insideBuilding){_inWater=false;_waterDepth=0;_waterDmgTimer=0;}
   var px=PL.group.position.x,pz=PL.group.position.z;
   var wasInWater=_inWater;
-  _inWater=isOverWater(px,pz);
+  if(!(typeof insideBuilding!=='undefined'&&insideBuilding))_inWater=isOverWater(px,pz);
   if(_inWater){
     /* 물에 들어가면 Y 서서히 낮아짐 */
     _waterDepth=Math.min(_waterDepth+dt*1.5,0.8);
