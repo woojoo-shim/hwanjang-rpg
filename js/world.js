@@ -82,7 +82,11 @@ function enterBuilding(door){
     }
     /* 플레이어 이동 */
     PL.group.position.set(0,door.interiorY+1,0);
-    /* 카메라 따라가기 */
+    /* 카메라 즉시 이동 */
+    camera.position.set(0,door.interiorY+12,10);
+    camera.lookAt(0,door.interiorY+1,0);
+    /* 안개 끄기 (실내) */
+    scene.fog=null;
     addChat('sys','[시스템]',door.name+'에 입장했습니다.');
     /* 페이드인 */
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -94,7 +98,13 @@ function exitBuilding(){
   fadeOverlay.style.opacity='1';
   fadeOverlay.style.background='#000';
   setTimeout(function(){
-    PL.group.position.set(_savedOutdoorPos.x,0,_savedOutdoorPos.z);
+    var oy=(typeof getTerrainY==='function')?getTerrainY(_savedOutdoorPos.x,_savedOutdoorPos.z):0;
+    PL.group.position.set(_savedOutdoorPos.x,oy,_savedOutdoorPos.z);
+    /* 카메라 즉시 복귀 */
+    camera.position.set(_savedOutdoorPos.x,oy+12,_savedOutdoorPos.z+10);
+    camera.lookAt(_savedOutdoorPos.x,oy+1,_savedOutdoorPos.z);
+    /* 안개 복원 */
+    scene.fog=new THREE.FogExp2(0x88aa88,.002);
     addChat('sys','[시스템]','밖으로 나왔습니다.');
     insideBuilding=null;
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
