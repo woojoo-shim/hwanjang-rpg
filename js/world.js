@@ -20,6 +20,7 @@ var BUILDING_DOORS=[]; /* [{x,z,name,interiorY,exitX,exitZ}] */
 var insideBuilding=null; /* 현재 들어가있는 건물 이름 */
 var _savedOutdoorPos={x:0,z:0}; /* 나갈 때 복귀 위치 */
 var _interiorBuilt={}; /* 이미 내부를 빌드했는지 */
+var _doorCooldown=0; /* 입장/퇴장 쿨다운 */
 
 function registerDoor(x,z,name){
   BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-500-(BUILDING_DOORS.length*80)});
@@ -28,12 +29,10 @@ function registerDoor(x,z,name){
 var nearestDoor=null;
 function checkBuildingDoors(){
   if(!PL||!PL.group||typeof fadeOverlay==='undefined')return;
+  if(_doorCooldown>0){_doorCooldown--;return;}
   var px=PL.group.position.x,pz=PL.group.position.z;
-  /* 건물 내부에 있을 때 — 나가기 체크 */
+  /* 건물 내부에 있을 때 — 나가기 체크 (E키로만) */
   if(insideBuilding){
-    if(Math.abs(px)<2&&pz>8){
-      exitBuilding();
-    }
     return;
   }
   /* 밖에서 — 가장 가까운 문 찾기 (반경 8 이내) */
@@ -71,6 +70,7 @@ function enterBuilding(door){
   insideBuilding=door.name;
   _savedOutdoorPos.x=PL.group.position.x;
   _savedOutdoorPos.z=PL.group.position.z;
+  _doorCooldown=60;/* 1초 쿨다운 */
   /* 힌트 즉시 숨기기 */
   var bh=document.getElementById('building-hint');
   if(bh)bh.style.display='none';
@@ -99,6 +99,7 @@ function enterBuilding(door){
 
 function exitBuilding(){
   if(!insideBuilding)return;
+  _doorCooldown=60;/* 1초 쿨다운 */
   fadeOverlay.style.opacity='1';
   fadeOverlay.style.background='#000';
   setTimeout(function(){
