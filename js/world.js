@@ -44,6 +44,16 @@ function checkBuildingDoors(){
       break;
     }
   }
+  /* 건물 입장 힌트 표시/숨김 */
+  var bh=document.getElementById('building-hint');
+  if(bh){
+    if(nearestDoor){
+      bh.style.display='block';
+      bh.textContent='E — '+nearestDoor.name+' 입장';
+    }else{
+      bh.style.display='none';
+    }
+  }
 }
 
 /* E키로 건물 입장 — main.js의 키 핸들러에서 호출 */
