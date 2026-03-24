@@ -134,7 +134,7 @@ function tickAtkAnim(dt){
 }
 
 /* 공용 히트 플래시 머티리얼 (1번만 생성) */
-var _hitFlashMat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:1.0});
+var _hitFlashMat=new THREE.MeshLambertMaterial({color:0xff2222,emissive:new THREE.Color(0xff0000),emissiveIntensity:1.0});
 
 function flashMonster(m){
   m.hitFlash=0.35;

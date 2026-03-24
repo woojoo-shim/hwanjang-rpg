@@ -1808,7 +1808,7 @@ function updateMonsterAnims(dt){
 
     if(m.state==='dead')return;
 
-    /* ── 3. 피격(흰색 플래시 + 흔들림) 애니메이션 ── */
+    /* ── 3. 피격(빨간 플래시 + 흔들림) 애니메이션 ── */
     if(m.hitFlash>0){
       m.hitFlash=Math.max(0,m.hitFlash-dt);
       var hprog=m.hitFlash/0.35;
@@ -1818,7 +1818,7 @@ function updateMonsterAnims(dt){
       var hsc=1+Math.sin(hprog*Math.PI)*0.15;
       if(m.spawnAnim<=0)m.mesh.scale.set(hsc,hsc,hsc);
       if(m.hitFlash<=0){
-        /* 흰색 플래시 재료 복원 */
+        /* 빨간 플래시 재료 복원 */
         if(m._origMats){
           m._origMats.forEach(function(o){o.mesh.material=o.orig;});
           m._origMats=null;
@@ -2033,6 +2033,7 @@ function updMonsters(dt,t){
             if(invincibleTimer<=0){
               playerHP=Math.max(0,playerHP-dmg);
               updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+              flashPlayerHit();
               if((mid==='toad'||mid==='jungle_snake')&&!playerPoisoned){
                 playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
                 spawnDmgNum('독!','#44ff44');addChat('inf','','독에 걸렸다!');

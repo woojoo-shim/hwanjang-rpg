@@ -11,6 +11,18 @@ function addChat(tp,w,tx){
   lg.appendChild(d);lg.scrollTop=lg.scrollHeight;
 }
 
+/* ── 피격 빨간 플래시 (마크 스타일) ── */
+var _hitOverlay=null;
+function flashPlayerHit(){
+  if(!_hitOverlay){
+    _hitOverlay=document.createElement('div');
+    _hitOverlay.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,0,0,0.35);pointer-events:none;z-index:9999;opacity:0;transition:opacity 0.08s;';
+    document.body.appendChild(_hitOverlay);
+  }
+  _hitOverlay.style.opacity='1';
+  setTimeout(function(){_hitOverlay.style.opacity='0';},120);
+}
+
 function spawnDmgNum(text,color){
   var el=document.createElement('div');
   el.textContent=text;
