@@ -190,22 +190,22 @@ function mkStonePath(parent){
     out.push(pts[pts.length-1]);
     return out;
   }
-  var smooth=lerpPath(cp,15);
+  var smooth=lerpPath(cp,20);
   for(var pi=0;pi<smooth.length;pi++){
-    var disc=new THREE.Mesh(new THREE.CircleGeometry(3.5,32),pathM);
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(4,32),pathM);
     disc.rotation.x=-Math.PI/2;
-    disc.position.set(smooth[pi][0],.016,smooth[pi][1]);
-    disc.receiveShadow=true;p.add(disc);
+    disc.position.set(smooth[pi][0],.02,smooth[pi][1]);
+    p.add(disc);
   }
   /* 갈림길 */
   var forkE=[[4,60],[12,65],[22,72],[34,82],[48,95],[60,112]];
   var forkW=[[-4,60],[-12,65],[-22,72],[-34,82],[-48,95],[-60,112]];
   [forkE,forkW].forEach(function(pts){
-    var sm=lerpPath(pts,10);
+    var sm=lerpPath(pts,12);
     for(var fi=0;fi<sm.length;fi++){
-      var fd=new THREE.Mesh(new THREE.CircleGeometry(2.8,32),pathM);
-      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.016,sm[fi][1]);
-      fd.receiveShadow=true;p.add(fd);
+      var fd=new THREE.Mesh(new THREE.CircleGeometry(3.2,32),pathM);
+      fd.rotation.x=-Math.PI/2;fd.position.set(sm[fi][0],.02,sm[fi][1]);
+      p.add(fd);
     }
   });
 }
