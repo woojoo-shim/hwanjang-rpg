@@ -35,8 +35,13 @@ var riverUVOffset=0;
 /* ── 지형 높이 헬퍼 ── */
 /* simpleNoise 기반 — 버텍스 변위와 동일한 함수 사용 */
 function getTerrainY(x,z){
-  /* 마을 구역 (z < 22) 은 평탄하게 유지 */
-  if(z<22)return 0;
+  /* 마을 구역 (z < 25) 은 평탄하게 유지 */
+  if(z<25)return 0;
+  /* 마을→필드 전환부 부드럽게 블렌딩 (z 25~50) */
+  if(z<50){
+    var blend=(z-25)/25;
+    return simpleNoise(x,z)*blend;
+  }
   return simpleNoise(x,z);
 }
 /* TERRAIN_HILLS 호환성용 빈 배열 (더 이상 사용 안 함) */
@@ -371,7 +376,9 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
     var ly=pos.getY(vi);  /* 로컬 y → 월드 -z (rotation.x=-PI/2 이후) */
     var wx=lx+worldCX;
     var wz=-ly+worldCZ;   /* 부호 반전: PlaneGeometry Y축이 Z축으로 매핑 */
-    var dy=(wz>25)?simpleNoise(wx,wz):0;
+    var dy=0;
+    if(wz>=50)dy=simpleNoise(wx,wz);
+    else if(wz>=25)dy=simpleNoise(wx,wz)*((wz-25)/25);
     pos.setZ(vi,dy);      /* 로컬 z → 회전 후 월드 y (높이) */
   }
   geo.computeVertexNormals();
@@ -387,7 +394,7 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
 /* ════════════ 바이옴 지면 빌드 (3x 확장) ════════════ */
 function buildGroundPlanes(){
   /* 기본 바닥 딥 — 전체 월드 (displacement 적용, 틈 방지) */
-  makeDisplacedGround(1400,2900,96,96,0x1a3a0e, 0,-0.15,1270);
+  makeDisplacedGround(1400,2900,96,96,0x1a3a0e, 0,-0.02,1270);
 
   /* 마을: 평탄하게 유지 (건물이 올라가야 함) x:-22~22, z:-32~20 */
   var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshStandardMaterial({color:0x2a5a1a,roughness:0.95,metalness:0.0}));
