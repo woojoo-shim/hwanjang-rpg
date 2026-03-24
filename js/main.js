@@ -235,14 +235,16 @@ function resetAfk(){lastActivity=Date.now();}
 /* ── 게임 루프 ── */
 var lastT=Date.now();
 var _loopRunning=false;
+var _dboxEl=null;/* 대화창 DOM 캐시 */
 function loop(){
   if(_loopRunning)return;
   _loopRunning=true;
+  if(!_dboxEl)_dboxEl=document.getElementById('dbox');
   function _tick(){
     requestAnimationFrame(_tick);
   try{
     var now=Date.now(),dt=Math.min((now-lastT)/1000,.05);lastT=now;
-    var dialogOpen=document.getElementById('dbox').classList.contains('show');
+    var dialogOpen=_dboxEl&&_dboxEl.classList.contains('show');
     if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
     else tickAtkAnim(dt);
     updCam();updNpcs(now/1000);chkNpc();

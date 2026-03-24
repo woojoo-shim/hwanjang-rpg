@@ -337,7 +337,13 @@ var MONSTER_DEFS=[
 
 /* ════════════ 오픈 월드 설정 ════════════ */
 /* 맵 3x 확장: 기존 z좌표 × 3 */
-var WORLD_BOUNDS=[-600,600,-32,2600]; // minX, maxX, minZ, maxZ (3x expanded)
+/* 원형 경계 — 섬 느낌 */
+var WORLD_BOUNDS=[-600,600,-32,2600]; // 하위 호환 (직사각형 fallback)
+/* 타원형 섬 경계: 중심 (cx, cz), 반경 (rx, rz) — 섬 모양 */
+var ISLAND_CENTER_X=0;
+var ISLAND_CENTER_Z=1280;  /* 맵 세로 중심 */
+var ISLAND_RADIUS_X=620;   /* 동서 방향 반경 */
+var ISLAND_RADIUS_Z=1340;  /* 남북 방향 반경 */
 var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={

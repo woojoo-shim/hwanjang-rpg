@@ -77,12 +77,20 @@ function mkHuman(bc,hc){
   return{group:g,legL:legL,legR:legR,armL:armL,armR:armR,armRPivot:armRPivot};
 }
 
+/* 공유 나무 머티리얼 — 함수 호출마다 생성 방지 */
+var _treeTrunkMat=null,_treeLeafMat1=null,_treeLeafMat2=null;
+function _getTreeMats(){
+  if(!_treeTrunkMat){
+    _treeTrunkMat=new THREE.MeshLambertMaterial({color:0x3a2008});
+    _treeLeafMat1=new THREE.MeshLambertMaterial({color:0x1a3a08});
+    _treeLeafMat2=new THREE.MeshLambertMaterial({color:0x224a10});
+  }
+}
 function mkTree(x,z,s,parent){
   s=s||1;var g=new THREE.Group();
   var p=parent||scene;
-  var tm=new THREE.MeshLambertMaterial({color:0x3a2008});
-  var lm1=new THREE.MeshLambertMaterial({color:0x1a3a08});
-  var lm2=new THREE.MeshLambertMaterial({color:0x224a10});
+  _getTreeMats();
+  var tm=_treeTrunkMat,lm1=_treeLeafMat1,lm2=_treeLeafMat2;
   var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.28,2*s,7),tm);
   trunk.position.set(0,s,0);trunk.castShadow=true;trunk.receiveShadow=true;g.add(trunk);
   var l1=new THREE.Mesh(new THREE.ConeGeometry(1.5*s,2.5*s,8),lm1);
@@ -92,14 +100,21 @@ function mkTree(x,z,s,parent){
   g.position.set(x,0,z);p.add(g);
 }
 
+/* mkBldg 공유 재질 */
+var _bldgStoneMat=null,_bldgDoorMat=null,_bldgWindowMat=null;
+function _initBldgMats(){
+  if(_bldgStoneMat)return;
+  _bldgStoneMat=new THREE.MeshLambertMaterial({color:0x3a3a3a});
+  _bldgDoorMat=new THREE.MeshLambertMaterial({color:0x080808});
+  _bldgWindowMat=new THREE.MeshLambertMaterial({color:0xffeeaa,emissive:new THREE.Color(0xffaa00),emissiveIntensity:.22});
+}
 function mkBldg(x,z,w,h,d,bc,rc,parent){
   var g=new THREE.Group();
   var p=parent||scene;
+  _initBldgMats();
   var bm=new THREE.MeshLambertMaterial({color:bc});
   var rm=new THREE.MeshLambertMaterial({color:rc});
-  var stm=new THREE.MeshLambertMaterial({color:0x3a3a3a});
-  var dm=new THREE.MeshLambertMaterial({color:0x080808});
-  var wm=new THREE.MeshLambertMaterial({color:0xffeeaa,emissive:new THREE.Color(0xffaa00),emissiveIntensity:.22});
+  var stm=_bldgStoneMat,dm=_bldgDoorMat,wm=_bldgWindowMat;
   var fd=new THREE.Mesh(new THREE.BoxGeometry(w+.4,.4,d+.4),stm);fd.position.set(0,.2,0);fd.castShadow=true;fd.receiveShadow=true;g.add(fd);
   var bd=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),bm);bd.position.set(0,h/2+.4,0);bd.castShadow=true;bd.receiveShadow=true;g.add(bd);
   var rf=new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*.72,2.8,4),rm);rf.position.set(0,h+.4+1.4,0);rf.rotation.y=Math.PI/4;rf.castShadow=true;g.add(rf);
@@ -262,32 +277,84 @@ function mkWaterRiver(parent){
 }
 
 /* ════════════ 지면 디테일 유틸 ════════════ */
+/* 공유 재질 (최초 1회 생성) */
+var _grassMat1=null,_grassMat2=null,_stoneMat1=null,_stoneMat2=null;
+var _flowerMats=null;
+function _initDetailMats(){
+  if(_grassMat1)return;
+  _grassMat1=new THREE.MeshLambertMaterial({color:0x2a5a18});
+  _grassMat2=new THREE.MeshLambertMaterial({color:0x3a6a28});
+  _stoneMat1=new THREE.MeshLambertMaterial({color:0x666055});
+  _stoneMat2=new THREE.MeshLambertMaterial({color:0x555045});
+  _flowerMats=[
+    new THREE.MeshLambertMaterial({color:0xffee44,emissive:new THREE.Color(0xffee44),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:.1}),
+    new THREE.MeshLambertMaterial({color:0xcc88ff,emissive:new THREE.Color(0xcc88ff),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0xff88aa,emissive:new THREE.Color(0xff88aa),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0x88ccff,emissive:new THREE.Color(0x88ccff),emissiveIntensity:.12})
+  ];
+}
 function scatterGroundDetail(group,count,xRange,zRange,type,offX,offZ){
   offX=offX||0;offZ=offZ||0;
+  _initDetailMats();
   for(var i=0;i<count;i++){
     var x=offX+(Math.random()-.5)*xRange*2;
     var z=offZ+(Math.random()-.5)*zRange*2;
     var m;
     if(type==='grass'){
-      var gc=Math.random()>.5?0x2a5a18:0x3a6a28;
-      m=new THREE.Mesh(new THREE.ConeGeometry(.08+Math.random()*.06,.3+Math.random()*.2,4),new THREE.MeshLambertMaterial({color:gc}));
+      var gm=Math.random()>.5?_grassMat1:_grassMat2;
+      m=new THREE.Mesh(new THREE.ConeGeometry(.08+Math.random()*.06,.3+Math.random()*.2,4),gm);
       m.position.set(x,.15,z);
       m.rotation.y=Math.random()*Math.PI;m.rotation.z=(Math.random()-.5)*.3;
       m.castShadow=true;
     } else if(type==='stone'){
-      var sc=Math.random()>.5?0x666055:0x555045;
+      var sm=Math.random()>.5?_stoneMat1:_stoneMat2;
       var ss=.08+Math.random()*.12;
-      m=new THREE.Mesh(new THREE.DodecahedronGeometry(ss,0),new THREE.MeshLambertMaterial({color:sc}));
+      m=new THREE.Mesh(new THREE.DodecahedronGeometry(ss,0),sm);
       m.position.set(x,ss*.3,z);
       m.rotation.set(Math.random(),Math.random(),Math.random());
       m.castShadow=true;m.receiveShadow=true;
     } else if(type==='flower'){
-      var fc=[0xffee44,0xffffff,0xcc88ff,0xff88aa,0x88ccff][Math.floor(Math.random()*5)];
-      m=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),new THREE.MeshLambertMaterial({color:fc,emissive:new THREE.Color(fc),emissiveIntensity:.15}));
+      var fm=_flowerMats[Math.floor(Math.random()*5)];
+      m=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),fm);
       m.position.set(x,.08,z);
     }
     if(m)group.add(m);
   }
+}
+
+/* ════════════ 바다/해양 경계 빌드 ════════════ */
+function buildOcean(){
+  /* 섬 주변 바다 — 지면보다 낮은 큰 평면 */
+  var oceanM=new THREE.MeshLambertMaterial({color:0x0a2a4a,emissive:new THREE.Color(0x051520),emissiveIntensity:.2,transparent:true,opacity:.88});
+  /* 넓은 바다 바닥 평면 */
+  var ocean=new THREE.Mesh(new THREE.PlaneGeometry(4000,4000),oceanM);
+  ocean.rotation.x=-Math.PI/2;ocean.position.set(0,-1.5,1280);scene.add(ocean);
+
+  /* 얕은 해안선 물 (섬 가장자리 둘레) */
+  var shallowM=new THREE.MeshLambertMaterial({color:0x1a5080,emissive:new THREE.Color(0x0a2840),emissiveIntensity:.15,transparent:true,opacity:.72});
+  var shallow=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),shallowM);
+  shallow.rotation.x=-Math.PI/2;shallow.position.set(0,-.6,1280);scene.add(shallow);
+
+  /* 바다 표면 파동 효과용 조명 */
+  var seaLight1=new THREE.PointLight(0x1a88cc,.25,400);seaLight1.position.set(-700,2,600);scene.add(seaLight1);
+  var seaLight2=new THREE.PointLight(0x1a88cc,.25,400);seaLight2.position.set(700,2,600);scene.add(seaLight2);
+  var seaLight3=new THREE.PointLight(0x1a88cc,.2,400);seaLight3.position.set(0,2,2700);scene.add(seaLight3);
+
+  /* 해안선 모래사장 링 */
+  var sandM=new THREE.MeshLambertMaterial({color:0xd4b87a});
+  /* 남쪽 해안 (마을 앞) */
+  var sandS=new THREE.Mesh(new THREE.PlaneGeometry(800,80),sandM);
+  sandS.rotation.x=-Math.PI/2;sandS.position.set(0,-.1,-60);scene.add(sandS);
+  /* 북쪽 해안 (화산 너머) */
+  var sandN=new THREE.Mesh(new THREE.PlaneGeometry(600,80),sandM);
+  sandN.rotation.x=-Math.PI/2;sandN.position.set(0,-.1,2660);scene.add(sandN);
+  /* 동쪽 해안 */
+  var sandE=new THREE.Mesh(new THREE.PlaneGeometry(80,2600),sandM);
+  sandE.rotation.x=-Math.PI/2;sandE.position.set(640,-.1,1280);scene.add(sandE);
+  /* 서쪽 해안 */
+  var sandW=new THREE.Mesh(new THREE.PlaneGeometry(80,2600),sandM);
+  sandW.rotation.x=-Math.PI/2;sandW.position.set(-640,-.1,1280);scene.add(sandW);
 }
 
 /* ════════════ 바이옴 지면 빌드 (3x 확장) ════════════ */
@@ -660,6 +727,9 @@ function initScene(){
   var sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
   scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:.3,sizeAttenuation:true})));
 
+  /* 바다/해양 경계 (지면보다 먼저 렌더) */
+  buildOcean();
+
   /* 바이옴 지면 */
   buildGroundPlanes();
 
@@ -707,7 +777,8 @@ function initScene(){
   currentZone='village';
   document.querySelector('.hloc').textContent='▸ 시작 마을';
 
-  renderer.setAnimationLoop(loop);
+  /* 게임 루프는 main.js의 loop()가 담당 — setAnimationLoop 중복 방지 */
+  /* renderer.setAnimationLoop(loop); — main.js의 loop()가 직접 호출됨 */
 }
 
 function onResize(){
@@ -739,6 +810,25 @@ function updNpcs(t){
   });
 }
 
+/* ════════════ LOD (거리 기반 장식 표시/숨김) ════════════ */
+var _lodObjects=[];/* [{mesh, cx, cz, dist}] — 등록된 LOD 오브젝트 */
+var _lodFrame=0;
+function registerLOD(mesh,cx,cz,dist){
+  _lodObjects.push({mesh:mesh,cx:cx,cz:cz,dist:dist});
+}
+function updateLOD(){
+  if(!PL.group)return;
+  _lodFrame++;
+  /* 6프레임마다 LOD 갱신 — 매 프레임 불필요 */
+  if(_lodFrame%6!==0)return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  for(var i=0;i<_lodObjects.length;i++){
+    var o=_lodObjects[i];
+    var dx=px-o.cx,dz=pz-o.cz;
+    o.mesh.visible=(dx*dx+dz*dz)<o.dist*o.dist;
+  }
+}
+
 /* ════════════ 파티클 + 물 UV 업데이트 ════════════ */
 var _vfxFrame=0;
 function updVisualFX(t){
@@ -754,11 +844,16 @@ function updVisualFX(t){
   }
 
   /* 강물 UV 오프셋 애니메이션 (머티리얼 offset 사용 — 빠름) */
-  waterMeshes.forEach(function(mesh){
-    if(mesh.material&&mesh.material.map){
-      mesh.material.map.offset.y+=0.0015;
+  /* waterMeshes에 map이 없는 경우 skip */
+  for(var wi=0;wi<waterMeshes.length;wi++){
+    var wm=waterMeshes[wi];
+    if(wm.material&&wm.material.map){
+      wm.material.map.offset.y+=0.0015;
     }
-  });
+  }
+
+  /* LOD 업데이트 */
+  updateLOD();
 }
 
 function chkNpc(){

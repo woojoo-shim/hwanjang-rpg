@@ -3,12 +3,17 @@
    선언: addChat, spawnDmgNum, showToast, _v3, proj, posEl, updLabels
    참조: camera (world.js), PL (player.js), npcs/closestNpc (world.js) — 런타임 참조 */
 
+var _chatLog=null;/* clog DOM 캐시 */
+var _CHAT_MAX=200;/* 최대 채팅 줄 수 — 메모리 누수 방지 */
 function addChat(tp,w,tx){
-  var lg=document.getElementById('clog');
+  if(!_chatLog)_chatLog=document.getElementById('clog');
   var d=document.createElement('div');d.className='cm '+tp;
   if(tp==='inf')d.textContent=tx;
   else d.innerHTML='<span class="who">'+w+'</span><span class="tx">'+tx+'</span>';
-  lg.appendChild(d);lg.scrollTop=lg.scrollHeight;
+  _chatLog.appendChild(d);
+  /* 오래된 메시지 제거 (메모리 누수 방지) */
+  while(_chatLog.children.length>_CHAT_MAX)_chatLog.removeChild(_chatLog.firstChild);
+  _chatLog.scrollTop=_chatLog.scrollHeight;
 }
 
 /* ── 피격 빨간 플래시 (마크 스타일) ── */
@@ -32,10 +37,11 @@ function spawnDmgNum(text,color){
 
 /* 3D → 2D 투영 */
 var _v3=new THREE.Vector3();
+var _projCanvas=null;/* 캔버스 DOM 요소 캐시 */
 function proj(wx,wy,wz){
+  if(!_projCanvas)_projCanvas=document.getElementById('cc');
   _v3.set(wx,wy,wz);_v3.project(camera);
-  var c=document.getElementById('cc');
-  return{x:(_v3.x*.5+.5)*c.clientWidth,y:(-_v3.y*.5+.5)*c.clientHeight,vis:_v3.z>0&&_v3.z<1};
+  return{x:(_v3.x*.5+.5)*_projCanvas.clientWidth,y:(-_v3.y*.5+.5)*_projCanvas.clientHeight,vis:_v3.z>0&&_v3.z<1};
 }
 function posEl(el,wx,wy,wz){
   var s=proj(wx,wy,wz);

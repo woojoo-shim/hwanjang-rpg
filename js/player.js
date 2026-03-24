@@ -160,15 +160,16 @@ var _groundPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
 var _raycaster=new THREE.Raycaster();
 var _mouseNDC=new THREE.Vector2();
 
+/* 재사용 가능한 hit 벡터 — 매 mousemove마다 생성 방지 */
+var _mouseHit=new THREE.Vector3();
 document.addEventListener('mousemove',function(e){
   if(typeof camera==='undefined'||!camera||typeof renderer==='undefined'||!renderer)return;
   var rect=renderer.domElement.getBoundingClientRect();
   _mouseNDC.x=((e.clientX-rect.left)/rect.width)*2-1;
   _mouseNDC.y=-((e.clientY-rect.top)/rect.height)*2+1;
   _raycaster.setFromCamera(_mouseNDC,camera);
-  var hit=new THREE.Vector3();
-  if(_raycaster.ray.intersectPlane(_groundPlane,hit)){
-    mouseWorldX=hit.x;mouseWorldZ=hit.z;
+  if(_raycaster.ray.intersectPlane(_groundPlane,_mouseHit)){
+    mouseWorldX=_mouseHit.x;mouseWorldZ=_mouseHit.z;
   }
 },{passive:true});
 
@@ -431,7 +432,7 @@ function playerAttack(){
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
   var midx=monsters.indexOf(target);
-  if(midx>=0&&ws&&ws.readyState===1)ws.send(JSON.stringify({type:'mhit',mid:midx,dmg:dmg,maxHp:target.maxHp}));
+  if(midx>=0&&typeof ws!=='undefined'&&ws&&ws.readyState===1)ws.send(JSON.stringify({type:'mhit',mid:midx,dmg:dmg,maxHp:target.maxHp}));
   var ddx=target.mesh.position.x-PL.group.position.x;
   var ddz=target.mesh.position.z-PL.group.position.z;
   PL.group.rotation.y=Math.atan2(ddx,ddz);
@@ -700,9 +701,13 @@ function handleMove(dt){
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
     if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    var wb=WORLD_BOUNDS;
-    if(nx>wb[0]&&nx<wb[1]&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
-    if(nz>wb[2]&&nz<wb[3]&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
+    /* 타원형 섬 경계 체크 — 자연스러운 해안선 느낌 */
+    var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
+    var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;
+    var _exN=(nx-_icx)/_irx,_ezN=(PL.group.position.z-_icz)/_irz;
+    var _exC=(PL.group.position.x-_icx)/_irx,_ezZ=(nz-_icz)/_irz;
+    if(_exN*_exN+_ezN*_ezN<1&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
+    if(_exC*_exC+_ezZ*_ezZ<1&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
     PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
     var wa=.32;
     PL.legL.rotation.x=Math.sin(PL.bobT)*wa;

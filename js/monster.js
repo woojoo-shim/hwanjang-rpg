@@ -17,6 +17,10 @@ var closestMonster=null;
 var currentZone='village';
 var targetedMonster=null;
 
+/* ── 성능 최적화: 상수 객체 — 매 프레임 생성 방지 ── */
+var _ATK_RANGES={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0};
+var _ATK_SPEEDS={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5};
+
 /* 몬스터별 추적 범위 (서식지 크기) */
 function getLeashRange(mid){
   var ranges={
@@ -865,13 +869,18 @@ function buildMeadow(){
   /* 초원 조명 */
   var pl1=new THREE.PointLight(0xffcc44,.3,300);pl1.position.set(0,8,450);scene.add(pl1);
   var pl2=new THREE.PointLight(0xffcc44,.25,250);pl2.position.set(0,8,800);scene.add(pl2);
-  /* 야생화 (더 넓게) */
-  var flowerColors=[0xffee44,0xffffff,0xcc88ff,0xff88aa,0x88ddff];
+  /* 야생화 (더 넓게) — 공유 머티리얼 사용 */
+  var _fMats=[
+    new THREE.MeshLambertMaterial({color:0xffee44,emissive:new THREE.Color(0xffee44),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0xffffff,emissive:new THREE.Color(0xffffff),emissiveIntensity:.1}),
+    new THREE.MeshLambertMaterial({color:0xcc88ff,emissive:new THREE.Color(0xcc88ff),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0xff88aa,emissive:new THREE.Color(0xff88aa),emissiveIntensity:.15}),
+    new THREE.MeshLambertMaterial({color:0x88ddff,emissive:new THREE.Color(0x88ddff),emissiveIntensity:.12})
+  ];
   for(var fi=0;fi<100;fi++){
     var fx=(Math.random()-.5)*440,fz=25+Math.random()*860;
     if(Math.abs(fx)<10)continue;
-    var fc=flowerColors[Math.floor(Math.random()*5)];
-    var fl=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),new THREE.MeshLambertMaterial({color:fc,emissive:new THREE.Color(fc),emissiveIntensity:.15}));
+    var fl=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),_fMats[Math.floor(Math.random()*5)]);
     fl.position.set(fx,.08,fz);scene.add(fl);
   }
   /* 초원 나무 (3x 배치) */
@@ -2001,11 +2010,9 @@ function updMonsters(dt,t){
         var spd=m.def.spd;
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
         if(mid==='deer'&&chaseDist>4&&chaseDist<15)spd=m.def.spd*3;
-        /* 몬스터별 공격 범위 + 공격 속도 */
-        var atkRanges={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0};
-        var atkRange=atkRanges[mid]||1.8;
-        var atkSpd={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5};
-        var atkCooldown=atkSpd[mid]||(0.8+Math.random()*.4);
+        /* 몬스터별 공격 범위 + 공격 속도 (모듈 상단 상수 참조) */
+        var atkRange=_ATK_RANGES[mid]||1.8;
+        var atkCooldown=_ATK_SPEEDS[mid]||(0.8+Math.random()*.4);
         /* 이동 — 가장 가까운 플레이어 쪽으로 */
         if(chaseDist>1.2){
           var dx=chasePx-mx,dz2=chasePz-mz,len=Math.sqrt(dx*dx+dz2*dz2);
