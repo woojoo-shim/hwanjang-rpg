@@ -478,10 +478,13 @@ function buildBorderMountains(){
   var mountainPeakM=new THREE.MeshLambertMaterial({color:0x8a9080});
   var snowM=new THREE.MeshLambertMaterial({color:0xeeeeff});
 
-  /* 섬 가장자리 산맥 — 원형으로 배치 */
+  /* 섬 가장자리 산맥 — 원형으로 배치 (마을 근처 제외) */
   for(var mi=0;mi<16;mi++){
     var ma=mi/16*Math.PI*2;
     var mx=Math.cos(ma)*580,mz=50+Math.sin(ma)*580;
+    /* 마을(-350,-350) 반경 300 이내면 건너뛰기 */
+    var vdx=mx-(-350),vdz=mz-(-350);
+    if(Math.sqrt(vdx*vdx+vdz*vdz)<300)continue;
     var mh=30+Math.random()*25;
     var mr=25+Math.random()*18;
     var mtBase=new THREE.Mesh(new THREE.ConeGeometry(mr,mh,8),mountainM);
