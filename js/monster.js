@@ -2211,8 +2211,7 @@ function updMonsters(dt,t){
           m.mesh.position.z+=dz2/len*spd*dt;
           m.mesh.rotation.y=Math.atan2(dx,dz2);
           /* 지형 높이에 맞추기 */
-          var _newBaseY=(m.mesh.position.z>22)?simpleNoise(m.mesh.position.x,m.mesh.position.z):0;
-          m.baseY=_newBaseY;
+          m.baseY=(typeof getTerrainY==='function')?getTerrainY(m.mesh.position.x,m.mesh.position.z):0;
         }
         m.attackTimer-=dt;
         if(chaseDist<atkRange&&m.attackTimer<=0){
@@ -2282,8 +2281,7 @@ function updMonsters(dt,t){
           m.mesh.position.z+=rdz/rlen*m.def.spd*dt;
           m.mesh.rotation.y=Math.atan2(rdx,rdz);
           /* 지형 높이에 맞추기 */
-          var _retBaseY=(m.mesh.position.z>22)?simpleNoise(m.mesh.position.x,m.mesh.position.z):0;
-          m.baseY=_retBaseY;
+          m.baseY=(typeof getTerrainY==='function')?getTerrainY(m.mesh.position.x,m.mesh.position.z):0;
         }
       }
   });
