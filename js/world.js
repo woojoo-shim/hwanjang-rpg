@@ -226,7 +226,7 @@ function buildInterior(name,baseY){
     var fireplace=new THREE.Mesh(new THREE.BoxGeometry(3,3,.5),new THREE.MeshLambertMaterial({color:0x555555}));fireplace.position.set(0,baseY+1.5,-9.8);scene.add(fireplace);
     var fireLight=new THREE.PointLight(0xff6622,.8,10);fireLight.position.set(0,baseY+1,-9);scene.add(fireLight);
     /* 여관 주인 NPC */
-    mkInteriorNpc(5,baseY,-6,0xaa5533,'(여관주인) 마리아');
+    mkInteriorNpc(5,-6,baseY,0xaa5533,'(여관주인) 마리아');
   }else if(name==='무기 상점'){
     /* 벽 진열대 (북쪽 벽) */
     var rackM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
@@ -248,7 +248,7 @@ function buildInterior(name,baseY){
       var shield=new THREE.Mesh(new THREE.CircleGeometry(.8,6),shieldM);shield.rotation.y=Math.PI/2;shield.position.set(-9.7,baseY+2.5,-5+shi*4);scene.add(shield);
     }
     /* 무기 상인 NPC */
-    mkInteriorNpc(0,baseY,1,0x6a4a2a,'(무기상인) 발두르');
+    mkInteriorNpc(0,1,baseY,0x6a4a2a,'(무기상인) 발두르');
   }else if(name==='도서관'){
     /* 책장 (북쪽+동쪽+서쪽 벽) */
     var shelfM=new THREE.MeshLambertMaterial({color:0x5a4a2a});
@@ -269,7 +269,7 @@ function buildInterior(name,baseY){
     var candle=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,.5,8),candleM);candle.position.set(0,baseY+1.55,0);scene.add(candle);
     var candleLight=new THREE.PointLight(0xffcc44,.5,8);candleLight.position.set(0,baseY+2,0);scene.add(candleLight);
     /* 사서 NPC */
-    mkInteriorNpc(-3,baseY,-5,0x4a5a8a,'(사서) 엘리노어');
+    mkInteriorNpc(-3,-5,baseY,0x4a5a8a,'(사서) 엘리노어');
   }else if(name==='모험가 길드'){
     /* 게시판 (북쪽 벽 대형) */
     var boardM=new THREE.MeshLambertMaterial({color:0x6a5a3a});
@@ -297,9 +297,9 @@ function buildInterior(name,baseY){
       banner.rotation.y=-Math.PI/2;banner.position.set(14.7,baseY+3.5,-8+bni*8);scene.add(banner);
     }
     /* 길드 마스터 NPC */
-    mkInteriorNpc(-12,baseY,-3,0x7a3a1a,'(길드마스터) 아르투스');
+    mkInteriorNpc(-12,-3,baseY,0x7a3a1a,'(길드마스터) 아르투스');
     /* 접수원 NPC */
-    mkInteriorNpc(-12,baseY,3,0x5a8a5a,'(접수원) 리나');
+    mkInteriorNpc(-12,3,baseY,0x5a8a5a,'(접수원) 리나');
   }else if(name==='방어구 상점'){
     /* 방어구 진열 */
     var armorM=new THREE.MeshLambertMaterial({color:0x888888});
@@ -310,7 +310,7 @@ function buildInterior(name,baseY){
     /* 카운터 */
     var aC=new THREE.Mesh(new THREE.BoxGeometry(8,1,2),woodM);aC.position.set(0,baseY+.5,3);scene.add(aC);
     /* 방어구 상인 NPC */
-    mkInteriorNpc(0,baseY,1,0x5a5a7a,'(방어구상인) 헥토르');
+    mkInteriorNpc(0,1,baseY,0x5a5a7a,'(방어구상인) 헥토르');
   }else{
     /* 기본 내부 */
     var defTable=new THREE.Mesh(new THREE.BoxGeometry(4,.1,3),woodM);defTable.position.set(0,baseY+1,0);scene.add(defTable);
