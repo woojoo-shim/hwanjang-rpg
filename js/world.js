@@ -140,15 +140,31 @@ function mkInteriorNpc(nx,nz,baseY,bodyColor,npcName){
   g.position.set(nx,baseY,nz);
   scene.add(g);
   /* 이름표 */
+  var lov=document.getElementById('lov')||document.getElementById('cc');
   var label=document.createElement('div');
   label.className='nlabel';
   label.textContent=npcName;
   label.style.color='#ffcc44';
   label.style.fontSize='11px';
-  document.getElementById('cc').appendChild(label);
+  label.style.display='none';
+  lov.appendChild(label);
+  /* E 대화 표시 */
+  var ie=document.createElement('div');
+  ie.className='linteract';ie.textContent='E 대화';ie.style.display='none';
+  lov.appendChild(ie);
+  /* npcs 배열에 등록 — chkNpc()가 감지할 수 있도록 */
+  var npcObj={mesh:g,name:npcName,label:label,interact:ie,bobOff:Math.random()*6};
+  npcs.push(npcObj);
+  /* NPC_AI에 등록 (AI 대화 가능) */
+  if(typeof NPC_AI!=='undefined'&&!NPC_AI[npcName]){
+    NPC_AI[npcName]={
+      system:'너는 '+npcName+'이다. 환장 RPG 세계관의 NPC이다. 친절하고 캐릭터에 맞게 대화하라. 짧게 답하라.',
+      history:[]
+    };
+  }
   /* 라벨 업데이트용 저장 */
   if(!window._interiorNpcs)window._interiorNpcs=[];
-  window._interiorNpcs.push({group:g,label:label,baseY:baseY});
+  window._interiorNpcs.push({group:g,label:label,interact:ie,baseY:baseY,npcObj:npcObj});
   return g;
 }
 
@@ -1210,13 +1226,24 @@ function updNpcs(t){
       var cc=document.getElementById('cc');
       if(cc){
         var hw=cc.clientWidth/2,hh=cc.clientHeight/2;
-        in_.label.style.left=(pos.x*hw+hw)+'px';
-        in_.label.style.top=(-pos.y*hh+hh)+'px';
-        in_.label.style.display=insideBuilding?'block':'none';
+        var sx=(pos.x*hw+hw),sy=(-pos.y*hh+hh);
+        in_.label.style.left=sx+'px';
+        in_.label.style.top=sy+'px';
+        in_.label.style.display='block';
+        /* E 대화 표시 */
+        if(in_.interact){
+          in_.interact.style.left=sx+'px';
+          in_.interact.style.top=(sy+16)+'px';
+          var isClose=closestNpc&&closestNpc===in_.npcObj;
+          in_.interact.style.display=isClose?'block':'none';
+        }
       }
     });
   }else if(window._interiorNpcs){
-    window._interiorNpcs.forEach(function(in_){in_.label.style.display='none';});
+    window._interiorNpcs.forEach(function(in_){
+      in_.label.style.display='none';
+      if(in_.interact)in_.interact.style.display='none';
+    });
   }
 }
 
