@@ -716,10 +716,10 @@ function handleMove(dt){
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
     if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    /* 건물 내부에서는 경계/충돌 체크 생략 */
+    /* 건물 내부에서는 벽 안으로 제한 */
     if(typeof insideBuilding!=='undefined'&&insideBuilding){
-      PL.group.position.x=nx;
-      PL.group.position.z=nz;
+      if(nx>-9&&nx<9)PL.group.position.x=nx;
+      if(nz>-9&&nz<9)PL.group.position.z=nz;
     }else{
       var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
       var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;

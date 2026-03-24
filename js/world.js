@@ -31,8 +31,17 @@ function checkBuildingDoors(){
   if(!PL||!PL.group||typeof fadeOverlay==='undefined')return;
   if(_doorCooldown>0){_doorCooldown--;return;}
   var px=PL.group.position.x,pz=PL.group.position.z;
-  /* 건물 내부에 있을 때 — 나가기 체크 (E키로만) */
+  /* 건물 내부에 있을 때 — 나가기 힌트 */
   if(insideBuilding){
+    var bh=document.getElementById('building-hint');
+    if(bh){
+      if(Math.abs(px)<3&&pz>5){
+        bh.style.display='block';
+        bh.textContent='E — 나가기';
+      }else{
+        bh.style.display='none';
+      }
+    }
     return;
   }
   /* 밖에서 — 가장 가까운 문 찾기 (반경 8 이내) */
@@ -88,9 +97,10 @@ function enterBuilding(door){
     /* 카메라 즉시 이동 */
     camera.position.set(0,door.interiorY+12,10);
     camera.lookAt(0,door.interiorY+1,0);
-    /* 실내: 안개+그림자 끄기 */
+    /* 실내: 안개+그림자 끄기, 배경 검은색 */
     scene.fog=null;
     renderer.shadowMap.enabled=false;
+    renderer.setClearColor(0x000000);
     addChat('sys','[시스템]',door.name+'에 입장했습니다.');
     /* 페이드인 */
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -108,9 +118,10 @@ function exitBuilding(){
     /* 카메라 즉시 복귀 */
     camera.position.set(_savedOutdoorPos.x,oy+12,_savedOutdoorPos.z+10);
     camera.lookAt(_savedOutdoorPos.x,oy+1,_savedOutdoorPos.z);
-    /* 안개+그림자 복원 */
+    /* 안개+그림자+배경 복원 */
     scene.fog=new THREE.FogExp2(0x88aa88,.002);
     renderer.shadowMap.enabled=true;
+    renderer.setClearColor(0x000000,0);
     addChat('sys','[시스템]','밖으로 나왔습니다.');
     insideBuilding=null;
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
