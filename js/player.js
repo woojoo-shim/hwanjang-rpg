@@ -697,10 +697,18 @@ function handleMove(dt){
   }
 
   var dx=0,dz=0;
-  if(keys['w']||keys['arrowup']){dx-=Math.sin(cYaw);dz-=Math.cos(cYaw);}
-  if(keys['s']||keys['arrowdown']){dx+=Math.sin(cYaw);dz+=Math.cos(cYaw);}
-  if(keys['a']||keys['arrowleft']){dx-=Math.cos(cYaw);dz+=Math.sin(cYaw);}
-  if(keys['d']||keys['arrowright']){dx+=Math.cos(cYaw);dz-=Math.sin(cYaw);}
+  if(typeof insideBuilding!=='undefined'&&insideBuilding){
+    /* 건물 내부: 화면 기준 상하좌우 (탑다운) */
+    if(keys['w']||keys['arrowup'])dz=-1;
+    if(keys['s']||keys['arrowdown'])dz=1;
+    if(keys['a']||keys['arrowleft'])dx=-1;
+    if(keys['d']||keys['arrowright'])dx=1;
+  }else{
+    if(keys['w']||keys['arrowup']){dx-=Math.sin(cYaw);dz-=Math.cos(cYaw);}
+    if(keys['s']||keys['arrowdown']){dx+=Math.sin(cYaw);dz+=Math.cos(cYaw);}
+    if(keys['a']||keys['arrowleft']){dx-=Math.cos(cYaw);dz+=Math.sin(cYaw);}
+    if(keys['d']||keys['arrowright']){dx+=Math.cos(cYaw);dz-=Math.sin(cYaw);}
+  }
   var moving=dx!==0||dz!==0;
   if(moving){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
