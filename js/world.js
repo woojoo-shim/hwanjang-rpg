@@ -23,6 +23,7 @@ function registerDoor(x,z,name){
   BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-100-(BUILDING_DOORS.length*50)});
 }
 
+var nearestDoor=null;
 function checkBuildingDoors(){
   if(!PL||!PL.group||typeof fadeOverlay==='undefined')return;
   var px=PL.group.position.x,pz=PL.group.position.z;
@@ -33,15 +34,25 @@ function checkBuildingDoors(){
     }
     return;
   }
-  /* 밖에서 — 입장 체크 */
+  /* 밖에서 — 가장 가까운 문 찾기 (반경 8 이내) */
+  nearestDoor=null;
   for(var i=0;i<BUILDING_DOORS.length;i++){
     var d=BUILDING_DOORS[i];
     var dx=px-d.x,dz=pz-d.z;
-    if(dx*dx+dz*dz<9){/* 반경 3 이내 */
-      enterBuilding(d);
-      return;
+    if(dx*dx+dz*dz<64){/* 반경 8 이내 */
+      nearestDoor=d;
+      break;
     }
   }
+}
+
+/* E키로 건물 입장 — main.js의 키 핸들러에서 호출 */
+function tryEnterBuilding(){
+  if(nearestDoor&&!insideBuilding){
+    enterBuilding(nearestDoor);
+    return true;
+  }
+  return false;
 }
 
 function enterBuilding(door){

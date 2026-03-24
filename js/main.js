@@ -181,7 +181,16 @@ function setupInput(){
     var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin');
     if(k==='e'&&!isInput){
       e.preventDefault();
-      if(closestNpc&&!document.getElementById('dbox').classList.contains('show'))talk(closestNpc);
+      /* 건물 입장 우선 체크 */
+      if(typeof tryEnterBuilding==='function'&&nearestDoor&&!closestNpc){
+        tryEnterBuilding();
+      }else if(insideBuilding){
+        exitBuilding();
+      }else if(closestNpc&&!document.getElementById('dbox').classList.contains('show')){
+        talk(closestNpc);
+      }else if(typeof tryEnterBuilding==='function'&&nearestDoor){
+        tryEnterBuilding();
+      }
     }
     if(k==='f'&&!isInput){e.preventDefault();playerAttack();}
     /* 스킬 키: Q=0, R=1, T=2 */
