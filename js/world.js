@@ -36,10 +36,10 @@ var riverUVOffset=0;
 /* simpleNoise 기반 — 버텍스 변위와 동일한 함수 사용 */
 function getTerrainY(x,z){
   /* 마을 구역 (z < 25) 은 평탄하게 유지 */
-  if(z<25)return 0;
-  /* 마을→필드 전환부 부드럽게 블렌딩 (z 25~50) */
-  if(z<50){
-    var blend=(z-25)/25;
+  if(z<30)return 0;
+  /* 마을→필드 전환부 부드럽게 블렌딩 (z 30~60) */
+  if(z<60){
+    var blend=(z-30)/30;
     return simpleNoise(x,z)*blend;
   }
   return simpleNoise(x,z);
@@ -377,8 +377,8 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
     var wx=lx+worldCX;
     var wz=-ly+worldCZ;   /* 부호 반전: PlaneGeometry Y축이 Z축으로 매핑 */
     var dy=0;
-    if(wz>=50)dy=simpleNoise(wx,wz);
-    else if(wz>=25)dy=simpleNoise(wx,wz)*((wz-25)/25);
+    if(wz>=60)dy=simpleNoise(wx,wz);
+    else if(wz>=30)dy=simpleNoise(wx,wz)*((wz-30)/30);
     pos.setZ(vi,dy);      /* 로컬 z → 회전 후 월드 y (높이) */
   }
   geo.computeVertexNormals();
@@ -396,9 +396,9 @@ function buildGroundPlanes(){
   /* 기본 바닥 딥 — 전체 월드 (displacement 적용, 틈 방지) */
   makeDisplacedGround(1400,2900,96,96,0x2a5a1a, 0,-0.02,1270);
 
-  /* 마을: 평탄하게 유지 (건물이 올라가야 함) x:-22~22, z:-32~20 */
-  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(44,52),new THREE.MeshStandardMaterial({color:0x4a8a3a,roughness:0.95,metalness:0.0}));
-  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(0,.01,-6);villGnd.receiveShadow=true;scene.add(villGnd);
+  /* 마을: 평탄하게 유지 — 블렌딩 구간(z=50)까지 커버 */
+  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(80,87),new THREE.MeshStandardMaterial({color:0x4a8a3a,roughness:0.95,metalness:0.0}));
+  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(0,.03,11.5);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원: 버텍스 변위 적용 x:-240~240, z:20~900 — 밝은 녹색 */
   makeDisplacedGround(520,920,64,64,0x5a9a3a, 0,0.01,460);
