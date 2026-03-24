@@ -89,12 +89,13 @@ function connectParty(){
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
     if(!window._mpFirstConnect){window._mpFirstConnect=true;addChat('sys','[시스템]','멀티플레이 서버에 연결되었습니다.');}
-    /* 5초 후 호스트 메시지도 mp|데이터도 안 오면 자동 호스트 */
+    /* 15초 후 호스트 메시지도 mp|데이터도 안 오면 자동 호스트 */
     receivedMpData=false;
     if(!isMonsterHost){
+      if(window._hostFallbackTmr)clearTimeout(window._hostFallbackTmr);
       window._hostFallbackTmr=setTimeout(function(){
         if(!isMonsterHost&&!receivedMpData){startMonsterSync();console.log('[MP] self-host fallback');}
-      },5000);
+      },15000);
     }
   };
 
@@ -103,6 +104,7 @@ function connectParty(){
     /* 호스트 몬스터 위치 수신: idx,x,z,state,targetId */
     if(typeof e.data==='string'&&e.data.indexOf('mp|')===0){
       receivedMpData=true;
+      if(window._hostFallbackTmr){clearTimeout(window._hostFallbackTmr);window._hostFallbackTmr=null;}
       if(!isMonsterHost){
         var parts=e.data.substring(3).split(';');
         for(var i=0;i<parts.length;i++){
