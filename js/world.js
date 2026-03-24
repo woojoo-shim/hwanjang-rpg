@@ -85,8 +85,9 @@ function enterBuilding(door){
     /* 카메라 즉시 이동 */
     camera.position.set(0,door.interiorY+12,10);
     camera.lookAt(0,door.interiorY+1,0);
-    /* 안개 끄기 (실내) */
+    /* 실내: 안개+그림자 끄기 */
     scene.fog=null;
+    renderer.shadowMap.enabled=false;
     addChat('sys','[시스템]',door.name+'에 입장했습니다.');
     /* 페이드인 */
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -103,8 +104,9 @@ function exitBuilding(){
     /* 카메라 즉시 복귀 */
     camera.position.set(_savedOutdoorPos.x,oy+12,_savedOutdoorPos.z+10);
     camera.lookAt(_savedOutdoorPos.x,oy+1,_savedOutdoorPos.z);
-    /* 안개 복원 */
+    /* 안개+그림자 복원 */
     scene.fog=new THREE.FogExp2(0x88aa88,.002);
+    renderer.shadowMap.enabled=true;
     addChat('sys','[시스템]','밖으로 나왔습니다.');
     insideBuilding=null;
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -113,16 +115,10 @@ function exitBuilding(){
 
 function buildInterior(name,baseY){
   var W=20,D=20,H=6;
-  /* ── 바닥 (체크무늬 타일) ── */
-  var tileA=new THREE.MeshLambertMaterial({color:0xb89870});
-  var tileB=new THREE.MeshLambertMaterial({color:0xa08058});
-  for(var tx=-W/2;tx<W/2;tx+=2){
-    for(var tz=-D/2;tz<D/2;tz+=2){
-      var isA=((tx+tz)/2)%2===0;
-      var tile=new THREE.Mesh(new THREE.PlaneGeometry(2,2),isA?tileA:tileB);
-      tile.rotation.x=-Math.PI/2;tile.position.set(tx+1,baseY,tz+1);scene.add(tile);
-    }
-  }
+  /* ── 바닥 (단일 평면) ── */
+  var floorM=new THREE.MeshLambertMaterial({color:0xb08858});
+  var floor=new THREE.Mesh(new THREE.PlaneGeometry(W,D),floorM);
+  floor.rotation.x=-Math.PI/2;floor.position.set(0,baseY,0);scene.add(floor);
   /* ── 벽 (두꺼운 박스) ── */
   var wallM=new THREE.MeshLambertMaterial({color:0xd4c4a0});
   var wallDarkM=new THREE.MeshLambertMaterial({color:0x8a7a5a});
@@ -148,10 +144,6 @@ function buildInterior(name,baseY){
   var mainLight=new THREE.PointLight(0xffcc88,1.5,30);mainLight.position.set(0,baseY+H-.5,0);scene.add(mainLight);
   var fillL=new THREE.PointLight(0xffaa66,.4,18);fillL.position.set(-6,baseY+H-.5,-5);scene.add(fillL);
   var fillR=new THREE.PointLight(0xffaa66,.4,18);fillR.position.set(6,baseY+H-.5,5);scene.add(fillR);
-  /* 검은색 바닥 아래 박스 (아래가 보이지 않도록) */
-  var underM=new THREE.MeshBasicMaterial({color:0x000000});
-  var under=new THREE.Mesh(new THREE.BoxGeometry(W+4,2,D+4),underM);under.position.set(0,baseY-1,0);scene.add(under);
-
   /* ── 나가기 매트 ── */
   var exitM=new THREE.MeshLambertMaterial({color:0xcc3333});
   var exitMat=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.5),exitM);
