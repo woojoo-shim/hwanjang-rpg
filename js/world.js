@@ -49,7 +49,7 @@ function checkBuildingDoors(){
   /* 건물 입장 힌트 표시/숨김 */
   var bh=document.getElementById('building-hint');
   if(bh){
-    if(nearestDoor){
+    if(nearestDoor&&!insideBuilding){
       bh.style.display='block';
       bh.textContent='E — '+nearestDoor.name+' 입장';
     }else{
@@ -71,6 +71,9 @@ function enterBuilding(door){
   insideBuilding=door.name;
   _savedOutdoorPos.x=PL.group.position.x;
   _savedOutdoorPos.z=PL.group.position.z;
+  /* 힌트 즉시 숨기기 */
+  var bh=document.getElementById('building-hint');
+  if(bh)bh.style.display='none';
   /* 페이드아웃 */
   fadeOverlay.style.opacity='1';
   fadeOverlay.style.background='#000';
