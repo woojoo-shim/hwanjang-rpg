@@ -23,25 +23,24 @@ var COLLIDERS=[
   /* 게이트 기둥 좌우 */ [-4,-28,1.2,1.2],[4,-28,1.2,1.2],
   /* ── 초원 장식 ── */
   /* 표지판 */  [2,22,0.5,0.5],
-  /* 고대 기둥 */[-50,195,1.2,1.2],[-48,198,0.7,0.7],
+  /* 고대 기둥 */[-50,585,1.2,1.2],[-48,594,0.7,0.7],
   /* ── 숲 장식 ── */
-  /* 숲 신전 */ [-75,430,1.6,1.6],
-  /* 야영지 텐트 */[-30,480,1.8,1.8],
-  /* 속빈 통나무 */[30,365,2.2,1.0],
+  /* 숲 신전 */ [-75,1290,1.6,1.6],
+  /* 야영지 텐트 */[-30,1440,1.8,1.8],
+  /* 속빈 통나무 */[30,1095,2.2,1.0],
   /* ── 늪지 장식 ── */
-  /* 해골 장대 (동) */[95,185,0.5,0.5],
-  /* 해골 장대 (서) */[-95,185,0.5,0.5],
-  /* 부서진 수레 (동) */[165,145,1.2,0.8],
-  /* 부서진 수레 (서) */[-165,145,1.2,0.8],
+  /* 해골 장대 (동) */[420,555,0.5,0.5],
+  /* 해골 장대 (서) */[-420,555,0.5,0.5],
+  /* 부서진 수레 (동) */[495,435,1.2,0.8],
+  /* 부서진 수레 (서) */[-495,435,1.2,0.8],
   /* ── 화산 장식 ── */
-  /* 우리 */ [-85,660,1.2,1.2],
-  /* 석조 우상들 */[-65,590,0.8,0.8],[70,640,0.8,0.8],[-45,710,0.8,0.8],[0,760,0.8,0.8],
+  /* 우리 */ [-85,1980,1.2,1.2],
+  /* 석조 우상들 */[-65,1770,0.8,0.8],[70,1920,0.8,0.8],[-45,2130,0.8,0.8],[0,2280,0.8,0.8],
   /* ── 보스 구역 ── */
-  /* 해골 장식 */[0,788,1.0,1.0],
-  /* 보스 기둥 원 (12개) — 반지름 12, z=800 중심, 개별 박스 */
-  [12,800,0.8,0.8],[-12,800,0.8,0.8],[0,812,0.8,0.8],[0,788,0.8,0.8],
-  [10,809,0.8,0.8],[-10,809,0.8,0.8],[10,791,0.8,0.8],[-10,791,0.8,0.8],
-  [6,811,0.8,0.8],[-6,811,0.8,0.8],[6,789,0.8,0.8],[-6,789,0.8,0.8],
+  /* 해골 장식 */[0,2388,1.0,1.0],
+  /* 보스 기둥 원 (8개) — 반지름 12, z=2400 중심, 개별 박스 */
+  [12,2400,0.8,0.8],[-12,2400,0.8,0.8],[0,2412,0.8,0.8],[0,2388,0.8,0.8],
+  [10,2409,0.8,0.8],[-10,2409,0.8,0.8],[10,2391,0.8,0.8],[-10,2391,0.8,0.8],
 ];
 function hitCollider(x,z){
   for(var i=0;i<COLLIDERS.length;i++){
@@ -589,29 +588,29 @@ function updPlayerHpBar(){
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }
 
-/* checkZone — 오픈 월드 위치 기반 존 감지 + 분위기 전환 */
+/* checkZone — 오픈 월드 위치 기반 존 감지 + 분위기 전환 (3x 확장 맵) */
 function checkZone(){
   var z=PL.group.position.z;
   var x=Math.abs(PL.group.position.x);
   var newZone;
   if(z<=20) newZone='village';
-  else if(z<=300&&x>80) newZone='swamp';
-  else if(z<=300) newZone='meadow';
-  else if(z<=560&&x>80) newZone='jungle';
-  else if(z<=560) newZone='darkforest';
+  else if(z<=900&&x>240) newZone='swamp';
+  else if(z<=900) newZone='meadow';
+  else if(z<=1680&&x>240) newZone='jungle';
+  else if(z<=1680) newZone='darkforest';
   else newZone='volcano';
 
   if(newZone!==currentZone){
     var prevZone=currentZone;
     currentZone=newZone;
     visitedZones[newZone]=true;
-    /* 분위기 전환 */
-    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,80,320);scene.background=new THREE.Color(0x0a1510);}
-    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,100,380);scene.background=new THREE.Color(0x1a3010);}
-    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,40,160);scene.background=new THREE.Color(0x050a05);}
-    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,25,130);scene.background=new THREE.Color(0x020202);}
-    else if(newZone==='jungle'){scene.fog=new THREE.Fog(0x0a2010,30,150);scene.background=new THREE.Color(0x0a2010);}
-    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,35,160);scene.background=new THREE.Color(0x100500);}
+    /* 분위기 전환 (3x 확장 맵 — 안개 거리 늘림) */
+    if(newZone==='village'){scene.fog=new THREE.Fog(0x0a1510,120,500);scene.background=new THREE.Color(0x0a1510);}
+    else if(newZone==='meadow'){scene.fog=new THREE.Fog(0x1a3010,180,700);scene.background=new THREE.Color(0x1a3010);}
+    else if(newZone==='swamp'){scene.fog=new THREE.Fog(0x050a05,80,350);scene.background=new THREE.Color(0x050a05);}
+    else if(newZone==='darkforest'){scene.fog=new THREE.Fog(0x020202,60,280);scene.background=new THREE.Color(0x020202);}
+    else if(newZone==='jungle'){scene.fog=new THREE.Fog(0x0a2010,70,300);scene.background=new THREE.Color(0x0a2010);}
+    else if(newZone==='volcano'){scene.fog=new THREE.Fog(0x100500,80,350);scene.background=new THREE.Color(0x100500);}
 
     /* 배너 표시 */
     var zi=ZONE_INFO[newZone];
@@ -639,6 +638,18 @@ function checkZone(){
   }
 }
 
+/* 물 속 여부 판정 */
+var _inWater=false;
+var _waterDepth=0;/* 0=지상, 양수=물에 잠긴 깊이 */
+
+function isOverWater(x,z){
+  /* 강은 z:20~2700 범위, x=-165±3 또는 x=165±3 */
+  if(z<20||z>2700)return false;
+  var rl=Math.abs(x-RIVER_X_LEFT);
+  var rr=Math.abs(x-RIVER_X_RIGHT);
+  return rl<9||rr<9;/* 강 폭 18 */
+}
+
 function handleMove(dt){
   tickAtkAnim(dt);
   /* 상태이상 틱 */
@@ -651,6 +662,32 @@ function handleMove(dt){
     }
   }
   if(playerSlowed>0)playerSlowed-=dt;
+
+  /* ── 물 물리 ── */
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  var wasInWater=_inWater;
+  _inWater=isOverWater(px,pz);
+  if(_inWater){
+    /* 물에 들어가면 Y 서서히 낮아짐 */
+    _waterDepth=Math.min(_waterDepth+dt*1.5,0.8);
+    PL.group.position.y=-_waterDepth;
+    if(!wasInWater)addChat('inf','','물에 빠졌다! 이동이 느려진다.');
+    /* 물 데미지: 5초마다 2 데미지 */
+    _waterDmgTimer=(_waterDmgTimer||0)+dt;
+    if(_waterDmgTimer>5){
+      _waterDmgTimer=0;
+      playerHP=Math.max(1,playerHP-2);
+      updPlayerHpBar();
+    }
+  }else{
+    /* 물 밖으로 나오면 Y 복귀 */
+    if(_waterDepth>0){
+      _waterDepth=Math.max(0,_waterDepth-dt*3);
+      if(_waterDepth===0&&wasInWater)addChat('inf','','강에서 빠져나왔다.');
+    }
+    _waterDmgTimer=0;
+  }
+
   var dx=0,dz=0;
   if(keys['w']||keys['arrowup']){dx-=Math.sin(cYaw);dz-=Math.cos(cYaw);}
   if(keys['s']||keys['arrowdown']){dx+=Math.sin(cYaw);dz+=Math.cos(cYaw);}
@@ -661,6 +698,7 @@ function handleMove(dt){
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
     var spdMul=(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul;
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
+    if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     var wb=WORLD_BOUNDS;
     if(nx>wb[0]&&nx<wb[1]&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
@@ -671,10 +709,11 @@ function handleMove(dt){
     PL.legR.rotation.x=-Math.sin(PL.bobT)*wa;
     PL.armL.rotation.x=-Math.sin(PL.bobT)*wa*.5;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x=Math.sin(PL.bobT)*wa*.5;
-    PL.group.position.y=Math.abs(Math.sin(PL.bobT))*.06;
+    if(!_inWater)PL.group.position.y=Math.abs(Math.sin(PL.bobT))*.06;
   }else{
     PL.legL.rotation.x*=.8;PL.legR.rotation.x*=.8;PL.armL.rotation.x*=.8;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x*=.8;
-    PL.group.position.y*=.8;
+    if(!_inWater)PL.group.position.y*=.8;
   }
 }
+var _waterDmgTimer=0;

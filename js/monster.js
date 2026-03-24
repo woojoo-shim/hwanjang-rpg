@@ -852,58 +852,57 @@ function spawnMonster(def,x,z,parent){
 /* 모든 좌표는 월드 절대 좌표 */
 
 function buildMeadow(){
-  /* 초원: x:-80~80, z:20~300 */
+  /* 초원: x:-240~240, z:20~900 (3x 확장) */
   /* 밝은 녹색 패치들 */
   var patchM=new THREE.MeshLambertMaterial({color:0x4a8a2a});
-  [[-30,80,12,8],[25,160,12,8],[0,240,12,9],
-   [60,110,8,6],[-55,220,8,6]
+  [[-80,200,20,14],[60,420,18,12],[0,660,20,16],
+   [160,300,14,10],[-140,550,14,10],[-60,780,16,12],[100,750,14,10],
+   [-200,380,12,8],[200,500,12,8]
   ].forEach(function(pp){
     var patch=new THREE.Mesh(new THREE.PlaneGeometry(pp[2],pp[3]),patchM);
     patch.rotation.x=-Math.PI/2;patch.position.set(pp[0],.015,pp[1]);scene.add(patch);
   });
-  /* 초원 길 */
-  var r1=new THREE.Mesh(new THREE.PlaneGeometry(6,280),new THREE.MeshLambertMaterial({color:0x1e1a10}));
-  r1.rotation.x=-Math.PI/2;r1.position.set(0,.013,160);scene.add(r1);
-  /* 조명 */
-  var pl1=new THREE.PointLight(0xffcc44,.35,180);pl1.position.set(0,8,160);scene.add(pl1);
-  /* 구릉 */
-  var hillM=new THREE.MeshLambertMaterial({color:0x3a6a22});
-  [[-40,80,5,1.2],[50,160,6,1.3],[65,240,5,1.2],[-30,130,6,1.4]
-  ].forEach(function(pp){
-    var hill=new THREE.Mesh(new THREE.SphereGeometry(pp[2],10,8),hillM);
-    hill.scale.set(1.5,.25,1.5);hill.position.set(pp[0],pp[3]*.25,pp[1]);scene.add(hill);
-  });
-  /* 야생화 */
+  /* 초원 조명 */
+  var pl1=new THREE.PointLight(0xffcc44,.3,300);pl1.position.set(0,8,450);scene.add(pl1);
+  var pl2=new THREE.PointLight(0xffcc44,.25,250);pl2.position.set(0,8,800);scene.add(pl2);
+  /* 야생화 (더 넓게) */
   var flowerColors=[0xffee44,0xffffff,0xcc88ff,0xff88aa,0x88ddff];
-  for(var fi=0;fi<35;fi++){
-    var fx=(Math.random()-.5)*150,fz=25+Math.random()*270;
+  for(var fi=0;fi<100;fi++){
+    var fx=(Math.random()-.5)*440,fz=25+Math.random()*860;
+    if(Math.abs(fx)<10)continue;
     var fc=flowerColors[Math.floor(Math.random()*5)];
     var fl=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.04,5,5),new THREE.MeshLambertMaterial({color:fc,emissive:new THREE.Color(fc),emissiveIntensity:.15}));
     fl.position.set(fx,.08,fz);scene.add(fl);
   }
-  /* 초원 나무 */
-  [[-60,55],[-65,130],[-55,200],[-70,270],
-   [60,70],[65,140],[55,210],[75,280],
-   [-40,100],[40,160],[-30,230],[30,285],
-   [0,90],[0,185]
-  ].forEach(function(pp){mkTree(pp[0],pp[1],.9+Math.random()*.7,scene);});
+  /* 초원 나무 (3x 배치) */
+  [[-80,80],[-100,220],[-90,380],[-120,540],[-80,700],[-100,840],
+   [80,120],[100,280],[90,440],[120,600],[80,760],[100,880],
+   [-50,160],[50,330],[-30,500],[30,670],[-60,830],[60,900],
+   [0,200],[0,480],[0,750],[-160,300],[160,400],[-180,620],[180,720]
+  ].forEach(function(pp){mkTree(pp[0],pp[1],.9+Math.random()*.8,scene);});
   /* 덤불 */
   var bushM=new THREE.MeshLambertMaterial({color:0x224a10});
-  [[-25,80],[28,145],[-50,200],[55,270]
+  [[-60,200],[80,380],[-130,500],[140,650],[-70,780],[90,860],
+   [-180,280],[180,420],[-150,700],[150,800]
   ].forEach(function(pp){
-    var bush=new THREE.Mesh(new THREE.SphereGeometry(.5+Math.random()*.3,6,6),bushM);
+    var bush=new THREE.Mesh(new THREE.SphereGeometry(.6+Math.random()*.4,6,6),bushM);
     bush.scale.y=.6;bush.position.set(pp[0],.3,pp[1]);scene.add(bush);
   });
-  /* 몬스터 스폰 — 월드 좌표 (넓게 분산) */
+  /* 몬스터 스폰 — 3x 확장 (더 많이, 더 넓게) */
   var rd=MONSTER_DEFS.find(function(x){return x.id==='rabbit';});
   var dd=MONSTER_DEFS.find(function(x){return x.id==='deer';});
-  if(rd)[[-35,35],[25,90],[-55,150],[50,210]
-        ].forEach(function(pp){spawnMonster(rd,pp[0],pp[1],scene);});
-  if(dd)[[55,45],[-45,160],[30,230],[-20,285]
-        ].forEach(function(pp){spawnMonster(dd,pp[0],pp[1],scene);});
+  if(rd)[
+    [-50,60],[30,180],[-80,320],[60,460],
+    [-30,600],[90,740],[-60,860],[40,400],
+    [-120,250],[120,550]
+  ].forEach(function(pp){spawnMonster(rd,pp[0],pp[1],scene);});
+  if(dd)[
+    [80,100],[-70,280],[50,450],[-40,620],
+    [100,780],[-100,350],[60,700],[-80,500]
+  ].forEach(function(pp){spawnMonster(dd,pp[0],pp[1],scene);});
   /* ★ 엘리트: 황금 사슴왕 */
   var es=MONSTER_DEFS.find(function(x){return x.id==='elite_stag';});
-  if(es)spawnMonster(es,0,200,scene);
+  if(es)spawnMonster(es,0,600,scene);
 }
 
 function buildSwamp(){
@@ -1151,18 +1150,22 @@ function buildSwamp(){
     scene.add(logMoss);
   });
 
-  /* ── 몬스터 스폰 — 동서 양쪽 (더 넓게 분산) ── */
+  /* ── 몬스터 스폰 — 동서 양쪽 3x 확장 좌표 ── */
   var sd=MONSTER_DEFS.find(function(x){return x.id==='slime';});
   var td=MONSTER_DEFS.find(function(x){return x.id==='toad';});
-  /* 동쪽 늪 */
-  if(sd)[[100,60],[150,145],[130,260]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
-  if(td)[[120,100],[165,200],[110,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
-  /* 서쪽 늪 */
-  if(sd)[[-100,60],[-150,145],[-130,260]].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
-  if(td)[[-120,100],[-165,200],[-110,280]].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
+  /* 동쪽 늪 (x:240~600, z:20~900) */
+  if(sd)[[280,120],[380,350],[320,580],[420,750],[500,220],[550,480]
+        ].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
+  if(td)[[300,200],[450,420],[350,650],[480,850],[540,300],[400,700]
+        ].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
+  /* 서쪽 늪 (x:-240~-600, z:20~900) */
+  if(sd)[[-280,120],[-380,350],[-320,580],[-420,750],[-500,220],[-550,480]
+        ].forEach(function(pp){spawnMonster(sd,pp[0],pp[1],scene);});
+  if(td)[[-300,200],[-450,420],[-350,650],[-480,850],[-540,300],[-400,700]
+        ].forEach(function(pp){spawnMonster(td,pp[0],pp[1],scene);});
   /* ★ 엘리트: 독왕 두꺼비 */
   var et=MONSTER_DEFS.find(function(x){return x.id==='elite_toad';});
-  if(et)spawnMonster(et,150,200,scene);
+  if(et)spawnMonster(et,400,600,scene);
 }
 
 function buildDarkForest(){
@@ -1577,117 +1580,113 @@ function buildDarkForest(){
   campfire3.position.set(-15,.25,510);scene.add(campfire3);
   var cfl3=new THREE.PointLight(0xff3300,1.2,12);cfl3.position.set(-15,1,510);scene.add(cfl3);
 
-  /* ═══ 몬스터 스폰 (기존 유지) ═══ */
+  /* ═══ 몬스터 스폰 — 3x 확장 좌표 (z:900~1680, x:-360~360) ═══ */
   var gd=MONSTER_DEFS.find(function(x){return x.id==='goblin';});
   var wd=MONSTER_DEFS.find(function(x){return x.id==='wolf';});
-  if(gd)[[-40,325],[25,395],[-18,460],[50,530]
-        ].forEach(function(pp){spawnMonster(gd,pp[0],pp[1],scene);});
-  if(wd)[[55,345],[-50,400],[35,470],[-25,540]
-        ].forEach(function(pp){spawnMonster(wd,pp[0],pp[1],scene);});
+  if(gd)[
+    [-80,950],[60,1080],[-40,1200],[100,1320],
+    [-120,1450],[30,1550],[-60,1620],[80,1400]
+  ].forEach(function(pp){spawnMonster(gd,pp[0],pp[1],scene);});
+  if(wd)[
+    [120,980],[-100,1100],[60,1250],[-80,1380],
+    [100,1500],[-50,1600],[80,1650],[-120,1350]
+  ].forEach(function(pp){spawnMonster(wd,pp[0],pp[1],scene);});
   /* ★ 엘리트: 늑대 대장 */
   var ew=MONSTER_DEFS.find(function(x){return x.id==='elite_wolf';});
-  if(ew)spawnMonster(ew,-100,540,scene);
+  if(ew)spawnMonster(ew,-200,1550,scene);
 }
 
 function buildJungle(){
-  /* 정글: x:80~200, z:300~560 */
+  /* 정글: x:240~600, z:900~1680 (3x 확장) */
   /* 지면 — 진한 초록 */
-  var jGround=new THREE.Mesh(new THREE.PlaneGeometry(140,260),new THREE.MeshLambertMaterial({color:0x0a3a0a}));
-  jGround.rotation.x=-Math.PI/2;jGround.position.set(140,.005,430);scene.add(jGround);
+  var jGround=new THREE.Mesh(new THREE.PlaneGeometry(360,780),new THREE.MeshLambertMaterial({color:0x0a3a0a}));
+  jGround.rotation.x=-Math.PI/2;jGround.position.set(420,.005,1290);scene.add(jGround);
   /* 조명 — 초록빛 */
-  var jl=new THREE.PointLight(0x22aa44,.6,200);jl.position.set(140,8,430);scene.add(jl);
-  /* 빽빽한 열대 나무 — 랜덤 70그루 */
+  var jl=new THREE.PointLight(0x22aa44,.5,400);jl.position.set(400,8,1290);scene.add(jl);
+  var jl2=new THREE.PointLight(0x22aa44,.4,300);jl2.position.set(500,8,1500);scene.add(jl2);
+  /* 빽빽한 열대 나무 — 랜덤 100그루 (3x) */
   var jTrunkM=new THREE.MeshLambertMaterial({color:0x3a2a10});
-  for(var jt=0;jt<70;jt++){
-    var tx=85+Math.random()*115,tz=305+Math.random()*250;
+  for(var jt=0;jt<100;jt++){
+    var tx=245+Math.random()*350,tz=905+Math.random()*770;
     var th=5+Math.random()*4;
     var trunk=new THREE.Mesh(new THREE.CylinderGeometry(.25+Math.random()*.2,.4+Math.random()*.3,th,6),jTrunkM);
     trunk.position.set(tx,th/2,tz);scene.add(trunk);
     var lr=2+Math.random()*2;
     var leaves=new THREE.Mesh(new THREE.SphereGeometry(lr,6,5),new THREE.MeshLambertMaterial({color:0x0a5515+Math.floor(Math.random()*0x115511)}));
     leaves.position.set(tx,th+lr*.4,tz);leaves.scale.y=.5+Math.random()*.3;scene.add(leaves);
-    /* 일부 나무에 두 번째 잎 레이어 */
     if(Math.random()<.4){
       var lr2=1.5+Math.random()*1.2;
       var leaves2=new THREE.Mesh(new THREE.SphereGeometry(lr2,5,4),new THREE.MeshLambertMaterial({color:0x117722+Math.floor(Math.random()*0x114400)}));
       leaves2.position.set(tx+Math.random()-.5,th+lr*.2,tz+Math.random()-.5);leaves2.scale.y=.5;scene.add(leaves2);
     }
   }
-  /* 작은 관목 30개 */
+  /* 작은 관목 */
   var bushM=new THREE.MeshLambertMaterial({color:0x1a6625});
-  for(var jb=0;jb<30;jb++){
-    var bx=85+Math.random()*115,bz=305+Math.random()*250;
+  for(var jb=0;jb<50;jb++){
+    var bx=245+Math.random()*350,bz=905+Math.random()*770;
     var bush=new THREE.Mesh(new THREE.SphereGeometry(.6+Math.random()*.5,5,4),bushM);
     bush.position.set(bx,.4,bz);bush.scale.y=.6;scene.add(bush);
   }
   /* 덩굴 */
   var vineM=new THREE.MeshLambertMaterial({color:0x228833});
-  for(var vi=0;vi<40;vi++){
-    var vx=85+Math.random()*115,vz=305+Math.random()*250;
+  for(var vi=0;vi<60;vi++){
+    var vx=245+Math.random()*350,vz=905+Math.random()*770;
     var vl=2+Math.random()*4;
     var vine=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,vl,4),vineM);
     vine.position.set(vx,1+Math.random()*3,vz);scene.add(vine);
   }
-  /* 물웅덩이 */
-  var poolM=new THREE.MeshLambertMaterial({color:0x115533,transparent:true,opacity:.6});
-  [[110,380],[155,460],[130,530]].forEach(function(pp){
-    var pool=new THREE.Mesh(new THREE.CircleGeometry(3+Math.random()*2,8),poolM);
-    pool.rotation.x=-Math.PI/2;pool.position.set(pp[0],.02,pp[1]);scene.add(pool);
-  });
-  /* 형광 파티클 (반딧불) */
+  /* 형광 파티클 */
   var glowM=new THREE.MeshBasicMaterial({color:0x44ff44,transparent:true,opacity:.7});
-  for(var gp=0;gp<50;gp++){
-    var gx=85+Math.random()*115,gz=305+Math.random()*250;
+  for(var gp=0;gp<80;gp++){
+    var gx=245+Math.random()*350,gz=905+Math.random()*770;
     var gy=.5+Math.random()*4;
     var glow=new THREE.Mesh(new THREE.SphereGeometry(.05,4,4),glowM);
     glow.position.set(gx,gy,gz);scene.add(glow);
   }
-  /* 큰 바위 */
-  var jRockM=new THREE.MeshLambertMaterial({color:0x2a3a1a});
-  [[100,345,1.8],[160,420,1.5],[125,505,2.0],[180,530,1.3]].forEach(function(pp){
-    var rock=new THREE.Mesh(new THREE.DodecahedronGeometry(pp[2],0),jRockM);
-    rock.position.set(pp[0],pp[2]*.4,pp[1]);rock.rotation.y=Math.random()*Math.PI;scene.add(rock);
-  });
-  /* 몬스터 스폰 */
+  /* 몬스터 스폰 — 3x 확장 */
   var sp=MONSTER_DEFS.find(function(x){return x.id==='jungle_spider';});
   var sn=MONSTER_DEFS.find(function(x){return x.id==='jungle_snake';});
   var ap=MONSTER_DEFS.find(function(x){return x.id==='jungle_ape';});
-  if(sp)[[95,330],[140,380],[170,450],[110,520],[155,340],[185,400]].forEach(function(pp){spawnMonster(sp,pp[0],pp[1],scene);});
-  if(sn)[[120,350],[155,430],[185,500],[100,540],[130,310],[175,530]].forEach(function(pp){spawnMonster(sn,pp[0],pp[1],scene);});
-  if(ap)[[130,370],[160,480],[190,540],[100,460]].forEach(function(pp){spawnMonster(ap,pp[0],pp[1],scene);});
-  /* 정글 표범 — 빠르고 치명적 */
+  if(sp)[[270,960],[380,1100],[450,1250],[320,1400],[500,1550],[560,1000],[290,1600],[420,1300]
+        ].forEach(function(pp){spawnMonster(sp,pp[0],pp[1],scene);});
+  if(sn)[[300,1020],[430,1180],[480,1350],[350,1500],[520,1620],[260,1080],[400,1450],[550,1200]
+        ].forEach(function(pp){spawnMonster(sn,pp[0],pp[1],scene);});
+  if(ap)[[360,1050],[490,1300],[540,1480],[280,1580],[320,1200],[460,1600]
+        ].forEach(function(pp){spawnMonster(ap,pp[0],pp[1],scene);});
   var pt=MONSTER_DEFS.find(function(x){return x.id==='jungle_panther';});
-  if(pt)[[110,400],[165,500],[190,350],[95,480]].forEach(function(pp){spawnMonster(pt,pp[0],pp[1],scene);});
-  /* 거대 모기 — 빠르고 성가심 */
+  if(pt)[[340,1100],[510,1380],[400,1550],[580,1150],[260,1460]
+        ].forEach(function(pp){spawnMonster(pt,pp[0],pp[1],scene);});
   var mq=MONSTER_DEFS.find(function(x){return x.id==='jungle_mosquito';});
-  if(mq)[[90,360],[135,420],[175,470],[115,550],[160,320],[195,520]].forEach(function(pp){spawnMonster(mq,pp[0],pp[1],scene);});
-  /* 나무 정령 — 느리지만 강력 */
+  if(mq)[[280,1000],[390,1220],[470,1420],[560,1050],[310,1650],[530,1350]
+        ].forEach(function(pp){spawnMonster(mq,pp[0],pp[1],scene);});
   var tr=MONSTER_DEFS.find(function(x){return x.id==='jungle_treant';});
-  if(tr)[[125,390],[155,510],[185,440]].forEach(function(pp){spawnMonster(tr,pp[0],pp[1],scene);});
+  if(tr)[[350,1150],[480,1400],[420,1600]
+        ].forEach(function(pp){spawnMonster(tr,pp[0],pp[1],scene);});
   /* ★ 엘리트: 정글의 왕 */
   var ea=MONSTER_DEFS.find(function(x){return x.id==='elite_ape';});
-  if(ea)spawnMonster(ea,140,470,scene);
+  if(ea)spawnMonster(ea,420,1400,scene);
 }
 
 function buildVolcano(){
-  /* 화산: x:-100~100, z:560~860 */
+  /* 화산: x:-300~300, z:1680~2600 (3x 확장) */
   /* 지면 균열 */
   var crackLineM=new THREE.MeshBasicMaterial({color:0xff2200,transparent:true,opacity:.4});
-  for(var ci=0;ci<12;ci++){
-    var cx2=(Math.random()-.5)*180,cz2=565+Math.random()*290;
-    var cLen=2+Math.random()*8;
+  for(var ci=0;ci<30;ci++){
+    var cx2=(Math.random()-.5)*540,cz2=1690+Math.random()*900;
+    var cLen=2+Math.random()*10;
     var crack=new THREE.Mesh(new THREE.PlaneGeometry(.15,cLen),crackLineM);
     crack.rotation.x=-Math.PI/2;crack.rotation.z=Math.random()*Math.PI;
     crack.position.set(cx2,.018,cz2);scene.add(crack);
   }
   /* 열 발광 */
   var heatGlowM=new THREE.MeshBasicMaterial({color:0xff1100,transparent:true,opacity:.06});
-  for(var hg=0;hg<6;hg++){
-    var hgp=new THREE.Mesh(new THREE.PlaneGeometry(12+Math.random()*10,10+Math.random()*8),heatGlowM);
-    hgp.rotation.x=-Math.PI/2;hgp.position.set((Math.random()-.5)*160,.02,580+hg*48);scene.add(hgp);
+  for(var hg=0;hg<15;hg++){
+    var hgp=new THREE.Mesh(new THREE.PlaneGeometry(16+Math.random()*14,12+Math.random()*10),heatGlowM);
+    hgp.rotation.x=-Math.PI/2;hgp.position.set((Math.random()-.5)*480,.02,1700+hg*60);scene.add(hgp);
   }
   /* 조명 */
-  var pl4=new THREE.PointLight(0xff2200,.8,300);pl4.position.set(0,3,710);scene.add(pl4);
+  var pl4=new THREE.PointLight(0xff2200,.8,500);pl4.position.set(0,3,2100);scene.add(pl4);
+  var pl4b=new THREE.PointLight(0xff2200,.6,400);pl4b.position.set(0,3,1850);scene.add(pl4b);
   /* 용암 강 */
   var lavaRiverM=new THREE.MeshLambertMaterial({color:0xff4400,emissive:new THREE.Color(0xff2200),emissiveIntensity:.7,transparent:true,opacity:.9});
   var river1=new THREE.Mesh(new THREE.PlaneGeometry(4,200),lavaRiverM);
@@ -1699,8 +1698,10 @@ function buildVolcano(){
   /* 용암 웅덩이 */
   var lavaM2=new THREE.MeshLambertMaterial({color:0xff3300,emissive:new THREE.Color(0xff1100),emissiveIntensity:.7,transparent:true,opacity:.9});
   var volcM=new THREE.MeshLambertMaterial({color:0x1a0800});
-  [[-40,600,6,4],[0,700,9,6],[35,800,6,4],
-   [-25,650,7,5],[30,750,5,4],[15,850,8,5]
+  /* 용암 웅덩이 (3x) */
+  [[-120,1750,8,6],[0,1900,12,8],[100,2050,8,6],
+   [-80,2150,10,7],[90,2250,8,6],[40,2380,12,8],
+   [-150,2000,6,5],[150,1850,6,5],[0,2500,10,7]
   ].forEach(function(pp){
     var lava=new THREE.Mesh(new THREE.PlaneGeometry(pp[2]*2,pp[3]*2),lavaM2);
     lava.rotation.x=-Math.PI/2;lava.position.set(pp[0],.05,pp[1]);scene.add(lava);
@@ -1708,17 +1709,17 @@ function buildVolcano(){
   });
   /* 연기 */
   var smokeM=new THREE.MeshLambertMaterial({color:0x1a0a00,transparent:true,opacity:.25});
-  for(var si=0;si<8;si++){
-    var sx=(Math.random()-.5)*160,sz=570+Math.random()*285;
-    var sy=3+Math.random()*5;
-    var sr=.5+Math.random()*.8;
+  for(var si=0;si<20;si++){
+    var sx=(Math.random()-.5)*480,sz=1700+Math.random()*880;
+    var sy=3+Math.random()*6;
+    var sr=.6+Math.random()*1.0;
     var smokeS=new THREE.Mesh(new THREE.SphereGeometry(sr,6,6),smokeM);
     smokeS.position.set(sx,sy,sz);scene.add(smokeS);
   }
   /* 화산 바위 */
   var crackVM=new THREE.MeshLambertMaterial({color:0xff3300,emissive:new THREE.Color(0xff1100),emissiveIntensity:.6});
-  [[-30,600,2],[18,700,2],[-25,760,1.9],[35,820,2.2],
-   [50,650,2],[-35,730,2]
+  [[-90,1800,2],[55,1950,2.5],[-75,2100,2.2],[100,2250,2.0],
+   [-130,2050,1.8],[140,1850,2.2],[-40,2300,2.5],[60,2450,2.0]
   ].forEach(function(pp){
     var rx=pp[0],rz=pp[1],rs=pp[2];
     var vr=new THREE.Mesh(new THREE.DodecahedronGeometry(rs,0),volcM);
@@ -1726,33 +1727,38 @@ function buildVolcano(){
     var cr=new THREE.Mesh(new THREE.BoxGeometry(.1,rs*.8,.1),crackVM);cr.position.set(rx,rs*.5,rz);scene.add(cr);
   });
   /* 화산 굴뚝 */
-  [[-70,600],[70,680],[-55,760],[55,840]].forEach(function(pp){
+  [[-200,1750],[200,1900],[-150,2050],[150,2200],[-220,2350],[220,2500],[0,2050],[-80,2400],[80,1800]
+  ].forEach(function(pp){
     var cx=pp[0],cz=pp[1];
-    var chimney=new THREE.Mesh(new THREE.CylinderGeometry(1,1.4,5,8),volcM);chimney.position.set(cx,2.5,cz);scene.add(chimney);
-    var smoke2=new THREE.Mesh(new THREE.CylinderGeometry(.6,.2,2,6),new THREE.MeshLambertMaterial({color:0x220800,emissive:new THREE.Color(0xff2200),emissiveIntensity:.5}));
-    smoke2.position.set(cx,6,cz);scene.add(smoke2);
-    var cl=new THREE.PointLight(0xff2200,1.2,14);cl.position.set(cx,5,cz);scene.add(cl);
+    var chimney=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.8,6,8),volcM);chimney.position.set(cx,3,cz);scene.add(chimney);
+    var smoke2=new THREE.Mesh(new THREE.CylinderGeometry(.7,.25,2.5,6),new THREE.MeshLambertMaterial({color:0x220800,emissive:new THREE.Color(0xff2200),emissiveIntensity:.5}));
+    smoke2.position.set(cx,7.5,cz);scene.add(smoke2);
+    var cl=new THREE.PointLight(0xff2200,1.2,20);cl.position.set(cx,6,cz);scene.add(cl);
   });
-  /* 보스 제단 */
+  /* 보스 제단 — z:2400 (끝부분) */
   var altarM=new THREE.MeshLambertMaterial({color:0x110800});
-  var altar=new THREE.Mesh(new THREE.CylinderGeometry(4,5,1,8),altarM);altar.position.set(0,.5,800);scene.add(altar);
-  var altarL=new THREE.PointLight(0xff4400,2.5,25);altarL.position.set(0,2,800);scene.add(altarL);
+  var altar=new THREE.Mesh(new THREE.CylinderGeometry(4,5,1,8),altarM);altar.position.set(0,.5,2400);scene.add(altar);
+  var altarL=new THREE.PointLight(0xff4400,2.5,40);altarL.position.set(0,2,2400);scene.add(altarL);
   var flamePillarM=new THREE.MeshBasicMaterial({color:0xff6600,transparent:true,opacity:.4});
-  [-3,3].forEach(function(fpx){
-    var fp=new THREE.Mesh(new THREE.CylinderGeometry(.15,.25,3,6),flamePillarM);
-    fp.position.set(fpx,1.5,800);scene.add(fp);
-    var fpl=new THREE.PointLight(0xff4400,.8,8);fpl.position.set(fpx,2,800);scene.add(fpl);
+  [-4,4].forEach(function(fpx){
+    var fp=new THREE.Mesh(new THREE.CylinderGeometry(.2,.3,4,6),flamePillarM);
+    fp.position.set(fpx,2,2400);scene.add(fp);
+    var fpl=new THREE.PointLight(0xff4400,.8,10);fpl.position.set(fpx,3,2400);scene.add(fpl);
   });
-  /* 몬스터 스폰 (더 넓게 분산) */
+  /* 몬스터 스폰 — 3x 확장 좌표 (z:1680~2600) */
   var gld=MONSTER_DEFS.find(function(x){return x.id==='golem';});
   var fdd=MONSTER_DEFS.find(function(x){return x.id==='firedrake';});
-  if(gld)[[-45,590],[35,665],[-25,730],[20,800]
-         ].forEach(function(pp){spawnMonster(gld,pp[0],pp[1],scene);});
-  if(fdd)[[50,610],[-40,680],[40,755],[0,840]
-         ].forEach(function(pp){spawnMonster(fdd,pp[0],pp[1],scene);});
+  if(gld)[
+    [-120,1750],[80,1900],[-60,2050],[100,2200],
+    [-150,2350],[50,2480],[0,1800],[-80,2100],[120,2300]
+  ].forEach(function(pp){spawnMonster(gld,pp[0],pp[1],scene);});
+  if(fdd)[
+    [130,1820],[-100,1980],[80,2130],[-130,2280],
+    [100,2430],[0,2100],[-60,1750],[140,2350]
+  ].forEach(function(pp){spawnMonster(fdd,pp[0],pp[1],scene);});
   /* ★ 엘리트: 고대 화염룡 */
   var ed=MONSTER_DEFS.find(function(x){return x.id==='elite_dragon';});
-  if(ed)spawnMonster(ed,0,800,scene);
+  if(ed)spawnMonster(ed,0,2400,scene);
 }
 
 /* ════════════ 전체 오픈 월드 빌드 ════════════ */

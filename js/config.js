@@ -336,17 +336,22 @@ var MONSTER_DEFS=[
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
-var WORLD_BOUNDS=[-200,200,-32,860]; // minX, maxX, minZ, maxZ
+/* 맵 3x 확장: 기존 z좌표 × 3 */
+var WORLD_BOUNDS=[-600,600,-32,2600]; // minX, maxX, minZ, maxZ (3x expanded)
 var WORLD_SPAWN=[5,-3]; // 분수 옆
 
 var ZONE_INFO={
   village:  {name:'시작 마을',   color:'#c9a84c',tp:[0,0]},
-  meadow:   {name:'초원',        color:'#4aaa3a',tp:[0,50]},
-  swamp:    {name:'독 늪',       color:'#44aa44',tp:[100,100]},
-  darkforest:{name:'어두운 숲',  color:'#aa4422',tp:[0,430]},
-  jungle:   {name:'정글',        color:'#11aa44',tp:[120,430]},
-  volcano:  {name:'화산 지대',   color:'#ff4400',tp:[0,700]},
+  meadow:   {name:'초원',        color:'#4aaa3a',tp:[0,150]},
+  swamp:    {name:'독 늪',       color:'#44aa44',tp:[240,300]},
+  darkforest:{name:'어두운 숲',  color:'#aa4422',tp:[0,1250]},
+  jungle:   {name:'정글',        color:'#11aa44',tp:[280,1250]},
+  volcano:  {name:'화산 지대',   color:'#ff4400',tp:[0,2100]},
 };
+
+/* 강 x좌표 (water physics 기준) */
+var RIVER_X_LEFT=-165;
+var RIVER_X_RIGHT=165;
 
 /* 방문한 존 기록 */
 var visitedZones={village:true};
