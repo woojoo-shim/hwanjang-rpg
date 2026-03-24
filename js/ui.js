@@ -53,16 +53,22 @@ function updLabels(){
   var ple=document.getElementById('ple');
   if(ple&&PL.group)posEl(ple,PL.group.position.x,PL.group.position.y+2.4,PL.group.position.z);
   npcs.forEach(function(n){
+    if(!n.nameEl&&!n.label)return;/* 내부 NPC는 별도 처리 */
+    var ne=n.nameEl||n.label;
+    var ie=n.intEl||n.interact;
+    if(!ne)return;
     var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
     var dist=Math.sqrt(dx*dx+dz*dz);
     if(dist<15){
-      n.nameEl.style.display='';
-      posEl(n.nameEl,n.mesh.position.x,n.mesh.position.y+2.4,n.mesh.position.z);
-      if(n===closestNpc){n.intEl.style.display='block';posEl(n.intEl,n.mesh.position.x,n.mesh.position.y+3.1,n.mesh.position.z);}
-      else n.intEl.style.display='none';
+      ne.style.display='';
+      posEl(ne,n.mesh.position.x,n.mesh.position.y+2.4,n.mesh.position.z);
+      if(ie){
+        if(n===closestNpc){ie.style.display='block';posEl(ie,n.mesh.position.x,n.mesh.position.y+3.1,n.mesh.position.z);}
+        else ie.style.display='none';
+      }
     }else{
-      n.nameEl.style.display='none';
-      n.intEl.style.display='none';
+      ne.style.display='none';
+      if(ie)ie.style.display='none';
     }
   });
   document.querySelectorAll('#lov .llabel.bld').forEach(function(el){
