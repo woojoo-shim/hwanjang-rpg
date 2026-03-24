@@ -279,10 +279,14 @@ var activeBuffs={};
 
 /* ════════════ NPC 정의 ════════════ */
 var NPC_DEF=[
-  {name:'(이장) 박건호',px:-356, pz:-350,  bc:0x7a4a18,hc:0xddaa77},
-  {name:'(상인) 김도윤',px:-357, pz:-362,bc:0x1a3a8a,hc:0xddcc99},
-  {name:'(대장장이) 이태산',px:-343,pz:-362,bc:0x3a2a1a,hc:0xcc9966},
-  {name:'(???) 정체불명',px:-342, pz:-350,  bc:0x1a1030,hc:0xaaaacc},
+  /* 이장 — 광장 중앙 근처 */
+  {name:'(이장) 박건호',px:-350, pz:-358,  bc:0x7a4a18,hc:0xddaa77},
+  /* 상인 — 상인 구역 (서쪽 시장 스탠드 앞) */
+  {name:'(상인) 김도윤',px:-395, pz:-370,bc:0x1a3a8a,hc:0xddcc99},
+  /* 대장장이 — 무기 상점 구역 (동쪽) */
+  {name:'(대장장이) 이태산',px:-305,pz:-370,bc:0x3a2a1a,hc:0xcc9966},
+  /* 정체불명 — 마을 외곽 북쪽 구석 */
+  {name:'(???) 정체불명',px:-390, pz:-320,  bc:0x1a1030,hc:0xaaaacc},
   /* 전직 NPC — 동적 스폰으로 이동 (npc.js에서 관리) */
   /* 아래 4개는 동적 스폰 — npc.js가 관리: warrior, rogue, assassin, berserker */
 ];
@@ -347,7 +351,7 @@ var WORLD_SPAWN=[-345,-345]; // 마을 분수 옆
 
 /* ── 존 중심 좌표 (거리 기반 존 감지에 사용) ── */
 var ZONE_CENTERS={
-  village:  {cx:-350,cz:-350,r:130},
+  village:  {cx:-350,cz:-350,r:280},
   meadow:   {cx:300, cz:-300,r:220},
   swamp:    {cx:-400,cz:100, r:220},
   jungle:   {cx:400, cz:100, r:220},

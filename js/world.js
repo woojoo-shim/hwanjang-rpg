@@ -35,13 +35,13 @@ var riverUVOffset=0;
 /* ── 지형 높이 헬퍼 ── */
 /* simpleNoise 기반 — 버텍스 변위와 동일한 함수 사용 */
 function getTerrainY(x,z){
-  /* 마을 구역 (중심 -350,-350, 반경 120) 은 평탄하게 유지 */
+  /* 마을 구역 (중심 -350,-350, 반경 240) 은 평탄하게 유지 — 마을 3-4배 확장 */
   var vdx=x-(-350),vdz=z-(-350);
   var vdist=Math.sqrt(vdx*vdx+vdz*vdz);
-  if(vdist<100)return 0;
-  /* 마을 외곽 블렌딩 (100~140) */
-  if(vdist<140){
-    var blend=(vdist-100)/40;
+  if(vdist<240)return 0;
+  /* 마을 외곽 블렌딩 (240~290) */
+  if(vdist<290){
+    var blend=(vdist-240)/50;
     return simpleNoise(x,z)*blend;
   }
   return simpleNoise(x,z);
@@ -193,17 +193,17 @@ function mkFountain(parent){
   var p=parent||scene;
   var stoneM=new THREE.MeshLambertMaterial({color:0x888070});
   var waterM=new THREE.MeshLambertMaterial({color:0x3399cc,transparent:true,opacity:0.65});
-  var outer=new THREE.Mesh(new THREE.CylinderGeometry(4,4.2,.6,16),stoneM);outer.position.set(0,.3,0);outer.castShadow=true;outer.receiveShadow=true;g.add(outer);
-  var water=new THREE.Mesh(new THREE.CylinderGeometry(3.6,3.6,.3,16),waterM);water.position.set(0,.45,0);g.add(water);
-  var pillar=new THREE.Mesh(new THREE.CylinderGeometry(.3,.4,2.5,8),stoneM);pillar.position.set(0,1.25,0);pillar.castShadow=true;g.add(pillar);
+  var outer=new THREE.Mesh(new THREE.CylinderGeometry(6,6.3,.7,16),stoneM);outer.position.set(0,.35,0);outer.castShadow=true;outer.receiveShadow=true;g.add(outer);
+  var water=new THREE.Mesh(new THREE.CylinderGeometry(5.5,5.5,.35,16),waterM);water.position.set(0,.52,0);g.add(water);
+  var pillar=new THREE.Mesh(new THREE.CylinderGeometry(.4,.55,3.2,8),stoneM);pillar.position.set(0,1.6,0);pillar.castShadow=true;g.add(pillar);
   var topM=new THREE.MeshLambertMaterial({color:0xccaa44});
-  var top=new THREE.Mesh(new THREE.ConeGeometry(.8,1.5,6),topM);top.position.set(0,3,0);top.castShadow=true;g.add(top);
+  var top=new THREE.Mesh(new THREE.ConeGeometry(1.1,2.0,6),topM);top.position.set(0,3.8,0);top.castShadow=true;g.add(top);
   var jetM=new THREE.MeshLambertMaterial({color:0x88ddff,transparent:true,opacity:.5});
-  [0,1,2,3].forEach(function(i){
-    var a=i*Math.PI/2;
-    var jet=new THREE.Mesh(new THREE.CylinderGeometry(.08,.12,1.8,6),jetM);
-    jet.position.set(Math.cos(a)*.5,2.5+Math.sin(a)*.3,Math.sin(a)*.5);
-    jet.rotation.z=Math.cos(a)*.4;jet.rotation.x=-Math.sin(a)*.4;
+  [0,1,2,3,4,5,6,7].forEach(function(i){
+    var a=i*Math.PI/4;
+    var jet=new THREE.Mesh(new THREE.CylinderGeometry(.08,.13,2.2,6),jetM);
+    jet.position.set(Math.cos(a)*.7,3.2+Math.sin(a)*.3,Math.sin(a)*.7);
+    jet.rotation.z=Math.cos(a)*.45;jet.rotation.x=-Math.sin(a)*.45;
     g.add(jet);
   });
   /* 아침에는 분수 라이트 불필요 */
@@ -212,9 +212,9 @@ function mkFountain(parent){
 
 function mkStonePath(parent){
   var p=parent||scene;
-  /* 광장 (마을 중심) */
+  /* 광장 (마을 중심) — 확장 */
   var pathM=new THREE.MeshLambertMaterial({color:0xc4a872});
-  var plaza=new THREE.Mesh(new THREE.CylinderGeometry(8,8,.05,32),pathM);
+  var plaza=new THREE.Mesh(new THREE.CylinderGeometry(14,14,.05,32),pathM);
   plaza.position.set(-350,.02,-358);plaza.receiveShadow=true;p.add(plaza);
 
   function lerpPath(pts,steps){
@@ -238,8 +238,28 @@ function mkStonePath(parent){
       p.add(disc);
     }
   }
+  /* ── 마을 내부 도로망 (확장 구역) ── */
+  /* 광장 ↔ 여관 (서쪽) */
+  drawPath([[-350,-358],[-362,-358],[-375,-360],[-388,-360]],8,3);
+  /* 광장 ↔ 무기/방어구 상점 (동쪽) */
+  drawPath([[-350,-358],[-338,-358],[-325,-360],[-312,-360]],8,3);
+  /* 광장 남북 메인도로 → 게이트 */
+  drawPath([[-350,-370],[-350,-390],[-350,-410],[-350,-430],[-350,-450]],12,4);
+  /* 광장 ↔ 모험가 길드 */
+  drawPath([[-350,-370],[-352,-385],[-354,-400],[-354,-418],[-352,-430]],10,3);
+  /* 시장 구역 (서쪽 상인 구역 내부) */
+  drawPath([[-350,-358],[-362,-362],[-375,-365],[-390,-368],[-402,-370]],8,3);
+  /* 도서관 ↔ 광장 (동쪽 외곽 루프) */
+  drawPath([[-350,-358],[-335,-358],[-322,-355],[-310,-350],[-300,-342]],8,3);
+  /* 주거 구역 도로 (북쪽) */
+  drawPath([[-350,-358],[-350,-345],[-350,-330],[-350,-315],[-350,-302]],8,3);
+  drawPath([[-350,-315],[-365,-312],[-380,-310],[-395,-312]],7,3);
+  drawPath([[-350,-315],[-335,-312],[-320,-310],[-305,-312]],7,3);
+  /* 우물 ↔ 주거구역 */
+  drawPath([[-350,-315],[-360,-312],[-370,-312],[-372,-310]],5,3);
+
   /* 마을 → 중앙 교차로 (0,0 부근) */
-  drawPath([[-350,-358],[-300,-300],[-250,-240],[-180,-160],[-100,-80],[-40,-20],[0,0]],15,5);
+  drawPath([[-350,-450],[-350,-470],[-320,-430],[-270,-380],[-220,-320],[-160,-240],[-100,-160],[-40,-80],[0,0]],15,5);
   /* 중앙 → 초원 (NE) */
   drawPath([[0,0],[60,-40],[120,-100],[180,-160],[240,-220],[300,-300]],12,4);
   /* 중앙 → 늪 (W) */
@@ -402,11 +422,11 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
     var wx=lx+worldCX;
     var wz=-ly+worldCZ;   /* 부호 반전: PlaneGeometry Y축이 Z축으로 매핑 */
     var dy=0;
-    /* 마을 구역 (중심 -350,-350, 반경 100) 평탄 유지 */
+    /* 마을 구역 (중심 -350,-350, 반경 240) 평탄 유지 — 마을 확장 */
     var _vdx2=wx-(-350),_vdz2=wz-(-350);
     var _vd2=Math.sqrt(_vdx2*_vdx2+_vdz2*_vdz2);
-    if(_vd2>=140)dy=simpleNoise(wx,wz);
-    else if(_vd2>=100)dy=simpleNoise(wx,wz)*((_vd2-100)/40);
+    if(_vd2>=290)dy=simpleNoise(wx,wz);
+    else if(_vd2>=240)dy=simpleNoise(wx,wz)*((_vd2-240)/50);
     pos.setZ(vi,dy);      /* 로컬 z → 회전 후 월드 y (높이) */
   }
   geo.computeVertexNormals();
@@ -427,8 +447,8 @@ function buildGroundPlanes(){
   var baseMesh=new THREE.Mesh(baseGeo,baseMat);
   baseMesh.rotation.x=-Math.PI/2;baseMesh.position.set(0,-0.02,50);baseMesh.receiveShadow=true;scene.add(baseMesh);
 
-  /* 마을 (NW): 평탄 (-350,-350 중심) */
-  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshLambertMaterial({color:0x4a8a3a}));
+  /* 마을 (NW): 평탄 (-350,-350 중심) — 3-4배 확장 */
+  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x4a8a3a}));
   villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.03,-350);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원 (NE): x:100~500, z:-500~-100 */
@@ -495,18 +515,21 @@ function buildBorderMountains(){
 /* ════════════ 마을 빌드 ════════════ */
 function buildVillage(){
   var VX=-350,VZ=-350; /* 마을 중심 */
-  /* 지면 디테일 */
-  scatterGroundDetail(scene,20,20,20,'grass',VX,VZ-6);
-  scatterGroundDetail(scene,10,18,18,'stone',VX,VZ-6);
-  scatterGroundDetail(scene,10,16,16,'flower',VX,VZ-6);
+
+  /* 지면 디테일 — 확장된 영역에 더 많이 */
+  scatterGroundDetail(scene,60,100,100,'grass',VX,VZ);
+  scatterGroundDetail(scene,30,90,90,'stone',VX,VZ);
+  scatterGroundDetail(scene,40,80,80,'flower',VX,VZ);
 
   /* 건물 주변 포인트 라이트 */
-  var shopLight1=new THREE.PointLight(0xff9944,.2,18);shopLight1.position.set(VX,3,VZ-8);scene.add(shopLight1);
+  var shopLight1=new THREE.PointLight(0xff9944,.2,22);shopLight1.position.set(VX,3,VZ-8);scene.add(shopLight1);
+  var shopLight2=new THREE.PointLight(0xff9944,.18,20);shopLight2.position.set(VX-45,3,VZ-20);scene.add(shopLight2);
+  var shopLight3=new THREE.PointLight(0xff9944,.18,20);shopLight3.position.set(VX+45,3,VZ-20);scene.add(shopLight3);
 
-  /* 반투명 안개 평면 */
+  /* 반투명 안개 평면 — 더 넓게 */
   var fogPlaneM=new THREE.MeshLambertMaterial({color:0xaabb88,transparent:true,opacity:.06});
-  [[VX-8,0,VZ+5],[VX+8,0,VZ-15]].forEach(function(fp){
-    var fogP=new THREE.Mesh(new THREE.PlaneGeometry(12+Math.random()*6,10+Math.random()*5),fogPlaneM);
+  [[VX-30,0,VZ+20],[VX+30,0,VZ-40],[VX-50,0,VZ-30],[VX+50,0,VZ+10],[VX,0,VZ+30]].forEach(function(fp){
+    var fogP=new THREE.Mesh(new THREE.PlaneGeometry(20+Math.random()*12,14+Math.random()*8),fogPlaneM);
     fogP.rotation.x=-Math.PI/2;fogP.position.set(fp[0],.15,fp[2]);scene.add(fogP);
   });
 
@@ -516,31 +539,77 @@ function buildVillage(){
   mkFountain(scene);
   mkCastle(scene);
 
-  /* 상점 */
-  mkStall(VX-14,VZ-6, .3, 0x8a3a10,0xcc5522,'업그레이드',scene);
-  mkStall(VX-14,VZ-13,.2, 0x1a4a8a,0x3366cc,'아이템',scene);
-  mkStall(VX+14,VZ-6, -.3, 0x3a6a10,0x558833,'퀘스트',scene);
-  mkStall(VX+14,VZ-13,-.2, 0x8a4a1a,0xcc8833,'무기점',scene);
-  mkStall(VX-6,VZ-18,.15, 0x6a1a1a,0xaa3333,'포션',scene);
-  mkStall(VX+6,VZ-18,-.15, 0x1a4a2a,0x336644,'방어구',scene);
+  /* ── 새 건물들 ── */
+  /* 여관 (Inn) — 서쪽 */
+  mkBldg(VX-38,VZ-14, 8,5,7, 0xd4b87a,0x8b3a2a,scene);
+  /* 무기 상점 building — 동쪽 */
+  mkBldg(VX+38,VZ-14, 7,4.5,6, 0x6a5a3a,0x4a2a0a,scene);
+  /* 방어구 상점 — 동쪽 (무기 상점 남쪽) */
+  mkBldg(VX+38,VZ-36, 7,4.5,6, 0x5a6a4a,0x334422,scene);
+  /* 도서관 (Library) — 동쪽 외곽 */
+  mkBldg(VX+50,VZ+12, 10,6,8, 0x8a8878,0x4a5a7a,scene);
+  /* 모험가 길드 — 남쪽 큰 건물 */
+  mkBldg(VX-8,VZ-72, 14,6,10, 0x7a5a30,0x5a3a12,scene);
+  /* 포션 상점 스탠드 (기존 광장 쪽) */
+  mkStall(VX-8,VZ-20,.15, 0x6a1a1a,0xaa3333,'포션',scene);
+  mkStall(VX+8,VZ-20,-.15, 0x1a4a2a,0x336644,'방어구',scene);
+  /* 시장 스탠드 (서쪽 상인 구역) */
+  mkStall(VX-40,VZ-18, .3, 0x8a3a10,0xcc5522,'잡화',scene);
+  mkStall(VX-40,VZ-28,.2, 0x1a4a8a,0x3366cc,'아이템',scene);
+  mkStall(VX-52,VZ-18, .4, 0x3a6a10,0x558833,'식료품',scene);
+  mkStall(VX-52,VZ-28,-.2, 0x8a4a1a,0xcc8833,'무기점',scene);
 
-  /* 횃불 */
-  var torchPos=[[VX-7,VZ-1,1],[VX+7,VZ-1,1],[VX-7,VZ-15,1],[VX+7,VZ-15,1],[VX-1,VZ-19,1],[VX+1,VZ-19,1]];
+  /* ── 광장 확장 (더 큰 분수) ── */
+  /* 광장 바닥 타일 추가 */
+  var plazaM=new THREE.MeshLambertMaterial({color:0xc8b888});
+  var plazaBig=new THREE.Mesh(new THREE.CylinderGeometry(16,16,.04,32),plazaM);
+  plazaBig.position.set(VX,.01,VZ-8);plazaBig.receiveShadow=true;scene.add(plazaBig);
+
+  /* ── 마을 입구 도로 포장 (게이트까지) ── */
+  var pathM2=new THREE.MeshLambertMaterial({color:0xb8a060});
+  for(var ri=0;ri<8;ri++){
+    var ry=VZ-30-ri*12;
+    var rd=new THREE.Mesh(new THREE.PlaneGeometry(10,.04),pathM2);
+    rd.rotation.x=-Math.PI/2;rd.position.set(VX,.05,ry);
+    rd.receiveShadow=true;scene.add(rd);
+  }
+
+  /* 횃불 — 더 많이, 더 넓게 — [x, z] 형식 */
+  var torchPos=[
+    [VX-10,VZ-2],[VX+10,VZ-2],
+    [VX-10,VZ-18],[VX+10,VZ-18],
+    [VX-2,VZ-26],[VX+2,VZ-26],
+    [VX-38,VZ-8],[VX+38,VZ-8],
+    [VX-44,VZ-22],[VX+44,VZ-22],
+    [VX-8,VZ-66],[VX+8,VZ-66],
+    [VX-8,VZ-80],[VX+8,VZ-80],
+  ];
   var poleMat=new THREE.MeshLambertMaterial({color:0x5a3a1a});
   var fireMat=new THREE.MeshBasicMaterial({color:0xff8820});
   torchPos.forEach(function(tp){
-    var pl=new THREE.PointLight(0xff8830,2.0,14);pl.position.set(tp[0],2.2,tp[2]);scene.add(pl);
-    var pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,2,6),poleMat);pole.position.set(tp[0],1,tp[2]);pole.castShadow=true;scene.add(pole);
-    var fire=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),fireMat);fire.position.set(tp[0],2.2,tp[2]);scene.add(fire);
+    var tx=tp[0],tz=tp[1];
+    var pl=new THREE.PointLight(0xff8830,1.8,16);pl.position.set(tx,2.2,tz);scene.add(pl);
+    var pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,2,6),poleMat);pole.position.set(tx,1,tz);pole.castShadow=true;scene.add(pole);
+    var fire=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),fireMat);fire.position.set(tx,2.2,tz);scene.add(fire);
   });
 
-  /* 마을 나무 */
+  /* ── 마을 나무 — 확장 구역에 더 많이 ── */
   var treeLayout=[
-    [VX-17,VZ-4],[VX-17,VZ-16],[VX-15,VZ-26],
-    [VX+17,VZ-4],[VX+17,VZ-16],[VX+15,VZ-26],
-    [VX-5,VZ+13],[VX+5,VZ+13],
-    [VX-12,VZ-30],[VX+12,VZ-30],
-    [VX-20,VZ-12],[VX+20,VZ-12],
+    /* 광장 주변 */
+    [VX-22,VZ-2],[VX+22,VZ-2],[VX-22,VZ-20],[VX+22,VZ-20],
+    /* 주거 구역 나무 */
+    [VX-60,VZ+25],[VX-45,VZ+28],[VX-30,VZ+26],[VX-15,VZ+25],[VX+5,VZ+28],
+    [VX-58,VZ+10],[VX+20,VZ+15],[VX+38,VZ+8],
+    /* 여관 주변 */
+    [VX-50,VZ-5],[VX-50,VZ-22],
+    /* 도서관 주변 */
+    [VX+58,VZ+5],[VX+60,VZ+22],
+    /* 길드 주변 */
+    [VX-25,VZ-80],[VX+10,VZ-82],[VX-22,VZ-55],[VX+18,VZ-58],
+    /* 입구 양옆 나무 */
+    [VX-22,VZ-40],[VX+22,VZ-40],[VX-22,VZ-56],[VX+22,VZ-56],
+    /* 시장 구역 */
+    [VX-62,VZ-10],[VX-62,VZ-32],
   ];
   treeLayout.forEach(function(pp){mkTree(pp[0],pp[1],.8+Math.random()*.6,scene);});
 
@@ -558,7 +627,16 @@ function buildVillage(){
   });
 
   /* 건물 이름표 */
-  [{x:VX,y:17,z:VZ-30,n:'성'},{x:VX-14,y:5,z:VZ-6,n:'업그레이드'},{x:VX+14,y:5,z:VZ-6,n:'퀘스트'},{x:VX-14,y:5,z:VZ-13,n:'아이템'},{x:VX+14,y:5,z:VZ-13,n:'무기점'}]
+  [
+    {x:VX,y:17,z:VZ-30,n:'성'},
+    {x:VX-38,y:7,z:VZ-14,n:'여관'},
+    {x:VX+38,y:7,z:VZ-14,n:'무기 상점'},
+    {x:VX+38,y:7,z:VZ-36,n:'방어구 상점'},
+    {x:VX+50,y:9,z:VZ+12,n:'도서관'},
+    {x:VX-8,y:9,z:VZ-72,n:'모험가 길드'},
+    {x:VX-40,y:5,z:VZ-18,n:'잡화'},
+    {x:VX-52,y:5,z:VZ-28,n:'무기점'},
+  ]
   .forEach(function(b){
     var el=document.createElement('div');el.className='llabel bld';el.textContent=b.n;
     el.dataset.wx=b.x;el.dataset.wy=b.y;el.dataset.wz=b.z;lov.appendChild(el);
@@ -583,10 +661,10 @@ function buildFireflies(){
   fireflyPhases=new Float32Array(COUNT);
 
   for(var i=0;i<COUNT;i++){
-    /* scatter around village and meadow mostly */
-    var px=-350+(Math.random()-.5)*300;
+    /* scatter around expanded village and meadow mostly */
+    var px=-350+(Math.random()-.5)*500;
     var py=0.5+Math.random()*3.5;
-    var pz=-350+(Math.random()-.5)*300;
+    var pz=-380+(Math.random()-.5)*500;
     pos[i*3]=px;pos[i*3+1]=py;pos[i*3+2]=pz;
     fireflyBaseY[i]=py;
     fireflyPhases[i]=Math.random()*Math.PI*2;
@@ -681,10 +759,13 @@ function initScene(){
   var hemi=new THREE.HemisphereLight(0x87ceeb,0x3a5a1a,.4);
   scene.add(hemi);
 
-  /* 2b) 마을 따뜻한 앰비언트 포인트 라이트 */
-  var villageAmbient=new THREE.PointLight(0xffcc88,.35,60);
-  villageAmbient.position.set(-350,8,-350);
+  /* 2b) 마을 따뜻한 앰비언트 포인트 라이트 — 확장 커버 */
+  var villageAmbient=new THREE.PointLight(0xffcc88,.35,180);
+  villageAmbient.position.set(-350,12,-380);
   scene.add(villageAmbient);
+  var villageAmbient2=new THREE.PointLight(0xffcc88,.25,120);
+  villageAmbient2.position.set(-350,10,-310);
+  scene.add(villageAmbient2);
 
   /* 3) 태양(방향광) — 따뜻한 황금빛, 그림자 활성화 */
   var sun=new THREE.DirectionalLight(0xfff0d0,.9);
@@ -975,14 +1056,19 @@ function mkHouses(parent){
     return g;
   }
 
-  /* 집 1: 북서쪽 크림색 집 */
-  makeHouse(-362,-354, 4,3,3, plasterM,roofR, 0.1);
-  /* 집 2: 남서쪽 연갈색 집 (조금 더 큼) */
-  makeHouse(-360,-366, 4.5,3.2,3.2, plaster2M,roofB, -0.05);
-  /* 집 3: 동쪽 초록 빛 집 */
-  makeHouse(-340,-353, 3.5,2.8,2.8, plaster3M,roofG, -0.12);
-  /* 집 4: 남동쪽 작은 집 */
-  makeHouse(-338,-366, 3.2,2.6,2.6, plasterM,roofR, 0.08);
+  /* ── 주거 구역 (북쪽) ── */
+  /* 집 1: 서북쪽 크림색 집 */
+  makeHouse(-382,-308, 4,3,3, plasterM,roofR, 0.1);
+  /* 집 2: 서북쪽 연갈색 집 */
+  makeHouse(-368,-305, 4.5,3.2,3.2, plaster2M,roofB, -0.05);
+  /* 집 3: 중앙 초록빛 집 */
+  makeHouse(-350,-302, 3.5,2.8,2.8, plaster3M,roofG, -0.12);
+  /* 집 4: 동북쪽 작은 집 */
+  makeHouse(-332,-305, 3.2,2.6,2.6, plasterM,roofR, 0.08);
+  /* 집 5: 동북쪽 추가 집 */
+  makeHouse(-316,-308, 4,3.0,3.0, plaster2M,roofG, 0.15);
+  /* 집 6: 서쪽 외곽 큰 집 */
+  makeHouse(-395,-315, 5,3.4,3.6, plasterM,roofB, -0.08);
 }
 
 /* ── 우물 ── */
@@ -1036,7 +1122,7 @@ function mkWell(parent){
     new THREE.MeshLambertMaterial({color:0xa09080}));
   ring.position.set(0,0.04,0);ring.receiveShadow=true;g.add(ring);
 
-  g.position.set(-342,-362,0);p.add(g);
+  g.position.set(-372,0,-310);p.add(g);
 }
 
 /* ── 나무 울타리 ── */
@@ -1065,16 +1151,22 @@ function mkFences(parent){
   }
 
   var VX=-350,VZ=-350;
-  /* 마을 서쪽 울타리 */
-  fenceRow(VX-22,VZ+12,VX-22,VZ-28,8);
-  /* 마을 동쪽 울타리 */
-  fenceRow(VX+22,VZ+12,VX+22,VZ-28,8);
-  /* 마을 북쪽 (성 방향 제외) */
-  fenceRow(VX-22,VZ+12,VX-12,VZ+12,3);
-  fenceRow(VX+12,VZ+12,VX+22,VZ+12,3);
-  /* 남쪽 게이트 옆 */
-  fenceRow(VX-22,VZ-28,VX-9,VZ-28,3);
-  fenceRow(VX+9,VZ-28,VX+22,VZ-28,3);
+  /* 주거 구역 울타리 (서북쪽) */
+  fenceRow(VX-60,VZ+40,VX-60,VZ-20,10);
+  fenceRow(VX-60,VZ+40,VX-30,VZ+40,5);
+  /* 길드 구역 울타리 (동쪽) */
+  fenceRow(VX+50,VZ-20,VX+80,VZ-20,5);
+  fenceRow(VX+80,VZ-20,VX+80,VZ-60,7);
+  /* 도서관 구역 울타리 */
+  fenceRow(VX+20,VZ+40,VX+60,VZ+40,7);
+  fenceRow(VX+60,VZ+10,VX+60,VZ+40,5);
+  /* 마을 남쪽 입구 양옆 */
+  fenceRow(VX-40,VZ-90,VX-14,VZ-90,5);
+  fenceRow(VX+14,VZ-90,VX+40,VZ-90,5);
+  /* 마을 서쪽 외곽 */
+  fenceRow(VX-90,VZ+20,VX-90,VZ-80,18);
+  /* 마을 동쪽 외곽 */
+  fenceRow(VX+90,VZ+20,VX+90,VZ-80,18);
 }
 
 /* ── 석조 아치 입구 ── */
@@ -1125,7 +1217,7 @@ function mkGate(parent){
     stepB.position.set(0,0.1+i*0.2,-0.7-i*0.7);stepB.castShadow=true;stepB.receiveShadow=true;g.add(stepB);
   });
 
-  g.position.set(-350,0,-378);p.add(g);
+  g.position.set(-350,0,-448);p.add(g);
 }
 
 /* ── 화단/꽃밭 ── */
@@ -1166,11 +1258,27 @@ function mkFlowerBeds(parent){
     p.add(bedG);
   }
 
-  /* 집들 근처, 길가 화단 */
-  flowerBed(-362,-356, 5);
-  flowerBed(-340,-355,  5);
-  flowerBed(-354,-370, 4);
-  flowerBed(-346,-370,  4);
+  /* 광장 주변 화단 */
+  flowerBed(-358,-352, 5);
+  flowerBed(-342,-352, 5);
+  flowerBed(-358,-368, 4);
+  flowerBed(-342,-368, 4);
+  /* 여관 앞 */
+  flowerBed(-388,-345, 5);
+  flowerBed(-380,-345, 5);
+  /* 도서관 앞 */
+  flowerBed(-322,-345, 5);
+  flowerBed(-314,-345, 5);
+  /* 길드 길가 */
+  flowerBed(-392,-385, 4);
+  flowerBed(-380,-385, 4);
+  /* 주거 구역 길가 */
+  flowerBed(-368,-310, 4);
+  flowerBed(-340,-310, 4);
+  flowerBed(-310,-310, 4);
+  /* 마을 입구 게이트 앞 */
+  flowerBed(-360,-440, 5);
+  flowerBed(-340,-440, 5);
 }
 
 /* ── 배럴/상자 ── */
@@ -1203,9 +1311,16 @@ function mkBarrelsAndCrates(parent){
     g.position.set(x,0,z);g.rotation.y=Math.random()*0.6;p.add(g);
   }
 
-  /* 상점 근처 */
-  barrel(-366,-356,0,0);barrel(-334,-356,0,0);
-  crate(-367,-358,0);crate(-345,-371,0);
+  /* 시장 스탠드 근처 */
+  barrel(-400,-362,0,0);barrel(-400,-374,0,0);barrel(-398,-370,0,0);
+  crate(-402,-365,0);crate(-402,-372,0);
+  /* 무기 상점 옆 */
+  barrel(-305,-378,0,0);barrel(-310,-378,0,0);
+  crate(-302,-380,0);
+  /* 여관 앞 */
+  barrel(-385,-352,0,0);crate(-388,-356,0);
+  /* 길드 앞 */
+  barrel(-320,-390,0,0);crate(-322,-394,0);
 }
 
 /* ── 깃발/배너 ── */
@@ -1236,11 +1351,17 @@ function mkBanners(parent){
     g.position.set(x,0,z);p.add(g);
   }
 
-  /* 게이트 양옆 */
-  banner(-356,-377, bannerColors[0]);
-  banner(-344,-377,  bannerColors[1]);
-  /* 광장 코너 */
-  banner(-350,-347,    bannerColors[2]);
+  /* 새 게이트 양옆 */
+  banner(-356,-447, bannerColors[0]);
+  banner(-344,-447,  bannerColors[1]);
+  /* 광장 코너 4방향 */
+  banner(-362,-348,    bannerColors[2]);
+  banner(-338,-348,    bannerColors[3]);
+  banner(-362,-368,    bannerColors[0]);
+  banner(-338,-368,    bannerColors[1]);
+  /* 길드 앞 */
+  banner(-328,-382,  bannerColors[2]);
+  banner(-316,-382,  bannerColors[3]);
 }
 
 /* ── 벤치 ── */
@@ -1275,6 +1396,22 @@ function mkBenches(parent){
   bench(-346,-354,   Math.PI);
   bench(-354,-362, 0);
   bench(-346,-362,  Math.PI);
+  /* 여관 앞 길가 */
+  bench(-388,-360, Math.PI/2);
+  bench(-388,-370, Math.PI/2);
+  /* 도서관 앞 길가 */
+  bench(-316,-360, -Math.PI/2);
+  bench(-316,-370, -Math.PI/2);
+  /* 주거 구역 길가 */
+  bench(-370,-320, 0);
+  bench(-340,-320, Math.PI);
+  bench(-310,-320, 0);
+  /* 길드 앞 광장 */
+  bench(-335,-395, 0);
+  bench(-320,-395, Math.PI);
+  /* 입구 길가 */
+  bench(-360,-430, Math.PI/2);
+  bench(-340,-430, -Math.PI/2);
 }
 
 /* ── 가로등 (중세 등불) ── */
@@ -1313,9 +1450,145 @@ function mkLampPosts(parent){
     g.position.set(x,0,z);p.add(g);
   }
 
-  /* 길가 양쪽 등불 */
-  lampPost(-353.5,-352);  lampPost(-346.5,-352);
-  lampPost(-353.5,-368); lampPost(-346.5,-368);
+  /* 광장 주변 */
+  lampPost(-356,-352);  lampPost(-344,-352);
+  lampPost(-356,-368); lampPost(-344,-368);
+  /* 광장 → 여관 길 */
+  lampPost(-368,-356); lampPost(-378,-360); lampPost(-388,-358);
+  /* 광장 → 무기상점 길 */
+  lampPost(-332,-356); lampPost(-322,-360); lampPost(-312,-358);
+  /* 남북 메인 도로 (광장 → 게이트) */
+  lampPost(-353,-378); lampPost(-347,-378);
+  lampPost(-353,-398); lampPost(-347,-398);
+  lampPost(-353,-418); lampPost(-347,-418);
+  lampPost(-353,-438); lampPost(-347,-438);
+  /* 주거 구역 도로 */
+  lampPost(-368,-320); lampPost(-350,-318); lampPost(-310,-320);
+  /* 길드 앞 */
+  lampPost(-335,-386); lampPost(-322,-386);
+}
+
+/* ── 여관 내부 장식 (침대 창문으로 보이게) ── */
+function mkInnDecor(parent){
+  var p=parent||scene;
+  var VX=-350,VZ=-350;
+  var IX=VX-38,IZ=VZ-14;
+  var bedM=new THREE.MeshLambertMaterial({color:0x8a2222});
+  var pillowM=new THREE.MeshLambertMaterial({color:0xeeeecc});
+  var frameM=new THREE.MeshLambertMaterial({color:0x5a3010});
+  /* 침대 2개 (창 방향으로 배치) */
+  function bed(bx,bz){
+    var g=new THREE.Group();
+    var frame=new THREE.Mesh(new THREE.BoxGeometry(1.5,.2,2.5),frameM);frame.position.set(0,.4,0);frame.castShadow=true;g.add(frame);
+    var mat=new THREE.Mesh(new THREE.BoxGeometry(1.4,.2,2.3),bedM);mat.position.set(0,.52,0);g.add(mat);
+    var pillow=new THREE.Mesh(new THREE.BoxGeometry(1.1,.18,.55),pillowM);pillow.position.set(0,.64,-0.85);g.add(pillow);
+    /* 침대 다리 */
+    [[-.6,.2,-.9],[.6,.2,-.9],[-.6,.2,.9],[.6,.2,.9]].forEach(function(lp){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.12,.45,.12),frameM);leg.position.set(lp[0],lp[1],lp[2]);g.add(leg);
+    });
+    g.position.set(bx,0,bz);p.add(g);
+  }
+  bed(IX-2.2,IZ+1.5);
+  bed(IX+2.2,IZ+1.5);
+  bed(IX-2.2,IZ-1.0);
+  bed(IX+2.2,IZ-1.0);
+  /* 여관 간판 */
+  var signM=new THREE.MeshLambertMaterial({color:0x5a2a08});
+  var sign=new THREE.Mesh(new THREE.BoxGeometry(3.5,.5,.15),signM);
+  sign.position.set(IX,5.8,IZ+3.6);scene.add(sign);
+  /* 포인트 라이트 여관 입구 */
+  var innLight=new THREE.PointLight(0xffaa44,1.2,18);innLight.position.set(IX,3.5,IZ+3.7);p.add(innLight);
+}
+
+/* ── 도서관 장식 ── */
+function mkLibraryDecor(parent){
+  var p=parent||scene;
+  var VX=-350,VZ=-350;
+  var LX=VX+50,LZ=VZ+12;
+  var stoneM2=new THREE.MeshLambertMaterial({color:0x7a7868});
+  var bookM=new THREE.MeshLambertMaterial({color:0x6a3a88});
+  var bookM2=new THREE.MeshLambertMaterial({color:0x883a3a});
+  var bookM3=new THREE.MeshLambertMaterial({color:0x3a6a38});
+  var shelfM=new THREE.MeshLambertMaterial({color:0x4a2e0a});
+  /* 책장들 */
+  function bookshelf(bx,bz){
+    var g=new THREE.Group();
+    var shelf=new THREE.Mesh(new THREE.BoxGeometry(2.5,2.8,.35),shelfM);shelf.position.set(0,1.4,0);shelf.castShadow=true;g.add(shelf);
+    var bms=[bookM,bookM2,bookM3];
+    for(var bi=0;bi<9;bi++){
+      var bk=new THREE.Mesh(new THREE.BoxGeometry(.18,.5+Math.random()*.3,.25),bms[bi%3]);
+      bk.position.set(-1.0+bi*.24,1.0+Math.floor(bi/6)*.9,0);g.add(bk);
+    }
+    g.position.set(bx,0,bz);p.add(g);
+  }
+  bookshelf(LX-3.5,LZ);
+  bookshelf(LX+3.5,LZ);
+  bookshelf(LX,LZ-2.5);
+  /* 도서관 포인트 라이트 */
+  var libLight=new THREE.PointLight(0xffeedd,1.0,16);libLight.position.set(LX,4,LZ+4.5);p.add(libLight);
+  /* 석상/조각 */
+  var statue=new THREE.Group();
+  var statBase=new THREE.Mesh(new THREE.CylinderGeometry(.5,.6,.4,8),stoneM2);statBase.position.set(0,.2,0);statBase.castShadow=true;statue.add(statBase);
+  var statBody=new THREE.Mesh(new THREE.CylinderGeometry(.25,.3,1.5,8),stoneM2);statBody.position.set(0,1.15,0);statBody.castShadow=true;statue.add(statBody);
+  var statHead=new THREE.Mesh(new THREE.SphereGeometry(.28,8,8),stoneM2);statHead.position.set(0,2.15,0);statue.add(statHead);
+  statue.position.set(LX,0,LZ+3.5);p.add(statue);
+}
+
+/* ── 모험가 길드 장식 ── */
+function mkGuildDecor(parent){
+  var p=parent||scene;
+  var VX=-350,VZ=-350;
+  var GX=VX-8,GZ=VZ-72;
+  var woodM=new THREE.MeshLambertMaterial({color:0x6a4a1a});
+  var boardM=new THREE.MeshLambertMaterial({color:0x5a3a10});
+  var pinM=new THREE.MeshLambertMaterial({color:0xccaa44});
+  /* 큰 간판 */
+  var bigSign=new THREE.Mesh(new THREE.BoxGeometry(7,.9,.2),boardM);
+  bigSign.position.set(GX,7.5,GZ+5.2);scene.add(bigSign);
+  /* 게시판 (퀘스트 보드) */
+  var board=new THREE.Group();
+  var bFrame=new THREE.Mesh(new THREE.BoxGeometry(3.5,2.5,.12),boardM);bFrame.position.set(0,1.25,0);bFrame.castShadow=true;board.add(bFrame);
+  /* 종이들 */
+  [[-1,.8],[.5,1.5],[-.8,2.0],[.9,.5],[-0.2,1.0]].forEach(function(pp){
+    var paper=new THREE.Mesh(new THREE.BoxGeometry(.7,.9,.05),
+      new THREE.MeshLambertMaterial({color:0xeedd88}));
+    paper.position.set(pp[0],pp[1],.1);board.add(paper);
+    var pin=new THREE.Mesh(new THREE.SphereGeometry(.06,6,6),pinM);
+    pin.position.set(pp[0],pp[1]+.35,.16);board.add(pin);
+  });
+  board.position.set(GX-5,0,GZ+3);p.add(board);
+  /* 길드 포인트 라이트 */
+  var guildLight=new THREE.PointLight(0xff8844,1.2,22);guildLight.position.set(GX,4,GZ+5.5);p.add(guildLight);
+  /* 기둥 장식 */
+  [[GX-7,GZ+5],[GX+7,GZ+5]].forEach(function(cp){
+    var col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.35,7.5,8),woodM);
+    col.position.set(cp[0],3.75,cp[1]);col.castShadow=true;p.add(col);
+    var cap=new THREE.Mesh(new THREE.BoxGeometry(.9,.4,.9),
+      new THREE.MeshLambertMaterial({color:0x8a6030}));
+    cap.position.set(cp[0],7.7,cp[1]);p.add(cap);
+  });
+}
+
+/* ── 광장 중앙 장식 (동상) ── */
+function mkPlazaStatue(parent){
+  var p=parent||scene;
+  var stoneM=new THREE.MeshLambertMaterial({color:0x9a9080});
+  var goldM=new THREE.MeshLambertMaterial({color:0xccaa22,emissive:new THREE.Color(0x665500),emissiveIntensity:.2});
+  var g=new THREE.Group();
+  /* 받침대 */
+  var base=new THREE.Mesh(new THREE.BoxGeometry(2.5,.6,2.5),stoneM);base.position.set(0,.3,0);base.castShadow=true;base.receiveShadow=true;g.add(base);
+  var plinth=new THREE.Mesh(new THREE.BoxGeometry(2.0,2.5,2.0),stoneM);plinth.position.set(0,2.05,0);plinth.castShadow=true;g.add(plinth);
+  /* 영웅 형상 (단순화) */
+  var body=new THREE.Mesh(new THREE.BoxGeometry(.7,1.2,.4),goldM);body.position.set(0,4.0,0);body.castShadow=true;g.add(body);
+  var head=new THREE.Mesh(new THREE.SphereGeometry(.28,8,8),goldM);head.position.set(0,4.9,0);g.add(head);
+  /* 검 들고 있는 팔 */
+  var arm=new THREE.Mesh(new THREE.BoxGeometry(.18,.9,.18),goldM);arm.position.set(.55,4.2,0);arm.rotation.z=-.4;arm.castShadow=true;g.add(arm);
+  var sword=new THREE.Mesh(new THREE.BoxGeometry(.08,1.4,.08),
+    new THREE.MeshLambertMaterial({color:0xcccccc,emissive:new THREE.Color(0x444444),emissiveIntensity:.3}));
+  sword.position.set(.85,4.5,0);sword.rotation.z=-.5;g.add(sword);
+  /* 황금빛 발광 */
+  var glow=new THREE.PointLight(0xffcc44,.5,12);glow.position.set(0,4.5,0);g.add(glow);
+  g.position.set(-350,0,-340);p.add(g);
 }
 
 /* ── 전체 마을 장식 호출 ── */
@@ -1330,6 +1603,10 @@ function buildVillageDecor(){
   mkBanners(scene);
   mkBenches(scene);
   mkLampPosts(scene);
+  mkInnDecor(scene);
+  mkLibraryDecor(scene);
+  mkGuildDecor(scene);
+  mkPlazaStatue(scene);
 }
 
 /* ════════════ 초원 장식 ════════════ */
