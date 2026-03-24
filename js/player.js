@@ -706,27 +706,32 @@ function handleMove(dt){
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
     if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
-    /* 원형 섬 경계 체크 */
-    var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
-    var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;
-    var _exN=(nx-_icx)/_irx,_ezN=(PL.group.position.z-_icz)/_irz;
-    var _exC=(PL.group.position.x-_icx)/_irx,_ezZ=(nz-_icz)/_irz;
-    if(_exN*_exN+_ezN*_ezN<1&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
-    if(_exC*_exC+_ezZ*_ezZ<1&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
+    /* 건물 내부에서는 경계/충돌 체크 생략 */
+    if(typeof insideBuilding!=='undefined'&&insideBuilding){
+      PL.group.position.x=nx;
+      PL.group.position.z=nz;
+    }else{
+      var _icx=ISLAND_CENTER_X,_icz=ISLAND_CENTER_Z;
+      var _irx=ISLAND_RADIUS_X,_irz=ISLAND_RADIUS_Z;
+      var _exN=(nx-_icx)/_irx,_ezN=(PL.group.position.z-_icz)/_irz;
+      var _exC=(PL.group.position.x-_icx)/_irx,_ezZ=(nz-_icz)/_irz;
+      if(_exN*_exN+_ezN*_ezN<1&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
+      if(_exC*_exC+_ezZ*_ezZ<1&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
+    }
     PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
     var wa=.32;
     PL.legL.rotation.x=Math.sin(PL.bobT)*wa;
     PL.legR.rotation.x=-Math.sin(PL.bobT)*wa;
     PL.armL.rotation.x=-Math.sin(PL.bobT)*wa*.5;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x=Math.sin(PL.bobT)*wa*.5;
-    if(!_inWater){
+    if(!_inWater&&!(typeof insideBuilding!=='undefined'&&insideBuilding)){
       var _ty=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
       PL.group.position.y=_ty+Math.abs(Math.sin(PL.bobT))*.06;
     }
   }else{
     PL.legL.rotation.x*=.8;PL.legR.rotation.x*=.8;PL.armL.rotation.x*=.8;
     if(PL.atkPhase===0)PL.armRPivot.rotation.x*=.8;
-    if(!_inWater){
+    if(!_inWater&&!(typeof insideBuilding!=='undefined'&&insideBuilding)){
       var _ty2=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
       PL.group.position.y=_ty2+(PL.group.position.y-_ty2)*.8;
     }
