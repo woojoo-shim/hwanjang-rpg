@@ -630,26 +630,32 @@ function mkWaterRiver(parent){
   var bridgeRailM=new THREE.MeshLambertMaterial({color:0x5a3820});
   var bridgePostM=new THREE.MeshLambertMaterial({color:0x4a2e10});
   function woodBridge(cx,cz,rotY){
+    var bLen=22;/* 강 폭보다 넉넉하게 */
     var g=new THREE.Group();
-    [-0.65,0.65].forEach(function(bx){
-      var mainBeam=new THREE.Mesh(new THREE.BoxGeometry(.22,.25,7),bridgeRailM);
-      mainBeam.position.set(bx,.12,0);mainBeam.castShadow=true;mainBeam.receiveShadow=true;g.add(mainBeam);
+    /* 메인 보 */
+    [-1.0,1.0].forEach(function(bx){
+      var mainBeam=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,bLen),bridgeRailM);
+      mainBeam.position.set(bx,.15,0);mainBeam.castShadow=true;mainBeam.receiveShadow=true;g.add(mainBeam);
     });
-    for(var pi2=-3;pi2<=3;pi2++){
-      var plank=new THREE.Mesh(new THREE.BoxGeometry(1.5,.12,.7),bridgePlanksM);
-      plank.position.set(0,.25,pi2*.95);plank.castShadow=true;plank.receiveShadow=true;g.add(plank);
+    /* 판자 */
+    var plankCount=Math.floor(bLen/1.0);
+    for(var pi2=-Math.floor(plankCount/2);pi2<=Math.floor(plankCount/2);pi2++){
+      var plank=new THREE.Mesh(new THREE.BoxGeometry(2.2,.14,.8),bridgePlanksM);
+      plank.position.set(0,.32,pi2*.95);plank.castShadow=true;plank.receiveShadow=true;g.add(plank);
     }
-    [-3,3].forEach(function(pz2){
-      [-0.65,0.65].forEach(function(px2){
-        var post=new THREE.Mesh(new THREE.BoxGeometry(.15,.9,.15),bridgePostM);
-        post.position.set(px2,.7,pz2*.95);post.castShadow=true;g.add(post);
+    /* 기둥 */
+    [-Math.floor(plankCount/2),Math.floor(plankCount/2)].forEach(function(pz2){
+      [-1.0,1.0].forEach(function(px2){
+        var post=new THREE.Mesh(new THREE.BoxGeometry(.18,1.2,.18),bridgePostM);
+        post.position.set(px2,.9,pz2*.95);post.castShadow=true;g.add(post);
       });
     });
-    [-0.65,0.65].forEach(function(rx){
-      var rail=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,5.8),bridgeRailM);
-      rail.position.set(rx,1.15,0);g.add(rail);
+    /* 난간 */
+    [-1.0,1.0].forEach(function(rx){
+      var rail=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,bLen-.5),bridgeRailM);
+      rail.position.set(rx,1.5,0);g.add(rail);
     });
-    g.position.set(cx,.08,cz);g.rotation.y=rotY||0;p.add(g);
+    g.position.set(cx,.1,cz);g.rotation.y=rotY||0;p.add(g);
   }
   /* 남북 강 위 다리 (동서 교차) */
   woodBridge(0,-200,Math.PI/2);
