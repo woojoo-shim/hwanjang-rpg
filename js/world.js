@@ -97,10 +97,11 @@ function enterBuilding(door){
     /* 카메라 즉시 이동 */
     camera.position.set(0,door.interiorY+12,10);
     camera.lookAt(0,door.interiorY+1,0);
-    /* 실내: 안개+그림자 끄기, 배경 검은색 */
+    /* 실내: 안개+그림자 끄기, 배경 검은색, 하늘 숨기기 */
     scene.fog=null;
     renderer.shadowMap.enabled=false;
     renderer.setClearColor(0x000000);
+    if(window._skyMesh)window._skyMesh.visible=false;
     addChat('sys','[시스템]',door.name+'에 입장했습니다.');
     /* 페이드인 */
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -118,10 +119,11 @@ function exitBuilding(){
     /* 카메라 즉시 복귀 */
     camera.position.set(_savedOutdoorPos.x,oy+12,_savedOutdoorPos.z+10);
     camera.lookAt(_savedOutdoorPos.x,oy+1,_savedOutdoorPos.z);
-    /* 안개+그림자+배경 복원 */
+    /* 안개+그림자+배경+하늘 복원 */
     scene.fog=new THREE.FogExp2(0x88aa88,.002);
     renderer.shadowMap.enabled=true;
     renderer.setClearColor(0x000000,0);
+    if(window._skyMesh)window._skyMesh.visible=true;
     addChat('sys','[시스템]','밖으로 나왔습니다.');
     insideBuilding=null;
     setTimeout(function(){fadeOverlay.style.opacity='0';},200);
@@ -1051,7 +1053,7 @@ function buildSkydome(){
     ].join('\n'),
     side:THREE.BackSide
   });
-  var sky=new THREE.Mesh(skyGeo,skyMat);
+  var sky=new THREE.Mesh(skyGeo,skyMat);window._skyMesh=sky;
   scene.add(sky);
 }
 
