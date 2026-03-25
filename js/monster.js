@@ -1759,7 +1759,7 @@ function buildJungle(){
       var _vstY=simpleNoise(sp[0],sp[1]);
       /* 큰 돌 블록 */
       var block=new THREE.Mesh(new THREE.BoxGeometry(2.5,2,2.5),vineStoneM);
-      block.position.set(sp[0],_vstY+1,sp[1]);scene.add(block);
+      block.position.set(sp[0],_vstY+1,sp[1]);blockblockscene.add(block);
       /* 덩굴 커버 */
       for(var vi=0;vi<4;vi++){
         var va=vi/4*Math.PI*2;
@@ -1797,7 +1797,7 @@ function buildJungle(){
         var t=si/steps+.5/steps;
         var px=x1+dx*t,pz=z1+dz*t;
         var plank=new THREE.Mesh(new THREE.BoxGeometry(1.1,.1,.6),planksM2);
-        plank.position.set(px,2,pz);plank.rotation.y=ang;scene.add(plank);
+        plank.position.set(px,2,pz);plank.rotation.y=ang;plankscene.add(plank);
       }
       /* 수직 지지 로프 */
       [0,.5,1].forEach(function(t){
