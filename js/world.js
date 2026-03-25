@@ -2085,16 +2085,7 @@ function buildMeadowDecor(){
     rock.castShadow=true;rock.receiveShadow=true;scene.add(rock);
   });
 
-  /* ── 쓰러진 통나무 ── */
-  [[-40,-60,0.3],[60,50,1.2],[-70,80,0.1],[40,-20,0.4],
-   [-30,100,0.8],[50,130,1.5],[-90,30,0.2],[80,-40,0.9]
-  ].forEach(function(ld){
-    var lx=MX+ld[0],lz=MZ+ld[1];
-    var log=new THREE.Mesh(new THREE.CylinderGeometry(.3,.35,4+Math.random()*3,8),logM);
-    log.rotation.z=Math.PI/2;log.rotation.y=ld[2];
-    log.position.set(lx,getTerrainY(lx,lz)+.3,lz);
-    log.castShadow=true;log.receiveShadow=true;scene.add(log);
-  });
+  /* 쓰러진 통나무 — 제거됨 */
 
   /* ── 야생화 패치 ── */
   for(var wfi=0;wfi<80;wfi++){
@@ -2217,36 +2208,7 @@ function buildMeadowDecor(){
     });
   })();
 
-  /* ── 돌담/울타리 길가 ── */
-  (function(){
-    var stWallM=new THREE.MeshLambertMaterial({color:0x888070});
-    var stWallDarkM=new THREE.MeshLambertMaterial({color:0x6a6050});
-    /* 돌담 세그먼트 함수 */
-    function stoneWall(x1,z1,x2,z2,h){
-      h=h||1.1;
-      var dx=x2-x1,dz=z2-z1;
-      var len=Math.sqrt(dx*dx+dz*dz);
-      var ang=Math.atan2(dx,dz);
-      var wall=new THREE.Mesh(new THREE.BoxGeometry(len,.9,.55),stWallM);
-      wall.position.set((x1+x2)/2,h/2,(z1+z2)/2);
-      wall.rotation.y=ang;wall.castShadow=true;wall.receiveShadow=true;scene.add(wall);
-      /* 윗 돌들 */
-      var count=Math.floor(len/1.2);
-      for(var wi=0;wi<count;wi++){
-        var t=wi/count+.5/count;
-        var wx=x1+dx*t,wz=z1+dz*t;
-        var cap=new THREE.Mesh(new THREE.BoxGeometry(.8+Math.random()*.3,.28+Math.random()*.15,.5),stWallDarkM);
-        cap.position.set(wx,h*.85+.14,wz);
-        cap.rotation.y=ang+(Math.random()-.5)*.1;
-        cap.castShadow=true;scene.add(cap);
-      }
-    }
-    /* 길가 양쪽 돌담 */
-    stoneWall(MX-30,MZ-80,MX-80,MZ-40,1.0);
-    stoneWall(MX+30,MZ-80,MX+80,MZ-40,1.0);
-    stoneWall(MX-40,MZ+20,MX-90,MZ+60,1.0);
-    stoneWall(MX+40,MZ+20,MX+80,MZ+60,1.0);
-  })();
+  /* 돌담 — 제거됨 */
 
   /* ── 풍차 구조물 ── */
   (function(){
