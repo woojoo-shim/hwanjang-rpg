@@ -1095,8 +1095,8 @@ function buildSkydome(){
 function initScene(){
   initFadeOverlay();
   var canvas=document.getElementById('gc');
-  renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:false,logarithmicDepthBuffer:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.0));
+  renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 
   /* ── 그림자 활성화 ── */
   renderer.shadowMap.enabled=true;
