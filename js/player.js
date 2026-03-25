@@ -649,8 +649,28 @@ function checkZone(){
 var _inWater=false;
 var _waterDepth=0;/* 0=지상, 양수=물에 잠긴 깊이 */
 
+var _BRIDGES=[
+  /* [cx, cz, halfLen, halfWid, rotated] — rotated=true면 다리가 동서방향(90도회전) */
+  [0,-200,12,2,true],[0,-350,12,2,true],[0,200,12,2,true],[0,400,12,2,true],
+  [-150,0,12,2,false],[150,0,12,2,false],[-350,0,12,2,false],[350,0,12,2,false],
+  [-200,-350,12,2,true],[-200,-300,12,2,true],
+  [0,375,12,2,false],[100,375,12,2,false]
+];
+function isOnBridge(x,z){
+  for(var i=0;i<_BRIDGES.length;i++){
+    var b=_BRIDGES[i];
+    var dx=Math.abs(x-b[0]),dz=Math.abs(z-b[1]);
+    if(b[4]){/* 회전된 다리: 길이가 x방향 */
+      if(dx<b[2]&&dz<b[3])return true;
+    }else{/* 일반: 길이가 z방향 */
+      if(dx<b[3]&&dz<b[2])return true;
+    }
+  }
+  return false;
+}
 function isOverWater(x,z){
   if(typeof insideBuilding!=='undefined'&&insideBuilding)return false;
+  if(isOnBridge(x,z))return false;
   /* 중앙 남북 강: x≈0, z:-400~500 */
   if(z>-400&&z<500&&Math.abs(x-RIVER_CENTER_X)<RIVER_HALF_W)return true;
   /* 동서 분기: z≈0 부근, x:-400~-10 또는 x:10~400 */
