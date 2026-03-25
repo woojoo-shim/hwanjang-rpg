@@ -653,10 +653,40 @@ function mkWaterRiver(parent){
   }
   /* 남북 강 위 다리 (동서 교차) */
   woodBridge(0,-200,Math.PI/2);
+  woodBridge(0,-350,Math.PI/2);
   woodBridge(0,200,Math.PI/2);
+  woodBridge(0,400,Math.PI/2);
   /* 동서 강 위 다리 (남북 교차) */
   woodBridge(-150,0,0);
   woodBridge(150,0,0);
+  woodBridge(-350,0,0);
+  woodBridge(350,0,0);
+
+  /* ── 존 경계 강: 마을↔초원 (x=-200, z:-500~-150) ── */
+  var vmLen=350;
+  var vmRiver=new THREE.Mesh(new THREE.PlaneGeometry(14,vmLen),riverM.clone());
+  vmRiver.rotation.x=-Math.PI/2;vmRiver.position.set(-200,.08,-325);p.add(vmRiver);
+  waterMeshes.push(vmRiver);
+  var vmDepth=new THREE.Mesh(new THREE.PlaneGeometry(14,vmLen),depthM);
+  vmDepth.rotation.x=-Math.PI/2;vmDepth.position.set(-200,-.06,-325);p.add(vmDepth);
+  [-11,11].forEach(function(bx){
+    var bank=new THREE.Mesh(new THREE.PlaneGeometry(5,vmLen),bankM);bank.rotation.x=-Math.PI/2;bank.position.set(-200+bx,.005,-325);p.add(bank);
+  });
+  /* 마을↔초원 다리 */
+  woodBridge(-200,-350,Math.PI/2);
+  woodBridge(-200,-300,Math.PI/2);
+
+  /* ── 존 경계 강: 늪↔정글 (z=100, x:-200~200) 이미 동서강이 커버 ── */
+  /* ── 존 경계 강: 어두운숲↔화산 (z=375, x:-100~200) ── */
+  var dfvLen=300;
+  var dfvRiver=new THREE.Mesh(new THREE.PlaneGeometry(dfvLen,14),riverM.clone());
+  dfvRiver.rotation.x=-Math.PI/2;dfvRiver.position.set(25,.08,375);p.add(dfvRiver);
+  waterMeshes.push(dfvRiver);
+  var dfvDepth=new THREE.Mesh(new THREE.PlaneGeometry(dfvLen,14),depthM);
+  dfvDepth.rotation.x=-Math.PI/2;dfvDepth.position.set(25,-.06,375);p.add(dfvDepth);
+  /* 어두운숲↔화산 다리 */
+  woodBridge(0,375,0);
+  woodBridge(100,375,0);
 }
 
 /* ════════════ 지면 디테일 유틸 ════════════ */

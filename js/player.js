@@ -650,10 +650,15 @@ var _inWater=false;
 var _waterDepth=0;/* 0=지상, 양수=물에 잠긴 깊이 */
 
 function isOverWater(x,z){
+  if(typeof insideBuilding!=='undefined'&&insideBuilding)return false;
   /* 중앙 남북 강: x≈0, z:-400~500 */
   if(z>-400&&z<500&&Math.abs(x-RIVER_CENTER_X)<RIVER_HALF_W)return true;
   /* 동서 분기: z≈0 부근, x:-400~-10 또는 x:10~400 */
   if(Math.abs(z)<RIVER_HALF_W&&(Math.abs(x)>10&&Math.abs(x)<400))return true;
+  /* 마을↔초원 강: x≈-200, z:-500~-150 */
+  if(z>-500&&z<-150&&Math.abs(x+200)<7)return true;
+  /* 어두운숲↔화산 강: z≈375, x:-125~175 */
+  if(Math.abs(z-375)<7&&x>-125&&x<175)return true;
   return false;
 }
 
