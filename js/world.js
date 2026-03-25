@@ -122,6 +122,7 @@ function exitBuilding(){
     /* 안개+그림자+배경+하늘 복원 */
     scene.fog=new THREE.FogExp2(0x88aa88,.002);
     renderer.shadowMap.enabled=true;
+    renderer.shadowMap.needsUpdate=true;
     renderer.setClearColor(0x000000,0);
     if(window._skyMesh)window._skyMesh.visible=true;
     addChat('sys','[시스템]','밖으로 나왔습니다.');
@@ -1105,16 +1106,17 @@ function initScene(){
   var sun=new THREE.DirectionalLight(0xfff0d0,.9);
   sun.position.set(-120,200,400);
   sun.castShadow=true;
-  sun.shadow.mapSize.width=1024;
-  sun.shadow.mapSize.height=1024;
+  sun.shadow.mapSize.width=2048;
+  sun.shadow.mapSize.height=2048;
   sun.shadow.camera.near=0.5;
-  sun.shadow.camera.far=2700;
-  sun.shadow.camera.left=-660;
-  sun.shadow.camera.right=660;
-  sun.shadow.camera.top=660;
-  sun.shadow.camera.bottom=-660;
-  sun.shadow.bias=-0.0005;
+  sun.shadow.camera.far=200;
+  sun.shadow.camera.left=-80;
+  sun.shadow.camera.right=80;
+  sun.shadow.camera.top=80;
+  sun.shadow.camera.bottom=-80;
+  sun.shadow.bias=-0.001;
   scene.add(sun);
+  window._sun=sun;
 
   /* 달 + 별 */
   var moon=new THREE.Mesh(new THREE.SphereGeometry(10,16,16),new THREE.MeshBasicMaterial({color:0xfffde8}));
@@ -1211,6 +1213,12 @@ function updCam(){
   camera.position.y+=(Math.max(ty,.6)-camera.position.y)*lr;
   camera.position.z+=(tz-camera.position.z)*lr;
   camera.lookAt(p.x,p.y+1.2,p.z);
+  /* 태양 그림자를 플레이어 주변으로 따라가게 */
+  if(window._sun){
+    window._sun.position.set(p.x-60,p.y+120,p.z+80);
+    window._sun.target.position.set(p.x,p.y,p.z);
+    window._sun.target.updateMatrixWorld();
+  }
 }
 
 function updNpcs(t){
