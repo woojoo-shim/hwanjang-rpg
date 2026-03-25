@@ -806,8 +806,8 @@ function buildGroundPlanes(){
   var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x4a8a3a}));
   villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.03,-350);villGnd.receiveShadow=true;scene.add(villGnd);
 
-  /* 초원 (NE): x:100~500, z:-500~-100 */
-  makeDisplacedGround(440,440,24,24,0x5a9a3a, 300,0.01,-300);
+  /* 초원: x:-270~170, z:-520~-80 — 중심 (-50,-300) */
+  makeDisplacedGround(440,440,24,24,0x5a9a3a, -50,0.01,-300);
 
   /* 늪 (W): x:-600~-200, z:-100~300 */
   makeDisplacedGround(440,440,24,24,0x3a5a2a, -400,0.01,100);
