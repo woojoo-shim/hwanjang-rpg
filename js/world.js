@@ -1999,7 +1999,7 @@ function buildVillageDecor(){
 /* ════════════ 초원 장식 ════════════ */
 /* 초원 (NE): x:100~500, z:-500~-100 — 중심 (300,-300) */
 function buildMeadowDecor(){
-  var MX=300,MZ=-300; /* 초원 중심 오프셋 */
+  var MX=-50,MZ=-300; /* 초원 중심 오프셋 */
   var stoneM=new THREE.MeshLambertMaterial({color:0x888070});
   var logM=new THREE.MeshLambertMaterial({color:0x4a2e0a});
   var signM=new THREE.MeshLambertMaterial({color:0x6e4010});

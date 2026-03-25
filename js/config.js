@@ -350,7 +350,7 @@ var WORLD_SPAWN=[-345,-345]; // 마을 분수 옆
 /* ── 존 중심 좌표 (거리 기반 존 감지에 사용) ── */
 var ZONE_CENTERS={
   village:  {cx:-350,cz:-350,r:280},
-  meadow:   {cx:300, cz:-300,r:220},
+  meadow:   {cx:-50, cz:-300,r:220},
   swamp:    {cx:-400,cz:100, r:220},
   jungle:   {cx:400, cz:100, r:220},
   darkforest:{cx:-300,cz:350, r:220},
@@ -360,7 +360,7 @@ var ZONE_CENTERS={
 
 var ZONE_INFO={
   village:   {name:'시작 마을',   color:'#c9a84c',tp:[-350,-350]},
-  meadow:    {name:'초원/구릉',   color:'#4aaa3a',tp:[300,-300]},
+  meadow:    {name:'초원/구릉',   color:'#4aaa3a',tp:[-50,-300]},
   swamp:     {name:'늪지대',      color:'#44aa44',tp:[-400,100]},
   darkforest:{name:'어두운 숲',   color:'#aa4422',tp:[-300,350]},
   jungle:    {name:'정글',        color:'#11aa44',tp:[400,100]},

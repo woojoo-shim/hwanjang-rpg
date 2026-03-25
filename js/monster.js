@@ -857,8 +857,8 @@ function spawnMonster(def,x,z,parent){
 /* 모든 좌표는 월드 절대 좌표 */
 
 function buildMeadow(){
-  /* 초원 (NE): x:100~500, z:-500~-100 — 중심 (300,-300) */
-  var MX=300,MZ=-300;
+  /* 초원: x:-270~170, z:-520~-80 — 중심 (-50,-300) */
+  var MX=-50,MZ=-300;
   /* 밝은 녹색 패치들 */
   var patchM=new THREE.MeshLambertMaterial({color:0x4a8a2a});
   [[MX-80,MZ-50,20,14],[MX+60,MZ+20,18,12],[MX,MZ+80,20,16],
