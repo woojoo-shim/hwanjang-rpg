@@ -454,19 +454,13 @@ function inviteToParty(){
   for(var i=0;i<partyMembers.length;i++){
     if(partyMembers[i].uid===target.uid){addChat('sys','[파티]',target.name+'은(는) 이미 파티원입니다.');return;}
   }
-  /* 파티가 없으면 생성 */
   var myUid=getMyUid();
-  if(!partyId){
-    partyId=myUid+'_'+Date.now();
-    partyLeader=myUid;
-    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
-    updatePartyUI();
-  }
-  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
-  /* 초대 전송 */
+  if(partyId&&partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
   if(!ws||ws.readyState!==1){addChat('sys','[파티]','서버에 연결되어 있지 않습니다.');return;}
-  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:partyId,fromName:myName}));
+  var invitePartyId=partyId||(myUid+'_'+Date.now());
+  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:invitePartyId,fromName:myName,fromUid:myUid}));
   addChat('sys','[파티]',target.name+'에게 파티 초대를 보냈습니다.');
+  if(!partyId)_pendingSentInvitePartyId=invitePartyId;
 }
 
 /* 닉네임으로 파티 초대 */
@@ -481,16 +475,12 @@ function inviteByName(targetName){
     if(partyMembers[i].uid===target.uid){addChat('sys','[파티]',target.name+'은(는) 이미 파티원입니다.');return;}
   }
   var myUid=getMyUid();
-  if(!partyId){
-    partyId=myUid+'_'+Date.now();
-    partyLeader=myUid;
-    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
-    updatePartyUI();
-  }
-  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
+  if(partyId&&partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
   if(!ws||ws.readyState!==1){addChat('sys','[파티]','서버에 연결되어 있지 않습니다.');return;}
-  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:partyId,fromName:myName}));
+  var invitePartyId=partyId||(myUid+'_'+Date.now());
+  ws.send(JSON.stringify({type:'party_invite',target:target.uid,partyId:invitePartyId,fromName:myName,fromUid:myUid}));
   addChat('sys','[파티]',target.name+'에게 파티 초대를 보냈습니다.');
+  if(!partyId)_pendingSentInvitePartyId=invitePartyId;
 }
 
 /* 파티 초대 수신 */
@@ -534,6 +524,14 @@ function rejectPartyInvite(){
 /* 파티 수락 수신 (리더가 받음) */
 function onPartyAccept(data){
   /* data: {from, name, level, hp, maxHp, partyId} */
+  /* 파티가 아직 없으면 지금 생성 (초대 보낸 사람) */
+  var myUid=getMyUid();
+  if(!partyId&&_pendingSentInvitePartyId&&data.partyId===_pendingSentInvitePartyId){
+    partyId=_pendingSentInvitePartyId;
+    partyLeader=myUid;
+    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
+    _pendingSentInvitePartyId=null;
+  }
   if(data.partyId!==partyId)return;
   if(partyMembers.length>=PARTY_MAX)return;
   /* 중복 체크 */
@@ -791,18 +789,18 @@ function inviteByUid(targetUid){
   for(var i=0;i<partyMembers.length;i++){
     if(partyMembers[i].uid===targetUid){addChat('sys','[파티]',rp.name+'은(는) 이미 파티원입니다.');return;}
   }
-  /* 파티가 없으면 생성 */
+  /* 이미 다른 파티에 소속되어있고 리더가 아니면 초대 불가 */
   var myUid=getMyUid();
-  if(!partyId){
-    partyId=myUid+'_'+Date.now();
-    partyLeader=myUid;
-    partyMembers=[{uid:myUid,name:myName,level:playerLevel,hp:playerHP,maxHp:playerMaxHP}];
-    updatePartyUI();
-  }
-  if(partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
+  if(partyId&&partyLeader!==myUid){addChat('sys','[파티]','파티장만 초대할 수 있습니다.');return;}
   if(!ws||ws.readyState!==1){addChat('sys','[파티]','서버에 연결되어 있지 않습니다.');return;}
-  ws.send(JSON.stringify({type:'party_invite',target:targetUid,partyId:partyId,fromName:myName}));
+  /* 파티 없으면 임시 ID 생성 (수락 시 확정) */
+  var invitePartyId=partyId||(myUid+'_'+Date.now());
+  ws.send(JSON.stringify({type:'party_invite',target:targetUid,partyId:invitePartyId,fromName:myName,fromUid:myUid}));
   addChat('sys','[파티]',rp.name+'에게 파티 초대를 보냈습니다.');
-  /* 패널 새로고침 */
+  /* 아직 파티 생성 안 함 — 수락 시 생성 */
+  if(!partyId){
+    _pendingSentInvitePartyId=invitePartyId;
+  }
   refreshPartyInvitePanel();
 }
+var _pendingSentInvitePartyId=null;
