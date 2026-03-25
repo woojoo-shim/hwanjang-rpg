@@ -1237,12 +1237,9 @@ function updCam(){
     return;
   }
   var tx=p.x+14*Math.sin(cYaw)*Math.cos(cPitch);
-  var ty=p.y+14*Math.sin(cPitch)+2.5;
+  var ty=Math.max(p.y+14*Math.sin(cPitch)+2.5,.6);
   var tz=p.z+14*Math.cos(cYaw)*Math.cos(cPitch);
-  var lr=.12;
-  camera.position.x+=(tx-camera.position.x)*lr;
-  camera.position.y+=(Math.max(ty,.6)-camera.position.y)*lr;
-  camera.position.z+=(tz-camera.position.z)*lr;
+  camera.position.set(tx,ty,tz);
   camera.lookAt(p.x,p.y+1.2,p.z);
   /* 태양 그림자를 플레이어 주변으로 따라가게 */
   if(window._sun){
