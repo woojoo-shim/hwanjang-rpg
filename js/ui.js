@@ -4,8 +4,6 @@
    참조: camera (world.js), PL (player.js), npcs/closestNpc (world.js) — 런타임 참조 */
 
 var _chatLog=null;/* clog DOM 캐시 */
-var _bldLabels=null;/* 건물 라벨 DOM 캐시 */
-var _labelFrame=0;/* 라벨 업데이트 프레임 카운터 */
 var _CHAT_MAX=200;/* 최대 채팅 줄 수 — 메모리 누수 방지 */
 function addChat(tp,w,tx){
   if(!_chatLog)_chatLog=document.getElementById('clog');
@@ -52,43 +50,34 @@ function posEl(el,wx,wy,wz){
 }
 
 function updLabels(){
-  _labelFrame++;
   var ple=document.getElementById('ple');
   if(ple&&PL.group)posEl(ple,PL.group.position.x,PL.group.position.y+2.4,PL.group.position.z);
   if(!PL.group)return;
   var _inside=(typeof insideBuilding!=='undefined')&&insideBuilding;
-  /* NPC 라벨 — 2프레임마다 갱신 (매 프레임 불필요) */
-  if(_labelFrame%2===0){
-    npcs.forEach(function(n){
-      if(!n.mesh)return;
-      /* 내부/외부 NPC 컨텍스트에 맞게 처리 */
-      var _isInterior=!!(n.label&&!n.nameEl);
-      if(_isInterior&&!_inside){return;}/* 내부 NPC는 실내에서만 */
-      if(!_isInterior&&_inside){return;}/* 외부 NPC는 실외에서만 */
-      var ne=n.nameEl||n.label;
-      var ie=n.intEl||n.interact;
-      if(!ne)return;
-      var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
-      var dist=dx*dx+dz*dz;
-      if(dist<225){/* 15*15=225 — sqrt 제거 */
-        ne.style.display='';
-        posEl(ne,n.mesh.position.x,n.mesh.position.y+2.4,n.mesh.position.z);
-        if(ie){
-          if(n===closestNpc){ie.style.display='block';posEl(ie,n.mesh.position.x,n.mesh.position.y+3.1,n.mesh.position.z);}
-          else ie.style.display='none';
-        }
-      }else{
-        ne.style.display='none';
-        if(ie)ie.style.display='none';
+  npcs.forEach(function(n){
+    if(!n.mesh)return;
+    /* 내부/외부 NPC 컨텍스트에 맞게 처리 */
+    var _isInterior=!!(n.label&&!n.nameEl);
+    if(_isInterior&&!_inside){return;}/* 내부 NPC는 실내에서만 */
+    if(!_isInterior&&_inside){return;}/* 외부 NPC는 실외에서만 */
+    var ne=n.nameEl||n.label;
+    var ie=n.intEl||n.interact;
+    if(!ne)return;
+    var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
+    var dist=Math.sqrt(dx*dx+dz*dz);
+    if(dist<15){
+      ne.style.display='';
+      posEl(ne,n.mesh.position.x,n.mesh.position.y+2.4,n.mesh.position.z);
+      if(ie){
+        if(n===closestNpc){ie.style.display='block';posEl(ie,n.mesh.position.x,n.mesh.position.y+3.1,n.mesh.position.z);}
+        else ie.style.display='none';
       }
-    });
-  }
-  /* 건물 라벨 — 캐시 후 4프레임마다 갱신 */
-  if(_labelFrame%4===0){
-    if(!_bldLabels)_bldLabels=document.querySelectorAll('#lov .llabel.bld');
-    for(var bi=0;bi<_bldLabels.length;bi++){
-      var el=_bldLabels[bi];
-      posEl(el,parseFloat(el.dataset.wx),parseFloat(el.dataset.wy),parseFloat(el.dataset.wz));
+    }else{
+      ne.style.display='none';
+      if(ie)ie.style.display='none';
     }
-  }
+  });
+  document.querySelectorAll('#lov .llabel.bld').forEach(function(el){
+    posEl(el,parseFloat(el.dataset.wx),parseFloat(el.dataset.wy),parseFloat(el.dataset.wz));
+  });
 }
