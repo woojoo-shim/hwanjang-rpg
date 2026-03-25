@@ -83,7 +83,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 #gc{width:100%;height:100%;display:block;cursor:grab;}
 #gc:active{cursor:grabbing;}
 .loverlay{position:absolute;inset:0;pointer-events:none;}
-.llabel{position:absolute;transform:translate(-50%,-100%);padding:2px 8px;font-size:11px;letter-spacing:1px;background:#08080ebb;border:1px solid;white-space:nowrap;pointer-events:none;will-change:left,top;}
+.llabel{position:absolute;transform:translate(-50%,-100%);padding:2px 8px;font-size:11px;letter-spacing:1px;background:#08080ebb;border:1px solid;white-space:nowrap;pointer-events:none;}
 .llabel.plr{color:#90ffa0;border-color:#3a7a50;}
 .llabel.npc{color:#c9a84c;border-color:#6a5020;}
 .llabel.bld{color:#c9a84c88;border-color:#c9a84c33;font-size:10px;letter-spacing:2px;}

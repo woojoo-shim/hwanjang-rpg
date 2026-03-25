@@ -47,7 +47,7 @@ function proj(wx,wy,wz){
 }
 function posEl(el,wx,wy,wz){
   var s=proj(wx,wy,wz);
-  if(s.vis){el.style.display='block';el.style.left=Math.round(s.x)+'px';el.style.top=Math.round(s.y)+'px';}
+  if(s.vis){el.style.display='block';el.style.left=s.x+'px';el.style.top=s.y+'px';}
   else el.style.display='none';
 }
 
