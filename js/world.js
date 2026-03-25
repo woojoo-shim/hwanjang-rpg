@@ -1655,13 +1655,13 @@ function mkFlowerBeds(parent){
     var bedG=new THREE.Group();
     /* 흙 받침 */
     var soil=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.15,1.4),soilM);
-    soil.position.set(0,0.075,0);soilbedG.add(soil);
+    soil.position.set(0,0.075,0);bedG.add(soil);
     /* 낮은 돌 테두리 */
     var borderM=new THREE.MeshLambertMaterial({color:0x888070});
     [[0,0.12,0.72],[0,0.12,-0.72],[1.1,0.12,0],[-1.1,0.12,0]].forEach(function(bp,bi){
       var bw=bi<2?2.4:0.15,bd2=bi<2?0.15:1.44;
       var border=new THREE.Mesh(new THREE.BoxGeometry(bw,0.22,bd2),borderM);
-      border.position.set(bp[0],bp[1],bp[2]);borderbedG.add(border);
+      border.position.set(bp[0],bp[1],bp[2]);bedG.add(border);
     });
     /* 꽃들 */
     for(var i=0;i<count;i++){
