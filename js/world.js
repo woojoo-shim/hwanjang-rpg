@@ -539,7 +539,7 @@ function mkStonePath(parent){
   /* 광장 (마을 중심) — 확장 */
   var pathM=new THREE.MeshLambertMaterial({color:0xc4a872});
   var plaza=new THREE.Mesh(new THREE.CylinderGeometry(14,14,.05,32),pathM);
-  plaza.position.set(-350,.02,-358);plaza.receiveShadow=true;p.add(plaza);
+  plaza.position.set(-350,.15,-358);plaza.receiveShadow=true;p.add(plaza);
 
   function lerpPath(pts,steps){
     /* 성능 최적화: 스텝 수를 절반으로 줄임 */
@@ -922,10 +922,7 @@ function buildVillage(){
   mkStall(VX-52,VZ-28,-.2, 0x8a4a1a,0xcc8833,'무기점',scene);
 
   /* ── 광장 확장 (더 큰 분수) ── */
-  /* 광장 바닥 타일 추가 */
-  var plazaM=new THREE.MeshLambertMaterial({color:0xc8b888});
-  var plazaBig=new THREE.Mesh(new THREE.CylinderGeometry(16,16,.04,32),plazaM);
-  plazaBig.position.set(VX,.01,VZ-8);plazaBig.receiveShadow=true;scene.add(plazaBig);
+  /* 광장 바닥 — 중복 제거됨 (plaza가 이미 있음) */
 
   /* ── 마을 입구 도로 포장 (게이트까지) ── */
   var pathM2=new THREE.MeshLambertMaterial({color:0xb8a060});
