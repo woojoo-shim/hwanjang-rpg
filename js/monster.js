@@ -1659,18 +1659,18 @@ function buildJungle(){
     /* 계단식 기단 */
     [6,4.5,3].forEach(function(sz,li){
       var step=new THREE.Mesh(new THREE.BoxGeometry(sz*2,1,sz*2),li===0?mossStoneM:templeM);
-      step.position.set(0,.5+li*1.0,0);stepstepg.add(step);
+      step.position.set(0,.5+li*1.0,0);g.add(step);
     });
     /* 정상 구조 */
     var top=new THREE.Mesh(new THREE.BoxGeometry(4,2,4),templeDarkM);
-    top.position.set(0,4.5,0);toptopg.add(top);
+    top.position.set(0,4.5,0);g.add(top);
     /* 꼭대기 장식 */
     var apex=new THREE.Mesh(new THREE.ConeGeometry(1.4,2,4),templeM);
-    apex.position.set(0,6.5,0);apex.rotation.y=Math.PI/4;apexg.add(apex);
+    apex.position.set(0,6.5,0);apex.rotation.y=Math.PI/4;g.add(apex);
     /* 기둥 4개 */
     [[-3.5,0,-3.5],[-3.5,0,3.5],[3.5,0,-3.5],[3.5,0,3.5]].forEach(function(pp){
       var pil=new THREE.Mesh(new THREE.CylinderGeometry(.4,.5,4.5,7),mossStoneM);
-      pil.position.set(pp[0],2.75,pp[2]);pilpilg.add(pil);
+      pil.position.set(pp[0],2.75,pp[2]);g.add(pil);
     });
     /* 이끼 덮임 */
     var mossLayer=new THREE.Mesh(new THREE.BoxGeometry(12.2,.15,12.2),mossStoneM);
@@ -1680,7 +1680,7 @@ function buildJungle(){
       var rubble=new THREE.Mesh(new THREE.BoxGeometry(.5+Math.random()*.6,.4+Math.random()*.4,.5+Math.random()*.4),templeDarkM);
       var ra=ri/6*Math.PI*2;
       rubble.position.set(Math.cos(ra)*7,.25,Math.sin(ra)*7);
-      rubble.rotation.y=Math.random()*Math.PI;rubbleg.add(rubble);
+      rubble.rotation.y=Math.random()*Math.PI;g.add(rubble);
     }
     /* 성능 최적화: 사원 PointLight 제거 */
     g.position.set(380,simpleNoise(380,1100),1100);scene.add(g);
@@ -1698,17 +1698,17 @@ function buildJungle(){
       /* 남은 벽 세그먼트 */
       var wallH=2+Math.random()*2;
       var wall=new THREE.Mesh(new THREE.BoxGeometry(4,wallH,.6),ruinJM);
-      wall.position.set(0,wallH/2,0);wallwallg.add(wall);
+      wall.position.set(0,wallH/2,0);g.add(wall);
       /* 이끼 */
       var moss=new THREE.Mesh(new THREE.BoxGeometry(4.1,.2,.65),ruinDkM);
       moss.position.set(0,wallH*.6,0);g.add(moss);
       /* 부서진 기둥 */
       var colH=1.5+Math.random()*1.5;
       var col=new THREE.Mesh(new THREE.CylinderGeometry(.35,.45,colH,7),ruinJM);
-      col.position.set(2.5,colH/2,0);colg.add(col);
+      col.position.set(2.5,colH/2,0);g.add(col);
       /* 쓰러진 돌 블록 */
       var block=new THREE.Mesh(new THREE.BoxGeometry(.8,.5,.6),ruinDkM);
-      block.position.set(-2.2,.25,0.3);block.rotation.z=.2;block.rotation.y=.3;blockg.add(block);
+      block.position.set(-2.2,.25,0.3);block.rotation.z=.2;block.rotation.y=.3;g.add(block);
       g.position.set(rs[0],simpleNoise(rs[0],rs[1]),rs[1]);g.rotation.y=Math.random()*Math.PI;scene.add(g);
     });
   })();
@@ -1723,7 +1723,7 @@ function buildJungle(){
       var g=new THREE.Group();
       /* 기둥 */
       var pole=new THREE.Mesh(new THREE.CylinderGeometry(.22,.3,4.5,7),totemWoodM);
-      pole.position.set(0,2.25,0);polepoleg.add(pole);
+      pole.position.set(0,2.25,0);g.add(pole);
       /* 하단 얼굴 */
       var face1=new THREE.Mesh(new THREE.BoxGeometry(.6,.7,.35),totemDarkM);
       face1.position.set(0,1.2,.2);g.add(face1);
@@ -1740,7 +1740,7 @@ function buildJungle(){
       });
       /* 꼭대기 조각 */
       var crown=new THREE.Mesh(new THREE.ConeGeometry(.35,.6,5),totemWoodM);
-      crown.position.set(0,4.8,0);crowng.add(crown);
+      crown.position.set(0,4.8,0);g.add(crown);
       /* 옆 장식 날개 */
       [-.55,.55].forEach(function(wx){
         var wing=new THREE.Mesh(new THREE.BoxGeometry(.08,.55,.3),totemDarkM);
