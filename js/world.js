@@ -1542,48 +1542,84 @@ function mkWell(parent){
   g.position.set(-372,0,-310);p.add(g);
 }
 
-/* ── 나무 울타리 ── */
+/* ── 마을 나무 방벽 (높은 통나무 벽) ── */
 function mkFences(parent){
   var p=parent||scene;
-  var postM=new THREE.MeshLambertMaterial({color:0x5a3810});
-  var railM=new THREE.MeshLambertMaterial({color:0x6e4c1a});
+  var logM=new THREE.MeshLambertMaterial({color:0x5a3a12});
+  var logDarkM=new THREE.MeshLambertMaterial({color:0x3a2808});
+  var VX=-350,VZ=-350;
+  var wallH=3.5; /* 플레이어보다 높은 벽 */
+  var R=95; /* 마을 벽 반경 */
 
-  function fenceRow(x1,z1,x2,z2,count){
+  /* 통나무 벽 한 구간 생성 */
+  function wallSegment(x1,z1,x2,z2){
     var dx=x2-x1,dz=z2-z1;
     var len=Math.sqrt(dx*dx+dz*dz);
     var ang=Math.atan2(dx,dz);
+    var count=Math.floor(len/1.2);
     for(var i=0;i<=count;i++){
       var t=i/count;
-      var fx=x1+dx*t,fz=z1+dz*t;
-      /* 기둥 */
-      var post=new THREE.Mesh(new THREE.BoxGeometry(0.15,1.2,0.15),postM);
-      post.position.set(fx,0.6,fz);post.castShadow=true;post.receiveShadow=true;p.add(post);
+      var lx=x1+dx*t,lz=z1+dz*t;
+      var h=wallH+Math.random()*.8-0.4;/* 높이 약간 랜덤 */
+      var log=new THREE.Mesh(new THREE.CylinderGeometry(.25,.3,h,6),logM);
+      log.position.set(lx,h/2,lz);log.castShadow=true;log.receiveShadow=true;p.add(log);
+      /* 뾰족한 끝 */
+      var tip=new THREE.Mesh(new THREE.ConeGeometry(.25,.6,6),logDarkM);
+      tip.position.set(lx,h+.3,lz);tip.castShadow=true;p.add(tip);
     }
-    /* 가로대 두 줄 */
-    [0.5,0.85].forEach(function(h){
-      var rail=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,len),railM);
-      rail.position.set((x1+x2)/2,h,(z1+z2)/2);
-      rail.rotation.y=ang;rail.castShadow=true;p.add(rail);
+    /* 가로 보강대 */
+    [wallH*.3,wallH*.7].forEach(function(hy){
+      var beam=new THREE.Mesh(new THREE.BoxGeometry(.15,.2,len),logDarkM);
+      beam.position.set((x1+x2)/2,hy,(z1+z2)/2);
+      beam.rotation.y=ang;beam.castShadow=true;p.add(beam);
     });
   }
 
-  var VX=-350,VZ=-350;
-  /* 주거 구역 울타리 (서북쪽) */
-  fenceRow(VX-60,VZ+40,VX-60,VZ-20,10);
-  fenceRow(VX-60,VZ+40,VX-30,VZ+40,5);
-  /* 길드 구역 울타리 (동쪽) */
-  fenceRow(VX+50,VZ-20,VX+80,VZ-20,5);
-  fenceRow(VX+80,VZ-20,VX+80,VZ-60,7);
-  /* 도서관 구역 울타리 */
-  fenceRow(VX+20,VZ+40,VX+60,VZ+40,7);
-  fenceRow(VX+60,VZ+10,VX+60,VZ+40,5);
-  /* 마을 남쪽 입구 양옆 */
-  fenceRow(VX-40,VZ-90,VX-14,VZ-90,5);
-  fenceRow(VX+14,VZ-90,VX+40,VZ-90,5);
-  /* 마을 서쪽 외곽 */
-  fenceRow(VX-90,VZ+20,VX-90,VZ-80,18);
-  /* 마을 동쪽 외곽 */
-  fenceRow(VX+90,VZ+20,VX+90,VZ-80,18);
+  /* 마을 둘레 벽 — 문 부분만 비움 */
+  /* 북쪽 벽 */
+  wallSegment(VX-R,VZ+R, VX+R,VZ+R);
+  /* 남쪽 벽 — 문 (중앙 8유닛 비움) */
+  wallSegment(VX-R,VZ-R, VX-6,VZ-R);
+  wallSegment(VX+6,VZ-R, VX+R,VZ-R);
+  /* 서쪽 벽 */
+  wallSegment(VX-R,VZ-R, VX-R,VZ+R);
+  /* 동쪽 벽 — 문 (중앙 8유닛 비움, 초원 방향) */
+  wallSegment(VX+R,VZ-R, VX+R,VZ-6);
+  wallSegment(VX+R,VZ+6, VX+R,VZ+R);
+
+  /* 문 기둥 (남쪽) */
+  [-6,6].forEach(function(gx){
+    var gatePost=new THREE.Mesh(new THREE.CylinderGeometry(.4,.5,wallH+1,8),logDarkM);
+    gatePost.position.set(VX+gx,(wallH+1)/2,VZ-R);gatePost.castShadow=true;p.add(gatePost);
+    var gateTop=new THREE.Mesh(new THREE.SphereGeometry(.5,6,4),logM);
+    gateTop.position.set(VX+gx,wallH+1,VZ-R);p.add(gateTop);
+  });
+  /* 문 상단 아치 (남쪽) */
+  var gateBeam=new THREE.Mesh(new THREE.BoxGeometry(12,.4,.5),logDarkM);
+  gateBeam.position.set(VX,wallH+.5,VZ-R);gateBeam.castShadow=true;p.add(gateBeam);
+
+  /* 동쪽 문 기둥 */
+  [-6,6].forEach(function(gz){
+    var gatePost2=new THREE.Mesh(new THREE.CylinderGeometry(.4,.5,wallH+1,8),logDarkM);
+    gatePost2.position.set(VX+R,(wallH+1)/2,VZ+gz);gatePost2.castShadow=true;p.add(gatePost2);
+    var gateTop2=new THREE.Mesh(new THREE.SphereGeometry(.5,6,4),logM);
+    gateTop2.position.set(VX+R,wallH+1,VZ+gz);p.add(gateTop2);
+  });
+  var gateBeam2=new THREE.Mesh(new THREE.BoxGeometry(.5,.4,12),logDarkM);
+  gateBeam2.position.set(VX+R,wallH+.5,VZ);gateBeam2.castShadow=true;p.add(gateBeam2);
+
+  /* 횃불 (문 양쪽) */
+  var torchM=new THREE.MeshLambertMaterial({color:0xff6600,emissive:new THREE.Color(0xff4400),emissiveIntensity:.8});
+  [[-6,VZ-R],[6,VZ-R]].forEach(function(tp){
+    var flame=new THREE.Mesh(new THREE.SphereGeometry(.2,5,4),torchM);
+    flame.position.set(VX+tp[0],wallH+1.5,tp[1]);p.add(flame);
+    var tLight=new THREE.PointLight(0xff6622,.6,15);tLight.position.set(VX+tp[0],wallH+1.5,tp[1]);p.add(tLight);
+  });
+  [[VX+R,-6],[VX+R,6]].forEach(function(tp){
+    var flame=new THREE.Mesh(new THREE.SphereGeometry(.2,5,4),torchM);
+    flame.position.set(tp[0],wallH+1.5,VZ+tp[1]);p.add(flame);
+    var tLight=new THREE.PointLight(0xff6622,.6,15);tLight.position.set(tp[0],wallH+1.5,VZ+tp[1]);p.add(tLight);
+  });
 }
 
 /* ── 석조 아치 입구 ── */
