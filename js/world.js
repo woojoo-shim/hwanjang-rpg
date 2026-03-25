@@ -1067,7 +1067,7 @@ function initScene(){
 
   /* ── 그림자 활성화 ── */
   renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=THREE.BasicShadowMap;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
   /* ── 톤매핑 제거 (성능 최적화) ── */
   /* renderer.toneMapping=THREE.ACESFilmicToneMapping; */
@@ -1114,7 +1114,8 @@ function initScene(){
   sun.shadow.camera.right=80;
   sun.shadow.camera.top=80;
   sun.shadow.camera.bottom=-80;
-  sun.shadow.bias=-0.001;
+  sun.shadow.bias=-0.003;
+  sun.shadow.normalBias=0.02;
   scene.add(sun);
   window._sun=sun;
 
