@@ -666,7 +666,8 @@ function talk(n){
   var te=document.getElementById('dtxt');
   te.innerHTML='';
   document.getElementById('dbox').classList.add('show');
-  document.getElementById('dmsg').focus();
+  var _dmsg=document.getElementById('dmsg');
+  setTimeout(function(){_dmsg.focus();_dmsg.value='';},50);
   var greeting;
   if(turned){
     greeting='수고했네! 보상을 받게.';
@@ -753,7 +754,8 @@ document.addEventListener('keydown',function(e){
   var k=CODE_MAP[e.code]||e.key;
   if(!k)return;
   var gHidden=document.getElementById('game-screen').classList.contains('hidden');
-  var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin')||document.activeElement===document.getElementById('ni')||document.activeElement===document.getElementById('login-email')||document.activeElement===document.getElementById('login-pw');
+  var _ae2=document.activeElement;
+  var isInput=_ae2===document.getElementById('dmsg')||_ae2===document.getElementById('cin')||_ae2===document.getElementById('ni')||_ae2===document.getElementById('login-email')||_ae2===document.getElementById('login-pw')||(_ae2&&(_ae2.tagName==='INPUT'||_ae2.tagName==='TEXTAREA'));
 
   /* ESC — 모든 창 닫기 (최우선) */
   if(k==='Escape'||e.code==='Escape'){
@@ -780,8 +782,8 @@ document.addEventListener('keydown',function(e){
     e.preventDefault();
     if(invOpen)closeInv();else openInv();
   }
-  /* Tab — 플레이어 리스트 */
-  if(e.code==='Tab'&&!isInput){
+  /* Tab — 플레이어 리스트 (Ctrl/Alt 조합은 브라우저에 양보) */
+  if(e.code==='Tab'&&!isInput&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
     e.preventDefault();
     if(typeof showPlayerList==='function')showPlayerList();
   }

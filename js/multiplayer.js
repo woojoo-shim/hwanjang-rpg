@@ -72,7 +72,7 @@ document.addEventListener('keyup',function(e){
 });
 
 function connectParty(){
-  if(ws&&ws.readyState<=1)return;
+  if(ws&&ws.readyState<=2)return;/* 연결 중(0), 열림(1), 닫힘 중(2) — 중복 연결 방지 */
   try{
     ws=new WebSocket('wss://'+PARTY_HOST+'/party/main');
   }catch(e){console.warn('WS connect error',e);return;}
@@ -141,7 +141,7 @@ function connectParty(){
   ws.onerror=function(e){console.warn('[MP] ws error',e);};
 }
 
-var _lastSentX=0,_lastSentZ=0,_lastSentRy=0,_lastSentMoving=false;
+var _lastSentX=0,_lastSentY=0,_lastSentZ=0,_lastSentRy=0,_lastSentMoving=false;
 function sendPosition(){
   if(!ws||ws.readyState!==1||!PL.group)return;
   var x=+PL.group.position.x.toFixed(2);
@@ -150,8 +150,8 @@ function sendPosition(){
   var ry=+PL.group.rotation.y.toFixed(2);
   var mv=!!(keys['w']||keys['s']||keys['a']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright']);
   /* 변화 없으면 안 보냄 */
-  if(x===_lastSentX&&z===_lastSentZ&&ry===_lastSentRy&&mv===_lastSentMoving)return;
-  _lastSentX=x;_lastSentZ=z;_lastSentRy=ry;_lastSentMoving=mv;
+  if(x===_lastSentX&&y===_lastSentY&&z===_lastSentZ&&ry===_lastSentRy&&mv===_lastSentMoving)return;
+  _lastSentX=x;_lastSentY=y;_lastSentZ=z;_lastSentRy=ry;_lastSentMoving=mv;
   ws.send(JSON.stringify({type:'move',x:x,y:y,z:z,ry:ry,moving:mv}));
 }
 
@@ -159,12 +159,12 @@ function onMpMessage(data){
   if(data.type==='init'){
     for(var id in data.players){
       var p=data.players[id];
-      spawnRemote(id,p.name,p.level,p.x,p.z,p.ry);
+      spawnRemote(id,p.name,p.level,p.x,p.z,p.ry,p.y);
     }
   }
   else if(data.type==='join'){
     var isNew=!remotePlayers[data.id];
-    spawnRemote(data.id,data.name,data.level,data.x,data.z,data.ry);
+    spawnRemote(data.id,data.name,data.level,data.x,data.z,data.ry,data.y);
     if(isNew)addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
   }
   else if(data.type==='move'){
@@ -211,7 +211,8 @@ function onMpMessage(data){
     if(idx>=0&&idx<monsters.length){
       var m=monsters[idx];
       m.hp=data.hp;m.maxHp=data.hp;
-      m.mesh.position.set(m.spawnX,0,m.spawnZ);
+      var _mry=(typeof getTerrainY==='function')?getTerrainY(m.spawnX,m.spawnZ):0;
+      m.mesh.position.set(m.spawnX,_mry,m.spawnZ);
       m.deathAnim=-1;m.state='idle';
       m.mesh.visible=true;m.mesh.scale.set(0,0,0);
       m.spawnAnim=0.6;
@@ -307,7 +308,7 @@ function startMonsterSync(){
 var REMOTE_BODY_COLOR=0x3a3a8a;
 var REMOTE_HEAD_COLOR=0xddcc99;
 
-function spawnRemote(id,name,level,x,z,ry){
+function spawnRemote(id,name,level,x,z,ry,y){
   if(remotePlayers[id]){
     /* 이미 존재하면 무시 — move 메시지가 더 정확 */
     return;
@@ -315,7 +316,8 @@ function spawnRemote(id,name,level,x,z,ry){
   var myUid=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
   if(id===myUid)return;
   var h=mkHuman(REMOTE_BODY_COLOR,REMOTE_HEAD_COLOR);
-  h.group.position.set(x,0,z);
+  var _initY=(y!==undefined&&y!==null)?y:((typeof getTerrainY==='function')?getTerrainY(x,z):0);
+  h.group.position.set(x,_initY,z);
   h.group.rotation.y=ry||0;
   scene.add(h.group);
 
@@ -331,7 +333,7 @@ function spawnRemote(id,name,level,x,z,ry){
     group:h.group,legL:h.legL,legR:h.legR,
     armL:h.armL,armRPivot:h.armRPivot,
     nameEl:ne,
-    tx:x,ty:0,tz:z,try_:ry||0,
+    tx:x,ty:_initY,tz:z,try_:ry||0,
     bobT:0,moving:false,
     atkPhase:0,atkTimer:0
   };

@@ -462,7 +462,7 @@ function killMonster(m){
   });
   setTimeout(function(){
     if(!m.mesh)return;
-    m.hp=m.def.hp;m.mesh.position.set(m.spawnX,0,m.spawnZ);
+    m.hp=m.def.hp;var _respawnY=(typeof getTerrainY==='function')?getTerrainY(m.spawnX,m.spawnZ):0;m.mesh.position.set(m.spawnX,_respawnY,m.spawnZ);
     m.mesh.rotation.set(0,Math.random()*Math.PI*2,0);
     /* 재료 투명도 리셋 */
     m.mesh.traverse(function(c){

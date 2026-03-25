@@ -52,8 +52,14 @@ function posEl(el,wx,wy,wz){
 function updLabels(){
   var ple=document.getElementById('ple');
   if(ple&&PL.group)posEl(ple,PL.group.position.x,PL.group.position.y+2.4,PL.group.position.z);
+  if(!PL.group)return;
+  var _inside=(typeof insideBuilding!=='undefined')&&insideBuilding;
   npcs.forEach(function(n){
-    if(!n.nameEl&&!n.label)return;/* 내부 NPC는 별도 처리 */
+    if(!n.mesh)return;
+    /* 내부/외부 NPC 컨텍스트에 맞게 처리 */
+    var _isInterior=!!(n.label&&!n.nameEl);
+    if(_isInterior&&!_inside){return;}/* 내부 NPC는 실내에서만 */
+    if(!_isInterior&&_inside){return;}/* 외부 NPC는 실외에서만 */
     var ne=n.nameEl||n.label;
     var ie=n.intEl||n.interact;
     if(!ne)return;

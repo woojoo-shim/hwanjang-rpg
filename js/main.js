@@ -178,7 +178,8 @@ function setupInput(){
     var k=CODE_TO_KEY[e.code]||(e.key?e.key.toLowerCase():null);
     if(!k)return;
     keys[k]=true;
-    var isInput=document.activeElement===document.getElementById('dmsg')||document.activeElement===document.getElementById('cin');
+    var _ae=document.activeElement;
+    var isInput=_ae===document.getElementById('dmsg')||_ae===document.getElementById('cin')||(_ae&&(_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'));
     if(k==='e'&&!isInput){
       e.preventDefault();
       /* 건물 내부 → 나가기 최우선 */

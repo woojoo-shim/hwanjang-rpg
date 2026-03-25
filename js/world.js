@@ -35,7 +35,8 @@ function checkBuildingDoors(){
   if(insideBuilding){
     var bh=document.getElementById('building-hint');
     if(bh){
-      if(Math.abs(px)<3&&pz>5){
+      var _exitThresh=(insideBuilding==='모험가 길드')?12:8;
+      if(Math.abs(px)<3&&pz>_exitThresh){
         bh.style.display='block';
         bh.textContent='E — 나가기';
       }else{
@@ -140,7 +141,7 @@ function mkInteriorNpc(nx,nz,baseY,bodyColor,npcName){
   /* 머리 */
   var head=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.6),new THREE.MeshLambertMaterial({color:0xf5d4a0}));
   head.position.y=1.5;g.add(head);
-  g.position.set(nx,baseY,nz);
+  g.position.set(nx,baseY+1,nz);
   scene.add(g);
   /* 이름표 */
   var lov=document.getElementById('lov')||document.getElementById('cc');
@@ -1224,7 +1225,9 @@ function updCam(){
 
 function updNpcs(t){
   npcs.forEach(function(n){
-    n.mesh.position.y=Math.sin(t*.9+n.bobOff)*.04;
+    /* 내부 NPC는 baseY 기준 bob, 외부 NPC는 지면(0) 기준 bob */
+    var _nBaseY=(n.label)?n.mesh.position.y:0;/* 내부 NPC는 현재 y 유지 */
+    if(!n.label)n.mesh.position.y=Math.sin(t*.9+n.bobOff)*.04;
     var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
     if(Math.sqrt(dx*dx+dz*dz)<10){var tr=Math.atan2(dx,dz);n.mesh.rotation.y+=(tr-n.mesh.rotation.y)*.04;}
   });
@@ -1307,6 +1310,10 @@ function updVisualFX(t){
 function chkNpc(){
   closestNpc=null;var md=4.5;
   npcs.forEach(function(n){
+    /* 내부 NPC(n.label 있음)는 건물 내부일 때만, 외부 NPC는 밖일 때만 감지 */
+    var isInterior=!!(n.label);
+    if(isInterior&&!insideBuilding)return;
+    if(!isInterior&&insideBuilding)return;
     var dx=PL.group.position.x-n.mesh.position.x,dz=PL.group.position.z-n.mesh.position.z;
     var d=Math.sqrt(dx*dx+dz*dz);if(d<md){md=d;closestNpc=n;}
   });
