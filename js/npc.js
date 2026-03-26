@@ -581,11 +581,15 @@ function buildSkillBar(){
   for(var i=0;i<skills.length;i++){
     var sk=skills[i];
     var slot=document.createElement('div');
-    slot.style.cssText='width:50px;height:50px;background:#1a1a2ecc;border:1px solid '+sk.color+';border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;';
+    slot.className='skill-slot ready';
+    slot.id='skill-slot-'+i;
     slot.title=sk.name+': '+sk.desc;
-    slot.innerHTML='<div style="color:'+sk.color+';font-size:9px;font-weight:bold;">'+sk.key+'</div>'
-      +'<div style="color:#ddd;font-size:10px;">'+sk.name+'</div>'
-      +'<div id="skill-cd-'+i+'" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#ff4444;font-size:14px;font-weight:bold;"></div>';
+    /* 스킬 키 라벨 (우상단), 스킬명, 쿨다운 오버레이 */
+    slot.innerHTML='<div class="skill-slot-key" style="color:'+sk.color+';">'+sk.key+'</div>'
+      +'<div style="color:'+sk.color+';font-size:14px;font-weight:bold;line-height:1;margin-bottom:3px;">'+(sk.icon||'✦')+'</div>'
+      +'<div class="skill-slot-name" style="color:'+sk.color+'88;">'+sk.name+'</div>'
+      +'<div class="skill-slot-sweep" id="skill-sweep-'+i+'"></div>'
+      +'<div class="skill-slot-cd" id="skill-cd-'+i+'"></div>';
     bar.appendChild(slot);
   }
 }

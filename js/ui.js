@@ -28,11 +28,49 @@ function flashPlayerHit(){
   setTimeout(function(){_hitOverlay.style.opacity='0';},120);
 }
 
-function spawnDmgNum(text,color){
+/* ── Diablo-style 데미지 숫자 ── */
+/* type: 'crit' | 'player' | 'heal' | 'normal' (기본) */
+function spawnDmgNum(text,color,type){
   var el=document.createElement('div');
-  el.textContent=text;
-  el.style.cssText='position:fixed;font-size:20px;font-weight:700;color:'+color+';pointer-events:none;z-index:300;text-shadow:0 2px 8px '+color+'88;animation:dmgFloat .9s ease-out forwards;left:'+(window.innerWidth*.38+Math.random()*120)+'px;top:'+(window.innerHeight*.38+Math.random()*80)+'px;';
-  document.body.appendChild(el);setTimeout(function(){el.remove();},900);
+  var isCrit=type==='crit'||(typeof color==='string'&&color.indexOf('ffdd')>=0&&text&&text.length>2&&!isNaN(text.replace(/[^0-9]/g,'')));
+  var isPlayerDmg=type==='player';
+  var isHeal=type==='heal'||text.charAt(0)==='+';
+
+  /* Diablo 스타일 오버라이드 */
+  var finalColor=color;
+  var fontSize=18;
+  var prefix='';
+  var extraStyle='';
+
+  if(isHeal){
+    finalColor='#44ff88';
+    fontSize=18;
+  }else if(isPlayerDmg){
+    finalColor='#ff3333';
+    fontSize=22;
+    extraStyle='animation:dmgFloatPlayer .9s ease-out forwards;';
+  }else if(isCrit||type==='crit'){
+    finalColor='#ffd700';
+    fontSize=28;
+    prefix='CRITICAL! ';
+    extraStyle='animation:dmgFloatCrit 1.1s ease-out forwards;letter-spacing:1px;';
+  }else{
+    finalColor=color||'#ffffff';
+    fontSize=20;
+  }
+
+  /* 살짝 랜덤 수평 오프셋으로 스택 방지 */
+  var leftPos=window.innerWidth*.38+Math.random()*140-70;
+  var topPos=window.innerHeight*.38+Math.random()*80;
+
+  el.textContent=prefix+text;
+  el.style.cssText='position:fixed;font-size:'+fontSize+'px;font-weight:700;color:'+finalColor
+    +';pointer-events:none;z-index:300;'
+    +'text-shadow:1px 1px 0 #000,-1px 1px 0 #000,1px -1px 0 #000,-1px -1px 0 #000,0 0 8px '+finalColor+'88;'
+    +(extraStyle||'animation:dmgFloat .9s ease-out forwards;')
+    +'left:'+leftPos+'px;top:'+topPos+'px;';
+  document.body.appendChild(el);
+  setTimeout(function(){el.remove();},isCrit?1100:900);
 }
 
 /* 3D → 2D 투영 */

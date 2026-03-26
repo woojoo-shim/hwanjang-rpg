@@ -8,6 +8,30 @@
 var PL={group:null,legL:null,legR:null,armL:null,armR:null,armRPivot:null,weaponMesh:null,bobT:0,atkAnim:0,atkPhase:0};
 var playerHP=100,playerMaxHP=100,playerEXP=0,playerLevel=1;
 var attackCooldown=0,invincibleTimer=0;
+
+/* ── 화면 흔들림 (Diablo-style screen shake) ── */
+var _shakeIntensity=0,_shakeDuration=0,_shakeElapsed=0,_shakeCamBase=null;
+function screenShake(intensity,duration){
+  _shakeIntensity=intensity;
+  _shakeDuration=duration||0.2;
+  _shakeElapsed=0;
+  if(typeof camera!=='undefined'&&camera&&!_shakeCamBase){
+    _shakeCamBase={x:camera.position.x,y:camera.position.y,z:camera.position.z};
+  }
+}
+function tickScreenShake(dt){
+  if(_shakeDuration<=0||_shakeElapsed>=_shakeDuration)return;
+  _shakeElapsed+=dt;
+  var t=_shakeElapsed/_shakeDuration;
+  var freq=18;
+  var offset=_shakeIntensity*Math.sin(t*freq*Math.PI)*(1-t);
+  if(typeof camera!=='undefined'&&camera){
+    camera.position.x+=(Math.random()-.5)*offset;
+    camera.position.y+=(Math.random()-.5)*offset*.5;
+    camera.position.z+=(Math.random()-.5)*offset;
+  }
+  if(_shakeElapsed>=_shakeDuration){_shakeDuration=0;}
+}
 /* 상태이상 */
 var playerPoisoned=0,playerPoisonDmg=0;
 var playerSlowed=0;
@@ -248,7 +272,7 @@ function useSkill(slotIdx){
     var heal=Math.floor(playerMaxHP*sk.selfHeal);
     playerHP=Math.min(playerMaxHP,playerHP+heal);
     updPlayerHpBar();
-    spawnDmgNum('+'+heal,'#44ff88');
+    spawnDmgNum('+'+heal,'#44ff88','heal');
     addChat('sys','[스킬]',sk.name+' 사용! HP +'+heal);
   }
   /* 자가 데미지 (광전사) */
@@ -350,14 +374,25 @@ function updateSkills(dt){
     activeBuffs[b].remaining-=dt;
     if(activeBuffs[b].remaining<=0)delete activeBuffs[b];
   }
-  /* HUD 스킬 쿨다운 표시 */
+  /* HUD 스킬 쿨다운 표시 — Diablo-style slot 업데이트 */
   var skills=CLASS_SKILLS[playerClass]||[];
   for(var i=0;i<skills.length;i++){
     var el=document.getElementById('skill-cd-'+i);
+    var slotEl=document.getElementById('skill-slot-'+i);
+    var sweepEl=document.getElementById('skill-sweep-'+i);
     if(!el)continue;
     var cd=skillCooldowns[skills[i].id]||0;
+    var maxCd=skills[i].cd||1;
     el.textContent=cd>0?Math.ceil(cd)+'s':'';
-    el.parentElement.style.opacity=cd>0?'0.5':'1';
+    if(slotEl){
+      if(cd>0){
+        slotEl.className='skill-slot on-cooldown';
+        if(sweepEl){sweepEl.style.display='block';sweepEl.style.opacity=Math.min(1,cd/maxCd)*0.6+'';}
+      }else{
+        slotEl.className='skill-slot ready';
+        if(sweepEl){sweepEl.style.display='none';}
+      }
+    }
   }
 }
 
@@ -374,7 +409,8 @@ function playerAttack(){
   /* 광전사 패시브: HP 낮을수록 ATK 증가 */
   if(cls.passive==='rage'){var hpRatio=playerHP/playerMaxHP;dmg=Math.floor(dmg*(1+(1-hpRatio)*0.8));}
   /* 치명타 판정 */
-  if(Math.random()<cls.crit){dmg=Math.floor(dmg*cls.critDmg);}
+  var _isCrit=false;
+  if(Math.random()<cls.crit){dmg=Math.floor(dmg*cls.critDmg);_isCrit=true;}
 
   /* 활: 마우스 방향으로 화살 발사 */
   if(isRangedWeapon()){
@@ -429,7 +465,7 @@ function playerAttack(){
   var ddx=target.mesh.position.x-PL.group.position.x;
   var ddz=target.mesh.position.z-PL.group.position.z;
   PL.group.rotation.y=Math.atan2(ddx,ddz);
-  spawnDmgNum('-'+dmg,'#ffdd44');
+  spawnDmgNum('-'+dmg,'#ffdd44',_isCrit?'crit':'normal');
   flashMonster(target);
   target.state='aggro';
   if(target.hp<=0)killMonster(target);
@@ -442,6 +478,17 @@ function killMonster(m){
   m.wrap.style.display='none';
   /* 붉은 공격 플래시 재료 복원 후 죽음 색상 적용 */
   if(m._origMats){m._origMats.forEach(function(o){o.mesh.material=o.orig;});m._origMats=null;}
+
+  /* ── Diablo 킬 이펙트: 흰색 플래시 100ms ── */
+  var _whiteMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:1});
+  var _savedMats=[];
+  m.mesh.traverse(function(c){if(c.isMesh){_savedMats.push({mesh:c,orig:c.material});c.material=_whiteMat;}});
+  setTimeout(function(){_savedMats.forEach(function(o){if(o.mesh)o.mesh.material=o.orig;});},100);
+
+  /* ── 파티클 튀기기 ── */
+  var mx=m.mesh.position.x,my=m.mesh.position.y,mz=m.mesh.position.z;
+  if(typeof spawnKillParticles==='function')spawnKillParticles(mx,my,mz,m.def.color);
+
   var _expGain=m.def.exp;
   if(typeof getPartyExpShare==='function')_expGain=getPartyExpShare(_expGain);
   playerEXP+=_expGain;
@@ -452,12 +499,21 @@ function killMonster(m){
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
   if(typeof onMonsterKillForShaman==='function')onMonsterKillForShaman();
+  /* ── 아이템 드롭: 인벤 직접 추가 대신 바닥 글로우 생성 ── */
   m.def.drops.forEach(function(drop){
     if(Math.random()<drop.rate){
       var qty=Array.isArray(drop.qty)?drop.qty[0]+Math.floor(Math.random()*(drop.qty[1]-drop.qty[0]+1)):drop.qty;
-      addItem(drop.id,qty);
-      var df=getItemDef(drop.id);if(df)addChat('sys','[시스템]','['+df.name+'] x'+qty+' 획득!');
-      if(typeof onItemCollect==='function')onItemCollect(drop.id,qty);
+      var df=getItemDef(drop.id);
+      /* 아이템 글로우 생성 (근처에 플레이어가 없을 때만 바닥 드롭) */
+      var dropX=mx+(Math.random()-.5)*2,dropZ=mz+(Math.random()-.5)*2;
+      if(df&&typeof spawnLootGlow==='function'){
+        spawnLootGlow(dropX,dropZ,df,qty);
+      }else{
+        /* fallback: 글로우 없으면 직접 추가 */
+        addItem(drop.id,qty);
+        if(df)addChat('sys','[시스템]','['+df.name+'] x'+qty+' 획득!');
+        if(typeof onItemCollect==='function')onItemCollect(drop.id,qty);
+      }
     }
   });
   setTimeout(function(){
@@ -577,7 +633,13 @@ function checkLevelUp(){
 }
 
 function updPlayerHpBar(){
-  document.querySelectorAll('.hbf.hp').forEach(function(f){f.style.width=(playerHP/playerMaxHP*100)+'%';});
+  var pct=playerHP/playerMaxHP*100;
+  document.querySelectorAll('.hbf.hp').forEach(function(f){
+    f.style.width=pct+'%';
+    /* 저체력 글로우 경고 (<25%) */
+    if(pct<25)f.classList.add('low-hp');
+    else f.classList.remove('low-hp');
+  });
   var vals=document.querySelectorAll('.hbv');
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
 }

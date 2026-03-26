@@ -2238,8 +2238,10 @@ function updMonsters(dt,t){
             /* 로컬 플레이어가 타겟 → 직접 데미지 */
             if(invincibleTimer<=0){
               playerHP=Math.max(0,playerHP-dmg);
-              updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555');
+              updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555','player');
               flashPlayerHit();
+              /* 화면 흔들림 — 받은 데미지에 비례 */
+              if(typeof screenShake==='function')screenShake(Math.min(1.5,dmg*0.04),0.2);
               if((mid==='toad'||mid==='jungle_snake')&&!playerPoisoned){
                 playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
                 spawnDmgNum('독!','#44ff44');addChat('inf','','독에 걸렸다!');
@@ -2287,4 +2289,174 @@ function updMonsters(dt,t){
   });
   var fh=document.getElementById('f-hint');
   if(fh)fh.style.display=(md<7&&currentZone!=='village')?'block':'none';
+}
+
+/* ════════════ 킬 파티클 시스템 (Diablo-style death splatter) ════════════ */
+var killParticles=[];
+
+function spawnKillParticles(x,y,z,color){
+  var count=8+Math.floor(Math.random()*5);/* 8-12 */
+  for(var i=0;i<count;i++){
+    var size=0.06+Math.random()*0.1;
+    var geo=new THREE.BoxGeometry(size,size,size);
+    var mat=new THREE.MeshLambertMaterial({color:color,transparent:true,opacity:1});
+    var mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(x+(Math.random()-.5)*.3,y+.5+Math.random()*.3,z+(Math.random()-.5)*.3);
+    var angle=Math.random()*Math.PI*2;
+    var spd=3+Math.random()*4;
+    var vx=Math.cos(angle)*spd;
+    var vz=Math.sin(angle)*spd;
+    var vy=2+Math.random()*4;
+    scene.add(mesh);
+    killParticles.push({mesh:mesh,vx:vx,vy:vy,vz:vz,life:1.0,maxLife:1.0});
+  }
+}
+
+function updateKillParticles(dt){
+  for(var i=killParticles.length-1;i>=0;i--){
+    var p=killParticles[i];
+    p.life-=dt;
+    p.vy-=12*dt;/* gravity */
+    p.mesh.position.x+=p.vx*dt;
+    p.mesh.position.y+=p.vy*dt;
+    p.mesh.position.z+=p.vz*dt;
+    p.mesh.rotation.x+=dt*8;
+    p.mesh.rotation.z+=dt*6;
+    p.mesh.material.opacity=Math.max(0,p.life/p.maxLife);
+    if(p.life<=0){
+      scene.remove(p.mesh);
+      p.mesh.geometry.dispose();
+      p.mesh.material.dispose();
+      killParticles.splice(i,1);
+    }
+  }
+}
+
+/* ════════════ 루트 글로우 시스템 (Diablo-style loot drops) ════════════ */
+var lootGlows=[];
+
+/* 희귀도 색상 매핑 */
+var RARITY_GLOW_COLORS={
+  common:0xffffff,
+  uncommon:0x44cc66,
+  rare:0x4488ff,
+  epic:0xaa44ff,
+  legendary:0xff8800,
+  hidden:0xff44ff
+};
+
+function spawnLootGlow(x,z,itemDef,qty){
+  if(!itemDef)return;
+  var rarity=itemDef.rarity||'common';
+  var glowColor=RARITY_GLOW_COLORS[rarity]||RARITY_GLOW_COLORS.common;
+
+  /* 발광 구체 메쉬 */
+  var geo=new THREE.SphereGeometry(0.18,8,8);
+  var mat=new THREE.MeshBasicMaterial({color:glowColor,transparent:true,opacity:0.85});
+  var mesh=new THREE.Mesh(geo,mat);
+  var baseY=0.22;
+  mesh.position.set(x,baseY,z);
+  scene.add(mesh);
+
+  /* 광원 링 */
+  var ringGeo=new THREE.RingGeometry(0.25,0.45,16);
+  var ringMat=new THREE.MeshBasicMaterial({color:glowColor,transparent:true,opacity:0.4,side:THREE.DoubleSide});
+  var ring=new THREE.Mesh(ringGeo,ringMat);
+  ring.rotation.x=-Math.PI/2;
+  ring.position.set(x,0.05,z);
+  scene.add(ring);
+
+  /* 플로팅 텍스트 라벨 */
+  var label=document.createElement('div');
+  label.className='loot-label';
+  label.style.cssText='position:fixed;pointer-events:none;z-index:60;font-size:10px;letter-spacing:1px;font-weight:700;white-space:nowrap;text-shadow:0 1px 4px #000,0 0 8px #000;';
+  var colorHex='#'+glowColor.toString(16).padStart(6,'0');
+  label.style.color=colorHex;
+  label.textContent=(qty>1?'x'+qty+' ':'')+itemDef.name;
+  var lov=document.getElementById('lov');
+  if(lov)lov.appendChild(label);
+
+  lootGlows.push({
+    mesh:mesh,ring:ring,label:label,
+    x:x,z:z,baseY:baseY,
+    life:60,/* 60초 후 소멸 */
+    animT:Math.random()*Math.PI*2,
+    itemDef:itemDef,qty:qty,
+    rarity:rarity,glowColor:glowColor,
+    picked:false
+  });
+}
+
+function updateLootGlows(dt){
+  if(!PL.group)return;
+  var px=PL.group.position.x,pz=PL.group.position.z;
+  for(var i=lootGlows.length-1;i>=0;i--){
+    var g=lootGlows[i];
+    if(g.picked){lootGlows.splice(i,1);continue;}
+    g.life-=dt;
+    g.animT+=dt;
+    /* 스케일 진동 */
+    var sc=0.9+Math.sin(g.animT*3)*0.15;
+    g.mesh.scale.set(sc,sc,sc);
+    g.mesh.position.y=g.baseY+Math.sin(g.animT*2.5)*0.06;
+    /* 링 회전 */
+    g.ring.rotation.z+=dt*1.2;
+    /* 링 펄스 */
+    g.ring.material.opacity=0.25+Math.sin(g.animT*3)*0.2;
+    /* 라벨 위치 업데이트 */
+    if(g.label&&typeof proj==='function'){
+      var lp=proj(g.x,g.mesh.position.y+0.45,g.z);
+      if(lp.vis){
+        g.label.style.display='block';
+        g.label.style.left=(lp.x-g.label.offsetWidth/2)+'px';
+        g.label.style.top=lp.y+'px';
+      }else{
+        g.label.style.display='none';
+      }
+    }
+    /* 픽업 범위 체크 (반경 3) */
+    var dx=px-g.x,dz=pz-g.z;
+    if(Math.sqrt(dx*dx+dz*dz)<3.0){
+      /* 자동 픽업 */
+      g.picked=true;
+      addItem(g.itemDef.id,g.qty);
+      addChat('sys','[아이템]','['+g.itemDef.name+'] x'+g.qty+' 획득!');
+      if(typeof onItemCollect==='function')onItemCollect(g.itemDef.id,g.qty);
+      /* Swoosh: 픽업 파티클 플레이어 방향 */
+      spawnPickupSwoosh(g.x,g.mesh.position.y,g.z,g.glowColor);
+      scene.remove(g.mesh);scene.remove(g.ring);
+      g.mesh.geometry.dispose();g.mesh.material.dispose();
+      g.ring.geometry.dispose();g.ring.material.dispose();
+      if(g.label&&g.label.parentNode)g.label.parentNode.removeChild(g.label);
+      lootGlows.splice(i,1);
+      continue;
+    }
+    /* 수명 만료 */
+    if(g.life<=0){
+      scene.remove(g.mesh);scene.remove(g.ring);
+      g.mesh.geometry.dispose();g.mesh.material.dispose();
+      g.ring.geometry.dispose();g.ring.material.dispose();
+      if(g.label&&g.label.parentNode)g.label.parentNode.removeChild(g.label);
+      lootGlows.splice(i,1);
+    }
+  }
+}
+
+function spawnPickupSwoosh(x,y,z,color){
+  if(!PL.group)return;
+  var count=6;
+  for(var i=0;i<count;i++){
+    var geo=new THREE.SphereGeometry(0.04,4,4);
+    var mat=new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:0.9});
+    var mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(x+(Math.random()-.5)*0.3,y,z+(Math.random()-.5)*0.3);
+    scene.add(mesh);
+    /* 파티클을 플레이어로 날림 */
+    var tx=PL.group.position.x,ty=1.0,tz=PL.group.position.z;
+    killParticles.push({mesh:mesh,
+      vx:(tx-x)*4+(Math.random()-.5),
+      vy:(ty-y)*4+2,
+      vz:(tz-z)*4+(Math.random()-.5),
+      life:0.4,maxLife:0.4,_pickup:true});
+  }
 }

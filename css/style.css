@@ -69,10 +69,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 .hbg{display:flex;flex-direction:column;gap:3px;margin-left:6px;}
 .hbr{display:flex;align-items:center;gap:6px;}
 .hbl{font-size:9px;letter-spacing:1px;width:16px;}
-.hb{height:7px;width:100px;background:#1a1a2a;border:1px solid #2a2a3a;overflow:hidden;}
-.hbf{height:100%;}
-.hbf.hp{background:linear-gradient(90deg,#3a8,#7f4);}
-.hbf.mp{background:linear-gradient(90deg,#228,#46e);}
+.hb{height:10px;width:120px;background:#0a0a14;border:1px solid #1a1a2a;box-shadow:inset 0 2px 4px #00000088;overflow:hidden;border-radius:2px;}
+.hbf{height:100%;transition:width .25s ease-out;}
+.hbf.hp{background:linear-gradient(180deg,#6cf066 0%,#2a8a2a 60%,#1a5a1a 100%);box-shadow:0 0 6px #44ff4466;}
+.hbf.mp{background:linear-gradient(180deg,#6699ff 0%,#2244cc 60%,#112266 100%);box-shadow:0 0 6px #4466ff66;}
 .hbv{font-size:9px;color:#5a5a7a;}
 .hsp{flex:1;}
 .hrt{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
@@ -194,9 +194,58 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 #zone-banner{position:fixed;top:52px;left:50%;transform:translateX(-50%) translateY(-10px);font-size:13px;letter-spacing:3px;padding:5px 20px;background:#08080eee;border:1px solid;z-index:90;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;}
 #zone-banner.show{opacity:1;transform:translateX(-50%) translateY(0);}
 #f-hint{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);background:#cc222288;border:1px solid #ff4444;padding:5px 18px;color:#ffaaaa;font-size:11px;letter-spacing:3px;pointer-events:none;display:none;animation:ibob .7s ease-in-out infinite alternate;}
-#exp-bar-wrap{width:100px;height:4px;background:#1a1a2a;border:1px solid #2a2a4a;overflow:hidden;margin-left:6px;}
-#exp-bar-fill{height:100%;background:#8855ff;width:0%;transition:width .4s;}
+/* ─── HP/MP/EXP 바 업그레이드 (Diablo-style) ─── */
+/* 저체력 펄스 */
+.hbf.hp.low-hp{animation:hpLowPulse 0.7s ease-in-out infinite;}
+@keyframes hpLowPulse{0%,100%{box-shadow:0 0 6px #ff0000aa,0 0 14px #ff000044}50%{box-shadow:0 0 14px #ff0000ff,0 0 28px #ff000088}}
+#exp-bar-wrap{width:120px;height:5px;background:#0a0a14;border:1px solid #1a1a2a;overflow:hidden;margin-left:6px;border-radius:2px;box-shadow:inset 0 1px 3px #00000088;}
+#exp-bar-fill{height:100%;background:linear-gradient(180deg,#ffcc44 0%,#c07700 60%,#7a4400 100%);width:0%;transition:width .4s ease-out;box-shadow:0 0 6px #c9a84c88;}
 @keyframes dmgFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(1.3)}}
+@keyframes dmgFloatPlayer{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(0.9)}}
+@keyframes dmgFloatCrit{0%{opacity:1;transform:translateY(0) scale(1.4)}30%{transform:translateY(-15px) scale(1.5)}100%{opacity:0;transform:translateY(-70px) scale(1.1)}}
+
+/* ─── 루트 글로우 라벨 ─── */
+.loot-label{pointer-events:none;z-index:60;font-size:10px;letter-spacing:1px;font-weight:700;white-space:nowrap;transform:translateX(-50%);animation:lootLabelBob 1.2s ease-in-out infinite alternate;}
+@keyframes lootLabelBob{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-4px)}}
+
+/* ─── 스킬 바 (Diablo-style stone) ─── */
+#skill-bar{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;}
+.skill-slot{
+  width:54px;height:54px;
+  background:linear-gradient(180deg,#2a2a3e 0%,#14141e 50%,#0a0a12 100%);
+  border:2px solid #4a4a6a;
+  border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;
+  box-shadow:0 0 0px transparent,inset 0 1px 0 #5a5a8a44,inset 0 -1px 0 #00000088;
+  transition:box-shadow .2s,border-color .2s;
+}
+.skill-slot.ready{
+  border-color:#c9a84c;
+  box-shadow:0 0 8px #c9a84c66,inset 0 1px 0 #c9a84c44;
+}
+.skill-slot.on-cooldown{
+  border-color:#3a3a4a;
+  opacity:0.6;
+}
+.skill-slot-key{
+  position:absolute;top:3px;right:5px;font-size:8px;color:#888;letter-spacing:0;font-weight:700;
+}
+.skill-slot-name{color:#bbb;font-size:8px;letter-spacing:0.5px;text-align:center;max-width:50px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.skill-slot-cd{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  color:#ff4444;font-size:15px;font-weight:bold;
+  text-shadow:0 1px 3px #000;
+  pointer-events:none;
+}
+/* 쿨다운 sweep 오버레이 */
+.skill-slot-sweep{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.55);
+  border-radius:3px;
+  pointer-events:none;
+  display:none;
+}
 
 /* ─── 상점 UI ─── */
 #shop-overlay{position:fixed;inset:0;z-index:70;background:#000000bb;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}

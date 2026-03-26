@@ -262,6 +262,9 @@ function loop(){
     if(typeof updateArrows==='function')updateArrows(dt);
     if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
+    if(typeof tickScreenShake==='function')tickScreenShake(dt);
+    if(typeof updateKillParticles==='function')updateKillParticles(dt);
+    if(typeof updateLootGlows==='function')updateLootGlows(dt);
     checkZone();
     if(typeof checkBuildingDoors==='function')checkBuildingDoors();
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
