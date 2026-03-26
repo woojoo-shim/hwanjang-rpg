@@ -605,25 +605,38 @@ function buildInterior(name,baseY){
     /* ── 카펫 ── */
     var carpetM=new THREE.MeshLambertMaterial({color:0x334455});
     var carpet=new THREE.Mesh(new THREE.PlaneGeometry(12,10),carpetM);carpet.rotation.x=-Math.PI/2;carpet.position.set(0,baseY+.01,-1);scene.add(carpet);
-    /* ── 마네킹 진열 (4개) ── */
+    /* ── 마네킹 진열 (카운터 양옆 2개씩) ── */
     var armorColors=[0x8899aa,0xaa8855,0x557799,0x667766];
-    var armorNames=['판금 갑옷','가죽 갑옷','사슬 갑옷','천 로브'];
+    var mannPositions=[[-6,-8],[-6,-6],[6,-8],[6,-6]];
     for(var ai=0;ai<4;ai++){
-      var aox=-7+ai*4.5;
+      var mp=mannPositions[ai];
       var aArmorM=new THREE.MeshLambertMaterial({color:armorColors[ai]});
-      /* 받침대 */
-      var mannBase=new THREE.Mesh(new THREE.CylinderGeometry(.28,.38,.55,8),woodM);mannBase.position.set(aox,baseY+.27,8.5);scene.add(mannBase);
-      var mannPole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.1,8),darkWoodM);mannPole.position.set(aox,baseY+1.05,8.5);scene.add(mannPole);
-      /* 몸통 */
-      var mannTorso=new THREE.Mesh(new THREE.BoxGeometry(.85,1.05,.45),aArmorM);mannTorso.position.set(aox,baseY+2.1,8.5);scene.add(mannTorso);
-      /* 어깨/팔 */
-      var mannShldrL=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrL.position.set(aox-.58,baseY+2.45,8.5);scene.add(mannShldrL);
-      var mannShldrR=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrR.position.set(aox+.58,baseY+2.45,8.5);scene.add(mannShldrR);
-      var mannArmL=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmL.position.set(aox-.65,baseY+1.85,8.5);scene.add(mannArmL);
-      var mannArmR=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmR.position.set(aox+.65,baseY+1.85,8.5);scene.add(mannArmR);
-      /* 투구 */
-      var mannHelm=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),aArmorM);mannHelm.position.set(aox,baseY+2.9,8.5);scene.add(mannHelm);
+      var mannBase=new THREE.Mesh(new THREE.CylinderGeometry(.28,.38,.55,8),woodM);mannBase.position.set(mp[0],baseY+.27,mp[1]);scene.add(mannBase);
+      var mannPole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.1,8),darkWoodM);mannPole.position.set(mp[0],baseY+1.05,mp[1]);scene.add(mannPole);
+      var mannTorso=new THREE.Mesh(new THREE.BoxGeometry(.85,1.05,.45),aArmorM);mannTorso.position.set(mp[0],baseY+2.1,mp[1]);scene.add(mannTorso);
+      var mannShldrL=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrL.position.set(mp[0]-.58,baseY+2.45,mp[1]);scene.add(mannShldrL);
+      var mannShldrR=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrR.position.set(mp[0]+.58,baseY+2.45,mp[1]);scene.add(mannShldrR);
+      var mannArmL=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmL.position.set(mp[0]-.65,baseY+1.85,mp[1]);scene.add(mannArmL);
+      var mannArmR=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmR.position.set(mp[0]+.65,baseY+1.85,mp[1]);scene.add(mannArmR);
+      var mannHelm=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),aArmorM);mannHelm.position.set(mp[0],baseY+2.9,mp[1]);scene.add(mannHelm);
     }
+    /* ── 갑옷 더미 (양쪽 벽) ── */
+    var pileM=new THREE.MeshLambertMaterial({color:0x778899});
+    /* 왼쪽 벽 — 헬멧 선반 */
+    var helmShelf=new THREE.Mesh(new THREE.BoxGeometry(.3,3,6),woodM);helmShelf.position.set(-9.5,baseY+1.5,-3);scene.add(helmShelf);
+    [[-9.3,baseY+.8,-5],[-9.3,baseY+.8,-3],[-9.3,baseY+.8,-1],[-9.3,baseY+2.2,-5],[-9.3,baseY+2.2,-3],[-9.3,baseY+2.2,-1]].forEach(function(hp){
+      var helm=new THREE.Mesh(new THREE.SphereGeometry(.35,6,5),new THREE.MeshLambertMaterial({color:0x667788+Math.floor(Math.random()*0x222222)}));
+      helm.position.set(hp[0],hp[1],hp[2]);helm.scale.y=.8;scene.add(helm);
+    });
+    /* 오른쪽 앞 — 상자에 갑옷 쌓인 모양 */
+    var crate1=new THREE.Mesh(new THREE.BoxGeometry(1.8,1,1.5),woodM);crate1.position.set(8,baseY+.5,4);scene.add(crate1);
+    var armorPile1=new THREE.Mesh(new THREE.BoxGeometry(1.4,.6,1.2),pileM);armorPile1.position.set(8,baseY+1.3,4);armorPile1.rotation.y=.3;scene.add(armorPile1);
+    var crate2=new THREE.Mesh(new THREE.BoxGeometry(1.5,.8,1.3),woodM);crate2.position.set(8,baseY+.4,6.5);scene.add(crate2);
+    var bootsPile=new THREE.Mesh(new THREE.BoxGeometry(.8,.5,.6),new THREE.MeshLambertMaterial({color:0x554433}));bootsPile.position.set(8,baseY+.9,6.5);scene.add(bootsPile);
+    /* 바닥에 놓인 갑옷 파츠 */
+    var floorArmor1=new THREE.Mesh(new THREE.BoxGeometry(1.2,.15,.8),pileM);floorArmor1.position.set(-3,baseY+.08,3);floorArmor1.rotation.y=.5;scene.add(floorArmor1);
+    var floorHelm=new THREE.Mesh(new THREE.SphereGeometry(.3,6,5),new THREE.MeshLambertMaterial({color:0x889988}));floorHelm.position.set(-2.5,baseY+.3,3.5);floorHelm.scale.y=.7;scene.add(floorHelm);
+    var floorShield=new THREE.Mesh(new THREE.BoxGeometry(.1,1.2,.9),new THREE.MeshLambertMaterial({color:0x885533}));floorShield.position.set(3,baseY+.6,2);floorShield.rotation.z=.2;scene.add(floorShield);
     /* ── 방패 진열대 (동쪽 벽) ── */
     var shRackM=new THREE.MeshLambertMaterial({color:0x5a3a18});
     var shRack=new THREE.Mesh(new THREE.BoxGeometry(.3,4,12),shRackM);shRack.position.set(9.7,baseY+2.5,0);scene.add(shRack);
