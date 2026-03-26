@@ -84,7 +84,8 @@ function connectParty(){
       type:'join',uid:uid,name:myName,level:playerLevel,
       x:+PL.group.position.x.toFixed(2),
       z:+PL.group.position.z.toFixed(2),
-      ry:+PL.group.rotation.y.toFixed(2)
+      ry:+PL.group.rotation.y.toFixed(2),
+      cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null}
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
@@ -160,11 +161,17 @@ function onMpMessage(data){
     for(var id in data.players){
       var p=data.players[id];
       spawnRemote(id,p.name,p.level,p.x,p.z,p.ry,p.y);
+      if(p.cosmetics&&remotePlayers[id]){
+        applyRemoteCosmetics(remotePlayers[id],p.cosmetics);
+      }
     }
   }
   else if(data.type==='join'){
     var isNew=!remotePlayers[data.id];
     spawnRemote(data.id,data.name,data.level,data.x,data.z,data.ry,data.y);
+    if(data.cosmetics&&remotePlayers[data.id]){
+      applyRemoteCosmetics(remotePlayers[data.id],data.cosmetics);
+    }
     if(isNew)addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
   }
   else if(data.type==='move'){
@@ -363,8 +370,8 @@ function updateRemotePlayers(dt){
     if(dRot<-Math.PI)dRot+=Math.PI*2;
     r.group.rotation.y+=dRot*0.1;
 
-    var baseY=(r.ty||0);
-    r.group.position.y+=(baseY-r.group.position.y)*0.15;
+    var baseY=(r.ty!==undefined?r.ty:0);
+    r.group.position.y+=(baseY-r.group.position.y)*0.25;
     if(r.moving){
       r.bobT+=dt*9;
       var wa=0.32;
