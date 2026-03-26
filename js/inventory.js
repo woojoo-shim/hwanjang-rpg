@@ -57,6 +57,7 @@ function equipItem(slot){
     equipped[cslot]=slot.itemId;
     addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
     if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
+    if(typeof sendCosmeticUpdate==='function')sendCosmeticUpdate();
     renderInv();showDetail(slot);updEquipHud();
     return;
   }
@@ -73,6 +74,7 @@ function unequipItem(slot){
     equipped[cslot]=null;
     addChat('sys','[시스템]','['+it.name+']을(를) 해제했습니다.');
     if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
+    if(typeof sendCosmeticUpdate==='function')sendCosmeticUpdate();
     renderInv();showDetail(slot);updEquipHud();
     return;
   }

@@ -156,6 +156,11 @@ function sendPosition(){
   ws.send(JSON.stringify({type:'move',x:x,y:y,z:z,ry:ry,moving:mv}));
 }
 
+function sendCosmeticUpdate(){
+  if(!ws||ws.readyState!==1)return;
+  ws.send(JSON.stringify({type:'cosmetic_update',cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null}}));
+}
+
 function onMpMessage(data){
   if(data.type==='init'){
     for(var id in data.players){
@@ -178,6 +183,10 @@ function onMpMessage(data){
     var r=remotePlayers[data.id];
     if(!r)return;
     r.tx=data.x;r.ty=(data.y!==undefined?data.y:0);r.tz=data.z;r.try_=data.ry;r.moving=data.moving;
+  }
+  else if(data.type==='cosmetic_update'){
+    var r=remotePlayers[data.id];
+    if(r&&data.cosmetics)applyRemoteCosmetics(r,data.cosmetics);
   }
   else if(data.type==='chat'){
     addChat('plr',data.name,data.text);

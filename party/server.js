@@ -52,6 +52,14 @@ export default {
       }
     }
 
+    if (data.type === 'cosmetic_update') {
+      var st = conn.deserializeAttachment();
+      var uid = st ? (st.uid || conn.id) : conn.id;
+      room.broadcast(JSON.stringify({
+        type: 'cosmetic_update', id: uid, cosmetics: data.cosmetics
+      }), [conn.id]);
+    }
+
     if (data.type === 'chat') {
       room.broadcast(JSON.stringify({
         type: 'chat', id: conn.id, name: data.name, text: data.text
