@@ -514,6 +514,36 @@ async function askAI(npcName,userMsg){
       }
       return '';
     }).trim();
+    /* 대화 거래 파싱 [TRADE_BUY:아이템id|가격] [TRADE_SELL:아이템id|가격] */
+    pp.clean=pp.clean.replace(/\[TRADE_BUY:([^\]]+)\]/g,function(_,m){
+      var p=m.split('|');if(p.length>=2){
+        var itemId=p[0].trim(),price=parseInt(p[1])||0;
+        var def=getItemDef(itemId);
+        if(!def){addChat('sys','[거래]','알 수 없는 아이템입니다.');return '';}
+        if(gold<price){addChat('sys','[거래]','골드가 부족합니다! ('+gold+'/'+price+')');return '';}
+        gold-=price;addItem(itemId,1);
+        addChat('sys','[거래]',def.name+'을(를) '+price+'골드에 구매했습니다!');
+        document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+        if(shopOpen)renderShopItems();
+      }
+      return '';
+    }).trim();
+    pp.clean=pp.clean.replace(/\[TRADE_SELL:([^\]]+)\]/g,function(_,m){
+      var p=m.split('|');if(p.length>=2){
+        var itemId=p[0].trim(),price=parseInt(p[1])||0;
+        /* 인벤토리에서 아이템 찾기 */
+        var idx=-1;
+        for(var ti=0;ti<inventory.length;ti++){if(inventory[ti].id===itemId){idx=ti;break;}}
+        if(idx===-1){addChat('sys','[거래]','해당 아이템이 없습니다.');return '';}
+        var def=inventory[idx];
+        var sellName=def.name||itemId;
+        inventory.splice(idx,1);gold+=price;
+        addChat('sys','[거래]',sellName+'을(를) '+price+'골드에 판매했습니다!');
+        document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+        if(shopOpen)renderShopItems();
+      }
+      return '';
+    }).trim();
     var qp=parseQuest(pp.clean);
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);

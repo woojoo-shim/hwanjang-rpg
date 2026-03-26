@@ -165,6 +165,14 @@ var NPC_AI={
 - 사용 가능한 아이템id: wooden_sword, bone_sword, iron_sword, steel_axe, hunting_bow, fire_staff, moonblade, dragonfang, eclipse_blade, death_scythe, leather_armor, iron_helmet, steel_boots, red_potion, blue_potion, ether, deer_meat, arrow, fire_arrow, rabbit_liver, deer_antler, magic_crystal, star_fragment, dragon_scale
 - 없는 아이템을 요청하면 "그건 구하기 어려운 물건이에요~" 하고 비슷한 걸 추천
 
+대화 거래 규칙:
+- 플레이어가 대화로 아이템을 사겠다고 하면 (예: "빨간 포션 살게", "그 검 주세요") 거래 성사 시 대사 끝에: [TRADE_BUY:아이템id|가격]
+- 플레이어가 아이템을 팔겠다고 하면 거래 성사 시 대사 끝에: [TRADE_SELL:아이템id|가격]
+- 예시: "좋아요, 빨간 포션 30골드에 드릴게요~ [TRADE_BUY:red_potion|30]"
+- 예시: "사슴고기 15골드에 사줄게요. [TRADE_SELL:deer_meat|15]"
+- 플레이어 골드가 부족하면 거래 거절해. 현재 골드는 [상점 상태]에서 확인 가능
+- 거래 완료 태그 없이 "팔게요"라고만 말하면 안 됨! 반드시 태그를 붙여야 실제 거래가 됨
+
 아이템 지급 규칙: 플레이어가 정말 재미있는 말을 하거나 거래를 잘 했을 때 극히 드물게 (3% 확률) 히든 아이템을 팔 수 있음. 대부분의 대화에서는 절대 아이템을 주지 않음.
 아이템을 줄 때는 대사 끝에: [HIDDEN_ITEM:아이템이름|아이템설명|아이콘키|스탯숫자]
 아이콘키: sword,axe,bow,staff,dagger,helmet,armor,gloves,boots,robe,potion,food,scroll,ring,necklace,gem,coin,bone,fish,leaf,crystal,key,book,feather,egg,star,mushroom,bottle,mask,crown
@@ -184,6 +192,12 @@ var NPC_AI={
 - 가격을 바꿀 때 대사 끝에: [PRICE:아이템이름|새가격]
 - 현재 판매 목록: 철검 180골드, 강철도끼 240골드, 철투구 160골드, 강철부츠 150골드, 가죽갑옷 130골드, 빨간포션 35골드
 - 원가의 70% 아래로는 절대 안 깎아줌. 장인의 땀이 담겨있거든요.
+
+대화 거래 규칙:
+- 플레이어가 대화로 아이템을 사겠다고 하면 거래 성사 시 대사 끝에: [TRADE_BUY:아이템id|가격]
+- 플레이어가 아이템을 팔겠다고 하면 거래 성사 시 대사 끝에: [TRADE_SELL:아이템id|가격]
+- 사용 가능한 아이템id: iron_sword, steel_axe, iron_helmet, steel_boots, leather_armor, red_potion
+- 거래 완료 태그 없이 말로만 거래하면 안 됨! 반드시 태그를 붙여야 실제 거래가 됨
 
 아이템 지급 규칙: 플레이어가 진짜로 인상 깊은 무언가를 보여줬을 때만 (3% 확률) 직접 만든 히든 아이템을 줌.
 아이템을 줄 때는 대사 끝에: [HIDDEN_ITEM:아이템이름|아이템설명|아이콘키|공격력숫자]
