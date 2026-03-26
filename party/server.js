@@ -44,10 +44,10 @@ export default {
     if (data.type === 'move') {
       var st = conn.deserializeAttachment();
       if (st) {
-        st.x = data.x; st.z = data.z; st.ry = data.ry; conn.serializeAttachment(st);
+        st.x = data.x; st.y = data.y; st.z = data.z; st.ry = data.ry; conn.serializeAttachment(st);
         room.broadcast(JSON.stringify({
           type: 'move', id: st.uid || conn.id,
-          x: data.x, z: data.z, ry: data.ry, moving: data.moving
+          x: data.x, y: data.y, z: data.z, ry: data.ry, moving: data.moving
         }), [conn.id]);
       }
     }
