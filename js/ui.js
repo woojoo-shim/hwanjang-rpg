@@ -51,9 +51,9 @@ function spawnDmgNum(text,color,type){
     extraStyle='animation:dmgFloatPlayer .9s ease-out forwards;';
   }else if(isCrit||type==='crit'){
     finalColor='#ffd700';
-    fontSize=28;
-    prefix='CRITICAL! ';
-    extraStyle='animation:dmgFloatCrit 1.1s ease-out forwards;letter-spacing:1px;';
+    fontSize=24;
+    prefix='';
+    extraStyle='';
   }else{
     finalColor=color||'#ffffff';
     fontSize=20;
