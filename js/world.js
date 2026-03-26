@@ -1439,9 +1439,9 @@ function initScene(){
       composer.addPass(renderPass);
       var bloomPass=new THREE.UnrealBloomPass(
         new THREE.Vector2(w2,h2),
-        0.4,  /* strength — 부드럽게 */
-        0.3,  /* radius */
-        0.85  /* threshold — 밝은 것만 */
+        0.15,  /* strength — 아주 약하게 */
+        0.2,  /* radius */
+        0.95  /* threshold — 매우 밝은 것만 */
       );
       composer.addPass(bloomPass);
     }catch(e){
