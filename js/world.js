@@ -612,17 +612,17 @@ function buildInterior(name,baseY){
       var aox=-7+ai*4.5;
       var aArmorM=new THREE.MeshLambertMaterial({color:armorColors[ai]});
       /* 받침대 */
-      var mannBase=new THREE.Mesh(new THREE.CylinderGeometry(.28,.38,.55,8),woodM);mannBase.position.set(aox,baseY+.27,-7);scene.add(mannBase);
-      var mannPole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.1,8),darkWoodM);mannPole.position.set(aox,baseY+1.05,-7);scene.add(mannPole);
+      var mannBase=new THREE.Mesh(new THREE.CylinderGeometry(.28,.38,.55,8),woodM);mannBase.position.set(aox,baseY+.27,5);scene.add(mannBase);
+      var mannPole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.1,8),darkWoodM);mannPole.position.set(aox,baseY+1.05,5);scene.add(mannPole);
       /* 몸통 */
-      var mannTorso=new THREE.Mesh(new THREE.BoxGeometry(.85,1.05,.45),aArmorM);mannTorso.position.set(aox,baseY+2.1,-7);scene.add(mannTorso);
+      var mannTorso=new THREE.Mesh(new THREE.BoxGeometry(.85,1.05,.45),aArmorM);mannTorso.position.set(aox,baseY+2.1,5);scene.add(mannTorso);
       /* 어깨/팔 */
-      var mannShldrL=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrL.position.set(aox-.58,baseY+2.45,-7);scene.add(mannShldrL);
-      var mannShldrR=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrR.position.set(aox+.58,baseY+2.45,-7);scene.add(mannShldrR);
-      var mannArmL=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmL.position.set(aox-.65,baseY+1.85,-7);scene.add(mannArmL);
-      var mannArmR=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmR.position.set(aox+.65,baseY+1.85,-7);scene.add(mannArmR);
+      var mannShldrL=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrL.position.set(aox-.58,baseY+2.45,5);scene.add(mannShldrL);
+      var mannShldrR=new THREE.Mesh(new THREE.BoxGeometry(.25,.3,.35),aArmorM);mannShldrR.position.set(aox+.58,baseY+2.45,5);scene.add(mannShldrR);
+      var mannArmL=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmL.position.set(aox-.65,baseY+1.85,5);scene.add(mannArmL);
+      var mannArmR=new THREE.Mesh(new THREE.BoxGeometry(.22,.75,.22),aArmorM);mannArmR.position.set(aox+.65,baseY+1.85,5);scene.add(mannArmR);
       /* 투구 */
-      var mannHelm=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),aArmorM);mannHelm.position.set(aox,baseY+2.9,-7);scene.add(mannHelm);
+      var mannHelm=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),aArmorM);mannHelm.position.set(aox,baseY+2.9,5);scene.add(mannHelm);
     }
     /* ── 방패 진열대 (동쪽 벽) ── */
     var shRackM=new THREE.MeshLambertMaterial({color:0x5a3a18});
@@ -640,14 +640,14 @@ function buildInterior(name,baseY){
     var mirrorFrame=new THREE.Mesh(new THREE.BoxGeometry(.15,3.5,2),mirrorFrameM);mirrorFrame.position.set(-9.7,baseY+2.2,3);scene.add(mirrorFrame);
     var mirrorSurfM=new THREE.MeshLambertMaterial({color:0xaaccdd,transparent:true,opacity:.7});
     var mirrorSurf=new THREE.Mesh(new THREE.PlaneGeometry(1.7,3.2),mirrorSurfM);mirrorSurf.rotation.y=Math.PI/2;mirrorSurf.position.set(-9.6,baseY+2.2,3);scene.add(mirrorSurf);
-    /* ── 측정 도구 카운터 ── */
-    var aC=new THREE.Mesh(new THREE.BoxGeometry(8,1.1,2),woodM);aC.position.set(0,baseY+.55,6.5);scene.add(aC);
-    var aCTop=new THREE.Mesh(new THREE.BoxGeometry(8.2,.1,2.2),darkWoodM);aCTop.position.set(0,baseY+1.15,6.5);scene.add(aCTop);
+    /* ── 측정 도구 카운터 (북쪽/안쪽) ── */
+    var aC=new THREE.Mesh(new THREE.BoxGeometry(8,1.1,2),woodM);aC.position.set(0,baseY+.55,-7);scene.add(aC);
+    var aCTop=new THREE.Mesh(new THREE.BoxGeometry(8.2,.1,2.2),darkWoodM);aCTop.position.set(0,baseY+1.15,-7);scene.add(aCTop);
     /* 카운터 위 아이템 */
     var tapeM=new THREE.MeshLambertMaterial({color:0xddcc88});
-    var tape=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.2,8),tapeM);tape.rotation.z=Math.PI/2;tape.position.set(-2,baseY+1.22,6.5);scene.add(tape);
+    var tape=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.2,8),tapeM);tape.rotation.z=Math.PI/2;tape.position.set(-2,baseY+1.22,-7);scene.add(tape);
     var scissorM=new THREE.MeshLambertMaterial({color:0x999999});
-    var scissor=new THREE.Mesh(new THREE.BoxGeometry(.06,.45,.06),scissorM);scissor.position.set(1,baseY+1.27,6.5);scissor.rotation.z=.3;scene.add(scissor);
+    var scissor=new THREE.Mesh(new THREE.BoxGeometry(.06,.45,.06),scissorM);scissor.position.set(1,baseY+1.27,-7);scissor.rotation.z=.3;scene.add(scissor);
     /* ── 가죽 두루마리/천 묶음 ── */
     var leatherM=new THREE.MeshLambertMaterial({color:0x8a5a30});
     var leather1=new THREE.Mesh(new THREE.CylinderGeometry(.25,.28,.9,8),leatherM);leather1.rotation.z=Math.PI/2;leather1.position.set(-7,baseY+.55,5);scene.add(leather1);
