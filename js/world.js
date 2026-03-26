@@ -583,13 +583,13 @@ function mkFountain(parent){
   var g=new THREE.Group();
   var p=parent||scene;
   var stoneM=new THREE.MeshLambertMaterial({color:0x888070});
-  var waterM=new THREE.MeshLambertMaterial({color:0x3399cc,transparent:true,opacity:0.65});
+  var waterM=new THREE.MeshLambertMaterial({color:0x226688,transparent:true,opacity:0.55});
   var outer=new THREE.Mesh(new THREE.CylinderGeometry(6,6.3,.7,16),stoneM);outer.position.set(0,.35,0);outer.castShadow=true;outer.receiveShadow=true;g.add(outer);
   var water=new THREE.Mesh(new THREE.CylinderGeometry(5.5,5.5,.35,16),waterM);water.position.set(0,.52,0);g.add(water);
   var pillar=new THREE.Mesh(new THREE.CylinderGeometry(.4,.55,3.2,8),stoneM);pillar.position.set(0,1.6,0);pillar.castShadow=true;g.add(pillar);
-  var topM=new THREE.MeshLambertMaterial({color:0xccaa44});
+  var topM=new THREE.MeshLambertMaterial({color:0x887733});
   var top=new THREE.Mesh(new THREE.ConeGeometry(1.1,2.0,6),topM);top.position.set(0,3.8,0);top.castShadow=true;g.add(top);
-  var jetM=new THREE.MeshLambertMaterial({color:0x88ddff,transparent:true,opacity:.5});
+  var jetM=new THREE.MeshLambertMaterial({color:0x4488aa,transparent:true,opacity:.4});
   [0,1,2,3,4,5,6,7].forEach(function(i){
     var a=i*Math.PI/4;
     var jet=new THREE.Mesh(new THREE.CylinderGeometry(.08,.13,2.2,6),jetM);
