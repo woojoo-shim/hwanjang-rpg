@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>환장 RPG — 월드 맵</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a0e06;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Noto Serif KR', 'Malgun Gothic', sans-serif;
+  }
+  #mapCanvas {
+    display: block;
+    cursor: crosshair;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  }
+  #controls {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    background: linear-gradient(180deg, #c4a040, #8a6a1a);
+    color: #1a0a00;
+    border: 2px solid #6a4a0a;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+  button:hover { background: linear-gradient(180deg, #d4b050, #aa8a2a); }
+  #coords {
+    color: #c4a040;
+    font-size: 0.82rem;
+    margin-top: 8px;
+    font-family: monospace;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<canvas id="mapCanvas" width="900" height="1300"></canvas>
+<div id="controls">
+  <button id="btnSave">이미지로 저장</button>
+  <button id="btnToggleGrid">격자 토글</button>
+  <button id="btnToggleMonsters">몬스터 표시 토글</button>
+</div>
+<div id="coords">마우스를 맵 위로 이동하면 좌표가 표시됩니다</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  환장 RPG — 월드맵 (Simple & Clear)
+// ═══════════════════════════════════════════════
+
+var CW = 900, CH = 1300;
+
+// World coordinate bounds
+var WX_MIN = -620, WX_MAX = 620;
+var WZ_MIN = -32,  WZ_MAX = 2600;
+
+// Canvas padding (title at top, legend at bottom)
+var PAD_L = 50, PAD_R = 50, PAD_T = 70, PAD_B = 100;
+
+// Map drawing area
+var MAP_X = PAD_L;
+var MAP_Y = PAD_T;
+var MAP_W = CW - PAD_L - PAD_R;
+var MAP_H = CH - PAD_T - PAD_B;
+
+// Convert world X to canvas X
+function wx(worldX) {
+  return MAP_X + (worldX - WX_MIN) / (WX_MAX - WX_MIN) * MAP_W;
+}
+// Convert world Z to canvas Y
+function wz(worldZ) {
+  return MAP_Y + (worldZ - WZ_MIN) / (WZ_MAX - WZ_MIN) * MAP_H;
+}
+// Convert world rect to canvas rect {x, y, w, h}
+function wrect(x1, z1, x2, z2) {
+  var cx1 = wx(x1), cy1 = wz(z1);
+  var cx2 = wx(x2), cy2 = wz(z2);
+  return { x: Math.min(cx1,cx2), y: Math.min(cy1,cy2), w: Math.abs(cx2-cx1), h: Math.abs(cy2-cy1) };
+}
+
+var canvas = document.getElementById('mapCanvas');
+var ctx = canvas.getContext('2d');
+
+var showGrid = false;
+var showMonsters = true;
+
+// ─── NPC data ───
+var NPC_DEF = [
+  { name:'마을 이장',  px: 2,  pz: -6,  color:'#ffcc44' },
+  { name:'상인',       px: 8,  pz: -4,  color:'#44aaff' },
+  { name:'대장장이',   px:-8,  pz: -4,  color:'#ff8844' },
+  { name:'???',        px:18,  pz:-18,  color:'#cc44ff' },
+];
+
+// ─── Elite monsters ───
+var ELITES = [
+  { name:'★황금사슴왕', x:  0,  z: 600,  color:'#ffdd00' },
+  { name:'★독왕두꺼비', x:400,  z: 600,  color:'#66ff00' },
+  { name:'★늑대대장',   x:-200, z:1550,  color:'#aaaaff' },
+  { name:'★정글의왕',   x: 420, z:1400,  color:'#ff8844' },
+  { name:'★고대화염룡', x:  0,  z:2200,  color:'#ff2200' },
+];
+
+// ─── Landmarks ───
+var LANDMARKS = [
+  { name:'성',    x:0,  z:-30, icon:'🏰' },
+  { name:'분수',  x:0,  z:-8,  icon:'⛲' },
+];
+
+// ─── Biome zones ───
+var BIOMES = [
+  // Village
+  { label:'🏘️ 시작 마을', x1:-620, z1:-32,  x2:620,  z2: 60,  color:'#4a8a3a' },
+  // Meadow center
+  { label:'🌿 초원',       x1:-240, z1: 60,  x2:240,  z2:900,  color:'#5a9a3a' },
+  // Swamp West
+  { label:'🐸 독 늪',      x1:-620, z1: 60,  x2:-240, z2:900,  color:'#3a5a2a' },
+  // Swamp East
+  { label:'🐸 독 늪',      x1: 240, z1: 60,  x2:620,  z2:900,  color:'#3a5a2a' },
+  // Dark Forest center
+  { label:'🌲 어두운 숲',  x1:-240, z1:900,  x2:240,  z2:1680, color:'#1a4a12' },
+  // Jungle East
+  { label:'🌴 정글',       x1: 240, z1:900,  x2:620,  z2:1680, color:'#2a6a1a' },
+  // Volcano (full width)
+  { label:'🌋 화산 지대',  x1:-620, z1:1680, x2:620,  z2:2600, color:'#3a1208' },
+];
+
+// ─── Helper: draw text with black outline ───
+function outlineText(text, x, y, fillColor, fontSize, align, baseline) {
+  ctx.font = (fontSize || 13) + 'px sans-serif';
+  ctx.textAlign = align || 'center';
+  ctx.textBaseline = baseline || 'middle';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = fillColor || '#ffffff';
+  ctx.fillText(text, x, y);
+}
+
+// ─── Helper: draw a filled circle marker ───
+function drawDot(x, y, r, color, borderColor) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = borderColor || '#000000';
+  ctx.stroke();
+}
+
+// ─── Helper: draw a star shape ───
+function drawStar(cx, cy, r, color) {
+  ctx.beginPath();
+  for (var i = 0; i < 5; i++) {
+    var outerA = (i * 2 * Math.PI / 5) - Math.PI / 2;
+    var innerA = outerA + Math.PI / 5;
+    if (i === 0) ctx.moveTo(cx + Math.cos(outerA)*r, cy + Math.sin(outerA)*r);
+    else         ctx.lineTo(cx + Math.cos(outerA)*r, cy + Math.sin(outerA)*r);
+    ctx.lineTo(cx + Math.cos(innerA)*(r*0.45), cy + Math.sin(innerA)*(r*0.45));
+  }
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#000';
+  ctx.stroke();
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN DRAW FUNCTION
+// ═══════════════════════════════════════════════
+function drawMap() {
+  ctx.clearRect(0, 0, CW, CH);
+
+  // ── (a) Ocean background ──
+  ctx.fillStyle = '#4a8ab5';
+  ctx.fillRect(0, 0, CW, CH);
+
+  // Ocean wave pattern (simple horizontal lines)
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  for (var wy = MAP_Y + 10; wy < MAP_Y + MAP_H; wy += 18) {
+    ctx.beginPath();
+    ctx.moveTo(MAP_X, wy);
+    ctx.lineTo(MAP_X + MAP_W, wy);
+    ctx.stroke();
+  }
+
+  // ── (b) Island as rounded rectangle ──
+  // Island covers the whole map area
+  var islandR = 40; // corner radius
+  ctx.beginPath();
+  ctx.moveTo(MAP_X + islandR, MAP_Y);
+  ctx.lineTo(MAP_X + MAP_W - islandR, MAP_Y);
+  ctx.quadraticCurveTo(MAP_X + MAP_W, MAP_Y, MAP_X + MAP_W, MAP_Y + islandR);
+  ctx.lineTo(MAP_X + MAP_W, MAP_Y + MAP_H - islandR);
+  ctx.quadraticCurveTo(MAP_X + MAP_W, MAP_Y + MAP_H, MAP_X + MAP_W - islandR, MAP_Y + MAP_H);
+  ctx.lineTo(MAP_X + islandR, MAP_Y + MAP_H);
+  ctx.quadraticCurveTo(MAP_X, MAP_Y + MAP_H, MAP_X, MAP_Y + MAP_H - islandR);
+  ctx.lineTo(MAP_X, MAP_Y + islandR);
+  ctx.quadraticCurveTo(MAP_X, MAP_Y, MAP_X + islandR, MAP_Y);
+  ctx.closePath();
+  ctx.fillStyle = '#5a9a3a'; // base green
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#2a5a8a';
+  ctx.stroke();
+
+  // ── (c) Biome zones as colored rectangles ──
+  for (var b = 0; b < BIOMES.length; b++) {
+    var bm = BIOMES[b];
+    var r = wrect(bm.x1, bm.z1, bm.x2, bm.z2);
+
+    // Clip to island
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MAP_X, MAP_Y, MAP_W, MAP_H);
+    ctx.clip();
+
+    ctx.fillStyle = bm.color;
+    ctx.fillRect(r.x, r.y, r.w, r.h);
+
+    // Biome border line
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+
+    ctx.restore();
+  }
+
+  // ── (i) Zone name labels (large, centered) ──
+  // Unique zones - only label each biome region once
+  var ZONE_LABELS = [
+    { label:'🏘️ 시작 마을', cx:0,    cz: 14,   size: 15 },
+    { label:'🌿 초원',       cx:0,    cz:480,   size: 17 },
+    { label:'🐸 독 늪',      cx:-430, cz:480,   size: 15 },
+    { label:'🐸 독 늪',      cx: 430, cz:480,   size: 15 },
+    { label:'🌲 어두운 숲',  cx:0,    cz:1290,  size: 17 },
+    { label:'🌴 정글',       cx: 430, cz:1290,  size: 16 },
+    { label:'🌋 화산 지대',  cx:0,    cz:2140,  size: 18 },
+  ];
+  for (var i = 0; i < ZONE_LABELS.length; i++) {
+    var zl = ZONE_LABELS[i];
+    outlineText(zl.label, wx(zl.cx), wz(zl.cz), '#ffffff', zl.size);
+  }
+
+  // ── (d) Rivers ──
+  var riverZ1 = wz(0);
+  var riverZ2 = wz(1680);
+  var riverColors = ['rgba(60,130,200,0.7)', 'rgba(60,130,200,0.7)'];
+  var riverXs = [wx(-165), wx(165)];
+  for (var ri = 0; ri < 2; ri++) {
+    ctx.beginPath();
+    ctx.moveTo(riverXs[ri], riverZ1);
+    ctx.lineTo(riverXs[ri], riverZ2);
+    ctx.strokeStyle = '#3a7ab5';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    // Lighter center line
+    ctx.beginPath();
+    ctx.moveTo(riverXs[ri], riverZ1);
+    ctx.lineTo(riverXs[ri], riverZ2);
+    ctx.strokeStyle = 'rgba(100,180,240,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // ── (e) Main path (village north through meadow) ──
+  ctx.beginPath();
+  ctx.moveTo(wx(0), wz(-32));  // south edge of map
+  ctx.lineTo(wx(0), wz(900));  // north edge of meadow
+  ctx.strokeStyle = '#c8a060';
+  ctx.lineWidth = 5;
+  ctx.setLineDash([]);
+  ctx.stroke();
+  // Lighter center
+  ctx.beginPath();
+  ctx.moveTo(wx(0), wz(-32));
+  ctx.lineTo(wx(0), wz(900));
+  ctx.strokeStyle = '#e8c880';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // ── Optional grid ──
+  if (showGrid) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([4, 4]);
+    // Vertical lines every 200 world units
+    for (var gx = -600; gx <= 600; gx += 200) {
+      ctx.beginPath();
+      ctx.moveTo(wx(gx), MAP_Y);
+      ctx.lineTo(wx(gx), MAP_Y + MAP_H);
+      ctx.stroke();
+    }
+    // Horizontal lines every 200 world units
+    for (var gz = 0; gz <= 2600; gz += 200) {
+      ctx.beginPath();
+      ctx.moveTo(MAP_X, wz(gz));
+      ctx.lineTo(MAP_X + MAP_W, wz(gz));
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  // ── (g) Landmarks ──
+  for (var li = 0; li < LANDMARKS.length; li++) {
+    var lm = LANDMARKS[li];
+    var lx = wx(lm.x), ly = wz(lm.z);
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lm.icon, lx, ly);
+    outlineText(lm.name, lx, ly + 14, '#ffffff', 11);
+  }
+
+  // ── (f) NPCs ──
+  for (var ni = 0; ni < NPC_DEF.length; ni++) {
+    var npc = NPC_DEF[ni];
+    var nx = wx(npc.px), ny = wz(npc.pz);
+    drawDot(nx, ny, 6, npc.color, '#000');
+    outlineText(npc.name, nx, ny - 12, '#ffffff', 11);
+  }
+
+  // ── (h) Elite monsters ──
+  if (showMonsters) {
+    for (var ei = 0; ei < ELITES.length; ei++) {
+      var el = ELITES[ei];
+      var ex = wx(el.x), ey = wz(el.z);
+      drawStar(ex, ey, 8, el.color);
+      outlineText(el.name, ex, ey - 14, '#ffee44', 11);
+    }
+  }
+
+  // ── (j) Title ──
+  ctx.font = 'bold 22px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+  ctx.strokeText('환장 RPG 월드맵', CW / 2, 38);
+  ctx.fillStyle = '#f0d060';
+  ctx.fillText('환장 RPG 월드맵', CW / 2, 38);
+
+  // ── (k) Compass (top-right corner) ──
+  drawCompass(CW - 65, 60, 28);
+
+  // ── (l) Legend ──
+  drawLegend();
+
+  // ── Map border ──
+  ctx.strokeStyle = '#2a4a6a';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(MAP_X, MAP_Y, MAP_W, MAP_H);
+}
+
+function drawCompass(cx, cy, r) {
+  // Background circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fill();
+  ctx.strokeStyle = '#c8a060';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // N arrow (up = decreasing z = north in game)
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r + 4);
+  ctx.lineTo(cx - 5, cy + 5);
+  ctx.lineTo(cx, cy);
+  ctx.closePath();
+  ctx.fillStyle = '#ff4444';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r + 4);
+  ctx.lineTo(cx + 5, cy + 5);
+  ctx.lineTo(cx, cy);
+  ctx.closePath();
+  ctx.fillStyle = '#dddddd';
+  ctx.fill();
+
+  // S arrow
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + r - 4);
+  ctx.lineTo(cx - 4, cy - 4);
+  ctx.lineTo(cx, cy);
+  ctx.closePath();
+  ctx.fillStyle = '#dddddd';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + r - 4);
+  ctx.lineTo(cx + 4, cy - 4);
+  ctx.lineTo(cx, cy);
+  ctx.closePath();
+  ctx.fillStyle = '#aaaaaa';
+  ctx.fill();
+
+  // Cardinal labels
+  ctx.font = 'bold 9px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#000';
+  ctx.strokeText('N', cx, cy - r + 3);
+  ctx.fillText('N', cx, cy - r + 3);
+  ctx.strokeText('S', cx, cy + r - 3);
+  ctx.fillText('S', cx, cy + r - 3);
+  ctx.strokeText('W', cx - r + 3, cy);
+  ctx.fillText('W', cx - r + 3, cy);
+  ctx.strokeText('E', cx + r - 3, cy);
+  ctx.fillText('E', cx + r - 3, cy);
+}
+
+function drawLegend() {
+  var lx = MAP_X + 6;
+  var ly = CH - PAD_B + 10;
+  var items = [
+    { color:'#4a8a3a', label:'시작 마을' },
+    { color:'#5a9a3a', label:'초원' },
+    { color:'#3a5a2a', label:'독 늪' },
+    { color:'#1a4a12', label:'어두운 숲' },
+    { color:'#2a6a1a', label:'정글' },
+    { color:'#3a1208', label:'화산 지대' },
+    { color:'#3a7ab5', label:'강' },
+    { color:'#c8a060', label:'메인 경로' },
+  ];
+
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillStyle = '#c8a060';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('[ 범례 ]', lx, ly);
+
+  var itemX = lx;
+  var itemY = ly + 20;
+  var colW = 115;
+  for (var i = 0; i < items.length; i++) {
+    var ix = itemX + (i % 8) * colW;
+    var iy = itemY + Math.floor(i / 8) * 18;
+    ctx.fillStyle = items[i].color;
+    ctx.fillRect(ix, iy - 6, 14, 12);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(ix, iy - 6, 14, 12);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(items[i].label, ix + 17, iy);
+  }
+
+  // NPC/Elite legend on right side
+  var rx = MAP_X + MAP_W - 200;
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillStyle = '#c8a060';
+  ctx.textAlign = 'left';
+  ctx.fillText('[ 마커 ]', rx, ly);
+
+  var markerItems = [
+    { type:'dot',  color:'#ffcc44', label:'NPC' },
+    { type:'star', color:'#ffdd00', label:'엘리트 몬스터' },
+    { type:'text', color:'#ffffff', text:'🏰', label:'랜드마크' },
+  ];
+  for (var mi = 0; mi < markerItems.length; mi++) {
+    var mx = rx, my = itemY + mi * 18;
+    var m = markerItems[mi];
+    if (m.type === 'dot') {
+      drawDot(mx + 7, my, 5, m.color, '#000');
+    } else if (m.type === 'star') {
+      drawStar(mx + 7, my, 7, m.color);
+    } else {
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.text, mx + 7, my);
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(m.label, mx + 17, my);
+  }
+}
+
+// ── Initial draw ──
+drawMap();
+
+// ── Mouse coordinate display ──
+canvas.addEventListener('mousemove', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var mx = e.clientX - rect.left;
+  var my = e.clientY - rect.top;
+  // Inverse conversion
+  var worldX = WX_MIN + (mx - MAP_X) / MAP_W * (WX_MAX - WX_MIN);
+  var worldZ = WZ_MIN + (my - MAP_Y) / MAP_H * (WZ_MAX - WZ_MIN);
+  document.getElementById('coords').textContent =
+    'World: X=' + worldX.toFixed(0) + ', Z=' + worldZ.toFixed(0) +
+    '  |  Canvas: ' + mx.toFixed(0) + ', ' + my.toFixed(0);
+});
+
+// ── Save button ──
+document.getElementById('btnSave').addEventListener('click', function() {
+  var link = document.createElement('a');
+  link.download = '환장RPG_월드맵.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+// ── Grid toggle ──
+document.getElementById('btnToggleGrid').addEventListener('click', function() {
+  showGrid = !showGrid;
+  drawMap();
+});
+
+// ── Monster toggle ──
+document.getElementById('btnToggleMonsters').addEventListener('click', function() {
+  showMonsters = !showMonsters;
+  drawMap();
+});
+</script>
+</body>
+</html>

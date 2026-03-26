@@ -8,7 +8,7 @@ var inventory=[]; // {itemId, qty, custom?, equipped?}
 var gold=0;
 var currentTab='all';
 var selectedItem=null;
-var equipped={weapon:null,armor:null};
+var equipped={weapon:null,armor:null,hat:null,cape:null,dye:null};
 
 function getItemDef(id){return ITEM_POOL.find(function(x){return x.id===id;});}
 
@@ -32,7 +32,12 @@ function getItemFull(slot){
 }
 
 function isEquipped(slot){
-  return Object.values(equipped).includes(slot.itemId);
+  var it=getItemFull(slot);
+  if(it.type==='cosmetic'){
+    var cslot=it.slot||'hat';
+    return equipped[cslot]===slot.itemId;
+  }
+  return equipped[it.type]===slot.itemId;
 }
 
 function equipItem(slot){
@@ -46,6 +51,15 @@ function equipItem(slot){
       return;
     }
   }
+  /* 코스메틱: slot 필드로 슬롯 결정 */
+  if(it.type==='cosmetic'){
+    var cslot=it.slot||'hat';
+    equipped[cslot]=slot.itemId;
+    addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
+    if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
+    renderInv();showDetail(slot);updEquipHud();
+    return;
+  }
   equipped[it.type]=slot.itemId;
   addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
@@ -54,6 +68,14 @@ function equipItem(slot){
 
 function unequipItem(slot){
   var it=getItemFull(slot);
+  if(it.type==='cosmetic'){
+    var cslot=it.slot||'hat';
+    equipped[cslot]=null;
+    addChat('sys','[시스템]','['+it.name+']을(를) 해제했습니다.');
+    if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
+    renderInv();showDetail(slot);updEquipHud();
+    return;
+  }
   equipped[it.type]=null;
   addChat('sys','[시스템]','['+it.name+']을(를) 해제했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
@@ -115,9 +137,15 @@ function updEquipHud(){
   }
   var w=equipped.weapon?getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{}):null;
   var a=equipped.armor?getItemFull(inventory.find(function(s){return s.itemId===equipped.armor;})||{}):null;
+  var ht=equipped.hat?getItemFull(inventory.find(function(s){return s.itemId===equipped.hat;})||{}):null;
+  var cp=equipped.cape?getItemFull(inventory.find(function(s){return s.itemId===equipped.cape;})||{}):null;
+  var dy=equipped.dye?getItemFull(inventory.find(function(s){return s.itemId===equipped.dye;})||{}):null;
   hudEq.innerHTML=
     (w?'<span title="무기" style="color:#c9a84c">'+(ICON[w.icon]||'⚔️')+' '+w.name+'</span>':'')+
-    (a?'<span title="방어구" style="color:#88aacc">'+(ICON[a.icon]||'🛡️')+' '+a.name+'</span>':'');
+    (a?'<span title="방어구" style="color:#88aacc">'+(ICON[a.icon]||'🛡️')+' '+a.name+'</span>':'')+
+    (ht?'<span title="모자" style="color:#cc88ff">'+(ICON[ht.icon]||'🎩')+' '+ht.name+'</span>':'')+
+    (cp?'<span title="망토" style="color:#ff8844">'+(ICON[cp.icon]||'🧣')+' '+cp.name+'</span>':'')+
+    (dy?'<span title="염색" style="color:#ff88cc">'+(ICON[dy.icon]||'🎨')+'</span>':'');
 }
 
 function giveStartItems(){
@@ -202,7 +230,7 @@ function showDetail(slot){
   }
   var btnArea=document.getElementById('inv-detail-btns');
   btnArea.innerHTML='';
-  if(it.type==='weapon'||it.type==='armor'){
+  if(it.type==='weapon'||it.type==='armor'||it.type==='cosmetic'){
     if(eq){
       var btn=document.createElement('button');
       btn.className='inv-action-btn unequip';

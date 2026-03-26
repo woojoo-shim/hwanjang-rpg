@@ -414,7 +414,7 @@ function mkHuman(bc,hc){
   armRPivot.add(armR);
   g.add(armRPivot);
 
-  return{group:g,legL:legL,legR:legR,armL:armL,armR:armR,armRPivot:armRPivot};
+  return{group:g,body:body,head:head,legL:legL,legR:legR,armL:armL,armR:armR,armRPivot:armRPivot,bodyMat:bm};
 }
 
 /* 공유 나무 머티리얼 — 함수 호출마다 생성 방지 */
@@ -1419,9 +1419,10 @@ function initScene(){
 
   /* 플레이어 */
   var ph2=mkHuman(0x2a6a3a,0xddcc99);
-  PL.group=ph2.group;PL.legL=ph2.legL;PL.legR=ph2.legR;
+  PL.group=ph2.group;PL.body=ph2.body;PL.head=ph2.head;PL.bodyMat=ph2.bodyMat;
+  PL.legL=ph2.legL;PL.legR=ph2.legR;
   PL.armL=ph2.armL;PL.armR=ph2.armR;PL.armRPivot=ph2.armRPivot;
-  PL.weaponMesh=null;PL.bobT=0;PL.atkAnim=0;PL.atkPhase=0;
+  PL.weaponMesh=null;PL.hatMesh=null;PL.capeMesh=null;PL.bobT=0;PL.atkAnim=0;PL.atkPhase=0;
   /* 플레이어도 그림자 */
   PL.group.traverse(function(c){if(c.isMesh){c.castShadow=true;c.receiveShadow=true;}});
   var ws=WORLD_SPAWN;PL.group.position.set(ws[0],0,ws[1]);scene.add(PL.group);

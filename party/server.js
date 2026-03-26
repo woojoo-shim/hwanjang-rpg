@@ -29,14 +29,15 @@ export default {
 
     if (data.type === 'join') {
       var uid = data.uid || conn.id;
-      var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
+      var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry, cosmetics: data.cosmetics || {} };
       conn.serializeAttachment(state);
       if (!room._uidMap) room._uidMap = {};
       room._uidMap[uid] = conn.id;
       room.broadcast(JSON.stringify({
         type: 'join', id: uid,
         name: data.name, level: data.level,
-        x: data.x, z: data.z, ry: data.ry
+        x: data.x, z: data.z, ry: data.ry,
+        cosmetics: data.cosmetics || {}
       }), [conn.id]);
     }
 

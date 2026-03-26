@@ -132,6 +132,7 @@ function enterGame(){
       if(playerData&&PL.group){
         PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
         refreshWeaponMesh();
+        if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
       loop();
@@ -270,6 +271,7 @@ function loop(){
     if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
     if(typeof tickScreenShake==='function')tickScreenShake(dt);
+    if(typeof tickCapeAnim==='function')tickCapeAnim(dt);
     if(typeof updateKillParticles==='function')updateKillParticles(dt);
     if(typeof updateLootGlows==='function')updateLootGlows(dt);
     checkZone();

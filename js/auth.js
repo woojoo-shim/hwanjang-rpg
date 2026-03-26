@@ -91,7 +91,7 @@ async function createPlayer(name){
     name:name,
     level:1,hp:100,max_hp:100,exp:0,gold:50,
     inventory:[],
-    equipped:{weapon:null,armor:null},
+    equipped:{weapon:null,armor:null,hat:null,cape:null,dye:null},
     position_x:WORLD_SPAWN[0],position_z:WORLD_SPAWN[1],
     zone:'village'
   };
@@ -132,7 +132,8 @@ function restoreGameState(){
   playerEXP=playerData.exp||0;
   gold=playerData.gold||0;
   inventory=playerData.inventory||[];
-  equipped=playerData.equipped||{weapon:null,armor:null};
+  var _eq=playerData.equipped||{};
+  equipped={weapon:_eq.weapon||null,armor:_eq.armor||null,hat:_eq.hat||null,cape:_eq.cape||null,dye:_eq.dye||null};
   playerClass=playerData.class||'none';
   if(playerData.visited_zones)visitedZones=playerData.visited_zones;
 }

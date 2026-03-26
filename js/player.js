@@ -836,3 +836,117 @@ function handleMove(dt){
   }
 }
 var _waterDmgTimer=0;
+
+/* ═══════════ 코스메틱 메시 시스템 ═══════════ */
+var _capeSwayT=0;
+
+function refreshCosmeticMesh(){
+  if(!PL.group)return;
+
+  /* ── 모자 제거 ── */
+  if(PL.hatMesh){PL.head.remove(PL.hatMesh);PL.hatMesh=null;}
+
+  /* ── 망토 제거 ── */
+  if(PL.capeMesh){PL.group.remove(PL.capeMesh);PL.capeMesh=null;}
+
+  /* ── 염색: body 색 복원 또는 변경 ── */
+  var dyeId=equipped.dye;
+  if(dyeId){
+    var dyeDef=getItemDef(dyeId);
+    if(dyeDef&&dyeDef.color&&PL.bodyMat){
+      PL.bodyMat.color.set(dyeDef.color);
+    }
+  } else {
+    /* 염색 없으면 기본 초록 */
+    if(PL.bodyMat)PL.bodyMat.color.set(0x2a6a3a);
+  }
+
+  /* ── 모자 생성 ── */
+  var hatId=equipped.hat;
+  if(hatId&&PL.head){
+    var hatDef=getItemDef(hatId);
+    if(hatDef){
+      var hatColor=hatDef.color?parseInt(hatDef.color.replace('#','0x')):0xffffff;
+      var hm=new THREE.MeshLambertMaterial({color:hatColor});
+      var hatG=new THREE.Group();
+
+      if(hatId==='wizard_hat'){
+        var cone=new THREE.Mesh(new THREE.ConeGeometry(.18,.45,8),hm);
+        cone.position.set(0,.28,0);hatG.add(cone);
+        var brim=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.04,8),hm);
+        brim.position.set(0,.06,0);hatG.add(brim);
+      } else if(hatId==='crown'){
+        var base=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.1,8),hm);
+        base.position.set(0,.06,0);hatG.add(base);
+        var spike1=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,5),hm);
+        spike1.position.set(0,.18,0);hatG.add(spike1);
+        var spike2=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,5),hm);
+        spike2.position.set(.14,.15,.08);hatG.add(spike2);
+        var spike3=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,5),hm);
+        spike3.position.set(-.14,.15,.08);hatG.add(spike3);
+        var spike4=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,5),hm);
+        spike4.position.set(.14,.15,-.08);hatG.add(spike4);
+        var spike5=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,5),hm);
+        spike5.position.set(-.14,.15,-.08);hatG.add(spike5);
+      } else if(hatId==='bunny_ears'){
+        var earL=new THREE.Mesh(new THREE.BoxGeometry(.07,.3,.05),hm);
+        earL.position.set(-.12,.28,0);hatG.add(earL);
+        var earR=new THREE.Mesh(new THREE.BoxGeometry(.07,.3,.05),hm);
+        earR.position.set(.12,.28,0);hatG.add(earR);
+        /* ピンク inside */
+        var pm=new THREE.MeshLambertMaterial({color:0xffaabb});
+        var earLi=new THREE.Mesh(new THREE.BoxGeometry(.04,.2,.04),pm);
+        earLi.position.set(-.12,.27,0);hatG.add(earLi);
+        var earRi=new THREE.Mesh(new THREE.BoxGeometry(.04,.2,.04),pm);
+        earRi.position.set(.12,.27,0);hatG.add(earRi);
+      } else if(hatId==='santa_hat'){
+        var rim=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.06,8),new THREE.MeshLambertMaterial({color:0xffffff}));
+        rim.position.set(0,.04,0);hatG.add(rim);
+        var rcone=new THREE.Mesh(new THREE.ConeGeometry(.2,.38,8),hm);
+        rcone.position.set(.04,.3,0);rcone.rotation.z=-.2;hatG.add(rcone);
+        var pom=new THREE.Mesh(new THREE.SphereGeometry(.06,6,6),new THREE.MeshLambertMaterial({color:0xffffff}));
+        pom.position.set(.1,.52,.0);hatG.add(pom);
+      } else if(hatId==='knight_helm'){
+        var helm=new THREE.Mesh(new THREE.BoxGeometry(.44,.42,.44),hm);
+        helm.position.set(0,.2,0);hatG.add(helm);
+        var visor=new THREE.Mesh(new THREE.BoxGeometry(.28,.08,.04),new THREE.MeshLambertMaterial({color:0x333333}));
+        visor.position.set(0,.16,.23);hatG.add(visor);
+      }
+
+      hatG.position.set(0,.22,0);
+      PL.head.add(hatG);
+      PL.hatMesh=hatG;
+    }
+  }
+
+  /* ── 망토 생성 ── */
+  var capeId=equipped.cape;
+  if(capeId&&PL.group){
+    var capeDef=getItemDef(capeId);
+    if(capeDef){
+      var capeColor=capeDef.color?parseInt(capeDef.color.replace('#','0x')):0xcc2222;
+      var isShadow=(capeId==='shadow_cape');
+      var capeMat=new THREE.MeshLambertMaterial({color:capeColor,transparent:isShadow,opacity:isShadow?.55:1.0,side:THREE.DoubleSide});
+      var capeG=new THREE.Group();
+      /* 상단 좁고 하단 넓은 사다리꼴 형태 (BoxGeometry로 근사) */
+      var cTop=new THREE.Mesh(new THREE.BoxGeometry(.45,.08,.04),capeMat);
+      cTop.position.set(0,.0,0);capeG.add(cTop);
+      var cMid=new THREE.Mesh(new THREE.BoxGeometry(.5,.4,.04),capeMat);
+      cMid.position.set(0,-.25,0);capeG.add(cMid);
+      var cBot=new THREE.Mesh(new THREE.BoxGeometry(.58,.3,.04),capeMat);
+      cBot.position.set(0,-.55,0);capeG.add(cBot);
+      /* 위치: 등 뒤 */
+      capeG.position.set(0,1.35,-.22);
+      PL.group.add(capeG);
+      PL.capeMesh=capeG;
+    }
+  }
+}
+
+function tickCapeAnim(dt){
+  if(!PL.capeMesh)return;
+  _capeSwayT+=dt*2.2;
+  var sway=Math.sin(_capeSwayT)*0.04;
+  PL.capeMesh.rotation.x=sway;
+  PL.capeMesh.rotation.z=Math.sin(_capeSwayT*0.7)*0.015;
+}

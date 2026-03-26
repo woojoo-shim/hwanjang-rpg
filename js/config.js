@@ -34,7 +34,7 @@ var RARITIES={
   legendary:{name:'전설', color:'#c9a84c'},
   hidden:  {name:'히든',  color:'#ff44ff'},
 };
-var ITEM_TYPES={weapon:'무기',armor:'방어구',consume:'소비',etc:'기타'};
+var ITEM_TYPES={weapon:'무기',armor:'방어구',consume:'소비',etc:'기타',cosmetic:'코스메틱'};
 
 var ICON={
   sword:'⚔️',axe:'🪓',bow:'🏹',staff:'🪄',dagger:'🗡️',
@@ -44,6 +44,7 @@ var ICON={
   bone:'🦴',fish:'🐟',leaf:'🍃',crystal:'🔮',
   key:'🗝️',book:'📚',feather:'🪶',egg:'🥚',star:'⭐',
   mushroom:'🍄',bottle:'🫙',mask:'🎭',crown:'👑',
+  hat:'🎩',cape:'🧣',dye:'🎨',bunny:'🐰',santa:'🎅',
 };
 
 var ITEM_POOL=[
@@ -82,6 +83,25 @@ var ITEM_POOL=[
   {id:'magic_crystal',  name:'마력 결정',        icon:'crystal',type:'etc',    rarity:'rare',     desc:'뭔가 대단한 것에 쓸 것 같다.',    stats:{마력:10}},
   {id:'star_fragment',  name:'별의 파편',        icon:'star',  type:'etc',     rarity:'epic',     desc:'떨어지는 별을 손으로 잡았다.',    stats:{운:50}},
   {id:'eternal_chain',  name:'영겁의 사슬',      icon:'ring',  type:'etc',     rarity:'legendary',desc:'모든 스킬을 봉인할 수 있다.',      stats:{봉인:100}},
+  // ─ 코스메틱: 모자 ─
+  {id:'wizard_hat',   name:'마법사 모자',     icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#9933cc',desc:'뾰족한 보라색 고깔모자. 마법사 느낌 200%.',  stats:{}},
+  {id:'crown',        name:'왕관',            icon:'crown', type:'cosmetic',slot:'hat',  rarity:'epic',     color:'#ffcc00',desc:'황금 왕관. 이걸 쓰면 왕처럼 보인다.',         stats:{}},
+  {id:'bunny_ears',   name:'토끼 귀',         icon:'bunny', type:'cosmetic',slot:'hat',  rarity:'common',   color:'#ffffff',desc:'하얀 토끼 귀. 귀엽지만 전투력은 없다.',       stats:{}},
+  {id:'santa_hat',    name:'산타 모자',        icon:'santa', type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#cc0000',desc:'빨간 산타 모자. 선물을 준다는 전설이 있다.',  stats:{}},
+  {id:'knight_helm',  name:'기사 투구',        icon:'helmet',type:'cosmetic',slot:'hat',  rarity:'epic',     color:'#888888',desc:'회색 철제 투구. 위압감이 있다.',              stats:{}},
+  // ─ 코스메틱: 망토 ─
+  {id:'red_cape',     name:'빨간 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'common',   color:'#cc2222',desc:'새빨간 망토. 바람에 펄럭인다.',               stats:{}},
+  {id:'blue_cape',    name:'파란 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'common',   color:'#2244cc',desc:'파란 망토. 마법사가 즐겨 입는다.',            stats:{}},
+  {id:'golden_cape',  name:'황금 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'legendary',color:'#ddaa00',desc:'황금빛 망토. 전설의 기사가 남긴 것.',          stats:{}},
+  {id:'shadow_cape',  name:'그림자 망토',      icon:'cape',  type:'cosmetic',slot:'cape', rarity:'epic',     color:'#111122',desc:'어둠에 녹아드는 반투명 망토. 암살자 전용.',    stats:{}},
+  // ─ 코스메틱: 염색약 ─
+  {id:'dye_red',      name:'빨간 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#cc2222',desc:'캐릭터 몸 색을 빨갛게 염색한다.',             stats:{}},
+  {id:'dye_blue',     name:'파란 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#2244cc',desc:'캐릭터 몸 색을 파랗게 염색한다.',             stats:{}},
+  {id:'dye_green',    name:'초록 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#226622',desc:'캐릭터 몸 색을 초록색으로 염색한다.',         stats:{}},
+  {id:'dye_gold',     name:'금색 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'legendary',color:'#ddaa00',desc:'캐릭터 몸 색을 황금빛으로 염색한다.',         stats:{}},
+  {id:'dye_pink',     name:'핑크 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#dd55aa',desc:'캐릭터 몸 색을 핑크빛으로 염색한다.',         stats:{}},
+  {id:'dye_black',    name:'검정 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'rare',     color:'#111111',desc:'캐릭터 몸 색을 검게 염색한다. 웅장해진다.',   stats:{}},
+  {id:'dye_white',    name:'흰색 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#eeeeee',desc:'캐릭터 몸 색을 하얗게 염색한다.',             stats:{}},
 ];
 
 /* ════════════ 상점 재고 ════════════ */
@@ -99,6 +119,14 @@ var SHOP_STOCK={
     {id:'tp_scroll',     price:100},
     {id:'arrow',         price:5},
     {id:'fire_arrow',    price:15},
+    {id:'dye_red',       price:80},
+    {id:'dye_blue',      price:80},
+    {id:'dye_green',     price:80},
+    {id:'dye_pink',      price:80},
+    {id:'dye_white',     price:80},
+    {id:'bunny_ears',    price:120},
+    {id:'red_cape',      price:150},
+    {id:'blue_cape',     price:150},
   ],
   '(대장장이) 이태산':[
     {id:'iron_sword',    price:180},
@@ -340,15 +368,15 @@ var MONSTER_DEFS=[
    drops:[{id:'dragon_scale',rate:.12,qty:1},{id:'star_fragment',rate:.3,qty:1},{id:'eternal_chain',rate:.01,qty:1}]},
   // ── 엘리트 몬스터 (지역별 1마리) ──
   {id:'elite_stag',name:'★ 황금 사슴왕',lv:7, hp:800,atk:55,exp:300,spd:5.5,aggro:25,color:0xddaa00,hc:0xffdd44,elite:true,
-   drops:[{id:'moonblade',rate:.08,qty:1},{id:'elixir',rate:.3,qty:1},{id:'star_fragment',rate:.5,qty:1}]},
+   drops:[{id:'moonblade',rate:.08,qty:1},{id:'elixir',rate:.3,qty:1},{id:'star_fragment',rate:.5,qty:1},{id:'wizard_hat',rate:.12,qty:1}]},
   {id:'elite_toad',name:'★ 독왕 두꺼비',lv:12, hp:1200,atk:65,exp:450,spd:3.5,aggro:22,color:0x225500,hc:0x66ff00,elite:true,
-   drops:[{id:'fire_staff',rate:.1,qty:1},{id:'elixir',rate:.4,qty:1},{id:'magic_crystal',rate:.8,qty:1}]},
+   drops:[{id:'fire_staff',rate:.1,qty:1},{id:'elixir',rate:.4,qty:1},{id:'magic_crystal',rate:.8,qty:1},{id:'blue_cape',rate:.15,qty:1},{id:'dye_black',rate:.12,qty:1}]},
   {id:'elite_wolf',name:'★ 늑대 대장',lv:16, hp:1800,atk:85,exp:650,spd:6.0,aggro:30,color:0x222233,hc:0xaaaadd,elite:true,
-   drops:[{id:'moonblade',rate:.12,qty:1},{id:'dragon_scale',rate:.05,qty:1},{id:'elixir',rate:.5,qty:1}]},
+   drops:[{id:'moonblade',rate:.12,qty:1},{id:'dragon_scale',rate:.05,qty:1},{id:'elixir',rate:.5,qty:1},{id:'knight_helm',rate:.12,qty:1},{id:'shadow_cape',rate:.1,qty:1}]},
   {id:'elite_ape',name:'★ 정글의 왕',lv:20, hp:2500,atk:100,exp:800,spd:4.0,aggro:28,color:0x3a1a00,hc:0xff8844,elite:true,
-   drops:[{id:'dragonfang',rate:.06,qty:1},{id:'star_fragment',rate:.6,qty:1},{id:'elixir',rate:.5,qty:1}]},
+   drops:[{id:'dragonfang',rate:.06,qty:1},{id:'star_fragment',rate:.6,qty:1},{id:'elixir',rate:.5,qty:1},{id:'golden_cape',rate:.1,qty:1}]},
   {id:'elite_dragon',name:'★ 고대 화염룡',lv:30, hp:5000,atk:150,exp:2000,spd:3.5,aggro:35,color:0x880000,hc:0xff2200,elite:true,
-   drops:[{id:'eclipse_blade',rate:.03,qty:1},{id:'dragon_scale',rate:.4,qty:1},{id:'immortal_potion',rate:.1,qty:1},{id:'eternal_chain',rate:.08,qty:1}]},
+   drops:[{id:'eclipse_blade',rate:.03,qty:1},{id:'dragon_scale',rate:.4,qty:1},{id:'immortal_potion',rate:.1,qty:1},{id:'eternal_chain',rate:.08,qty:1},{id:'crown',rate:.08,qty:1},{id:'dye_gold',rate:.15,qty:1}]},
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */

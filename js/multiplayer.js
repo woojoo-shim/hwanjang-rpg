@@ -337,13 +337,70 @@ function spawnRemote(id,name,level,x,z,ry,y){
 
   remotePlayers[id]={
     name:name,level:level,
-    group:h.group,legL:h.legL,legR:h.legR,
+    group:h.group,head:h.head,body:h.body,bodyMat:h.bodyMat,
+    legL:h.legL,legR:h.legR,
     armL:h.armL,armRPivot:h.armRPivot,
     nameEl:ne,
     tx:x,ty:_initY,tz:z,try_:ry||0,
     bobT:0,moving:false,
-    atkPhase:0,atkTimer:0
+    atkPhase:0,atkTimer:0,
+    hatMesh:null,capeMesh:null
   };
+}
+
+function applyRemoteCosmetics(r,cosmetics){
+  if(!r||!r.group)return;
+  /* 기존 코스메틱 제거 */
+  if(r.hatMesh){r.head.remove(r.hatMesh);r.hatMesh=null;}
+  if(r.capeMesh){r.group.remove(r.capeMesh);r.capeMesh=null;}
+  /* 염색 */
+  if(cosmetics.dye){
+    var dyeDef=(typeof getItemDef==='function')?getItemDef(cosmetics.dye):null;
+    if(dyeDef&&dyeDef.color&&r.bodyMat)r.bodyMat.color.set(dyeDef.color);
+  } else {
+    if(r.bodyMat)r.bodyMat.color.set(REMOTE_BODY_COLOR);
+  }
+  /* 모자: 간단한 표현 (wizard=cone, crown=cylinder, bunny=boxes, santa=cone, knight=box) */
+  if(cosmetics.hat){
+    var hatDef=(typeof getItemDef==='function')?getItemDef(cosmetics.hat):null;
+    if(hatDef&&r.head){
+      var hColor=hatDef.color?parseInt(hatDef.color.replace('#','0x')):0xffffff;
+      var hm2=new THREE.MeshLambertMaterial({color:hColor});
+      var hg=new THREE.Group();
+      if(cosmetics.hat==='wizard_hat'){
+        var c2=new THREE.Mesh(new THREE.ConeGeometry(.18,.45,8),hm2);c2.position.set(0,.28,0);hg.add(c2);
+        var b2=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.04,8),hm2);b2.position.set(0,.06,0);hg.add(b2);
+      } else if(cosmetics.hat==='crown'){
+        var cb=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.1,8),hm2);cb.position.set(0,.06,0);hg.add(cb);
+        for(var si=0;si<5;si++){var ang=si/5*Math.PI*2;var sp=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.12,4),hm2);sp.position.set(Math.cos(ang)*.14,.15,Math.sin(ang)*.14);hg.add(sp);}
+      } else if(cosmetics.hat==='bunny_ears'){
+        var el=new THREE.Mesh(new THREE.BoxGeometry(.07,.3,.05),hm2);el.position.set(-.12,.28,0);hg.add(el);
+        var er=new THREE.Mesh(new THREE.BoxGeometry(.07,.3,.05),hm2);er.position.set(.12,.28,0);hg.add(er);
+      } else if(cosmetics.hat==='santa_hat'){
+        var sr=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.06,8),new THREE.MeshLambertMaterial({color:0xffffff}));sr.position.set(0,.04,0);hg.add(sr);
+        var sc=new THREE.Mesh(new THREE.ConeGeometry(.2,.38,8),hm2);sc.position.set(.04,.3,0);sc.rotation.z=-.2;hg.add(sc);
+      } else if(cosmetics.hat==='knight_helm'){
+        var kh=new THREE.Mesh(new THREE.BoxGeometry(.44,.42,.44),hm2);kh.position.set(0,.2,0);hg.add(kh);
+      }
+      hg.position.set(0,.22,0);
+      r.head.add(hg);r.hatMesh=hg;
+    }
+  }
+  /* 망토 */
+  if(cosmetics.cape){
+    var capeDef2=(typeof getItemDef==='function')?getItemDef(cosmetics.cape):null;
+    if(capeDef2){
+      var cc=capeDef2.color?parseInt(capeDef2.color.replace('#','0x')):0xcc2222;
+      var isSh=(cosmetics.cape==='shadow_cape');
+      var cm2=new THREE.MeshLambertMaterial({color:cc,transparent:isSh,opacity:isSh?.55:1.0,side:THREE.DoubleSide});
+      var cg=new THREE.Group();
+      var ct=new THREE.Mesh(new THREE.BoxGeometry(.45,.08,.04),cm2);ct.position.set(0,0,0);cg.add(ct);
+      var cm3=new THREE.Mesh(new THREE.BoxGeometry(.5,.4,.04),cm2);cm3.position.set(0,-.25,0);cg.add(cm3);
+      var cb2=new THREE.Mesh(new THREE.BoxGeometry(.58,.3,.04),cm2);cb2.position.set(0,-.55,0);cg.add(cb2);
+      cg.position.set(0,1.35,-.22);
+      r.group.add(cg);r.capeMesh=cg;
+    }
+  }
 }
 
 function removeRemote(id){
