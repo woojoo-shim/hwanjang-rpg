@@ -23,7 +23,7 @@ var _interiorBuilt={}; /* 이미 내부를 빌드했는지 */
 var _doorCooldown=0; /* 입장/퇴장 쿨다운 */
 
 function registerDoor(x,z,name){
-  BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-500-(BUILDING_DOORS.length*80)});
+  BUILDING_DOORS.push({x:x,z:z,name:name,interiorY:-500-(BUILDING_DOORS.length*200)});
 }
 
 var nearestDoor=null;
