@@ -1430,27 +1430,8 @@ function initScene(){
   var lov=document.getElementById('lov');
   var ple=document.createElement('div');ple.className='llabel plr';ple.id='ple';ple.textContent=myName;lov.appendChild(ple);
 
-  /* ── Bloom 포스트프로세싱 ── */
-  if(typeof THREE.EffectComposer!=='undefined'){
-    try{
-      var cc2=document.getElementById('cc'),w2=cc2.clientWidth||800,h2=cc2.clientHeight||600;
-      composer=new THREE.EffectComposer(renderer);
-      var renderPass=new THREE.RenderPass(scene,camera);
-      composer.addPass(renderPass);
-      var bloomPass=new THREE.UnrealBloomPass(
-        new THREE.Vector2(w2,h2),
-        0.15,  /* strength — 아주 약하게 */
-        0.2,  /* radius */
-        0.95  /* threshold — 매우 밝은 것만 */
-      );
-      composer.addPass(bloomPass);
-    }catch(e){
-      console.warn('Bloom init failed:',e);
-      composer=null;
-    }
-  }else{
-    composer=null;
-  }
+  /* ── Bloom 비활성화 — 성능 우선 ── */
+  composer=null;
 
   setupInput();onResize();window.addEventListener('resize',onResize);
 
