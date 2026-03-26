@@ -700,7 +700,7 @@ function talk(n){
     return;
   }
   /* 상인/대장장이: 상점만 열기 (대화는 상점 내 채팅으로) */
-  if(n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0){
+  if(n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0||n.name.indexOf('(코디샵)')===0){
     activeNpc=n;
     openShop(n.name);
     return;

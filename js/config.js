@@ -109,24 +109,26 @@ var SHOP_STOCK={
   '(상인) 김도윤':[
     {id:'red_potion',    price:30},
     {id:'blue_potion',   price:40},
-    {id:'leather_armor', price:120},
-    {id:'iron_sword',    price:180},
-    {id:'badminton_neck',price:300},
-    {id:'death_scythe',  price:300},
     {id:'ether',         price:150},
     {id:'deer_meat',     price:20},
-    {id:'hunting_bow',   price:220},
     {id:'tp_scroll',     price:100},
     {id:'arrow',         price:5},
     {id:'fire_arrow',    price:15},
+  ],
+  '(코디샵) 루나':[
     {id:'dye_red',       price:80},
     {id:'dye_blue',      price:80},
     {id:'dye_green',     price:80},
     {id:'dye_pink',      price:80},
     {id:'dye_white',     price:80},
+    {id:'dye_black',     price:100},
+    {id:'dye_gold',      price:300},
     {id:'bunny_ears',    price:120},
     {id:'red_cape',      price:150},
     {id:'blue_cape',     price:150},
+    {id:'wizard_hat',    price:200},
+    {id:'santa_hat',     price:250},
+    {id:'golden_cape',   price:500},
   ],
   '(대장장이) 이태산':[
     {id:'iron_sword',    price:180},
@@ -234,6 +236,20 @@ var NPC_AI={
 답변은 1~3문장으로 매우 간결하게. 한국어로만 대답.`,
     history:[]
   },
+  '(코디샵) 루나':{
+    system:`너는 환장 RPG 시작 마을의 코디샵 주인 "루나"야.
+성격: 밝고 수다스러움. 패션에 열정적. 손님 스타일을 칭찬하거나 조언함.
+말투: "~요!", "~잖아요!", "완전~", "대박~" 등 활기차고 친근한 말투.
+
+판매 품목: 염색약(빨강,파랑,초록,핑크,흰색,검정,금색), 모자(토끼귀,마법사모자,산타모자), 망토(빨강,파랑,황금)
+- 가격은 원래 가격에서 10% 이내로만 깎아줌
+- 패션 조언을 잘해줌
+- 가격을 바꿀 때: [PRICE:아이템이름|새가격]
+- 거래 성사 시: [TRADE_BUY:아이템id|가격]
+- 사용 가능한 id: dye_red, dye_blue, dye_green, dye_pink, dye_white, dye_black, dye_gold, bunny_ears, wizard_hat, santa_hat, red_cape, blue_cape, golden_cape
+답변은 2~3문장으로 간결하게. 한국어로만 대답.`,
+    history:[]
+  },
   '(???) 정체불명':{
     system:`너는 환장 RPG의 최고 고인물 플레이어 "토끼공듀"야. 세계관 최강자.
 성격: 쿨하고 초연함. 뉴비를 귀여워하지만 티 잘 안 냄.
@@ -327,6 +343,8 @@ var NPC_DEF=[
   {name:'(상인) 김도윤',px:-392, pz:-366,bc:0x1a3a8a,hc:0xddcc99},
   /* 대장장이 — 무기 상점과 방어구 상점 사이 (동쪽) */
   {name:'(대장장이) 이태산',px:-316,pz:-368,bc:0x3a2a1a,hc:0xcc9966},
+  /* 코디샵 — 광장 남쪽 */
+  {name:'(코디샵) 루나',px:-358, pz:-380,bc:0xcc44aa,hc:0xffaadd},
   /* 정체불명 — 마을 북쪽 외곽 골목 (숨어있는 느낌) */
   {name:'(???) 정체불명',px:-380, pz:-310,  bc:0x1a1030,hc:0xaaaacc},
 ];
