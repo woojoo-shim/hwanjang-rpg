@@ -492,7 +492,19 @@ async function askAI(npcName,userMsg){
     }
     var pp=parsePrice(parsed.clean);
     if(pp.changes.length>0){
+      console.log('[PRICE] changes detected:',JSON.stringify(pp.changes),'npc:',npcName);
       pp.changes.forEach(function(c){applyPriceChange(c.item,c.price,npcName);});
+    }else{
+      /* AI가 태그 없이 가격을 언급했을 때 자동 파싱 시도 */
+      var priceMatch=parsed.clean.match(/(.+?)\s*[을를]?\s*(\d+)\s*골드/);
+      if(priceMatch){
+        var guessItem=priceMatch[1].replace(/[^가-힣a-zA-Z\s]/g,'').trim();
+        var guessPrice=parseInt(priceMatch[2]);
+        if(guessItem&&guessPrice>0){
+          console.log('[PRICE] auto-detected:',guessItem,guessPrice);
+          applyPriceChange(guessItem,guessPrice,npcName);
+        }
+      }
     }
     /* 상점 아이템 추가 파싱 [SHOP_ADD:아이템id|가격] */
     pp.clean=pp.clean.replace(/\[SHOP_ADD:([^\]]+)\]/g,function(_,m){
