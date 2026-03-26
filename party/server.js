@@ -2,6 +2,7 @@
 export default {
   onConnect(conn, room) {
     if (!room._monsterHp) room._monsterHp = {};
+    if (!room._uidMap) room._uidMap = {};
     var players = {};
     for (var c of room.getConnections()) {
       if (c.id === conn.id) continue;
@@ -30,6 +31,8 @@ export default {
       var uid = data.uid || conn.id;
       var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry };
       conn.serializeAttachment(state);
+      if (!room._uidMap) room._uidMap = {};
+      room._uidMap[uid] = conn.id;
       room.broadcast(JSON.stringify({
         type: 'join', id: uid,
         name: data.name, level: data.level,
@@ -66,9 +69,11 @@ export default {
       var st = conn.deserializeAttachment();
       var fromUid = st ? (st.uid || conn.id) : conn.id;
       var targetUid = data.target;
+      if (!room._uidMap) room._uidMap = {};
+      var targetConnId = room._uidMap[targetUid];
+      /* connId로 직접 찾기 */
       for (var c of room.getConnections()) {
-        var cst = c.deserializeAttachment();
-        if (cst && (cst.uid || c.id) === targetUid) {
+        if (c.id === targetConnId || (!targetConnId && (function(){ var cs=c.deserializeAttachment(); return cs&&(cs.uid||c.id)===targetUid; })())) {
           var fwd = JSON.parse(JSON.stringify(data));
           fwd.from = fromUid;
           c.send(JSON.stringify(fwd));
@@ -111,6 +116,7 @@ export default {
     var st = conn.deserializeAttachment();
     if (!st) return;
     var uid = st.uid || conn.id;
+    if (room._uidMap && room._uidMap[uid]) delete room._uidMap[uid];
     room.broadcast(JSON.stringify({ type: 'leave', id: uid }));
     if (room._hostId === conn.id) {
       room._hostId = null;
