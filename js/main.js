@@ -182,9 +182,16 @@ function setupInput(){
     var isInput=_ae===document.getElementById('dmsg')||_ae===document.getElementById('cin')||(_ae&&(_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'));
     if(k==='e'&&!isInput){
       e.preventDefault();
-      /* 건물 내부 → 나가기 최우선 */
+      /* 건물 내부 → NPC 대화 우선, 나가기 카펫 위에서만 나가기 */
       if(typeof insideBuilding!=='undefined'&&insideBuilding){
-        exitBuilding();
+        if(closestNpc&&!document.getElementById('dbox').classList.contains('show')){
+          talk(closestNpc);
+        }else{
+          var _exitThresh=(insideBuilding==='모험가 길드')?12:8;
+          if(Math.abs(PL.group.position.x)<3&&PL.group.position.z>_exitThresh){
+            exitBuilding();
+          }
+        }
       }else if(closestNpc&&!document.getElementById('dbox').classList.contains('show')){
         talk(closestNpc);
       }else if(typeof tryEnterBuilding==='function'&&nearestDoor){
