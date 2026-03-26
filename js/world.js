@@ -351,7 +351,7 @@ function buildInterior(name,baseY){
     var ambL1=new THREE.PointLight(0xffaa44,.5,14);ambL1.position.set(-5,baseY+4,0);scene.add(ambL1);
     var ambL2=new THREE.PointLight(0xffaa44,.5,14);ambL2.position.set(5,baseY+4,5);scene.add(ambL2);
     /* ── 여관 주인 NPC ── */
-    mkInteriorNpc(5,-6,baseY,0xaa5533,'(여관주인) 마리아');
+    mkInteriorNpc(5,-8,baseY,0xaa5533,'(여관주인) 마리아');
 
   }else if(name==='무기 상점'){
     /* ── 환영 매트 ── */
@@ -423,7 +423,7 @@ function buildInterior(name,baseY){
     /* ── 추가 포인트라이트 ── */
     var ambL1=new THREE.PointLight(0xffaa55,.5,14);ambL1.position.set(-5,baseY+4,0);scene.add(ambL1);
     /* ── 무기 상인 NPC ── */
-    mkInteriorNpc(0,4,baseY,0x6a4a2a,'(무기상인) 발두르');
+    mkInteriorNpc(0,-7,baseY,0x6a4a2a,'(무기상인) 발두르');
 
   }else if(name==='도서관'){
     /* ── 환영 매트 ── */
@@ -663,7 +663,7 @@ function buildInterior(name,baseY){
     var arL1=new THREE.PointLight(0xffcc88,.6,14);arL1.position.set(-5,baseY+4,-5);scene.add(arL1);
     var arL2=new THREE.PointLight(0xffcc88,.6,14);arL2.position.set(5,baseY+4,5);scene.add(arL2);
     /* ── 방어구 상인 NPC ── */
-    mkInteriorNpc(0,4,baseY,0x5a5a7a,'(방어구상인) 헥토르');
+    mkInteriorNpc(0,-8,baseY,0x5a5a7a,'(방어구상인) 헥토르');
 
   }else{
     /* 기본 내부 */
