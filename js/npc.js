@@ -544,6 +544,24 @@ async function askAI(npcName,userMsg){
       }
       return '';
     }).trim();
+    /* 숙박(REST) 파싱 */
+    var hasRest=pp.clean.indexOf('[REST]')!==-1;
+    pp.clean=pp.clean.replace(/\[REST\]/g,'').trim();
+    if(hasRest){
+      setTimeout(function(){
+        if(typeof fadeOverlay==='undefined'||!fadeOverlay)return;
+        fadeOverlay.style.opacity='1';
+        fadeOverlay.style.background='#000';
+        addChat('sys','[시스템]','잠들었습니다... zzZ');
+        setTimeout(function(){
+          playerHP=playerMaxHP;
+          if(typeof playerMP!=='undefined')playerMP=playerMaxMP||60;
+          updPlayerHpBar();
+          addChat('sys','[시스템]','푹 자고 일어났습니다! HP/MP가 회복되었습니다.');
+          setTimeout(function(){fadeOverlay.style.opacity='0';},500);
+        },2000);
+      },800);
+    }
     var qp=parseQuest(pp.clean);
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
