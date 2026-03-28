@@ -966,38 +966,38 @@ function mkStonePath(parent){
   }
   /* ── 마을 내부 도로망 (확장 구역) ── */
   /* 광장 ↔ 여관 (서쪽) */
-  drawPath([[-350,-358],[-362,-358],[-375,-360],[-388,-360]],8,3);
+  drawPath([[-350,-358],[-362,-358],[-375,-360],[-388,-360]],4,3);
   /* 광장 ↔ 무기/방어구 상점 (동쪽) */
-  drawPath([[-350,-358],[-338,-358],[-325,-360],[-312,-360]],8,3);
+  drawPath([[-350,-358],[-338,-358],[-325,-360],[-312,-360]],4,3);
   /* 광장 남북 메인도로 → 게이트 */
-  drawPath([[-350,-370],[-350,-390],[-350,-410],[-350,-430],[-350,-450]],12,4);
+  drawPath([[-350,-370],[-350,-390],[-350,-410],[-350,-430],[-350,-450]],5,4);
   /* 광장 ↔ 모험가 길드 */
-  drawPath([[-350,-370],[-352,-385],[-354,-400],[-354,-418],[-352,-430]],10,3);
+  drawPath([[-350,-370],[-352,-385],[-354,-400],[-354,-418],[-352,-430]],4,3);
   /* 시장 구역 (서쪽 상인 구역 내부) */
-  drawPath([[-350,-358],[-362,-362],[-375,-365],[-390,-368],[-402,-370]],8,3);
+  drawPath([[-350,-358],[-362,-362],[-375,-365],[-390,-368],[-402,-370]],4,3);
   /* 도서관 ↔ 광장 (동쪽 외곽 루프) */
-  drawPath([[-350,-358],[-335,-358],[-322,-355],[-310,-350],[-300,-342]],8,3);
+  drawPath([[-350,-358],[-335,-358],[-322,-355],[-310,-350],[-300,-342]],4,3);
   /* 주거 구역 도로 (북쪽) */
-  drawPath([[-350,-358],[-350,-345],[-350,-330],[-350,-315],[-350,-302]],8,3);
-  drawPath([[-350,-315],[-365,-312],[-380,-310],[-395,-312]],7,3);
-  drawPath([[-350,-315],[-335,-312],[-320,-310],[-305,-312]],7,3);
+  drawPath([[-350,-358],[-350,-345],[-350,-330],[-350,-315],[-350,-302]],4,3);
+  drawPath([[-350,-315],[-365,-312],[-380,-310],[-395,-312]],3,3);
+  drawPath([[-350,-315],[-335,-312],[-320,-310],[-305,-312]],3,3);
   /* 우물 ↔ 주거구역 */
-  drawPath([[-350,-315],[-360,-312],[-370,-312],[-372,-310]],5,3);
+  drawPath([[-350,-315],[-360,-312],[-370,-312],[-372,-310]],2,3);
 
   /* 마을 → 중앙 교차로 (0,0 부근) */
-  drawPath([[-350,-450],[-350,-470],[-320,-430],[-270,-380],[-220,-320],[-160,-240],[-100,-160],[-40,-80],[0,0]],15,5);
+  drawPath([[-350,-450],[-350,-470],[-320,-430],[-270,-380],[-220,-320],[-160,-240],[-100,-160],[-40,-80],[0,0]],6,5);
   /* 중앙 → 초원 (NE) */
-  drawPath([[0,0],[60,-40],[120,-100],[180,-160],[240,-220],[300,-300]],12,4);
+  drawPath([[0,0],[60,-40],[120,-100],[180,-160],[240,-220],[300,-300]],5,4);
   /* 중앙 → 늪 (W) */
-  drawPath([[0,0],[-60,20],[-120,40],[-200,60],[-300,80],[-400,100]],12,4);
+  drawPath([[0,0],[-60,20],[-120,40],[-200,60],[-300,80],[-400,100]],5,4);
   /* 중앙 → 정글 (E) */
-  drawPath([[0,0],[60,20],[120,40],[200,60],[300,80],[400,100]],12,4);
+  drawPath([[0,0],[60,20],[120,40],[200,60],[300,80],[400,100]],5,4);
   /* 중앙 → 어두운 숲 (SW) */
-  drawPath([[0,0],[-40,40],[-100,120],[-180,220],[-260,300],[-300,350]],12,4);
+  drawPath([[0,0],[-40,40],[-100,120],[-180,220],[-260,300],[-300,350]],5,4);
   /* 중앙 → 화산 (SE) */
-  drawPath([[0,0],[40,40],[100,120],[180,220],[260,300],[350,400]],12,4);
+  drawPath([[0,0],[40,40],[100,120],[180,220],[260,300],[350,400]],5,4);
   /* 중앙 → 보스 (S center) */
-  drawPath([[0,0],[0,60],[0,140],[0,240],[0,360],[0,480],[0,550]],10,4);
+  drawPath([[0,0],[0,60],[0,140],[0,240],[0,360],[0,480],[0,550]],4,4);
 }
 
 function mkWaterRiver(parent){
@@ -1301,9 +1301,9 @@ function buildVillage(){
   registerDoor(VX-8,  VZ-64, '모험가 길드');/* 길드 북쪽 앞 */
 
   /* 지면 디테일 — 확장된 영역에 더 많이 */
-  scatterGroundDetail(scene,60,100,100,'grass',VX,VZ);
-  scatterGroundDetail(scene,30,90,90,'stone',VX,VZ);
-  scatterGroundDetail(scene,40,80,80,'flower',VX,VZ);
+  scatterGroundDetail(scene,15,100,100,'grass',VX,VZ);
+  scatterGroundDetail(scene,8,90,90,'stone',VX,VZ);
+  scatterGroundDetail(scene,10,80,80,'flower',VX,VZ);
 
   /* 건물 주변 포인트 라이트 제거 — 성능 최적화 (횃불 라이트로 충분) */
 
@@ -1380,20 +1380,20 @@ function buildVillage(){
   /* ── 마을 나무 — 확장 구역에 더 많이 ── */
   var treeLayout=[
     /* 광장 주변 */
-    [VX-22,VZ-2],[VX+22,VZ-2],[VX-22,VZ-20],[VX+22,VZ-20],
+    [VX-22,VZ-2],[VX+22,VZ-20],
     /* 주거 구역 나무 */
-    [VX-60,VZ+25],[VX-45,VZ+28],[VX-30,VZ+26],[VX-15,VZ+25],[VX+5,VZ+28],
-    [VX-58,VZ+10],[VX+20,VZ+15],[VX+38,VZ+8],
+    [VX-60,VZ+25],[VX-30,VZ+26],[VX+5,VZ+28],
+    [VX+20,VZ+15],
     /* 여관 주변 */
-    [VX-50,VZ-5],[VX-50,VZ-22],
+    [VX-50,VZ-5],
     /* 도서관 주변 */
-    [VX+58,VZ+5],[VX+60,VZ+22],
+    [VX+58,VZ+5],
     /* 길드 주변 */
-    [VX-25,VZ-80],[VX+10,VZ-82],[VX-22,VZ-55],[VX+18,VZ-58],
+    [VX-25,VZ-80],[VX-22,VZ-55],
     /* 입구 양옆 나무 */
-    [VX-22,VZ-40],[VX+22,VZ-40],[VX-22,VZ-56],[VX+22,VZ-56],
+    [VX-22,VZ-40],[VX+22,VZ-56],
     /* 시장 구역 */
-    [VX-62,VZ-10],[VX-62,VZ-32],
+    [VX-62,VZ-10],
   ];
   treeLayout.forEach(function(pp,idx){
     /* 마을 나무 다양화: 기본 소나무 + 간간이 참나무/버드나무 */
@@ -2180,7 +2180,7 @@ function mkFences(parent){
     var dx=x2-x1,dz=z2-z1;
     var len=Math.sqrt(dx*dx+dz*dz);
     var ang=Math.atan2(dx,dz);
-    var count=Math.floor(len/1.2);
+    var count=Math.floor(len/2.4);
     for(var i=0;i<=count;i++){
       var t=i/count;
       var lx=x1+dx*t,lz=z1+dz*t;
@@ -2335,25 +2335,16 @@ function mkFlowerBeds(parent){
 
   /* 광장 주변 화단 */
   flowerBed(-358,-352, 5);
-  flowerBed(-342,-352, 5);
-  flowerBed(-358,-368, 4);
   flowerBed(-342,-368, 4);
   /* 여관 앞 */
   flowerBed(-388,-345, 5);
-  flowerBed(-380,-345, 5);
   /* 도서관 앞 */
-  flowerBed(-322,-345, 5);
   flowerBed(-314,-345, 5);
-  /* 길드 길가 */
-  flowerBed(-392,-385, 4);
-  flowerBed(-380,-385, 4);
   /* 주거 구역 길가 */
   flowerBed(-368,-310, 4);
-  flowerBed(-340,-310, 4);
   flowerBed(-310,-310, 4);
   /* 마을 입구 게이트 앞 */
   flowerBed(-360,-440, 5);
-  flowerBed(-340,-440, 5);
 }
 
 /* ── 배럴/상자 ── */
@@ -2468,25 +2459,18 @@ function mkBenches(parent){
 
   /* 광장 길가 벤치들 */
   bench(-354,-354,  0);
-  bench(-346,-354,   Math.PI);
-  bench(-354,-362, 0);
   bench(-346,-362,  Math.PI);
   /* 여관 앞 길가 */
   bench(-388,-360, Math.PI/2);
-  bench(-388,-370, Math.PI/2);
   /* 도서관 앞 길가 */
-  bench(-316,-360, -Math.PI/2);
   bench(-316,-370, -Math.PI/2);
   /* 주거 구역 길가 */
   bench(-370,-320, 0);
-  bench(-340,-320, Math.PI);
   bench(-310,-320, 0);
   /* 길드 앞 광장 */
   bench(-335,-395, 0);
-  bench(-320,-395, Math.PI);
   /* 입구 길가 */
   bench(-360,-430, Math.PI/2);
-  bench(-340,-430, -Math.PI/2);
 }
 
 /* ── 가로등 (중세 등불) ── */
@@ -2523,21 +2507,18 @@ function mkLampPosts(parent){
   }
 
   /* 광장 주변 */
-  lampPost(-356,-352);  lampPost(-344,-352);
-  lampPost(-356,-368); lampPost(-344,-368);
+  lampPost(-356,-352);  lampPost(-344,-368);
   /* 광장 → 여관 길 */
-  lampPost(-368,-356); lampPost(-378,-360); lampPost(-388,-358);
+  lampPost(-378,-360);
   /* 광장 → 무기상점 길 */
-  lampPost(-332,-356); lampPost(-322,-360); lampPost(-312,-358);
+  lampPost(-322,-360);
   /* 남북 메인 도로 (광장 → 게이트) */
-  lampPost(-353,-378); lampPost(-347,-378);
-  lampPost(-353,-398); lampPost(-347,-398);
-  lampPost(-353,-418); lampPost(-347,-418);
-  lampPost(-353,-438); lampPost(-347,-438);
+  lampPost(-350,-398);
+  lampPost(-350,-438);
   /* 주거 구역 도로 */
-  lampPost(-368,-320); lampPost(-350,-318); lampPost(-310,-320);
+  lampPost(-368,-320); lampPost(-310,-320);
   /* 길드 앞 */
-  lampPost(-335,-386); lampPost(-322,-386);
+  lampPost(-328,-386);
 }
 
 /* ── 여관 내부 장식 (침대 창문으로 보이게) ── */
@@ -2706,7 +2687,7 @@ function buildMeadowDecor(){
   /* 쓰러진 통나무 — 제거됨 */
 
   /* ── 야생화 패치 ── */
-  for(var wfi=0;wfi<80;wfi++){
+  for(var wfi=0;wfi<30;wfi++){
     var wx2=MX+(Math.random()-.5)*360,wz2=MZ+(Math.random()-.5)*360;
     if(false)continue;/* 레이아웃에 걸리는 위치 없음 */
     var wfc=meadowFlowerColors[Math.floor(Math.random()*meadowFlowerColors.length)];
@@ -2767,9 +2748,8 @@ function buildMeadowDecor(){
   var tallGrassM=new THREE.MeshLambertMaterial({color:0x3a7a1a});
   var tallGrass2M=new THREE.MeshLambertMaterial({color:0x4a8a22});
   [[-80,-80],[60,-50],[-20,30],[50,60],
-   [-100,80],[40,100],[-50,120],[90,-60],
-   [-10,50],[30,90],[-60,20],[20,-40],
-   [0,10],[-40,100],[70,130],[-30,-60]
+   [-100,80],[-50,120],
+   [-10,50],[-60,20]
   ].forEach(function(pp){
     var tgh=.6+Math.random()*.7;
     var tgm=Math.random()>.5?tallGrassM:tallGrass2M;
@@ -2925,10 +2905,9 @@ function buildMeadowDecor(){
     signPost(MX+40,MZ+80,[['정글 →',0,1,.05],['↑ 마을',0,1,.05]],getTerrainY(MX+40,MZ+80));
   })();
 
-  /* ── 추가 나무 (20그루) ── */
-  [[-40,-90],[40,-60],[-80,30],[80,50],[-50,70],[50,90],
-   [-100,100],[100,120],[-30,130],[30,150],[-120,160],[120,170],
-   [-60,-60],[60,-30],[-90,60],[90,40],[0,20],[-130,80],[130,110],[0,140]
+  /* ── 추가 나무 (10그루) ── */
+  [[-40,-90],[40,-60],[-80,30],[80,50],[-50,70],
+   [-100,100],[-30,130],[-60,-60],[90,40],[0,140]
   ].forEach(function(pp){mkTree(MX+pp[0],MZ+pp[1],.8+Math.random()*.7,scene);});
 
   /* ── 추가 목재 울타리/돌담 ── */
@@ -3003,8 +2982,8 @@ function buildMeadowDecor(){
     var g=new THREE.Group();
     var grassBladeMat=new THREE.MeshLambertMaterial({color:0x4a9a2a,side:THREE.DoubleSide});
     var grassBladeMat2=new THREE.MeshLambertMaterial({color:0x3a7a1a,side:THREE.DoubleSide});
-    /* 삼각형 풀날 — 초원에 100개 */
-    for(var gi=0;gi<100;gi++){
+    /* 삼각형 풀날 — 초원에 40개 */
+    for(var gi=0;gi<40;gi++){
       var gx=MX+(Math.random()-.5)*320,gz=MZ+(Math.random()-.5)*320;
       var gh=.3+Math.random()*.35;
       var gm=Math.random()>.4?grassBladeMat:grassBladeMat2;
@@ -3022,11 +3001,11 @@ function buildMeadowDecor(){
   })();
 
   /* ── 벚나무 (Cherry Blossom) — 초원에 희귀하게 ── */
-  [[MX-30,MZ-40],[MX+55,MZ+70],[MX-80,MZ+40],[MX+20,MZ-90]].forEach(function(pp){
+  [[MX-30,MZ-40],[MX-80,MZ+40]].forEach(function(pp){
     mkTree(pp[0],pp[1],.85+Math.random()*.3,scene,3);
   });
   /* 참나무 — 초원 곳곳 */
-  [[MX-60,MZ+30],[MX+80,MZ-20],[MX-20,MZ+100],[MX+50,MZ+50]].forEach(function(pp){
+  [[MX-60,MZ+30],[MX+50,MZ+50]].forEach(function(pp){
     mkTree(pp[0],pp[1],.9+Math.random()*.4,scene,1);
   });
 }
@@ -3218,8 +3197,8 @@ function buildForestDecor(){
   });
 
   /* ── 넝쿨 (나무에서 늘어지는 얇은 원통들) ── */
-  [[FX-80,FZ-80,2.2],[FX-70,FZ+10,2.0],[FX+80,FZ-20,2.2],[FX+90,FZ+100,2.0],
-   [FX-50,FZ+80,2.1],[FX+60,FZ-60,1.9],[FX-30,FZ+120,2.2],[FX+50,FZ+40,2.0]
+  [[FX-80,FZ-80,2.2],[FX+80,FZ-20,2.2],
+   [FX-50,FZ+80,2.1],[FX+50,FZ+40,2.0]
   ].forEach(function(vd){
     var vl=.8+Math.random()*.8;
     var vine=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,vl,5),vineM);
@@ -3451,14 +3430,14 @@ function buildForestDecor(){
     });
   })();
 
-  /* ── 숲 추가 나무 15그루 ── */
+  /* ── 숲 추가 나무 7그루 ── */
   (function(){
     var fTrunkM=new THREE.MeshLambertMaterial({color:0x1a0e05});
     var fLeafM=new THREE.MeshLambertMaterial({color:0x1a4a12});
     var fLeaf2M=new THREE.MeshLambertMaterial({color:0x150a20});
-    [[FX-100,FZ-90],[FX+100,FZ-80],[FX-90,FZ-20],[FX+90,FZ-10],[FX,FZ-50],
-     [FX-110,FZ+20],[FX+110,FZ+30],[FX-100,FZ+80],[FX+100,FZ+90],[FX,FZ+50],
-     [FX-120,FZ+120],[FX+120,FZ+110],[FX-80,FZ+10],[FX+80,FZ+40],[FX,FZ+90]
+    [[FX-100,FZ-90],[FX+90,FZ-10],[FX,FZ-50],
+     [FX-110,FZ+20],[FX+100,FZ+90],
+     [FX-120,FZ+120],[FX,FZ+90]
     ].forEach(function(pp){
       var th=5+Math.random()*4;
       var ts=1.1+Math.random()*.9;
@@ -3496,7 +3475,7 @@ function buildForestDecor(){
       new THREE.MeshLambertMaterial({color:0x4a2a08,side:THREE.DoubleSide}),
       new THREE.MeshLambertMaterial({color:0x5a3510,side:THREE.DoubleSide})
     ];
-    for(var li=0;li<80;li++){
+    for(var li=0;li<30;li++){
       var lx=FX+(Math.random()-.5)*280,lz=FZ+(Math.random()-.5)*280;
       var lm=leafColors[Math.floor(Math.random()*4)];
       var leaf=new THREE.Mesh(new THREE.PlaneGeometry(.2+Math.random()*.15,.14+Math.random()*.1),lm);
@@ -3510,10 +3489,10 @@ function buildForestDecor(){
   })();
 
   /* ── 버드나무/참나무 추가 (숲 다양화) ── */
-  [[FX-60,FZ-30],[FX+40,FZ-50],[FX-30,FZ+80]].forEach(function(pp){
+  [[FX-60,FZ-30]].forEach(function(pp){
     mkTree(pp[0],pp[1],.9+Math.random()*.4,scene,2);
   });
-  [[FX-80,FZ+40],[FX+60,FZ+30]].forEach(function(pp){
+  [[FX+60,FZ+30]].forEach(function(pp){
     mkTree(pp[0],pp[1],1+Math.random()*.4,scene,1);
   });
 }
