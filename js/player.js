@@ -224,6 +224,7 @@ function updateArrows(dt){
         m.hp=Math.max(0,m.hp-a.dmg);
         m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
         spawnDmgNum('-'+a.dmg,'#ffdd44');
+        if(typeof SFX!=='undefined')SFX.hit();
         flashMonster(m);
         m.state='aggro';
         var midx=monsters.indexOf(m);
@@ -432,6 +433,7 @@ function playerAttack(){
     dx/=len;dz/=len;
     PL.group.rotation.y=Math.atan2(dx,dz);
     shootArrow(dx,dz,dmg);
+    if(typeof SFX!=='undefined')SFX.bowShoot();
     attackCooldown=.5/cls.spdMul;
     triggerAtkAnim();
     if(typeof sendAttackMP==='function')sendAttackMP();
@@ -453,10 +455,12 @@ function playerAttack(){
   }
   target.hp=Math.max(0,target.hp-dmg);
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
+  if(typeof SFX!=='undefined')SFX.hit();
   /* 성기사 패시브: 흡혈 */
   if(cls.passive==='lifesteal'){var heal=Math.floor(dmg*0.05);playerHP=Math.min(playerMaxHP,playerHP+heal);updPlayerHpBar();}
   /* 주술사 패시브: 독 */
   if(cls.passive==='poison'&&target){target._poisonT=3;target._poisonDmg=Math.floor(dmg*0.15);}
+  if(typeof SFX!=='undefined')SFX.swing();
   attackCooldown=.75/cls.spdMul;
   triggerAtkAnim();
   if(typeof sendAttackMP==='function')sendAttackMP();
@@ -473,6 +477,7 @@ function playerAttack(){
 
 function killMonster(m){
   m.state='dead';
+  if(typeof SFX!=='undefined')SFX.monsterDie();
   /* 사망 애니메이션 시작 (0.8초) */
   m.deathAnim=0.8;
   m.wrap.style.display='none';
@@ -533,6 +538,7 @@ function killMonster(m){
 }
 
 function playerDied(){
+  if(typeof SFX!=='undefined')SFX.playerDie();
   /* 사망 오버레이 */
   var ov=document.getElementById('death-overlay');
   if(!ov){
@@ -613,6 +619,7 @@ function doTeleport(zoneKey){
   }
   /* 텔레포트 */
   PL.group.position.set(zi.tp[0],0,zi.tp[1]);
+  if(typeof SFX!=='undefined')SFX.teleport();
   closeTpModal();
   addChat('sys','[시스템]','★ '+zi.name+'(으)로 텔레포트!');
   /* 존 전환 트리거 */
@@ -625,6 +632,7 @@ function checkLevelUp(){
     playerEXP-=need;playerLevel++;var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;playerMaxHP+=Math.floor(12*cls.hpMul);playerHP=playerMaxHP;
     document.querySelector('.hlv').textContent='Lv.'+playerLevel;
     updPlayerHpBar();
+    if(typeof SFX!=='undefined')SFX.levelUp();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
     gold+=20;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
   }
@@ -699,6 +707,7 @@ function checkZone(){
       village:'마을로 귀환. HP 일부 회복.',
     };
     if(msgs[newZone])addChat('sys','[시스템]',msgs[newZone]);
+    if(typeof playBGM==='function')playBGM(newZone);
     /* 마을 귀환 시 HP 회복 */
     if(newZone==='village'){
       playerHP=Math.min(playerMaxHP,playerHP+Math.floor(playerMaxHP*.25));
@@ -798,6 +807,7 @@ function handleMove(dt){
   }
   var moving=dx!==0||dz!==0;
   if(moving){
+    if(typeof SFX!=='undefined')SFX.step();
     var len=Math.sqrt(dx*dx+dz*dz);dx/=len;dz/=len;
     var spdMul=(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul;
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */

@@ -2218,14 +2218,16 @@ function updMonsters(dt,t){
             if(invincibleTimer<=0){
               playerHP=Math.max(0,playerHP-dmg);
               updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555','player');
+              if(typeof SFX!=='undefined')SFX.playerHit();
               flashPlayerHit();
               /* 화면 흔들림 — 받은 데미지에 비례 */
               if(typeof screenShake==='function')screenShake(Math.min(1.5,dmg*0.04),0.2);
               if((mid==='toad'||mid==='jungle_snake')&&!playerPoisoned){
                 playerPoisoned=3;playerPoisonDmg=Math.floor(dmg*0.3);
+                if(typeof SFX!=='undefined')SFX.poison();
                 spawnDmgNum('독!','#44ff44');addChat('inf','','독에 걸렸다!');
               }
-              if(mid==='slime'){playerSlowed=2;spawnDmgNum('둔화!','#22aa22');}
+              if(mid==='slime'){if(typeof SFX!=='undefined')SFX.slow();playerSlowed=2;spawnDmgNum('둔화!','#22aa22');}
               if(mid==='golem'){spawnLavaPool(mx,mz,6,4);spawnDmgNum('용암 강타!','#ff4400');}
               if(mid==='jungle_panther')spawnDmgNum('연속!','#ffaa00');
               if(mid==='jungle_mosquito')spawnDmgNum('흡혈!','#ff00aa');

@@ -623,6 +623,7 @@ function confirmClassSelect(){
   playerMaxHP=Math.floor(100*def.hpMul);
   playerHP=playerMaxHP;
   updPlayerHpBar();
+  if(typeof SFX!=='undefined')SFX.classChange();
   addChat('sys','[시스템]','★ '+def.name+'(으)로 전직하였습니다!');
   document.getElementById('class-modal').style.display='none';
   /* 스킬바 UI 생성 */
@@ -723,6 +724,7 @@ function talk(n){
     openShop(n.name);
     return;
   }
+  if(typeof SFX!=='undefined')SFX.talkStart();
   /* 완료된 퀘스트 수령 체크 */
   var turned=tryTurnInQuests(n.name);
   activeNpc=n;
@@ -763,7 +765,9 @@ function typeText(txt){
   if(typTmr)clearInterval(typTmr);
   var i=0;
   typTmr=setInterval(function(){
-    te.textContent+=txt[i];i++;
+    te.textContent+=txt[i];
+    if(i%3===0&&typeof SFX!=='undefined')SFX.typeChar();
+    i++;
     if(i>=txt.length)clearInterval(typTmr);
   },30);
 }

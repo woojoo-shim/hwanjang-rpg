@@ -77,6 +77,7 @@ function tryEnterBuilding(){
 }
 
 function enterBuilding(door){
+  if(typeof SFX!=='undefined')SFX.doorEnter();
   insideBuilding=door.name;
   _savedOutdoorPos.x=PL.group.position.x;
   _savedOutdoorPos.z=PL.group.position.z;
@@ -111,6 +112,7 @@ function enterBuilding(door){
 
 function exitBuilding(){
   if(!insideBuilding)return;
+  if(typeof SFX!=='undefined')SFX.doorExit();
   _doorCooldown=60;/* 1초 쿨다운 */
   fadeOverlay.style.opacity='1';
   fadeOverlay.style.background='#000';

@@ -59,6 +59,7 @@ function acceptQuest(q){
   q.progress=0;
   q.ready=false;
   activeQuests.push(q);
+  if(typeof SFX!=='undefined')SFX.questAccept();
   addChat('sys','[시스템]','퀘스트 수락: ['+q.name+']');
   renderQuestTracker();
   // collect 타입이면 현재 인벤토리에서 이미 있는 수량 체크
@@ -138,6 +139,7 @@ function onItemCollect(itemId,qty){
 
 /* ── 퀘스트 완료 (보상 지급) ── */
 function completeQuest(q){
+  if(typeof SFX!=='undefined')SFX.questComplete();
   addChat('sys','[시스템]','✦ 퀘스트 완료: ['+q.name+'] ✦');
   // 보상 지급
   if(q.rewardType==='exp'){

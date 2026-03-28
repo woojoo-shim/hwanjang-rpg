@@ -62,6 +62,7 @@ function equipItem(slot){
     return;
   }
   equipped[it.type]=slot.itemId;
+  if(typeof SFX!=='undefined')SFX.click();
   addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
   renderInv();showDetail(slot);updEquipHud();
@@ -120,6 +121,7 @@ function useItem(slot){
   if(it.stats.부활){
     msg='부활 효과가 부여되었습니다!';
   }
+  if(typeof SFX!=='undefined')SFX.potion();
   slot.qty--;
   if(slot.qty<=0)inventory=inventory.filter(function(s){return s!==slot;});
   addChat('sys','[시스템]','['+it.name+'] 사용! '+(msg||''));
@@ -162,6 +164,7 @@ function giveStartItems(){
 var invOpen=false;
 function openInv(){
   invOpen=true;
+  if(typeof SFX!=='undefined')SFX.click();
   document.getElementById('inv-overlay').classList.add('show');
   renderInv();
 }
@@ -397,6 +400,7 @@ function doBuy(){
     var finalPrice=entry._hagglePrice||entry.price;
     if(gold<finalPrice){addChat('inf','','골드가 부족합니다!');return;}
     gold-=finalPrice;
+    if(typeof SFX!=='undefined')SFX.buy();
     addItem(entry.id,1);
     updShopGold();
     document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
