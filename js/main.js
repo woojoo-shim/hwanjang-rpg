@@ -87,6 +87,8 @@ document.getElementById('ni').addEventListener('keydown',function(e){if(e.key===
 
 /* ── 로딩 ── */
 function startGame(){
+  /* 유저 제스처 시점에서 AudioContext 생성/resume — autoplay 정책 충족 */
+  if(typeof getAudioCtx==='function')getAudioCtx();
   if(!myName){var v=document.getElementById('ni').value.trim();myName=v||'모험가';}
   if(!ANTHROPIC_API_KEY&&(location.hostname==='localhost'||location.hostname==='127.0.0.1')){
     try{
