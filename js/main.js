@@ -139,6 +139,7 @@ function enterGame(){
       var _bgmStarted=false;
       function _startBGM(){
         if(_bgmStarted)return;_bgmStarted=true;
+        _bgmZone='';/* 강제 초기화 — 첫 시작 시 반드시 재생 */
         if(typeof playBGM==='function')playBGM(currentZone||'village');
         document.removeEventListener('keydown',_startBGM);
         document.removeEventListener('click',_startBGM);
