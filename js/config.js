@@ -203,6 +203,11 @@ var NPC_AI={
 - 플레이어 골드가 부족하면 거래 거절해. 현재 골드는 [상점 상태]에서 확인 가능
 - 거래 완료 태그 없이 "팔게요"라고만 말하면 안 됨! 반드시 태그를 붙여야 실제 거래가 됨
 
+퀘스트 규칙: 대화 중 자연스럽게 퀘스트를 제안할 수 있음. 퀘스트를 줄 때는 대사 끝에: [QUEST:퀘스트이름|퀘스트설명|타입|대상|수량|보상타입|보상량]
+- 타입: kill(처치) 또는 collect(수집). 대상: 몬스터이름 또는 아이템id. 보상타입: exp, gold, item.
+- 예: [QUEST:재료 수집|가죽갑옷 재료가 필요해요|collect|deer_antler|3|gold|200]
+- 한 대화에서 퀘스트는 최대 1개만.
+
 아이템 지급 규칙: 플레이어가 정말 재미있는 말을 하거나 거래를 잘 했을 때 극히 드물게 (3% 확률) 히든 아이템을 팔 수 있음. 대부분의 대화에서는 절대 아이템을 주지 않음.
 아이템을 줄 때는 대사 끝에: [HIDDEN_ITEM:아이템이름|아이템설명|아이콘키|스탯숫자]
 아이콘키: sword,axe,bow,staff,dagger,helmet,armor,gloves,boots,robe,potion,food,scroll,ring,necklace,gem,coin,bone,fish,leaf,crystal,key,book,feather,egg,star,mushroom,bottle,mask,crown
@@ -233,6 +238,9 @@ var NPC_AI={
 아이템을 줄 때는 대사 끝에: [HIDDEN_ITEM:아이템이름|아이템설명|아이콘키|공격력숫자]
 아이콘키: sword,axe,bow,staff,dagger,helmet,armor,gloves,boots,robe,potion,food,scroll,ring,necklace,gem,coin,bone,fish,leaf,crystal,key,book,feather,egg,star,mushroom,bottle,mask,crown
 아이템은 대장장이가 만든 것처럼 묵직하고 투박한 이름. 예: "대충 만든 검", "아직 식지 않은 금속 덩어리"
+퀘스트 규칙: 대화 중 자연스럽게 퀘스트를 제안할 수 있음. 퀘스트를 줄 때는 대사 끝에: [QUEST:퀘스트이름|퀘스트설명|타입|대상|수량|보상타입|보상량]
+- 타입: kill 또는 collect. 예: [QUEST:재료 수집|강철 갑옷 만들 재료가 필요하오|collect|magic_crystal|3|item|iron_sword]
+- 한 대화에서 퀘스트는 최대 1개만.
 답변은 1~3문장으로 매우 간결하게. 한국어로만 대답.`,
     history:[]
   },
@@ -247,6 +255,8 @@ var NPC_AI={
 - 가격을 바꿀 때: [PRICE:아이템이름|새가격]
 - 거래 성사 시: [TRADE_BUY:아이템id|가격]
 - 사용 가능한 id: dye_red, dye_blue, dye_green, dye_pink, dye_white, dye_black, dye_gold, bunny_ears, wizard_hat, santa_hat, red_cape, blue_cape, golden_cape
+퀘스트 규칙: 대화 중 자연스럽게 퀘스트를 줄 수 있음. 대사 끝에: [QUEST:퀘스트이름|설명|타입|대상|수량|보상타입|보상량]
+- 예: [QUEST:패션 센스|토끼귀를 착용하고 돌아와요!|collect|bunny_ears|1|gold|150]
 답변은 2~3문장으로 간결하게. 한국어로만 대답.`,
     history:[]
   },
@@ -266,6 +276,8 @@ var NPC_AI={
 일반 대화:
 - 마을 소식, 모험 조언 등을 해줌
 - 다른 NPC들에 대한 가십을 알려줌
+퀘스트 규칙: 대화 중 자연스럽게 퀘스트를 줄 수 있음. 대사 끝에: [QUEST:퀘스트이름|설명|타입|대상|수량|보상타입|보상량]
+- 예: [QUEST:저녁 재료|사슴고기를 구해와 주세요~|collect|deer_meat|3|gold|100]
 답변은 2~3문장으로 간결하게. 한국어로만 대답.`,
     history:[]
   },
