@@ -203,7 +203,30 @@ var SFX={
   _lastStep:0,
   step:function(){
     var now=Date.now();if(now-SFX._lastStep<350)return;SFX._lastStep=now;
-    playFilteredNoise(0.05,0.12,1200,200);
+    var zone=(typeof insideBuilding!=='undefined'&&insideBuilding)?'indoor':(typeof currentZone!=='undefined'?currentZone:'village');
+    if(zone==='indoor'){
+      /* 나무 바닥 — 톡톡 */
+      playImpact(800+Math.random()*200,100,20,0.04,0.1);
+    }else if(zone==='village'){
+      /* 돌바닥 — 딱딱 */
+      playImpact(600+Math.random()*150,200,30,0.04,0.1);
+    }else if(zone==='meadow'){
+      /* 잔디 — 사각사각 */
+      playFilteredNoise(0.05,0.1,1800,400);
+    }else if(zone==='swamp'){
+      /* 늪 — 찰퍽 */
+      playFilteredNoise(0.06,0.12,600,80);
+      playSweep(200,80,0.06,0.04);
+    }else if(zone==='darkforest'||zone==='jungle'){
+      /* 낙엽 — 바스락 */
+      playFilteredNoise(0.05,0.1,2500,600);
+    }else if(zone==='volcano'){
+      /* 자갈 — 짜각 */
+      playImpact(500+Math.random()*300,300,40,0.03,0.1);
+      playFilteredNoise(0.03,0.06,3000,1000);
+    }else{
+      playFilteredNoise(0.05,0.1,1500,300);
+    }
   },
   /* UI 클릭 */
   click:function(){playChime(800,0.03,0.04);},
