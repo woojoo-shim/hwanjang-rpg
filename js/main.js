@@ -135,6 +135,18 @@ function enterGame(){
         if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
+      /* BGM 시작 — 첫 유저 상호작용 후 */
+      var _bgmStarted=false;
+      function _startBGM(){
+        if(_bgmStarted)return;_bgmStarted=true;
+        if(typeof playBGM==='function')playBGM(currentZone||'village');
+        document.removeEventListener('keydown',_startBGM);
+        document.removeEventListener('click',_startBGM);
+        document.removeEventListener('mousedown',_startBGM);
+      }
+      document.addEventListener('keydown',_startBGM);
+      document.addEventListener('click',_startBGM);
+      document.addEventListener('mousedown',_startBGM);
       loop();
     }catch(e){console.error('initScene error',e);}
   },100);
