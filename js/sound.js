@@ -273,7 +273,7 @@ function playBGM(zone){
   if(_bgmFiles[zone]){
     _bgmAudio=new Audio(_bgmFiles[zone]);
     _bgmAudio.loop=true;
-    _bgmAudio.volume=_bgmVolume*3;
+    _bgmAudio.volume=_bgmVolume;
     _bgmAudio.play().catch(function(){});
     return;
   }
@@ -300,4 +300,4 @@ function playBGM(zone){
 }
 
 function setSfxVolume(v){_sfxVolume=Math.max(0,Math.min(1,v));}
-function setBgmVolume(v){_bgmVolume=Math.max(0,Math.min(1,v));if(_bgmAudio)_bgmAudio.volume=_bgmVolume*3;}
+function setBgmVolume(v){_bgmVolume=Math.max(0,Math.min(1,v));if(_bgmAudio)_bgmAudio.volume=_bgmVolume;}
