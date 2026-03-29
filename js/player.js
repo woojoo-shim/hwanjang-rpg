@@ -124,28 +124,59 @@ function refreshWeaponMesh(){
 
 /* 공격 애니메이션 상태 */
 var atkAnimTimer=0;
-var ATK_PHASES=[0,.12,.18,.25];
+var ATK_PHASES=[0,.1,.08,.15];
+var _atkBodyYaw=0;/* 공격 시 몸 회전 보존 */
 
 function triggerAtkAnim(){
-  PL.atkPhase=1;atkAnimTimer=0;
+  PL.atkPhase=1;atkAnimTimer=0;_atkBodyYaw=0;
 }
+
+/* 이징 함수 — 부드러운 가감속 */
+function easeOutBack(t){var s=1.7;return 1+(t-1)*(t-1)*((s+1)*(t-1)+s);}
+function easeInQuad(t){return t*t;}
+function easeOutQuad(t){return t*(2-t);}
 
 function tickAtkAnim(dt){
   if(PL.atkPhase===0)return;
   atkAnimTimer+=dt;
   var phases=ATK_PHASES;
+
   if(PL.atkPhase===1){
+    /* 1단계: 준비 — 팔 뒤로 들어올리기 + 몸 살짝 뒤틀기 */
     var t=Math.min(1,atkAnimTimer/phases[1]);
-    PL.armRPivot.rotation.x=t*(-Math.PI*.65);
+    var et=easeOutQuad(t);
+    PL.armRPivot.rotation.x=et*(-Math.PI*.7);
+    PL.armRPivot.rotation.z=et*(-.2);
+    if(PL.armL)PL.armL.rotation.x=et*(-.15);
+    _atkBodyYaw=et*(-.12);
     if(atkAnimTimer>=phases[1]){PL.atkPhase=2;atkAnimTimer=0;}
+
   } else if(PL.atkPhase===2){
+    /* 2단계: 내려찍기 — 빠르고 강하게 */
     var t=Math.min(1,atkAnimTimer/phases[2]);
-    PL.armRPivot.rotation.x=(-Math.PI*.65)+(t*(Math.PI*1.2));
+    var et=easeInQuad(t);
+    PL.armRPivot.rotation.x=(-Math.PI*.7)+(et*(Math.PI*1.4));
+    PL.armRPivot.rotation.z=(-.2)+(et*.4);
+    if(PL.armL)PL.armL.rotation.x=(-.15)+(et*.3);
+    _atkBodyYaw=(-.12)+(et*.24);
+    /* 순간 정지 느낌 — 마지막에 약간 과장 */
     if(atkAnimTimer>=phases[2]){PL.atkPhase=3;atkAnimTimer=0;}
+
   } else if(PL.atkPhase===3){
+    /* 3단계: 복귀 — 부드럽게 원위치 */
     var t=Math.min(1,atkAnimTimer/phases[3]);
-    PL.armRPivot.rotation.x=(Math.PI*.55)*(1-t);
-    if(atkAnimTimer>=phases[3]){PL.atkPhase=0;atkAnimTimer=0;PL.armRPivot.rotation.x=0;}
+    var et=easeOutBack(t);
+    PL.armRPivot.rotation.x=(Math.PI*.7)*(1-et);
+    PL.armRPivot.rotation.z=(.2)*(1-et);
+    if(PL.armL)PL.armL.rotation.x=(.15)*(1-et);
+    _atkBodyYaw=(.12)*(1-et);
+    if(atkAnimTimer>=phases[3]){
+      PL.atkPhase=0;atkAnimTimer=0;
+      PL.armRPivot.rotation.x=0;
+      PL.armRPivot.rotation.z=0;
+      if(PL.armL)PL.armL.rotation.x=0;
+      _atkBodyYaw=0;
+    }
   }
 }
 
