@@ -274,7 +274,17 @@ function playBGM(zone){
     _bgmAudio=new Audio(_bgmFiles[zone]);
     _bgmAudio.loop=true;
     _bgmAudio.volume=_bgmVolume;
-    _bgmAudio.play().catch(function(){});
+    _bgmAudio.play().catch(function(e){
+      console.warn('BGM play failed:',e.message);
+      /* autoplay 차단 시 — 다음 클릭에서 재시도 */
+      var _retryBGM=function(){
+        if(_bgmAudio)_bgmAudio.play().catch(function(){});
+        document.removeEventListener('click',_retryBGM);
+        document.removeEventListener('keydown',_retryBGM);
+      };
+      document.addEventListener('click',_retryBGM);
+      document.addEventListener('keydown',_retryBGM);
+    });
     return;
   }
 
