@@ -247,29 +247,46 @@ var SFX={
   }
 };
 
-/* ════════════ BGM — 앰비언트 드론 ════════════ */
+/* ════════════ BGM — MP3 파일 + 드론 폴백 ════════════ */
+var _bgmAudio=null;
+
+var _bgmFiles={
+  village:'sounds/village_meadow.mp3',
+  meadow:'sounds/village_meadow.mp3'
+};
+
 function stopBGM(){
   _bgmIntervals.forEach(function(id){clearInterval(id);});
   _bgmIntervals=[];
   _bgmOscs.forEach(function(o){try{o.stop();}catch(e){}});
-  _bgmOscs=[];_bgmNode=null;_bgmZone='';
+  _bgmOscs=[];_bgmNode=null;
+  if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;}
+  _bgmZone='';
 }
 
 function playBGM(zone){
   if(zone===_bgmZone)return;
   stopBGM();
   _bgmZone=zone;
-  var ctx=getAudioCtx();if(!ctx)return;
 
+  /* MP3 파일이 있는 존 */
+  if(_bgmFiles[zone]){
+    _bgmAudio=new Audio(_bgmFiles[zone]);
+    _bgmAudio.loop=true;
+    _bgmAudio.volume=_bgmVolume*3;
+    _bgmAudio.play().catch(function(){});
+    return;
+  }
+
+  /* 나머지 존 — 앰비언트 드론 */
+  var ctx=getAudioCtx();if(!ctx)return;
   var chords={
-    village:[262,330,392],meadow:[294,370,440],
     swamp:[131,165,196],darkforest:[147,175,220],
     jungle:[196,247,294],volcano:[110,139,165],
     boss:[98,123,147]
   };
-  var notes=chords[zone]||chords.village;
+  var notes=chords[zone]||[196,247,294];
 
-  /* 부드러운 드론 — 로우패스 필터 + 저볼륨 */
   for(var i=0;i<notes.length;i++){
     var osc=ctx.createOscillator();
     var lp=ctx.createBiquadFilter();
@@ -283,4 +300,4 @@ function playBGM(zone){
 }
 
 function setSfxVolume(v){_sfxVolume=Math.max(0,Math.min(1,v));}
-function setBgmVolume(v){_bgmVolume=Math.max(0,Math.min(1,v));}
+function setBgmVolume(v){_bgmVolume=Math.max(0,Math.min(1,v));if(_bgmAudio)_bgmAudio.volume=_bgmVolume*3;}
