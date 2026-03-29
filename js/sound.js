@@ -202,8 +202,8 @@ var SFX={
   /* 걷기 — 거의 안 들림 */
   _lastStep:0,
   step:function(){
-    var now=Date.now();if(now-SFX._lastStep<400)return;SFX._lastStep=now;
-    playFilteredNoise(0.03,0.02,1500,300);
+    var now=Date.now();if(now-SFX._lastStep<350)return;SFX._lastStep=now;
+    playFilteredNoise(0.05,0.12,1200,200);
   },
   /* UI 클릭 */
   click:function(){playChime(800,0.03,0.04);},
