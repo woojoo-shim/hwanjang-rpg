@@ -1,11 +1,10 @@
 @font-face{
-  font-family:'BoldPixels';
-  src:url('../fonts/boldpixels.woff2') format('woff2'),
-      url('../fonts/boldpixels.woff') format('woff');
+  font-family:'PixelRoborobo';
+  src:url('../fonts/pixelroborobo.otf') format('opentype');
   font-weight:normal;font-style:normal;font-display:swap;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:'BoldPixels','Malgun Gothic','Apple SD Gothic Neo',sans-serif;}
+html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:'PixelRoborobo','Malgun Gothic','Apple SD Gothic Neo',sans-serif;}
 .screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .5s;}
 .screen.hidden{opacity:0;pointer-events:none;}
 #bg-stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
