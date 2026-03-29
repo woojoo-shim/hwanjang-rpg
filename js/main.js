@@ -135,19 +135,10 @@ function enterGame(){
         if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
-      /* BGM 시작 — 첫 유저 상호작용 후 */
-      var _bgmStarted=false;
-      function _startBGM(){
-        if(_bgmStarted)return;_bgmStarted=true;
-        _bgmZone='';/* 강제 초기화 — 첫 시작 시 반드시 재생 */
-        if(typeof playBGM==='function')playBGM(currentZone||'village');
-        document.removeEventListener('keydown',_startBGM);
-        document.removeEventListener('click',_startBGM);
-        document.removeEventListener('mousedown',_startBGM);
-      }
-      document.addEventListener('keydown',_startBGM);
-      document.addEventListener('click',_startBGM);
-      document.addEventListener('mousedown',_startBGM);
+      /* BGM 즉시 시작 — 로그인 과정에서 이미 유저 상호작용 발생했으므로 autoplay 허용됨 */
+      _bgmZone='';
+      if(typeof getAudioCtx==='function')getAudioCtx();/* AudioContext resume */
+      if(typeof playBGM==='function')playBGM(currentZone||'village');
       loop();
     }catch(e){console.error('initScene error',e);}
   },100);
