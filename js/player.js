@@ -124,59 +124,178 @@ function refreshWeaponMesh(){
 
 /* 공격 애니메이션 상태 */
 var atkAnimTimer=0;
-var ATK_PHASES=[0,.1,.08,.15];
-var _atkBodyYaw=0;/* 공격 시 몸 회전 보존 */
+var _atkBodyYaw=0;
+var _atkCombo=0;/* 콤보 카운터 0,1,2 */
+var _comboTimer=0;/* 콤보 유효 시간 */
+var _hitStop=0;/* 히트스톱 타이머 */
 
 function triggerAtkAnim(){
-  PL.atkPhase=1;atkAnimTimer=0;_atkBodyYaw=0;
+  /* 콤보: 복귀 중이면 다음 콤보 */
+  if(_comboTimer>0&&_atkCombo<2)_atkCombo++;
+  else _atkCombo=0;
+  PL.atkPhase=1;atkAnimTimer=0;_atkBodyYaw=0;_comboTimer=0.6;
 }
 
-/* 이징 함수 — 부드러운 가감속 */
+function triggerHitStop(){_hitStop=0.04;}
+
+/* 이징 함수 */
 function easeOutBack(t){var s=1.7;return 1+(t-1)*(t-1)*((s+1)*(t-1)+s);}
 function easeInQuad(t){return t*t;}
 function easeOutQuad(t){return t*(2-t);}
+function easeOutElastic(t){if(t===0||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t-.075)*2*Math.PI/.3)+1;}
+
+/* 무기 타입별 모션 파라미터 */
+function getAtkStyle(){
+  var wep=equipped&&equipped.weapon?ITEM_POOL.find(function(x){return x.id===equipped.weapon;}):null;
+  if(wep&&wep.id.indexOf('bow')!==-1)return 'bow';
+  if(wep&&(wep.id.indexOf('staff')!==-1||wep.id.indexOf('fire_staff')!==-1))return 'staff';
+  return 'sword';/* 기본 근접 */
+}
 
 function tickAtkAnim(dt){
+  if(_comboTimer>0)_comboTimer-=dt;
   if(PL.atkPhase===0)return;
+  /* 히트스톱 */
+  if(_hitStop>0){_hitStop-=dt;return;}
   atkAnimTimer+=dt;
-  var phases=ATK_PHASES;
+
+  var style=getAtkStyle();
+  /* 콤보별 다른 타이밍 */
+  var speeds=[1.0,1.15,0.9];
+  var spdMul=speeds[_atkCombo]||1.0;
+
+  if(style==='sword'){
+    tickSwordAnim(dt,spdMul);
+  }else if(style==='bow'){
+    tickBowAnim(dt);
+  }else if(style==='staff'){
+    tickStaffAnim(dt);
+  }
+}
+
+function tickSwordAnim(dt,spdMul){
+  /* 콤보별 공격 방향 변경 */
+  var combo=_atkCombo;
+  /* 0=오른쪽 베기, 1=왼쪽 베기, 2=내려찍기 */
 
   if(PL.atkPhase===1){
-    /* 1단계: 준비 — 팔 뒤로 들어올리기 + 몸 살짝 뒤틀기 */
-    var t=Math.min(1,atkAnimTimer/phases[1]);
+    /* 준비 — 팔+몸 뒤로 */
+    var dur=0.08/spdMul;
+    var t=Math.min(1,atkAnimTimer/dur);
     var et=easeOutQuad(t);
-    PL.armRPivot.rotation.x=et*(-Math.PI*.7);
-    PL.armRPivot.rotation.z=et*(-.2);
-    if(PL.armL)PL.armL.rotation.x=et*(-.15);
-    _atkBodyYaw=et*(-.12);
-    if(atkAnimTimer>=phases[1]){PL.atkPhase=2;atkAnimTimer=0;}
-
-  } else if(PL.atkPhase===2){
-    /* 2단계: 내려찍기 — 빠르고 강하게 */
-    var t=Math.min(1,atkAnimTimer/phases[2]);
-    var et=easeInQuad(t);
-    PL.armRPivot.rotation.x=(-Math.PI*.7)+(et*(Math.PI*1.4));
-    PL.armRPivot.rotation.z=(-.2)+(et*.4);
-    if(PL.armL)PL.armL.rotation.x=(-.15)+(et*.3);
-    _atkBodyYaw=(-.12)+(et*.24);
-    /* 순간 정지 느낌 — 마지막에 약간 과장 */
-    if(atkAnimTimer>=phases[2]){PL.atkPhase=3;atkAnimTimer=0;}
-
-  } else if(PL.atkPhase===3){
-    /* 3단계: 복귀 — 부드럽게 원위치 */
-    var t=Math.min(1,atkAnimTimer/phases[3]);
-    var et=easeOutBack(t);
-    PL.armRPivot.rotation.x=(Math.PI*.7)*(1-et);
-    PL.armRPivot.rotation.z=(.2)*(1-et);
-    if(PL.armL)PL.armL.rotation.x=(.15)*(1-et);
-    _atkBodyYaw=(.12)*(1-et);
-    if(atkAnimTimer>=phases[3]){
-      PL.atkPhase=0;atkAnimTimer=0;
-      PL.armRPivot.rotation.x=0;
+    if(combo===0){
+      PL.armRPivot.rotation.x=et*(-Math.PI*.6);
+      PL.armRPivot.rotation.z=et*(-.4);
+      _atkBodyYaw=et*(-.2);
+      if(PL.armL)PL.armL.rotation.x=et*(-.1);
+    }else if(combo===1){
+      PL.armRPivot.rotation.x=et*(-Math.PI*.5);
+      PL.armRPivot.rotation.z=et*(.3);
+      _atkBodyYaw=et*(.15);
+      if(PL.armL)PL.armL.rotation.x=et*(.1);
+    }else{
+      PL.armRPivot.rotation.x=et*(-Math.PI*.9);
       PL.armRPivot.rotation.z=0;
+      _atkBodyYaw=0;
+      if(PL.armL)PL.armL.rotation.x=et*(-.2);
+      /* 내려찍기: 살짝 점프 */
+      if(PL.group&&typeof insideBuilding==='undefined'||!insideBuilding){
+        PL.group.position.y+=(et<.5?et*2:(1-et)*2)*.3;
+      }
+    }
+    /* 다리 구부리기 */
+    if(PL.legL)PL.legL.rotation.x=et*(-.15);
+    if(PL.legR)PL.legR.rotation.x=et*(.1);
+    if(atkAnimTimer>=dur){PL.atkPhase=2;atkAnimTimer=0;}
+
+  }else if(PL.atkPhase===2){
+    /* 스윙 — 빠르고 강하게 */
+    var dur=0.06/spdMul;
+    var t=Math.min(1,atkAnimTimer/dur);
+    var et=easeInQuad(t);
+    if(combo===0){
+      PL.armRPivot.rotation.x=(-Math.PI*.6)+(et*(Math.PI*1.3));
+      PL.armRPivot.rotation.z=(-.4)+(et*.8);
+      _atkBodyYaw=(-.2)+(et*.4);
+      if(PL.armL)PL.armL.rotation.x=(-.1)+(et*.25);
+    }else if(combo===1){
+      PL.armRPivot.rotation.x=(-Math.PI*.5)+(et*(Math.PI*1.2));
+      PL.armRPivot.rotation.z=(.3)+(et*(-.7));
+      _atkBodyYaw=(.15)+(et*(-.35));
+      if(PL.armL)PL.armL.rotation.x=(.1)+(et*(-.2));
+    }else{
+      PL.armRPivot.rotation.x=(-Math.PI*.9)+(et*(Math.PI*1.6));
+      PL.armRPivot.rotation.z=0;
+      _atkBodyYaw=et*(-.05);
+      if(PL.armL)PL.armL.rotation.x=(-.2)+(et*.4);
+    }
+    /* 다리 전진 */
+    if(PL.legL)PL.legL.rotation.x=(-.15)+(et*.3);
+    if(PL.legR)PL.legR.rotation.x=(.1)+(et*(-.2));
+    if(atkAnimTimer>=dur){PL.atkPhase=3;atkAnimTimer=0;}
+
+  }else if(PL.atkPhase===3){
+    /* 복귀 — 이징으로 부드럽게 */
+    var dur=0.18/spdMul;
+    var t=Math.min(1,atkAnimTimer/dur);
+    var et=easeOutElastic(t);
+    /* 현재 값에서 0으로 보간 */
+    PL.armRPivot.rotation.x*=(1-et);
+    PL.armRPivot.rotation.z*=(1-et);
+    _atkBodyYaw*=(1-et);
+    if(PL.armL)PL.armL.rotation.x*=(1-et);
+    if(PL.legL)PL.legL.rotation.x*=(1-et);
+    if(PL.legR)PL.legR.rotation.x*=(1-et);
+    if(atkAnimTimer>=dur){
+      PL.atkPhase=0;atkAnimTimer=0;
+      PL.armRPivot.rotation.x=0;PL.armRPivot.rotation.z=0;
       if(PL.armL)PL.armL.rotation.x=0;
+      if(PL.legL)PL.legL.rotation.x=0;
+      if(PL.legR)PL.legR.rotation.x=0;
       _atkBodyYaw=0;
     }
+  }
+}
+
+/* ── 활 공격 모션 ── */
+function tickBowAnim(dt){
+  if(PL.atkPhase===1){
+    var t=Math.min(1,atkAnimTimer/0.15);var et=easeOutQuad(t);
+    PL.armRPivot.rotation.x=et*(-Math.PI*.3);PL.armRPivot.rotation.z=et*(-.1);
+    if(PL.armL){PL.armL.rotation.x=et*(-Math.PI*.4);PL.armL.rotation.z=et*(.15);}
+    _atkBodyYaw=et*(-.08);
+    if(atkAnimTimer>=0.15){PL.atkPhase=2;atkAnimTimer=0;}
+  }else if(PL.atkPhase===2){
+    var t=Math.min(1,atkAnimTimer/0.05);var et=easeInQuad(t);
+    PL.armRPivot.rotation.x=(-Math.PI*.3)+(et*(.5));
+    if(PL.armL)PL.armL.rotation.x=(-Math.PI*.4)+(et*(.2));
+    _atkBodyYaw=(-.08)+(et*(.04));
+    if(atkAnimTimer>=0.05){PL.atkPhase=3;atkAnimTimer=0;}
+  }else if(PL.atkPhase===3){
+    var t=Math.min(1,atkAnimTimer/0.2);var et=easeOutBack(t);
+    PL.armRPivot.rotation.x*=(1-et);PL.armRPivot.rotation.z*=(1-et);
+    if(PL.armL){PL.armL.rotation.x*=(1-et);PL.armL.rotation.z*=(1-et);}
+    _atkBodyYaw*=(1-et);
+    if(atkAnimTimer>=0.2){PL.atkPhase=0;atkAnimTimer=0;PL.armRPivot.rotation.set(0,0,0);if(PL.armL){PL.armL.rotation.x=0;PL.armL.rotation.z=0;}_atkBodyYaw=0;}
+  }
+}
+
+/* ── 지팡이 공격 모션 ── */
+function tickStaffAnim(dt){
+  if(PL.atkPhase===1){
+    var t=Math.min(1,atkAnimTimer/0.12);var et=easeOutQuad(t);
+    PL.armRPivot.rotation.x=et*(-Math.PI*.8);PL.armRPivot.rotation.z=et*(-.15);_atkBodyYaw=et*(-.1);
+    if(atkAnimTimer>=0.12){PL.atkPhase=2;atkAnimTimer=0;}
+  }else if(PL.atkPhase===2){
+    var t=Math.min(1,atkAnimTimer/0.15);var angle=t*Math.PI*2;
+    PL.armRPivot.rotation.x=(-Math.PI*.3)+Math.sin(angle)*1.2;PL.armRPivot.rotation.z=Math.cos(angle)*.4;
+    _atkBodyYaw=Math.sin(angle)*.15;if(PL.armL)PL.armL.rotation.x=Math.sin(angle+Math.PI)*.2;
+    if(atkAnimTimer>=0.15){PL.atkPhase=3;atkAnimTimer=0;}
+  }else if(PL.atkPhase===3){
+    var t=Math.min(1,atkAnimTimer/0.2);var et=easeOutElastic(t);
+    PL.armRPivot.rotation.x*=(1-et);PL.armRPivot.rotation.z*=(1-et);
+    if(PL.armL)PL.armL.rotation.x*=(1-et);_atkBodyYaw*=(1-et);
+    if(atkAnimTimer>=0.2){PL.atkPhase=0;atkAnimTimer=0;PL.armRPivot.rotation.set(0,0,0);if(PL.armL)PL.armL.rotation.x=0;_atkBodyYaw=0;}
   }
 }
 
@@ -256,6 +375,7 @@ function updateArrows(dt){
         m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
         spawnDmgNum('-'+a.dmg,'#ffdd44');
         if(typeof SFX!=='undefined')SFX.hit();
+        triggerHitStop();
         flashMonster(m);
         m.state='aggro';
         var midx=monsters.indexOf(m);
@@ -487,6 +607,7 @@ function playerAttack(){
   target.hp=Math.max(0,target.hp-dmg);
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
   if(typeof SFX!=='undefined')SFX.hit();
+  triggerHitStop();
   /* 성기사 패시브: 흡혈 */
   if(cls.passive==='lifesteal'){var heal=Math.floor(dmg*0.05);playerHP=Math.min(playerMaxHP,playerHP+heal);updPlayerHpBar();}
   /* 주술사 패시브: 독 */
