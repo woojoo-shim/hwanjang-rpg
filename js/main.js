@@ -171,7 +171,35 @@ function updTime(){
 }
 
 /* ── 입력 ── */
-var keys={},cYaw=0,cPitch=0.75,isDrag=false,lmx=0,lmy=0;
+var keys={},cYaw=0,cPitch=0.75,isDrag=false,lmx=0,lmy=0,camSensitivity=1.0;
+
+/* ── ESC 메뉴 ── */
+var _escMenuOpen=false;
+function openEscMenu(){
+  var m=document.getElementById('esc-menu');
+  m.style.display='flex';
+  _escMenuOpen=true;
+  /* 현재 볼륨을 슬라이더에 반영 */
+  document.getElementById('esc-sfx-vol').value=Math.round(_sfxVolume*100);
+  document.getElementById('esc-bgm-vol').value=Math.round(_bgmVolume*100);
+}
+function closeEscMenu(){
+  document.getElementById('esc-menu').style.display='none';
+  _escMenuOpen=false;
+}
+/* 이벤트 바인딩 — DOM 로드 후 */
+document.addEventListener('DOMContentLoaded',function(){
+  var resumeBtn=document.getElementById('esc-resume');
+  var logoutBtn=document.getElementById('esc-logout');
+  var sfxSlider=document.getElementById('esc-sfx-vol');
+  var bgmSlider=document.getElementById('esc-bgm-vol');
+  var camSlider=document.getElementById('esc-cam-sens');
+  if(resumeBtn)resumeBtn.addEventListener('click',closeEscMenu);
+  if(logoutBtn)logoutBtn.addEventListener('click',function(){closeEscMenu();logout();});
+  if(sfxSlider)sfxSlider.addEventListener('input',function(){if(typeof setSfxVolume==='function')setSfxVolume(this.value/100);});
+  if(bgmSlider)bgmSlider.addEventListener('input',function(){if(typeof setBgmVolume==='function')setBgmVolume(this.value/100);});
+  if(camSlider)camSlider.addEventListener('input',function(){if(typeof camSensitivity!=='undefined')camSensitivity=this.value/100;});
+});
 
 function setupInput(){
   /* e.code 기반 키 매핑 — 한/영 상관없이 작동 */
@@ -187,6 +215,23 @@ function setupInput(){
     keys[k]=true;
     var _ae=document.activeElement;
     var isInput=_ae===document.getElementById('dmsg')||_ae===document.getElementById('cin')||(_ae&&(_ae.tagName==='INPUT'||_ae.tagName==='TEXTAREA'));
+    /* ESC 메뉴 */
+    if(e.key==='Escape'){
+      e.preventDefault();
+      var escMenu=document.getElementById('esc-menu');
+      if(escMenu.style.display==='flex'){
+        closeEscMenu();
+      }else{
+        /* 다른 UI가 열려있으면 그것부터 닫기 */
+        if(document.getElementById('dbox').classList.contains('show')){closeDialog();return;}
+        if(invOpen){closeInv();return;}
+        if(shopOpen){closeShop();return;}
+        openEscMenu();
+      }
+      return;
+    }
+    /* ESC 메뉴가 열려있으면 다른 키 무시 */
+    if(document.getElementById('esc-menu').style.display==='flex')return;
     if(k==='e'&&!isInput){
       e.preventDefault();
       /* 건물 내부 → NPC 대화 우선, 나가기 카펫 위에서만 나가기 */
@@ -229,8 +274,8 @@ function setupInput(){
   });
   document.addEventListener('mousemove',function(e){
     if(!isDrag)return;
-    cYaw-=(e.clientX-lmx)*.007;
-    cPitch-=(e.clientY-lmy)*.005;
+    cYaw-=(e.clientX-lmx)*.007*camSensitivity;
+    cPitch-=(e.clientY-lmy)*.005*camSensitivity;
     cPitch=Math.max(.05,Math.min(1.2,cPitch));
     lmx=e.clientX;lmy=e.clientY;
   });
@@ -238,8 +283,8 @@ function setupInput(){
   cc.addEventListener('touchstart',function(e){if(e.touches.length===1){isDrag=true;lmx=e.touches[0].clientX;lmy=e.touches[0].clientY;}},{passive:true});
   cc.addEventListener('touchmove',function(e){
     if(!isDrag||e.touches.length!==1)return;
-    cYaw-=(e.touches[0].clientX-lmx)*.007;
-    cPitch-=(e.touches[0].clientY-lmy)*.005;
+    cYaw-=(e.touches[0].clientX-lmx)*.007*camSensitivity;
+    cPitch-=(e.touches[0].clientY-lmy)*.005*camSensitivity;
     cPitch=Math.max(.05,Math.min(1.2,cPitch));
     lmx=e.touches[0].clientX;lmy=e.touches[0].clientY;
   },{passive:true});
@@ -266,6 +311,8 @@ function loop(){
     requestAnimationFrame(_tick);
   try{
     var now=Date.now(),dt=Math.min((now-lastT)/1000,.05);lastT=now;
+    /* ESC 메뉴 열려있으면 게임 일시정지 (렌더링만) */
+    if(_escMenuOpen){renderer.render(scene,camera);return;}
     var dialogOpen=_dboxEl&&_dboxEl.classList.contains('show');
     if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
     else tickAtkAnim(dt);

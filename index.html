@@ -104,6 +104,27 @@
   </div>
 </div>
 
+<!-- ESC 메뉴 -->
+<div id="esc-menu" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:10000;justify-content:center;align-items:center;">
+  <div style="background:#1a1a2e;border:2px solid #c9a84c88;border-radius:12px;padding:30px 40px;min-width:280px;text-align:center;">
+    <div style="color:#c9a84c;font-size:18px;letter-spacing:3px;margin-bottom:24px;font-weight:bold;">▣ 메 뉴 ▣</div>
+    <div style="margin-bottom:12px;">
+      <div style="color:#aaa;font-size:11px;margin-bottom:4px;">🔊 효과음</div>
+      <input type="range" id="esc-sfx-vol" min="0" max="100" value="25" style="width:200px;accent-color:#c9a84c;"/>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="color:#aaa;font-size:11px;margin-bottom:4px;">🎵 배경음악</div>
+      <input type="range" id="esc-bgm-vol" min="0" max="100" value="4" style="width:200px;accent-color:#c9a84c;"/>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="color:#aaa;font-size:11px;margin-bottom:4px;">🖱️ 카메라 감도</div>
+      <input type="range" id="esc-cam-sens" min="10" max="200" value="100" style="width:200px;accent-color:#c9a84c;"/>
+    </div>
+    <button id="esc-resume" style="width:100%;background:#c9a84c;color:#1a1a2e;border:none;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-bottom:8px;border-radius:6px;">게임으로 돌아가기</button>
+    <button id="esc-logout" style="width:100%;background:transparent;color:#aa6666;border:1px solid #aa666644;padding:10px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;border-radius:6px;">로그아웃</button>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- 퀘스트 알림 -->
