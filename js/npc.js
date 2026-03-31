@@ -563,6 +563,10 @@ async function askAI(npcName,userMsg){
       },800);
     }
     var qp=parseQuest(pp.clean);
+    /* AI가 태그를 안 넣었으면 자동 생성 시도 */
+    if(!qp.quest){
+      qp=autoDetectQuest(pp.clean,npcName);
+    }
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
     }

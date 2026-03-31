@@ -32,6 +32,64 @@ function parseQuest(reply){
   return{clean:clean,quest:q};
 }
 
+/* ── AI 응답에서 퀘스트 자동 감지 ── */
+var _questMonsters=['토끼','사슴','슬라임','독두꺼비','고블린','늑대','용암 골렘','파이어드레이크','정글 거미','독사','숲 유인원','정글 표범','거대 모기','나무 정령'];
+var _questItems=['deer_meat','rabbit_liver','magic_crystal','star_fragment','dragon_scale','deer_antler'];
+
+function autoDetectQuest(reply,npcName){
+  /* 처치/토벌 키워드 + 몬스터 이름 감지 */
+  var killWords=['처치','퇴치','토벌','잡아','사냥','소탕','제거','해치워'];
+  var collectWords=['모아','수집','가져','구해','찾아'];
+  var foundMonster=null,foundItem=null,foundType=null,foundCount=3;
+
+  for(var i=0;i<_questMonsters.length;i++){
+    if(reply.indexOf(_questMonsters[i])!==-1){foundMonster=_questMonsters[i];break;}
+  }
+  for(var j=0;j<_questItems.length;j++){
+    if(reply.indexOf(_questItems[j])!==-1){foundItem=_questItems[j];break;}
+  }
+
+  var isKill=false,isCollect=false;
+  for(var k=0;k<killWords.length;k++){if(reply.indexOf(killWords[k])!==-1){isKill=true;break;}}
+  for(var l=0;l<collectWords.length;l++){if(reply.indexOf(collectWords[l])!==-1){isCollect=true;break;}}
+
+  /* 숫자 감지 */
+  var numMatch=reply.match(/(\d+)\s*(?:마리|개|명)/);
+  if(numMatch)foundCount=parseInt(numMatch[1])||3;
+
+  if(isKill&&foundMonster){
+    foundType='kill';
+    var q={
+      id:'quest_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      name:foundMonster+' 토벌',
+      desc:npcName+'의 의뢰: '+foundMonster+'를 '+foundCount+'마리 처치',
+      type:'kill',
+      target:foundMonster,
+      count:foundCount,
+      rewardType:'gold',
+      rewardAmount:''+(foundCount*50),
+      ready:false
+    };
+    return{clean:reply,quest:q};
+  }
+  if(isCollect&&foundItem){
+    var itemName=foundItem.replace(/_/g,' ');
+    var q2={
+      id:'quest_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      name:itemName+' 수집',
+      desc:npcName+'의 의뢰: '+itemName+'을(를) '+foundCount+'개 수집',
+      type:'collect',
+      target:foundItem,
+      count:foundCount,
+      rewardType:'exp',
+      rewardAmount:''+(foundCount*100),
+      ready:false
+    };
+    return{clean:reply,quest:q2};
+  }
+  return{clean:reply,quest:null};
+}
+
 /* ── 퀘스트 알림 UI ── */
 function showQuestNotif(q,npcName){
   q.npc=npcName;
