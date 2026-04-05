@@ -277,7 +277,7 @@ function setupInput(){
     if(!isDrag)return;
     cYaw-=(e.clientX-lmx)*.007*camSensitivity;
     cPitch-=(e.clientY-lmy)*.005*camSensitivity;
-    cPitch=Math.max(.05,Math.min(1.2,cPitch));
+    cPitch=Math.max(-0.3,Math.min(1.5,cPitch));
     lmx=e.clientX;lmy=e.clientY;
   });
   document.addEventListener('mouseup',function(){isDrag=false;cc.style.cursor='grab';});
@@ -286,7 +286,7 @@ function setupInput(){
     if(!isDrag||e.touches.length!==1)return;
     cYaw-=(e.touches[0].clientX-lmx)*.007*camSensitivity;
     cPitch-=(e.touches[0].clientY-lmy)*.005*camSensitivity;
-    cPitch=Math.max(.05,Math.min(1.2,cPitch));
+    cPitch=Math.max(-0.3,Math.min(1.5,cPitch));
     lmx=e.touches[0].clientX;lmy=e.touches[0].clientY;
   },{passive:true});
   cc.addEventListener('touchend',function(){isDrag=false;},{passive:true});
