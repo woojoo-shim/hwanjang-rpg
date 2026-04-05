@@ -9,6 +9,13 @@ var _camTouchId=-1,_camLX=0,_camLY=0;
 function initMobileControls(){
   if(!isMobile)return;
 
+  /* 가로 모드 잠금 시도 (전체화면 시) */
+  try{
+    if(screen.orientation&&screen.orientation.lock){
+      screen.orientation.lock('landscape').catch(function(){});
+    }
+  }catch(e){}
+
   /* ── 뷰포트 메타 ── */
   var meta=document.querySelector('meta[name="viewport"]');
   if(!meta){meta=document.createElement('meta');meta.name='viewport';document.head.appendChild(meta);}
