@@ -392,13 +392,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
 .pm-hpbar{height:4px;background:#1a1a2a;border:1px solid #2a2a4a;overflow:hidden;}
 .pm-hpfill{height:100%;background:linear-gradient(90deg,#3a8,#7f4);transition:width .3s;}
 
-/* ════════════ 모바일 세로 모드 경고 ════════════ */
-#rotate-warning{display:none;position:fixed;inset:0;z-index:9999;background:#06060f;color:#c9a84c;flex-direction:column;align-items:center;justify-content:center;font-size:18px;gap:16px;}
-#rotate-warning .rotate-icon{font-size:60px;animation:rotatePhone 2s ease-in-out infinite;}
-@keyframes rotatePhone{0%,100%{transform:rotate(0deg);}50%{transform:rotate(90deg);}}
+/* ════════════ 모바일 세로 → 강제 가로 회전 ════════════ */
+#rotate-warning{display:none!important;}
 @media(max-width:768px) and (orientation:portrait){
-  #rotate-warning{display:flex!important;}
-  #game-screen,#login-screen,#nick-screen,#load-screen{display:none!important;}
+  html{
+    width:100vh!important;height:100vw!important;
+    transform:rotate(90deg);transform-origin:top left;
+    position:absolute;top:0;left:100vw;
+    overflow:hidden;
+  }
 }
 
 /* ════════════ 모바일 반응형 ════════════ */
