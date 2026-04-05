@@ -183,6 +183,9 @@ function openEscMenu(){
   /* 현재 볼륨을 슬라이더에 반영 */
   document.getElementById('esc-sfx-vol').value=Math.round(_sfxVolume*100);
   document.getElementById('esc-bgm-vol').value=Math.round(_bgmVolume*100);
+  /* 모바일에서만 컨트롤 설정 버튼 표시 */
+  var ctrlBtn=document.getElementById('esc-ctrl');
+  if(ctrlBtn)ctrlBtn.style.display=(typeof isMobile!=='undefined'&&isMobile)?'block':'none';
 }
 function closeEscMenu(){
   document.getElementById('esc-menu').style.display='none';

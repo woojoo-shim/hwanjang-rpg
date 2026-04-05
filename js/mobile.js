@@ -181,9 +181,145 @@ function hideMobileControls(){
   if(mb)mb.style.display='none';
 }
 
+/* ════════════ 컨트롤 커스터마이즈 ════════════ */
+var _mobileSettings=null;
+var _editMode=false;
+var _editTarget=null;
+
+function loadMobileSettings(){
+  try{
+    var s=localStorage.getItem('mobileCtrl');
+    if(s)_mobileSettings=JSON.parse(s);
+  }catch(e){}
+  if(!_mobileSettings)_mobileSettings={
+    joy:{x:20,y:120,size:140},
+    btns:{x:20,y:100},
+    btnSize:1.0
+  };
+}
+
+function saveMobileSettings(){
+  try{localStorage.setItem('mobileCtrl',JSON.stringify(_mobileSettings));}catch(e){}
+}
+
+function applyMobileSettings(){
+  var s=_mobileSettings;
+  var jw=document.getElementById('joy-wrap');
+  var mb=document.getElementById('mobile-btns');
+  if(jw){
+    jw.style.left=s.joy.x+'px';
+    jw.style.bottom=s.joy.y+'px';
+    jw.style.width=s.joy.size+'px';
+    jw.style.height=s.joy.size+'px';
+    var base=document.getElementById('joy-base');
+    if(base){base.style.width=s.joy.size+'px';base.style.height=s.joy.size+'px';}
+    var knob=document.getElementById('joy-knob');
+    if(knob){
+      var ks=s.joy.size*0.36;
+      knob.style.width=ks+'px';knob.style.height=ks+'px';
+      knob.style.left=(s.joy.size-ks)/2+'px';knob.style.top=(s.joy.size-ks)/2+'px';
+    }
+  }
+  if(mb){
+    mb.style.right=s.btns.x+'px';
+    mb.style.bottom=s.btns.y+'px';
+    var scale=s.btnSize||1.0;
+    mb.querySelectorAll('div').forEach(function(btn){
+      if(btn.id&&btn.id.indexOf('m-')===0){
+        btn.style.transform='scale('+scale+')';
+      }
+    });
+  }
+}
+
+function openControlSettings(){
+  if(!isMobile)return;
+  _editMode=true;
+  loadMobileSettings();
+
+  /* 설정 오버레이 */
+  var ov=document.createElement('div');
+  ov.id='ctrl-settings-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none;';
+
+  var panel=document.createElement('div');
+  panel.style.cssText='background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;padding:20px;width:85vw;max-width:400px;color:#f0e4bb;font-size:14px;';
+
+  panel.innerHTML='<div style="text-align:center;font-size:18px;margin-bottom:15px;color:#c9a84c;">⚙️ 컨트롤 설정</div>'+
+    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 크기</label><br>'+
+    '<input type="range" id="ctrl-joy-size" min="80" max="220" value="'+_mobileSettings.joy.size+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="margin-bottom:12px;"><label>🔘 버튼 크기</label><br>'+
+    '<input type="range" id="ctrl-btn-size" min="0.5" max="2.0" step="0.1" value="'+(_mobileSettings.btnSize||1.0)+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 X 위치</label><br>'+
+    '<input type="range" id="ctrl-joy-x" min="0" max="300" value="'+_mobileSettings.joy.x+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 Y 위치 (하단)</label><br>'+
+    '<input type="range" id="ctrl-joy-y" min="20" max="300" value="'+_mobileSettings.joy.y+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="margin-bottom:12px;"><label>🔘 버튼 X 위치 (우측)</label><br>'+
+    '<input type="range" id="ctrl-btn-x" min="0" max="200" value="'+_mobileSettings.btns.x+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="margin-bottom:12px;"><label>🔘 버튼 Y 위치 (하단)</label><br>'+
+    '<input type="range" id="ctrl-btn-y" min="20" max="300" value="'+_mobileSettings.btns.y+'" style="width:100%;accent-color:#c9a84c;"></div>'+
+    '<div style="display:flex;gap:10px;margin-top:15px;">'+
+    '<button id="ctrl-save" style="flex:1;background:#c9a84c;color:#0c0c1e;border:none;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">저장</button>'+
+    '<button id="ctrl-reset" style="flex:1;background:transparent;color:#c9a84c;border:1px solid #c9a84c;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">초기화</button>'+
+    '<button id="ctrl-close" style="flex:1;background:#333;color:#fff;border:none;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">닫기</button>'+
+    '</div>';
+
+  ov.appendChild(panel);
+  document.body.appendChild(ov);
+
+  /* 실시간 미리보기 */
+  function updatePreview(){
+    _mobileSettings.joy.size=parseInt(document.getElementById('ctrl-joy-size').value);
+    _mobileSettings.joy.x=parseInt(document.getElementById('ctrl-joy-x').value);
+    _mobileSettings.joy.y=parseInt(document.getElementById('ctrl-joy-y').value);
+    _mobileSettings.btns.x=parseInt(document.getElementById('ctrl-btn-x').value);
+    _mobileSettings.btns.y=parseInt(document.getElementById('ctrl-btn-y').value);
+    _mobileSettings.btnSize=parseFloat(document.getElementById('ctrl-btn-size').value);
+    applyMobileSettings();
+  }
+
+  ['ctrl-joy-size','ctrl-btn-size','ctrl-joy-x','ctrl-joy-y','ctrl-btn-x','ctrl-btn-y'].forEach(function(id){
+    document.getElementById(id).addEventListener('input',updatePreview);
+  });
+
+  document.getElementById('ctrl-save').addEventListener('click',function(){
+    updatePreview();
+    saveMobileSettings();
+    ov.remove();
+    _editMode=false;
+    if(typeof addChat==='function')addChat('sys','[시스템]','컨트롤 설정이 저장되었습니다.');
+  });
+
+  document.getElementById('ctrl-reset').addEventListener('click',function(){
+    _mobileSettings={joy:{x:20,y:120,size:140},btns:{x:20,y:100},btnSize:1.0};
+    document.getElementById('ctrl-joy-size').value=140;
+    document.getElementById('ctrl-btn-size').value=1.0;
+    document.getElementById('ctrl-joy-x').value=20;
+    document.getElementById('ctrl-joy-y').value=120;
+    document.getElementById('ctrl-btn-x').value=20;
+    document.getElementById('ctrl-btn-y').value=100;
+    applyMobileSettings();
+  });
+
+  document.getElementById('ctrl-close').addEventListener('click',function(){
+    ov.remove();
+    _editMode=false;
+  });
+}
+
+/* 게임 시작 후 저장된 설정 적용 */
+function initMobileSettings(){
+  if(!isMobile)return;
+  loadMobileSettings();
+  applyMobileSettings();
+}
+
 /* 게임 시작 후 호출 */
 if(typeof document!=='undefined'){
   document.addEventListener('DOMContentLoaded',function(){
-    setTimeout(initMobileControls,500);
+    setTimeout(function(){
+      initMobileControls();
+      initMobileSettings();
+    },500);
   });
 }
