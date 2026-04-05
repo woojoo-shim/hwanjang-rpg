@@ -26,6 +26,7 @@ function initMobileControls(){
   joyKnob.style.cssText='width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.6);position:absolute;left:45px;top:45px;transition:none;';
   joyBase.appendChild(joyKnob);
   joyWrap.appendChild(joyBase);
+  joyWrap.style.display='none'; /* 게임 진입 전 숨김 */
   document.body.appendChild(joyWrap);
 
   /* ── 액션 버튼 (오른쪽 하단) ── */
@@ -62,6 +63,7 @@ function initMobileControls(){
     },{passive:false});
     btnWrap.appendChild(btn);
   });
+  btnWrap.style.display='none'; /* 게임 진입 전 숨김 */
   document.body.appendChild(btnWrap);
 
   /* ── 조이스틱 터치 이벤트 ── */
@@ -157,10 +159,24 @@ function initMobileControls(){
   if(hud)hud.style.fontSize='11px';
 }
 
+/* 게임 화면 진입 시 컨트롤 표시 */
+function showMobileControls(){
+  if(!isMobile)return;
+  var jw=document.getElementById('joy-wrap');
+  var mb=document.getElementById('mobile-btns');
+  if(jw)jw.style.display='block';
+  if(mb)mb.style.display='flex';
+}
+function hideMobileControls(){
+  var jw=document.getElementById('joy-wrap');
+  var mb=document.getElementById('mobile-btns');
+  if(jw)jw.style.display='none';
+  if(mb)mb.style.display='none';
+}
+
 /* 게임 시작 후 호출 */
 if(typeof document!=='undefined'){
   document.addEventListener('DOMContentLoaded',function(){
-    /* enterGame 이후에 초기화되도록 약간 지연 */
-    setTimeout(initMobileControls,2000);
+    setTimeout(initMobileControls,500);
   });
 }

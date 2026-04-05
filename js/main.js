@@ -119,6 +119,7 @@ function startGame(){
 function enterGame(){
   document.getElementById('load-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
+  if(typeof showMobileControls==='function')showMobileControls();
   document.getElementById('hname').textContent=myName;
   /* 복귀 유저 HUD 복원 */
   if(playerData){
