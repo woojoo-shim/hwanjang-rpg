@@ -138,6 +138,21 @@ var SHOP_STOCK={
     {id:'leather_armor', price:130},
     {id:'red_potion',    price:35},
   ],
+  '(무기상인) 발두르':[
+    {id:'iron_sword',    price:200},
+    {id:'steel_axe',     price:260},
+    {id:'fire_staff',    price:500},
+    {id:'moonblade',     price:1200},
+    {id:'arrow',         price:5},
+    {id:'fire_arrow',    price:15},
+  ],
+  '(방어구상인) 헥토르':[
+    {id:'leather_armor', price:120},
+    {id:'iron_helmet',   price:150},
+    {id:'steel_boots',   price:140},
+    {id:'dragon_scale',  price:800},
+    {id:'red_potion',    price:30},
+  ],
 };
 
 /* ════════════ AI NPC 시스템 프롬프트 ════════════ */
