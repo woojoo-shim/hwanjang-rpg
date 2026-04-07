@@ -237,73 +237,145 @@ function openControlSettings(){
   _editMode=true;
   loadMobileSettings();
 
-  /* 설정 오버레이 */
-  var ov=document.createElement('div');
-  ov.id='ctrl-settings-overlay';
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none;';
+  var jw=document.getElementById('joy-wrap');
+  var mb=document.getElementById('mobile-btns');
+  if(!jw||!mb)return;
 
-  var panel=document.createElement('div');
-  panel.style.cssText='background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;padding:20px;width:85vw;max-width:400px;color:#f0e4bb;font-size:14px;';
+  /* 컨트롤을 보이도록 */
+  jw.style.display='block';
+  mb.style.display='flex';
 
-  panel.innerHTML='<div style="text-align:center;font-size:18px;margin-bottom:15px;color:#c9a84c;">⚙️ 컨트롤 설정</div>'+
-    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 크기</label><br>'+
-    '<input type="range" id="ctrl-joy-size" min="80" max="220" value="'+_mobileSettings.joy.size+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="margin-bottom:12px;"><label>🔘 버튼 크기</label><br>'+
-    '<input type="range" id="ctrl-btn-size" min="0.5" max="2.0" step="0.1" value="'+(_mobileSettings.btnSize||1.0)+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 X 위치</label><br>'+
-    '<input type="range" id="ctrl-joy-x" min="0" max="300" value="'+_mobileSettings.joy.x+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="margin-bottom:12px;"><label>🕹️ 조이스틱 Y 위치 (하단)</label><br>'+
-    '<input type="range" id="ctrl-joy-y" min="20" max="300" value="'+_mobileSettings.joy.y+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="margin-bottom:12px;"><label>🔘 버튼 X 위치 (우측)</label><br>'+
-    '<input type="range" id="ctrl-btn-x" min="0" max="200" value="'+_mobileSettings.btns.x+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="margin-bottom:12px;"><label>🔘 버튼 Y 위치 (하단)</label><br>'+
-    '<input type="range" id="ctrl-btn-y" min="20" max="300" value="'+_mobileSettings.btns.y+'" style="width:100%;accent-color:#c9a84c;"></div>'+
-    '<div style="display:flex;gap:10px;margin-top:15px;">'+
-    '<button id="ctrl-save" style="flex:1;background:#c9a84c;color:#0c0c1e;border:none;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">저장</button>'+
-    '<button id="ctrl-reset" style="flex:1;background:transparent;color:#c9a84c;border:1px solid #c9a84c;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">초기화</button>'+
-    '<button id="ctrl-close" style="flex:1;background:#333;color:#fff;border:none;padding:10px;font-size:14px;border-radius:6px;cursor:pointer;">닫기</button>'+
+  /* 편집 모드 표시 — 노란 테두리 + 반투명 배경 */
+  var editStyleEl=document.createElement('style');
+  editStyleEl.id='ctrl-edit-style';
+  editStyleEl.textContent='#joy-wrap,#mobile-btns{outline:3px dashed #c9a84c;outline-offset:4px;}#joy-wrap::before,#mobile-btns::before{content:"드래그";position:absolute;top:-22px;left:50%;transform:translateX(-50%);color:#c9a84c;font-size:10px;font-weight:bold;white-space:nowrap;}';
+  document.head.appendChild(editStyleEl);
+
+  /* 상단 툴바 (저장/초기화/닫기 + 크기 슬라이더) */
+  var toolbar=document.createElement('div');
+  toolbar.id='ctrl-toolbar';
+  toolbar.style.cssText='position:fixed;top:0;left:0;right:0;background:rgba(10,10,20,0.92);border-bottom:2px solid #c9a84c;padding:10px;z-index:300;display:flex;flex-direction:column;gap:8px;color:#f0e4bb;font-size:12px;font-family:inherit;';
+  toolbar.innerHTML=
+    '<div style="text-align:center;color:#c9a84c;font-size:13px;font-weight:bold;">⚙️ 컨트롤 편집 — 드래그해서 이동</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;">'+
+      '<span style="min-width:70px;">🕹️ 조이스틱</span>'+
+      '<input type="range" id="ctrl-joy-size" min="80" max="220" value="'+_mobileSettings.joy.size+'" style="flex:1;accent-color:#c9a84c;">'+
+      '<span id="ctrl-joy-size-val" style="min-width:35px;text-align:right;">'+_mobileSettings.joy.size+'px</span>'+
+    '</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;">'+
+      '<span style="min-width:70px;">🔘 버튼</span>'+
+      '<input type="range" id="ctrl-btn-size" min="0.5" max="2.0" step="0.1" value="'+(_mobileSettings.btnSize||1.0)+'" style="flex:1;accent-color:#c9a84c;">'+
+      '<span id="ctrl-btn-size-val" style="min-width:35px;text-align:right;">'+(_mobileSettings.btnSize||1.0).toFixed(1)+'x</span>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;">'+
+      '<button id="ctrl-save" style="flex:1;background:#c9a84c;color:#0c0c1e;border:none;padding:10px;font-size:13px;font-weight:bold;border-radius:6px;">✓ 저장</button>'+
+      '<button id="ctrl-reset" style="flex:1;background:transparent;color:#c9a84c;border:1px solid #c9a84c;padding:10px;font-size:12px;border-radius:6px;">↻ 초기화</button>'+
+      '<button id="ctrl-close" style="flex:1;background:#333;color:#fff;border:none;padding:10px;font-size:12px;border-radius:6px;">✕ 닫기</button>'+
     '</div>';
+  document.body.appendChild(toolbar);
 
-  ov.appendChild(panel);
-  document.body.appendChild(ov);
+  /* ── 드래그 편집을 위한 이벤트 가로채기 플래그 ── */
+  /* 게임 내 조이스틱/버튼 touchstart 핸들러가 편집 모드 중에는 작동 안 하도록 */
+  var joyDragOverlay=document.createElement('div');
+  joyDragOverlay.id='joy-edit-overlay';
+  joyDragOverlay.style.cssText='position:absolute;inset:0;z-index:5;background:rgba(201,168,76,0.15);border-radius:50%;touch-action:none;';
+  jw.appendChild(joyDragOverlay);
 
-  /* 실시간 미리보기 */
-  function updatePreview(){
-    _mobileSettings.joy.size=parseInt(document.getElementById('ctrl-joy-size').value);
-    _mobileSettings.joy.x=parseInt(document.getElementById('ctrl-joy-x').value);
-    _mobileSettings.joy.y=parseInt(document.getElementById('ctrl-joy-y').value);
-    _mobileSettings.btns.x=parseInt(document.getElementById('ctrl-btn-x').value);
-    _mobileSettings.btns.y=parseInt(document.getElementById('ctrl-btn-y').value);
-    _mobileSettings.btnSize=parseFloat(document.getElementById('ctrl-btn-size').value);
+  var btnDragOverlay=document.createElement('div');
+  btnDragOverlay.id='btn-edit-overlay';
+  btnDragOverlay.style.cssText='position:absolute;inset:-10px;z-index:5;background:rgba(201,168,76,0.12);border-radius:10px;touch-action:none;';
+  mb.style.position='fixed';
+  mb.appendChild(btnDragOverlay);
+
+  /* ── 조이스틱 드래그 ── */
+  var joyDrag={active:false,startX:0,startY:0,initLeft:0,initBottom:0};
+  joyDragOverlay.addEventListener('touchstart',function(e){
+    e.preventDefault();e.stopPropagation();
+    var t=e.changedTouches[0];
+    joyDrag.active=true;
+    joyDrag.startX=t.clientX;joyDrag.startY=t.clientY;
+    joyDrag.initLeft=_mobileSettings.joy.x;
+    joyDrag.initBottom=_mobileSettings.joy.y;
+  },{passive:false});
+  joyDragOverlay.addEventListener('touchmove',function(e){
+    e.preventDefault();e.stopPropagation();
+    if(!joyDrag.active)return;
+    var t=e.changedTouches[0];
+    var dx=t.clientX-joyDrag.startX;
+    var dy=t.clientY-joyDrag.startY;
+    _mobileSettings.joy.x=Math.max(0,Math.min(window.innerWidth-_mobileSettings.joy.size,joyDrag.initLeft+dx));
+    _mobileSettings.joy.y=Math.max(0,Math.min(window.innerHeight-_mobileSettings.joy.size,joyDrag.initBottom-dy));
     applyMobileSettings();
-  }
+  },{passive:false});
+  joyDragOverlay.addEventListener('touchend',function(e){
+    e.preventDefault();e.stopPropagation();
+    joyDrag.active=false;
+  },{passive:false});
 
-  ['ctrl-joy-size','ctrl-btn-size','ctrl-joy-x','ctrl-joy-y','ctrl-btn-x','ctrl-btn-y'].forEach(function(id){
-    document.getElementById(id).addEventListener('input',updatePreview);
+  /* ── 버튼 그룹 드래그 ── */
+  var btnDrag={active:false,startX:0,startY:0,initRight:0,initBottom:0};
+  btnDragOverlay.addEventListener('touchstart',function(e){
+    e.preventDefault();e.stopPropagation();
+    var t=e.changedTouches[0];
+    btnDrag.active=true;
+    btnDrag.startX=t.clientX;btnDrag.startY=t.clientY;
+    btnDrag.initRight=_mobileSettings.btns.x;
+    btnDrag.initBottom=_mobileSettings.btns.y;
+  },{passive:false});
+  btnDragOverlay.addEventListener('touchmove',function(e){
+    e.preventDefault();e.stopPropagation();
+    if(!btnDrag.active)return;
+    var t=e.changedTouches[0];
+    var dx=t.clientX-btnDrag.startX;
+    var dy=t.clientY-btnDrag.startY;
+    _mobileSettings.btns.x=Math.max(0,Math.min(window.innerWidth-80,btnDrag.initRight-dx));
+    _mobileSettings.btns.y=Math.max(0,Math.min(window.innerHeight-80,btnDrag.initBottom-dy));
+    applyMobileSettings();
+  },{passive:false});
+  btnDragOverlay.addEventListener('touchend',function(e){
+    e.preventDefault();e.stopPropagation();
+    btnDrag.active=false;
+  },{passive:false});
+
+  /* ── 크기 슬라이더 ── */
+  document.getElementById('ctrl-joy-size').addEventListener('input',function(e){
+    _mobileSettings.joy.size=parseInt(e.target.value);
+    document.getElementById('ctrl-joy-size-val').textContent=_mobileSettings.joy.size+'px';
+    applyMobileSettings();
+  });
+  document.getElementById('ctrl-btn-size').addEventListener('input',function(e){
+    _mobileSettings.btnSize=parseFloat(e.target.value);
+    document.getElementById('ctrl-btn-size-val').textContent=_mobileSettings.btnSize.toFixed(1)+'x';
+    applyMobileSettings();
   });
 
-  document.getElementById('ctrl-save').addEventListener('click',function(){
-    updatePreview();
-    saveMobileSettings();
-    ov.remove();
+  function cleanupEdit(){
+    toolbar.remove();
+    var ss=document.getElementById('ctrl-edit-style');if(ss)ss.remove();
+    var jo=document.getElementById('joy-edit-overlay');if(jo)jo.remove();
+    var bo=document.getElementById('btn-edit-overlay');if(bo)bo.remove();
     _editMode=false;
+  }
+
+  document.getElementById('ctrl-save').addEventListener('click',function(){
+    saveMobileSettings();
+    cleanupEdit();
     if(typeof addChat==='function')addChat('sys','[시스템]','컨트롤 설정이 저장되었습니다.');
   });
 
   document.getElementById('ctrl-reset').addEventListener('click',function(){
     _mobileSettings={joy:{x:20,y:120,size:140},btns:{x:20,y:100},btnSize:1.0};
     document.getElementById('ctrl-joy-size').value=140;
+    document.getElementById('ctrl-joy-size-val').textContent='140px';
     document.getElementById('ctrl-btn-size').value=1.0;
-    document.getElementById('ctrl-joy-x').value=20;
-    document.getElementById('ctrl-joy-y').value=120;
-    document.getElementById('ctrl-btn-x').value=20;
-    document.getElementById('ctrl-btn-y').value=100;
+    document.getElementById('ctrl-btn-size-val').textContent='1.0x';
     applyMobileSettings();
   });
 
   document.getElementById('ctrl-close').addEventListener('click',function(){
-    ov.remove();
-    _editMode=false;
+    loadMobileSettings();
+    applyMobileSettings();
+    cleanupEdit();
   });
 }
 
