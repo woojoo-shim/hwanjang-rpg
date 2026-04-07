@@ -418,12 +418,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
   .hlv{font-size:9px!important;padding:1px 3px!important;}
   #hname{font-size:10px!important;}
 
-  /* 채팅창 — 접히도록, 작게 */
+  /* 채팅창 — 우측 상단 (존 정보 아래), 반투명 */
   #chat-wrap,.chat-wrap{
-    width:160px!important;max-height:120px!important;font-size:9px!important;
-    opacity:0.7!important;right:0!important;top:auto!important;bottom:60px!important;
+    width:200px!important;max-height:130px!important;font-size:9px!important;
+    opacity:0.72!important;
+    right:8px!important;left:auto!important;
+    top:42px!important;bottom:auto!important;
+    background:rgba(10,10,20,0.55)!important;
+    border:1px solid rgba(201,168,76,0.3)!important;
+    border-radius:6px!important;
+    padding:4px!important;
+    transition:opacity .2s;
   }
-  #clog{max-height:80px!important;padding:2px!important;}
+  #chat-wrap:hover,#chat-wrap:focus-within,#chat-wrap:active{opacity:1!important;}
+  #clog{max-height:80px!important;padding:2px!important;line-height:1.35!important;}
   #chat-wrap input,#chat-wrap .chat-input{font-size:9px!important;padding:3px!important;}
   #chat-wrap button,.chat-send{font-size:8px!important;padding:2px 4px!important;}
 
