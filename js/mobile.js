@@ -73,22 +73,6 @@ function initMobileControls(){
   btnWrap.style.display='none'; /* 게임 진입 전 숨김 */
   document.body.appendChild(btnWrap);
 
-  /* ── 설정 버튼 (좌상단, 작게) ── */
-  var settingsBtn=document.createElement('div');
-  settingsBtn.id='m-settings';
-  settingsBtn.style.cssText='position:fixed;left:8px;top:8px;width:38px;height:38px;border-radius:50%;background:rgba(20,20,30,0.6);border:1px solid rgba(201,168,76,0.5);display:none;align-items:center;justify-content:center;font-size:18px;color:#c9a84c;z-index:51;user-select:none;touch-action:none;';
-  settingsBtn.textContent='⚙️';
-  settingsBtn.addEventListener('touchstart',function(e){
-    e.preventDefault();
-    settingsBtn.style.transform='scale(0.9)';
-  },{passive:false});
-  settingsBtn.addEventListener('touchend',function(e){
-    e.preventDefault();
-    settingsBtn.style.transform='scale(1)';
-    if(typeof openEscMenu==='function')openEscMenu();
-  },{passive:false});
-  document.body.appendChild(settingsBtn);
-
   /* ── 조이스틱 터치 이벤트 ── */
   joyWrap.addEventListener('touchstart',function(e){
     e.preventDefault();
@@ -187,18 +171,14 @@ function showMobileControls(){
   if(!isMobile)return;
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
-  var st=document.getElementById('m-settings');
   if(jw)jw.style.display='block';
   if(mb)mb.style.display='flex';
-  if(st)st.style.display='flex';
 }
 function hideMobileControls(){
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
-  var st=document.getElementById('m-settings');
   if(jw)jw.style.display='none';
   if(mb)mb.style.display='none';
-  if(st)st.style.display='none';
 }
 
 /* ════════════ 컨트롤 커스터마이즈 ════════════ */
