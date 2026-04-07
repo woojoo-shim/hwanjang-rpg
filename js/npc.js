@@ -722,10 +722,17 @@ function talk(n){
     }
     return;
   }
-  /* 상인/대장장이: 상점만 열기 (대화는 상점 내 채팅으로) */
-  if(n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0){
+  /* 상인 계열: 모두 동일한 상점 UI로 열기 */
+  var isMerchant=n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0;
+  if(isMerchant){
     activeNpc=n;
-    openShop(n.name);
+    var opened=openShop(n.name);
+    if(opened)return;
+    /* SHOP_STOCK에 없으면 기본 빈 상점 추가 후 재시도 */
+    if(typeof SHOP_STOCK!=='undefined'&&!SHOP_STOCK[n.name]){
+      SHOP_STOCK[n.name]=[{id:'red_potion',price:30}];
+      openShop(n.name);
+    }
     return;
   }
   if(typeof SFX!=='undefined')SFX.talkStart();
