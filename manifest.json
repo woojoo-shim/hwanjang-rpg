@@ -1,0 +1,14 @@
+{
+  "name": "환장 RPG",
+  "short_name": "환장RPG",
+  "description": "Three.js 기반 3D 판타지 멀티플레이 RPG",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0c0c1e",
+  "theme_color": "#c9a84c",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
