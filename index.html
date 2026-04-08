@@ -28,6 +28,39 @@ if('serviceWorker' in navigator){
 
 <div id="bg-stars"></div>
 
+<!-- 플로팅 설치 버튼 (PWA 설치 가능 시) -->
+<button id="pwa-install-btn" style="display:none;position:fixed;top:10px;right:10px;z-index:998;background:#c9a84c;color:#0c0c1e;border:none;padding:10px 16px;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:1px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.4);">📥 앱 설치</button>
+
+<script>
+var _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  _deferredPrompt=e;
+  var btn=document.getElementById('pwa-install-btn');
+  if(btn)btn.style.display='block';
+});
+window.addEventListener('load',function(){
+  var btn=document.getElementById('pwa-install-btn');
+  if(!btn)return;
+  btn.addEventListener('click',async function(){
+    if(!_deferredPrompt){
+      alert('이 브라우저에서는 설치가 지원되지 않거나, 이미 설치되어있습니다.\n\nChrome/Edge에서 주소창 오른쪽의 ⊕ 아이콘을 확인해보세요.');
+      return;
+    }
+    _deferredPrompt.prompt();
+    var choice=await _deferredPrompt.userChoice;
+    if(choice.outcome==='accepted'){
+      btn.style.display='none';
+    }
+    _deferredPrompt=null;
+  });
+});
+window.addEventListener('appinstalled',function(){
+  var btn=document.getElementById('pwa-install-btn');
+  if(btn)btn.style.display='none';
+});
+</script>
+
 <!-- 설치 안내 (첫 방문) -->
 <div id="install-guide" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#1a1a2e;border:2px solid #c9a84c;border-radius:14px;padding:28px;max-width:420px;width:100%;color:#f0e4bb;font-family:inherit;">
