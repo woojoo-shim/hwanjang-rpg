@@ -61,6 +61,21 @@ function openEnhance(npcName){
   var armLv=(equipped.armor&&equipped.armor.enhLevel)||0;
   html+=renderEnhanceSlot('armor',arm,armLv);
 
+  /* 수리 버튼 */
+  var wpnCurDur=equippedDur.weapon||0,wpnMax=wpn?getMaxDurability(equipped.weapon):0;
+  var armCurDur=equippedDur.armor||0,armMax=arm?getMaxDurability(equipped.armor):0;
+  var needsRepair=(wpn&&wpnCurDur<wpnMax)||(arm&&armCurDur<armMax);
+  if(needsRepair){
+    var repairCost=Math.floor(((wpnMax-wpnCurDur)+(armMax-armCurDur))*3);
+    html+='<div style="background:rgba(100,60,20,0.3);border:1px solid #c9a84c;border-radius:8px;padding:12px;margin-top:12px;">';
+    html+='<div style="color:#c9a84c;font-weight:bold;margin-bottom:6px;">🔧 장비 수리</div>';
+    if(wpn)html+='<div style="font-size:11px;color:#aaa;">⚔️ '+wpn.name+': '+wpnCurDur+'/'+wpnMax+'</div>';
+    if(arm)html+='<div style="font-size:11px;color:#aaa;">🛡️ '+arm.name+': '+armCurDur+'/'+armMax+'</div>';
+    html+='<div style="font-size:11px;color:'+(gold>=repairCost?'#c9a84c':'#ff4444')+';margin:6px 0;">💰 수리 비용: '+repairCost+' 골드</div>';
+    html+='<button onclick="doRepair()" '+(gold>=repairCost?'':'disabled')+' style="width:100%;background:'+(gold>=repairCost?'#5a7c3a':'#444')+';color:#fff;border:none;padding:8px;font-size:12px;font-weight:bold;cursor:'+(gold>=repairCost?'pointer':'not-allowed')+';font-family:inherit;border-radius:6px;">🔧 모두 수리</button>';
+    html+='</div>';
+  }
+
   html+='<div style="text-align:center;margin-top:16px;color:#c9a84c;font-size:13px;">💰 '+gold+' 골드</div>';
 
   wrap.innerHTML=html;
@@ -137,6 +152,25 @@ function tryEnhance(slotType){
   if(typeof updEquipHud==='function')updEquipHud();
   if(typeof savePlayerData==='function')savePlayerData();
   /* UI 새로고침 */
+  openEnhance(activeNpc?activeNpc.name:'대장장이');
+}
+
+function doRepair(){
+  var wpnMax=equipped.weapon?getMaxDurability(equipped.weapon):0;
+  var armMax=equipped.armor?getMaxDurability(equipped.armor):0;
+  var wpnCur=equippedDur.weapon||0;
+  var armCur=equippedDur.armor||0;
+  var total=(wpnMax-wpnCur)+(armMax-armCur);
+  if(total<=0){addChat('sys','[수리]','수리할 장비가 없습니다.');return;}
+  var cost=Math.floor(total*3);
+  if(gold<cost){addChat('sys','[수리]','골드가 부족합니다.');return;}
+  gold-=cost;
+  if(equipped.weapon)equippedDur.weapon=wpnMax;
+  if(equipped.armor)equippedDur.armor=armMax;
+  if(typeof SFX!=='undefined')SFX.levelUp();
+  addChat('sys','[수리]','장비가 수리되었습니다. ('+cost+' 골드)');
+  if(typeof updEquipHud==='function')updEquipHud();
+  if(typeof savePlayerData==='function')savePlayerData();
   openEnhance(activeNpc?activeNpc.name:'대장장이');
 }
 

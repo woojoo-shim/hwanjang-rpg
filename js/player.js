@@ -517,12 +517,20 @@ function updateSkills(dt){
 
 function playerAttack(){
   if(attackCooldown>0)return;
+  /* 무기 부서짐 체크 */
+  if(typeof isItemBroken==='function'&&isItemBroken('weapon')){
+    if(typeof addChat==='function')addChat('sys','[시스템]','무기가 부서졌습니다! 수리가 필요합니다.');
+    attackCooldown=0.3;
+    return;
+  }
 
   var baseAtk=5;
   if(equipped.weapon){
     var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
     if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
   }
+  /* 무기 내구도 감소 */
+  if(typeof damageEquipment==='function')damageEquipment('weapon',1);
   var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
   var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul);
   /* 광전사 패시브: HP 낮을수록 ATK 증가 */

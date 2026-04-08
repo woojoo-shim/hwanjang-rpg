@@ -5,6 +5,7 @@
    참조: refreshWeaponMesh (player.js) — 런타임 참조 */
 
 var inventory=[]; // {itemId, qty, custom?, equipped?}
+var equippedDur={}; // { weapon: currentDur, armor: currentDur } — 현재 내구도 추적
 var gold=0;
 var currentTab='all';
 var selectedItem=null;
@@ -62,10 +63,59 @@ function equipItem(slot){
     return;
   }
   equipped[it.type]=slot.itemId;
+  /* 내구도 초기화 — 최대값 */
+  var maxDur=getMaxDurability(slot.itemId);
+  if(equippedDur[it.type]===undefined||equippedDur[it.type]<=0){
+    equippedDur[it.type]=maxDur;
+  }
   if(typeof SFX!=='undefined')SFX.click();
   addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
   renderInv();showDetail(slot);updEquipHud();
+}
+
+/* 최대 내구도 조회 */
+function getMaxDurability(itemId){
+  var def=getItemDef(itemId);
+  if(!def||!def.stats)return 100;
+  return def.stats.내구도||def.stats['내구도']||100;
+}
+
+/* 내구도 감소 */
+function damageEquipment(slotType,amount){
+  if(!equipped[slotType])return;
+  var id=typeof equipped[slotType]==='object'?equipped[slotType].id:equipped[slotType];
+  var def=getItemDef(id);
+  if(!def||!def.stats||!def.stats.내구도)return;/* 내구도 없는 아이템 */
+  if(equippedDur[slotType]===undefined)equippedDur[slotType]=getMaxDurability(id);
+  equippedDur[slotType]=Math.max(0,equippedDur[slotType]-amount);
+  if(equippedDur[slotType]===0){
+    /* 파괴 */
+    addChat('sys','[시스템]','⚠️ ['+def.name+']이(가) 부서졌습니다! 수리가 필요합니다.');
+    if(typeof toast==='function')toast('⚠️ '+def.name+' 파손');
+    if(typeof SFX!=='undefined')SFX.hit();
+    if(typeof updEquipHud==='function')updEquipHud();
+  }
+}
+
+/* 내구도 수리 */
+function repairEquipment(slotType){
+  if(!equipped[slotType])return 0;
+  var id=typeof equipped[slotType]==='object'?equipped[slotType].id:equipped[slotType];
+  var max=getMaxDurability(id);
+  var cur=equippedDur[slotType]||0;
+  var missing=max-cur;
+  equippedDur[slotType]=max;
+  return missing;
+}
+
+/* 현재 아이템 부서졌는지 */
+function isItemBroken(slotType){
+  if(!equipped[slotType])return false;
+  var id=typeof equipped[slotType]==='object'?equipped[slotType].id:equipped[slotType];
+  var def=getItemDef(id);
+  if(!def||!def.stats||!def.stats.내구도)return false;
+  return (equippedDur[slotType]||0)<=0;
 }
 
 function unequipItem(slot){
@@ -144,9 +194,18 @@ function updEquipHud(){
   var ht=equipped.hat?getItemFull(inventory.find(function(s){return s.itemId===equipped.hat;})||{}):null;
   var cp=equipped.cape?getItemFull(inventory.find(function(s){return s.itemId===equipped.cape;})||{}):null;
   var dy=equipped.dye?getItemFull(inventory.find(function(s){return s.itemId===equipped.dye;})||{}):null;
+  function durTxt(slotType,item){
+    if(!item||!item.stats||!item.stats.내구도)return '';
+    var cur=equippedDur[slotType];
+    var max=item.stats.내구도;
+    if(cur===undefined)cur=max;
+    var pct=cur/max;
+    var color=pct>0.5?'#88cc88':pct>0.2?'#ffaa22':'#ff4444';
+    return ' <span style="color:'+color+';font-size:9px;">('+cur+'/'+max+')</span>';
+  }
   hudEq.innerHTML=
-    (w?'<span title="무기" style="color:#c9a84c">'+(ICON[w.icon]||'⚔️')+' '+w.name+'</span>':'')+
-    (a?'<span title="방어구" style="color:#88aacc">'+(ICON[a.icon]||'🛡️')+' '+a.name+'</span>':'')+
+    (w?'<span title="무기" style="color:#c9a84c">'+(ICON[w.icon]||'⚔️')+' '+w.name+durTxt('weapon',w)+'</span>':'')+
+    (a?'<span title="방어구" style="color:#88aacc">'+(ICON[a.icon]||'🛡️')+' '+a.name+durTxt('armor',a)+'</span>':'')+
     (ht?'<span title="모자" style="color:#cc88ff">'+(ICON[ht.icon]||'🎩')+' '+ht.name+'</span>':'')+
     (cp?'<span title="망토" style="color:#ff8844">'+(ICON[cp.icon]||'🧣')+' '+cp.name+'</span>':'')+
     (dy?'<span title="염색" style="color:#ff88cc">'+(ICON[dy.icon]||'🎨')+'</span>':'');

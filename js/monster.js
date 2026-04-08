@@ -2228,6 +2228,8 @@ function updMonsters(dt,t){
             /* 로컬 플레이어가 타겟 → 직접 데미지 */
             if(invincibleTimer<=0){
               playerHP=Math.max(0,playerHP-dmg);
+              /* 방어구 내구도 감소 */
+              if(typeof damageEquipment==='function')damageEquipment('armor',1);
               updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555','player');
               if(typeof SFX!=='undefined')SFX.playerHit();
               flashPlayerHit();
