@@ -105,55 +105,117 @@ var ITEM_POOL=[
 ];
 
 /* ════════════ 상점 재고 ════════════ */
-var SHOP_STOCK={
-  '(상인) 김도윤':[
-    {id:'red_potion',    price:30},
-    {id:'blue_potion',   price:40},
-    {id:'ether',         price:150},
-    {id:'deer_meat',     price:20},
-    {id:'tp_scroll',     price:100},
-    {id:'arrow',         price:5},
-    {id:'fire_arrow',    price:15},
-  ],
-  '(코디샵) 루나':[
-    {id:'dye_red',       price:80},
-    {id:'dye_blue',      price:80},
-    {id:'dye_green',     price:80},
-    {id:'dye_pink',      price:80},
-    {id:'dye_white',     price:80},
-    {id:'dye_black',     price:100},
-    {id:'dye_gold',      price:300},
-    {id:'bunny_ears',    price:120},
-    {id:'red_cape',      price:150},
-    {id:'blue_cape',     price:150},
-    {id:'wizard_hat',    price:200},
-    {id:'santa_hat',     price:250},
-    {id:'golden_cape',   price:500},
-  ],
-  '(대장장이) 이태산':[
-    {id:'iron_sword',    price:180},
-    {id:'steel_axe',     price:240},
-    {id:'iron_helmet',   price:160},
-    {id:'steel_boots',   price:150},
-    {id:'leather_armor', price:130},
-    {id:'red_potion',    price:35},
-  ],
-  '(무기상인) 발두르':[
-    {id:'iron_sword',    price:200},
-    {id:'steel_axe',     price:260},
-    {id:'fire_staff',    price:500},
-    {id:'moonblade',     price:1200},
-    {id:'arrow',         price:5},
-    {id:'fire_arrow',    price:15},
-  ],
-  '(방어구상인) 헥토르':[
-    {id:'leather_armor', price:120},
-    {id:'iron_helmet',   price:150},
-    {id:'steel_boots',   price:140},
-    {id:'dragon_scale',  price:800},
-    {id:'red_potion',    price:30},
-  ],
+/* 상점별 판매 카테고리 — 서로 겹치지 않음 */
+var SHOP_CATEGORIES={
+  '(상인) 김도윤':{
+    /* 잡화상: 포션/스크롤/소재/화살 */
+    pool:['red_potion','blue_potion','ether','elixir','deer_meat','rabbit_liver','deer_antler','tp_scroll','arrow','fire_arrow','magic_crystal','star_fragment'],
+    slots:8
+  },
+  '(무기상인) 발두르':{
+    /* 무기만 */
+    pool:['wooden_sword','bone_sword','iron_sword','steel_axe','hunting_bow','fire_staff','moonblade','dragonfang','eclipse_blade','death_scythe'],
+    slots:8
+  },
+  '(방어구상인) 헥토르':{
+    /* 방어구만 */
+    pool:['leather_armor','iron_helmet','steel_boots','mage_robe','dragon_scale'],
+    slots:5
+  },
+  '(코디샵) 루나':{
+    /* 코스메틱만 */
+    pool:['dye_red','dye_blue','dye_green','dye_pink','dye_white','dye_black','dye_gold','bunny_ears','red_cape','blue_cape','wizard_hat','santa_hat','golden_cape','crown','knight_helm','shadow_cape'],
+    slots:8
+  }
 };
+
+/* 동적 상점 재고 (매일 새로고침) */
+var SHOP_STOCK={};
+var SHOP_REFRESH_COUNT={};/* npcName → 오늘 새로고침 횟수 */
+var SHOP_MAX_REFRESH=3;
+
+function _todayKey(){
+  var d=new Date();
+  return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+}
+
+function _getShopState(){
+  try{
+    var raw=localStorage.getItem('shopState');
+    if(!raw)return null;
+    var s=JSON.parse(raw);
+    if(s.day!==_todayKey())return null;
+    return s;
+  }catch(e){return null;}
+}
+
+function _saveShopState(){
+  try{
+    localStorage.setItem('shopState',JSON.stringify({
+      day:_todayKey(),
+      stock:SHOP_STOCK,
+      refresh:SHOP_REFRESH_COUNT
+    }));
+  }catch(e){}
+}
+
+/* 랜덤 N개 선택 */
+function _pickRandom(arr,n){
+  var copy=arr.slice();
+  var out=[];
+  while(out.length<n&&copy.length>0){
+    var idx=Math.floor(Math.random()*copy.length);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+
+/* 랜덤 가격 생성 (아이템 희귀도 기반) */
+function _rollPrice(itemId){
+  var def=(typeof getItemDef==='function')?getItemDef(itemId):null;
+  if(!def)return 100;
+  var rarity=def.rarity||'common';
+  var base={common:40,uncommon:120,rare:400,epic:1200,legendary:3000,hidden:5000}[rarity]||100;
+  var jitter=0.85+Math.random()*0.3;/* ±15% */
+  return Math.floor(base*jitter);
+}
+
+function rollShopStock(npcName){
+  var cat=SHOP_CATEGORIES[npcName];
+  if(!cat)return;
+  var picks=_pickRandom(cat.pool,cat.slots);
+  SHOP_STOCK[npcName]=picks.map(function(id){return{id:id,price:_rollPrice(id)};});
+}
+
+function refreshShop(npcName){
+  var count=SHOP_REFRESH_COUNT[npcName]||0;
+  if(count>=SHOP_MAX_REFRESH)return false;
+  SHOP_REFRESH_COUNT[npcName]=count+1;
+  rollShopStock(npcName);
+  _saveShopState();
+  return true;
+}
+
+function initShops(){
+  var saved=_getShopState();
+  if(saved){
+    SHOP_STOCK=saved.stock||{};
+    SHOP_REFRESH_COUNT=saved.refresh||{};
+  }
+  /* 오늘 처음인 상점은 자동 롤 */
+  Object.keys(SHOP_CATEGORIES).forEach(function(name){
+    if(!SHOP_STOCK[name]){
+      rollShopStock(name);
+    }
+    if(SHOP_REFRESH_COUNT[name]===undefined)SHOP_REFRESH_COUNT[name]=0;
+  });
+  _saveShopState();
+}
+
+/* 즉시 초기화 */
+if(typeof window!=='undefined'){
+  setTimeout(initShops,100);
+}
 
 /* ════════════ AI NPC 시스템 프롬프트 ════════════ */
 var NPC_AI={

@@ -273,7 +273,10 @@ function openShop(npcName){
   shopOpen=true;
   shopTab='buy';
   document.getElementById('shop-overlay').classList.add('show');
-  document.getElementById('shop-title-text').textContent='▣ '+npcName+' 상점';
+  /* 새로고침 횟수 표시 */
+  var remaining=SHOP_MAX_REFRESH-(SHOP_REFRESH_COUNT[npcName]||0);
+  var titleEl=document.getElementById('shop-title-text');
+  titleEl.innerHTML='▣ '+npcName+' 상점 <button onclick="doShopRefresh()" style="margin-left:12px;background:'+(remaining>0?'#c9a84c':'#555')+';color:'+(remaining>0?'#0c0c1e':'#888')+';border:none;padding:4px 10px;font-size:11px;cursor:'+(remaining>0?'pointer':'not-allowed')+';border-radius:4px;font-family:inherit;">🔄 새로고침 ('+remaining+'/'+SHOP_MAX_REFRESH+')</button>';
   document.querySelectorAll('.shop-tab').forEach(function(t,i){t.classList.toggle('active',i===0);});
   shopSelectedItem=null;
   renderShopDetail(null);
@@ -289,6 +292,21 @@ function closeShop(){
   document.getElementById('shop-overlay').classList.remove('show');
   var sc=document.getElementById('shop-chat');if(sc)sc.style.display='none';
   shopSelectedItem=null;currentShopNpc=null;
+}
+
+function doShopRefresh(){
+  if(!currentShopNpc)return;
+  var used=SHOP_REFRESH_COUNT[currentShopNpc]||0;
+  if(used>=SHOP_MAX_REFRESH){
+    addChat('sys','[상점]','오늘은 더이상 새로고침할 수 없습니다. 내일 다시 오세요.');
+    return;
+  }
+  if(refreshShop(currentShopNpc)){
+    if(typeof SFX!=='undefined')SFX.shopOpen();
+    var npc=currentShopNpc;
+    closeShop();
+    openShop(npc);
+  }
 }
 
 function updShopGold(){
