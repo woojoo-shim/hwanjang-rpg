@@ -230,6 +230,7 @@ function setupInput(){
         if(document.getElementById('dbox').classList.contains('show')){closeDialog();return;}
         if(invOpen){closeInv();return;}
         if(shopOpen){closeShop();return;}
+        if(typeof enhanceOpen!=='undefined'&&enhanceOpen){closeEnhance();return;}
         openEscMenu();
       }
       return;

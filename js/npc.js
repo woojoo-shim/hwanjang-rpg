@@ -737,8 +737,13 @@ function talk(n){
     }
     return;
   }
+  /* 대장장이: 강화 UI 열기 */
+  if(n.name.indexOf('(대장장이)')===0){
+    activeNpc=n;
+    if(typeof openEnhance==='function'){openEnhance(n.name);return;}
+  }
   /* 상인 계열: 모두 동일한 상점 UI로 열기 */
-  var isMerchant=n.name.indexOf('(상인)')===0||n.name.indexOf('(대장장이)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0;
+  var isMerchant=n.name.indexOf('(상인)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0;
   if(isMerchant){
     activeNpc=n;
     var opened=openShop(n.name);
