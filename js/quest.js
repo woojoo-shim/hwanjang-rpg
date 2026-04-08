@@ -112,6 +112,24 @@ function autoDetectQuest(reply,npcName){
 /* ── 퀘스트 알림 UI ── */
 function showQuestNotif(q,npcName){
   q.npc=npcName;
+  /* 중복 체크 — 진행 중이거나 완료된 동일 퀘스트 거부 */
+  for(var i=0;i<activeQuests.length;i++){
+    var a=activeQuests[i];
+    if(a.type===q.type&&a.target===q.target&&a.npc===npcName){
+      addChat('sys','[시스템]','이미 진행 중인 퀘스트입니다.');
+      return;
+    }
+  }
+  if(typeof quests!=='undefined'){
+    for(var j=0;j<quests.length;j++){
+      if(quests[j]===q.id)return;
+    }
+  }
+  /* 알림 큐에 이미 같은 퀘스트가 있는지 */
+  for(var k=0;k<questNotifQueue.length;k++){
+    var qn=questNotifQueue[k];
+    if(qn.type===q.type&&qn.target===q.target&&qn.npc===npcName)return;
+  }
   questNotifQueue.push(q);
   if(!questNotifShowing)popQuestNotif();
 }
