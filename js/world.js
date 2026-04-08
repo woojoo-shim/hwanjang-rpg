@@ -164,7 +164,7 @@ function mkInteriorNpc(nx,nz,baseY,bodyColor,npcName){
   /* NPC_AI에 등록 (AI 대화 가능) */
   if(typeof NPC_AI!=='undefined'&&!NPC_AI[npcName]){
     NPC_AI[npcName]={
-      system:'너는 '+npcName+'이다. 환장 RPG 세계관의 NPC이다. 친절하고 캐릭터에 맞게 대화하라. 짧게 답하라.',
+      system:'너는 '+npcName+'이다. 포톤 RPG 세계관의 NPC이다. 친절하고 캐릭터에 맞게 대화하라. 짧게 답하라.',
       history:[]
     };
   }

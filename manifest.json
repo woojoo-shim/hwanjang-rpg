@@ -1,6 +1,6 @@
 {
-  "name": "환장 RPG",
-  "short_name": "환장RPG",
+  "name": "포톤 RPG",
+  "short_name": "포톤RPG",
   "description": "Three.js 기반 3D 판타지 멀티플레이 RPG",
   "start_url": "/",
   "display": "fullscreen",

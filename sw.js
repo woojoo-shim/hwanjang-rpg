@@ -1,4 +1,4 @@
-/* 환장 RPG Service Worker */
+/* 포톤 RPG Service Worker */
 var CACHE='hwanjang-v1';
 var ASSETS=['/','/index.html','/css/style.css'];
 
