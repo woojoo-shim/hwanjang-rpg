@@ -861,6 +861,8 @@ function isOnBridge(x,z){
 function isOverWater(x,z){
   if(typeof insideBuilding!=='undefined'&&insideBuilding)return false;
   if(isOnBridge(x,z))return false;
+  /* 지형이 물 높이(0) 위로 솟아있으면 물이 아님 — 땅속 강 방지 */
+  if(typeof getTerrainY==='function'&&getTerrainY(x,z)>0.5)return false;
   /* 중앙 남북 강: x≈0, z:-400~500 */
   if(z>-400&&z<500&&Math.abs(x-RIVER_CENTER_X)<RIVER_HALF_W)return true;
   /* 동서 분기: z≈0 부근, x:-400~-10 또는 x:10~400 */
