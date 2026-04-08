@@ -28,17 +28,18 @@ function genWeirdName(){
 
 /* ════════════ 아이템 시스템 ════════════ */
 var RARITIES={
-  common:  {name:'일반',  color:'#888888'},
-  rare:    {name:'희귀',  color:'#3aaa3a'},
-  epic:    {name:'에픽',  color:'#6666ff'},
-  legendary:{name:'전설', color:'#c9a84c'},
-  hidden:  {name:'히든',  color:'#ff44ff'},
+  common:   {name:'일반',  color:'#888888'},
+  uncommon: {name:'고급',  color:'#55bb55'},
+  rare:     {name:'희귀',  color:'#3aaa3a'},
+  epic:     {name:'에픽',  color:'#6666ff'},
+  legendary:{name:'전설',  color:'#c9a84c'},
+  hidden:   {name:'히든',  color:'#ff44ff'},
 };
 var ITEM_TYPES={weapon:'무기',armor:'방어구',consume:'소비',etc:'기타',cosmetic:'코스메틱'};
 
 var ICON={
-  sword:'⚔️',axe:'🪓',bow:'🏹',staff:'🪄',dagger:'🗡️',
-  helmet:'⛑️',armor:'🛡️',gloves:'🧤',boots:'👢',robe:'🥻',
+  sword:'⚔️',axe:'🪓',bow:'🏹',staff:'🪄',dagger:'🗡️',spear:'🔱',hammer:'🔨',
+  helmet:'⛑️',armor:'🛡️',gloves:'🧤',boots:'👢',robe:'🥻',shield:'🛡️',
   potion:'🧪',food:'🍖',scroll:'📜',
   ring:'💍',necklace:'📿',gem:'💎',coin:'🪙',
   bone:'🦴',fish:'🐟',leaf:'🍃',crystal:'🔮',
@@ -58,6 +59,78 @@ var ITEM_POOL=[
   {id:'moonblade',      name:'달빛 검',          icon:'sword', type:'weapon',  rarity:'epic',     desc:'달이 뜨면 공격력이 2배가 된다.',   stats:{공격력:35,야간공격력:70}},
   {id:'dragonfang',     name:'용의 송곳니',      icon:'dagger',type:'weapon',  rarity:'legendary',desc:'진짜 용의 이빨로 만들었다. 아파.',  stats:{공격력:60,관통:25}},
   {id:'eclipse_blade',  name:'이클립스',         icon:'sword', type:'weapon',  rarity:'legendary',desc:'동양 검사 최고의 검. 어디서 났지?',stats:{공격력:88,발도술:50}},
+  // ─ 추가 무기: Common ─
+  {id:'wood_sword',     name:'나무 검',          icon:'sword', type:'weapon',  rarity:'common',   desc:'그냥 나무를 깎아서 만든 검. 그래도 안 아프지는 않다.',  stats:{공격력:4,내구도:20}},
+  {id:'rusty_dagger',   name:'녹슨 단검',        icon:'dagger',type:'weapon',  rarity:'common',   desc:'녹이 잔뜩 슨 단검. 파상풍이 걱정된다.',              stats:{공격력:5,공격속도:10}},
+  {id:'old_club',       name:'낡은 몽둥이',      icon:'hammer',type:'weapon',  rarity:'common',   desc:'어딘가에서 줍온 몽둥이. 의외로 묵직하다.',            stats:{공격력:6,힘요구치:5}},
+  {id:'stone_axe',      name:'돌 도끼',          icon:'axe',   type:'weapon',  rarity:'common',   desc:'석기시대 전사의 로망. 돌로 만든 도끼.',               stats:{공격력:7,공격속도:-5}},
+  {id:'bamboo_bow',     name:'나무 활',          icon:'bow',   type:'weapon',  rarity:'common',   desc:'할아버지가 직접 깎아준 나무 활. 정이 넘친다.',        stats:{공격력:5,사거리:8}},
+  {id:'bamboo_spear',   name:'대나무 창',        icon:'spear', type:'weapon',  rarity:'common',   desc:'마디가 고스란히 남아있는 대나무 창. 삐걱인다.',       stats:{공격력:6,관통력:5}},
+  // ─ 추가 무기: Uncommon ─
+  {id:'copper_sword',   name:'구리 검',          icon:'sword', type:'weapon',  rarity:'uncommon', desc:'구리의 광택이 빛나는 견고한 검.',                    stats:{공격력:12,내구도:50,힘요구치:10}},
+  {id:'iron_dagger',    name:'철 단검',          icon:'dagger',type:'weapon',  rarity:'uncommon', desc:'날카롭게 벼린 철제 단검. 빠른 공격에 최적화.',        stats:{공격력:10,공격속도:15,민첩요구치:12}},
+  {id:'bronze_axe',     name:'청동 도끼',        icon:'axe',   type:'weapon',  rarity:'uncommon', desc:'청동 합금으로 주조한 도끼. 꽤 균형 잡혔다.',          stats:{공격력:14,공격속도:-3,힘요구치:15}},
+  {id:'copper_bow',     name:'구리 활',          icon:'bow',   type:'weapon',  rarity:'uncommon', desc:'구리 장식이 달린 강화 활. 사거리가 늘어났다.',        stats:{공격력:11,사거리:12,민첩요구치:10}},
+  {id:'iron_spear',     name:'쇠 창',            icon:'spear', type:'weapon',  rarity:'uncommon', desc:'단단한 쇳대로 만든 창. 돌격에 제격.',                stats:{공격력:13,관통력:8,이동속도:3}},
+  {id:'wood_staff',     name:'나무 지팡이',      icon:'staff', type:'weapon',  rarity:'uncommon', desc:'마법사 견습생이 처음 받는 지팡이. 마력을 조금 담는다.',stats:{공격력:9,마나훔치기:3,내구도:45}},
+  // ─ 추가 무기: Rare ─
+  {id:'steel_sword',    name:'강철 검',          icon:'sword', type:'weapon',  rarity:'rare',     desc:'정제된 강철로 만든 검. 전장에서 검증된 무기.',        stats:{공격력:22,크리확률:5,내구도:90,힘요구치:20}},
+  {id:'assassin_dagger',name:'암살자 단검',      icon:'dagger',type:'weapon',  rarity:'rare',     desc:'어둠 속에서 한 번의 일격으로 결판낸다.',              stats:{공격력:18,공격속도:20,크리확률:12,민첩요구치:25}},
+  {id:'knight_axe',     name:'기사의 도끼',      icon:'axe',   type:'weapon',  rarity:'rare',     desc:'기사단이 수여하는 격식 있는 전투 도끼.',              stats:{공격력:26,크리데미지:30,힘요구치:28,내구도:85}},
+  {id:'longbow',        name:'장궁',             icon:'bow',   type:'weapon',  rarity:'rare',     desc:'전장을 지배하는 긴 활. 사거리가 압도적이다.',         stats:{공격력:20,사거리:20,크리확률:8,민첩요구치:22}},
+  {id:'silver_spear',   name:'은빛 창',          icon:'spear', type:'weapon',  rarity:'rare',     desc:'은으로 도금한 창촉. 어둠의 존재에게 더 잘 통한다.',  stats:{공격력:24,관통력:15,냉기데미지:8,내구도:75}},
+  {id:'mage_staff',     name:'마법사 지팡이',    icon:'staff', type:'weapon',  rarity:'rare',     desc:'마법진이 새겨진 지팡이. 마력의 흐름이 느껴진다.',    stats:{공격력:17,화염데미지:12,마나훔치기:5,내구도:65}},
+  {id:'greatsword',     name:'쌍수 대검',        icon:'sword', type:'weapon',  rarity:'rare',     desc:'양손으로 들어야 하는 거대한 검. 한 방이 다르다.',    stats:{공격력:32,크리데미지:40,공격속도:-10,힘요구치:35}},
+  {id:'chain_flail',    name:'쇠사슬 도리깨',    icon:'hammer',type:'weapon',  rarity:'rare',     desc:'철구가 달린 쇠사슬 도리깨. 방어구를 무시한다.',      stats:{공격력:28,관통력:12,이동속도:-5,힘요구치:30}},
+  // ─ 추가 무기: Epic ─
+  {id:'dragonslayer',   name:'드래곤 슬레이어',  icon:'sword', type:'weapon',  rarity:'epic',     desc:'용을 잡기 위해 제련된 전설의 검. 용에게 3배 대미지.',stats:{공격력:52,크리확률:15,번개데미지:20,내구도:120,힘요구치:50}},
+  {id:'shadow_dagger',  name:'그림자 단검',      icon:'dagger',type:'weapon',  rarity:'epic',     desc:'그림자 속에 숨겨진 단검. 적이 눈치채기도 전에 찌른다.',stats:{공격력:44,공격속도:30,크리확률:25,독데미지:15,민첩요구치:40}},
+  {id:'rune_axe',       name:'룬 도끼',          icon:'axe',   type:'weapon',  rarity:'epic',     desc:'고대 룬이 새겨진 도끼. 룬이 피를 갈망한다.',         stats:{공격력:58,흡혈:8,화염데미지:18,크리데미지:50,힘요구치:55}},
+  {id:'storm_bow',      name:'폭풍의 활',        icon:'bow',   type:'weapon',  rarity:'epic',     desc:'바람의 신이 깃든 활. 화살이 폭풍처럼 몰아친다.',    stats:{공격력:48,번개데미지:22,공격속도:18,크리확률:18,민첩요구치:45}},
+  {id:'thunder_spear',  name:'천둥 창',          icon:'spear', type:'weapon',  rarity:'epic',     desc:'낙뢰의 힘을 담은 창. 관통 후 전기가 튄다.',         stats:{공격력:55,번개데미지:30,관통력:22,이동속도:8,힘요구치:48}},
+  {id:'flame_staff',    name:'화염 지팡이 II',   icon:'staff', type:'weapon',  rarity:'epic',     desc:'용의 심장으로 만든 마법 지팡이. 시전 속도가 빠르다.',stats:{공격력:42,화염데미지:35,마나훔치기:8,크리확률:12,내구도:100}},
+  {id:'hero_sword',     name:'영웅의 대검',      icon:'sword', type:'weapon',  rarity:'epic',     desc:'영웅만이 들 수 있는 대검. 보는 것만으로도 기가 죽는다.',stats:{공격력:62,크리데미지:60,생명력훔치기:5,힘요구치:60,내구도:150}},
+  {id:'executioner_axe',name:'처형자의 도끼',    icon:'axe',   type:'weapon',  rarity:'epic',     desc:'단두대에서 쓰이던 도끼. 적을 두려움에 떨게 한다.',  stats:{공격력:70,크리확률:20,크리데미지:70,공격속도:-15,힘요구치:65}},
+  // ─ 추가 무기: Legendary ─
+  {id:'excalibur',      name:'엑스칼리버',       icon:'sword', type:'weapon',  rarity:'legendary',desc:'아서왕의 성검. 정의로운 자만이 진정한 힘을 발휘한다.',stats:{공격력:100,크리확률:25,생명력훔치기:10,이동속도:10,내구도:999}},
+  {id:'baldurs_gate',   name:'발더스 게이트',    icon:'sword', type:'weapon',  rarity:'legendary',desc:'신들의 문을 여는 검. 신성한 빛이 깃들어 있다.',     stats:{공격력:95,번개데미지:40,화염데미지:40,크리데미지:80,힘요구치:70}},
+  {id:'nidhogg_fang',   name:'니드호그의 송곳니',icon:'dagger',type:'weapon',  rarity:'legendary',desc:'세계수를 갉아먹는 독룡의 이빨. 저주받은 독이 흐른다.',stats:{공격력:88,독데미지:50,흡혈:15,크리확률:30,민첩요구치:60}},
+  {id:'piercing_angel', name:'관통의 천사',      icon:'bow',   type:'weapon',  rarity:'legendary',desc:'천사가 쏜 화살은 어떤 방어구도 꿰뚫는다고 전해진다.',stats:{공격력:90,관통력:50,크리확률:28,사거리:35,민첩요구치:65}},
+  {id:'world_tree_staff',name:'세계수 지팡이',   icon:'staff', type:'weapon',  rarity:'legendary',desc:'세계수의 가지로 만든 지팡이. 자연의 모든 마력이 깃들었다.',stats:{공격력:80,화염데미지:30,냉기데미지:30,번개데미지:30,마나훔치기:15}},
+  {id:'sky_wrath',      name:'하늘의 분노',      icon:'spear', type:'weapon',  rarity:'legendary',desc:'하늘에서 내려친 낙뢰가 창이 되었다. 바라보는 것도 위험하다.',stats:{공격력:105,번개데미지:60,관통력:35,이동속도:15,힘요구치:75}},
+  {id:'judgement_hammer',name:'심판의 망치',     icon:'hammer',type:'weapon',  rarity:'legendary',desc:'죄인을 심판하는 빛의 망치. 강타 시 지상이 흔들린다.',stats:{공격력:115,화염데미지:45,크리데미지:100,공격속도:-20,힘요구치:80}},
+  {id:'soul_reaper',    name:'소울 리퍼',        icon:'axe',   type:'weapon',  rarity:'legendary',desc:'영혼을 거두는 낫. 처치 시 생명력이 크게 회복된다.',  stats:{공격력:98,흡혈:20,생명력훔치기:18,크리확률:22,크리데미지:90}},
+  // ─ 추가 방어구: Common ─
+  {id:'cloth_helm',     name:'천 두건',          icon:'helmet',type:'armor',   rarity:'common',   desc:'천으로 만든 두건. 없는 것보다는 낫다.',              stats:{방어력:2,요구레벨:1}},
+  {id:'cloth_boots',    name:'천 신발',          icon:'boots', type:'armor',   rarity:'common',   desc:'발을 감싸는 천 신발. 이동이 가볍다.',               stats:{방어력:1,이동속도:2}},
+  {id:'cloth_gloves',   name:'천 장갑',          icon:'gloves',type:'armor',   rarity:'common',   desc:'손을 보호하는 천 장갑. 그립감은 좋다.',             stats:{방어력:1,체력회복:1}},
+  {id:'padded_armor',   name:'누빈 갑옷',        icon:'armor', type:'armor',   rarity:'common',   desc:'천을 겹겹이 누빈 갑옷. 따뜻하다.',                  stats:{방어력:4,최대생명력:10}},
+  {id:'wooden_shield',  name:'나무 방패',        icon:'shield',type:'armor',   rarity:'common',   desc:'나무를 둥글게 깎은 방패. 화염에 약하다.',            stats:{방어력:5,화염저항:-5}},
+  // ─ 추가 방어구: Uncommon ─
+  {id:'bronze_helm',    name:'청동 투구',        icon:'helmet',type:'armor',   rarity:'uncommon', desc:'청동으로 주조한 투구. 머리를 제법 잘 보호한다.',    stats:{방어력:8,요구레벨:5,최대생명력:15}},
+  {id:'bronze_armor',   name:'청동 갑옷',        icon:'armor', type:'armor',   rarity:'uncommon', desc:'청동 판금 갑옷. 이제부터 진짜 모험가다.',           stats:{방어력:12,요구레벨:5,이동속도:-2}},
+  {id:'leather_boots',  name:'가죽 부츠',        icon:'boots', type:'armor',   rarity:'uncommon', desc:'든든한 가죽으로 만든 부츠. 오래 걸어도 아프지 않다.',stats:{방어력:6,이동속도:4,요구레벨:4}},
+  {id:'leather_gloves', name:'가죽 장갑',        icon:'gloves',type:'armor',   rarity:'uncommon', desc:'가죽을 재단한 장갑. 손에 꼭 맞는다.',               stats:{방어력:5,체력회복:2,요구레벨:4}},
+  {id:'round_shield',   name:'원형 방패',        icon:'shield',type:'armor',   rarity:'uncommon', desc:'철테를 두른 원형 방패. 방어 시 소리가 우렁차다.',   stats:{방어력:10,화염저항:5,냉기저항:5,요구레벨:6}},
+  // ─ 추가 방어구: Rare ─
+  {id:'chainmail',      name:'사슬 갑옷',        icon:'armor', type:'armor',   rarity:'rare',     desc:'고리들을 엮어 만든 사슬 갑옷. 유연하면서도 튼튼하다.',stats:{방어력:20,최대생명력:40,이동속도:-3,요구레벨:10}},
+  {id:'plate_helm',     name:'판금 투구',        icon:'helmet',type:'armor',   rarity:'rare',     desc:'단단한 판금으로 만든 투구. 내부가 좀 좁다.',         stats:{방어력:18,최대생명력:30,이동속도:-4,요구레벨:10}},
+  {id:'ranger_boots',   name:'정찰대 부츠',      icon:'boots', type:'armor',   rarity:'rare',     desc:'숲속을 누비는 정찰대의 가벼운 부츠.',               stats:{방어력:12,이동속도:8,독저항:15,요구레벨:9}},
+  {id:'battle_gloves',  name:'전투 장갑',        icon:'gloves',type:'armor',   rarity:'rare',     desc:'전투에 최적화된 두꺼운 장갑. 타격감이 살아있다.',   stats:{방어력:10,최대생명력:20,체력회복:4,요구레벨:9}},
+  {id:'mage_hood',      name:'마법사 두건',      icon:'helmet',type:'armor',   rarity:'rare',     desc:'마법 집중을 돕는 두건. 생각이 맑아지는 기분이다.',  stats:{방어력:8,최대마나:60,마나회복:5,요구레벨:8}},
+  {id:'tower_shield',   name:'탑방패',           icon:'shield',type:'armor',   rarity:'rare',     desc:'전신을 가릴 수 있는 거대한 탑방패.',                stats:{방어력:25,화염저항:10,냉기저항:10,이동속도:-6,요구레벨:12}},
+  {id:'mystic_robe',    name:'신비로운 로브',    icon:'robe',  type:'armor',   rarity:'rare',     desc:'별빛이 수놓인 신비로운 마법사 로브.',               stats:{방어력:10,최대마나:80,마나회복:8,마나회복:6,요구레벨:11}},
+  // ─ 추가 방어구: Epic ─
+  {id:'shadow_armor',   name:'그림자 갑옷',      icon:'armor', type:'armor',   rarity:'epic',     desc:'어둠을 짜서 만든 갑옷. 암살자의 전용 방어구.',      stats:{방어력:30,이동속도:10,독저항:25,최대생명력:60,요구레벨:20}},
+  {id:'storm_helm',     name:'폭풍 투구',        icon:'helmet',type:'armor',   rarity:'epic',     desc:'번개를 담은 투구. 착용하면 머리카락이 곤두선다.',   stats:{방어력:28,번개저항:40,최대생명력:80,마나회복:10,요구레벨:22}},
+  {id:'phoenix_boots',  name:'불사조 부츠',      icon:'boots', type:'armor',   rarity:'epic',     desc:'불사조의 깃털로 만든 부츠. 화염 위도 걸을 수 있다.',stats:{방어력:18,이동속도:12,화염저항:45,체력회복:8,요구레벨:20}},
+  {id:'arcane_gloves',  name:'비전 장갑',        icon:'gloves',type:'armor',   rarity:'epic',     desc:'마력이 농축된 비전 장갑. 마법 주문이 강해진다.',    stats:{방어력:15,최대마나:120,마나회복:15,크리확률:8,요구레벨:22}},
+  // ─ 추가 방어구: Legendary ─
+  {id:'aegis',          name:'아이기스',         icon:'shield',type:'armor',   rarity:'legendary',desc:'신들의 방패 아이기스. 어떤 공격도 막아낸다는 전설.',  stats:{방어력:70,화염저항:50,냉기저항:50,번개저항:50,요구레벨:30}},
+  {id:'dragon_helm',    name:'용왕 투구',        icon:'helmet',type:'armor',   rarity:'legendary',desc:'용왕의 머리에서 직접 벗겨낸 투구. 착용자를 황제로 만든다.',stats:{방어력:55,최대생명력:200,화염저항:60,이동속도:-5,요구레벨:28}},
+  {id:'valkyrie_armor', name:'발키리 갑옷',      icon:'armor', type:'armor',   rarity:'legendary',desc:'발키리가 남긴 갑옷. 죽음의 문턱에서 착용자를 지킨다.',stats:{방어력:60,최대생명력:150,체력회복:20,냉기저항:40,요구레벨:30}},
+  {id:'void_robe',      name:'공허의 로브',      icon:'robe',  type:'armor',   rarity:'legendary',desc:'공허에서 건져낸 로브. 물리 법칙을 무시한다.',        stats:{방어력:35,최대마나:300,마나회복:25,번개저항:40,요구레벨:30}},
+  {id:'hermes_boots',   name:'헤르메스 부츠',    icon:'boots', type:'armor',   rarity:'legendary',desc:'전령의 신 헤르메스의 신발. 바람처럼 달린다.',        stats:{방어력:25,이동속도:25,독저항:30,체력회복:15,요구레벨:28}},
   {id:'tp_scroll',      name:'텔레포트 두루마리',icon:'scroll', type:'consume',rarity:'rare',    desc:'방문했던 장소로 순간이동한다.',       stats:{}},
   {id:'arrow',          name:'화살',            icon:'feather',type:'consume',rarity:'common',  desc:'활에 사용하는 기본 화살.',            stats:{}},
   {id:'fire_arrow',     name:'불 화살',         icon:'feather',type:'consume',rarity:'rare',    desc:'불이 붙은 화살. 추가 데미지.',        stats:{추가데미지:5}},
@@ -114,13 +187,27 @@ var SHOP_CATEGORIES={
   },
   '(무기상인) 발두르':{
     /* 무기만 */
-    pool:['wooden_sword','bone_sword','iron_sword','steel_axe','hunting_bow','fire_staff','moonblade','dragonfang','eclipse_blade','death_scythe'],
+    pool:[
+      'wooden_sword','bone_sword','iron_sword','steel_axe','hunting_bow','fire_staff','moonblade','dragonfang','eclipse_blade','death_scythe',
+      'wood_sword','rusty_dagger','old_club','stone_axe','bamboo_bow','bamboo_spear',
+      'copper_sword','iron_dagger','bronze_axe','copper_bow','iron_spear','wood_staff',
+      'steel_sword','assassin_dagger','knight_axe','longbow','silver_spear','mage_staff','greatsword','chain_flail',
+      'dragonslayer','shadow_dagger','rune_axe','storm_bow','thunder_spear','flame_staff','hero_sword','executioner_axe',
+      'excalibur','baldurs_gate','nidhogg_fang','piercing_angel','world_tree_staff','sky_wrath','judgement_hammer','soul_reaper'
+    ],
     slots:8
   },
   '(방어구상인) 헥토르':{
     /* 방어구만 */
-    pool:['leather_armor','iron_helmet','steel_boots','mage_robe','dragon_scale'],
-    slots:5
+    pool:[
+      'cloth_armor','leather_armor','iron_helmet','steel_boots','mage_robe','dragon_scale',
+      'cloth_helm','cloth_boots','cloth_gloves','padded_armor','wooden_shield',
+      'bronze_helm','bronze_armor','leather_boots','leather_gloves','round_shield',
+      'chainmail','plate_helm','ranger_boots','battle_gloves','mage_hood','tower_shield','mystic_robe',
+      'shadow_armor','storm_helm','phoenix_boots','arcane_gloves',
+      'aegis','dragon_helm','valkyrie_armor','void_robe','hermes_boots'
+    ],
+    slots:8
   },
   '(코디샵) 루나':{
     /* 코스메틱만 */
@@ -183,7 +270,48 @@ function _rollPrice(itemId){
 function rollShopStock(npcName){
   var cat=SHOP_CATEGORIES[npcName];
   if(!cat)return;
-  var picks=_pickRandom(cat.pool,cat.slots);
+  var picks;
+  /* 8슬롯이면 희귀도 가중 분배: 일반4 + 희귀/고급3 + 에픽1(3%확률로 전설) */
+  if(cat.slots===8){
+    /* 풀을 희귀도별로 분류 */
+    var byRarity={common:[],uncommon:[],rare:[],epic:[],legendary:[]};
+    cat.pool.forEach(function(id){
+      var def=(typeof getItemDef==='function')?getItemDef(id):null;
+      var r=(def&&def.rarity)||'common';
+      if(!byRarity[r])byRarity[r]=[];
+      byRarity[r].push(id);
+    });
+    picks=[];
+    /* 일반 4개 */
+    var commonPool=byRarity.common.concat(byRarity.uncommon);
+    var commonPicks=_pickRandom(byRarity.common,4);
+    if(commonPicks.length<4) commonPicks=commonPicks.concat(_pickRandom(byRarity.uncommon,4-commonPicks.length));
+    if(commonPicks.length<4) commonPicks=commonPicks.concat(_pickRandom(cat.pool,4-commonPicks.length));
+    picks=picks.concat(commonPicks);
+    /* 희귀/고급 3개 */
+    var rarePicks=_pickRandom(byRarity.rare,3);
+    if(rarePicks.length<3) rarePicks=rarePicks.concat(_pickRandom(byRarity.uncommon,3-rarePicks.length));
+    if(rarePicks.length<3) rarePicks=rarePicks.concat(_pickRandom(cat.pool,3-rarePicks.length));
+    picks=picks.concat(rarePicks);
+    /* 에픽 1개 (3% 확률로 전설) */
+    var epicPool=(Math.random()<0.03)?byRarity.legendary:byRarity.epic;
+    if(!epicPool||epicPool.length===0) epicPool=byRarity.epic.concat(byRarity.legendary);
+    var epicPick=_pickRandom(epicPool,1);
+    if(epicPick.length===0) epicPick=_pickRandom(cat.pool,1);
+    picks=picks.concat(epicPick);
+    /* 중복 제거 후 8개로 맞추기 */
+    var seen={};var deduped=[];
+    picks.forEach(function(id){if(!seen[id]){seen[id]=true;deduped.push(id);}});
+    /* 부족하면 나머지 풀에서 채우기 */
+    if(deduped.length<8){
+      var remaining=cat.pool.filter(function(id){return!seen[id];});
+      var extra=_pickRandom(remaining,8-deduped.length);
+      deduped=deduped.concat(extra);
+    }
+    picks=deduped.slice(0,8);
+  }else{
+    picks=_pickRandom(cat.pool,cat.slots);
+  }
   SHOP_STOCK[npcName]=picks.map(function(id){return{id:id,price:_rollPrice(id)};});
 }
 
