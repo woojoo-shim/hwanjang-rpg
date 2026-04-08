@@ -11,6 +11,24 @@ var questNotifQueue=[];
 var questNotifShowing=false;
 
 /* ── 퀘스트 파싱 ── */
+/* ── 몬스터 난이도별 보상 상한 (몬스터 레벨 × 수량 기반) ── */
+function capQuestReward(target,count,rewardType,rewardAmount){
+  var mDef=(typeof MONSTER_DEFS!=='undefined')?MONSTER_DEFS.find(function(x){return x.name===target;}):null;
+  var lv=mDef?(mDef.lv||1):1;
+  var n=parseInt(rewardAmount)||0;
+  if(rewardType==='gold'){
+    var maxGold=lv*count*30;/* 레벨당 마리당 30골드 */
+    if(n>maxGold)n=maxGold;
+  }else if(rewardType==='exp'){
+    var maxExp=lv*count*50;
+    if(n>maxExp)n=maxExp;
+  }else if(rewardType==='item'){
+    /* 아이템은 수량만 제한 */
+    if(n>5)n=5;
+  }
+  return String(n);
+}
+
 function parseQuest(reply){
   var re=/\[QUEST:([^\]]+)\]/;
   var m=reply.match(re);
@@ -18,15 +36,16 @@ function parseQuest(reply){
   var clean=reply.replace(re,'').trim();
   var p=m[1].split('|');
   if(p.length<7)return{clean:clean,quest:null};
+  var cnt=Math.min(parseInt(p[4])||1,20);/* 최대 20개 */
   var q={
     id:'quest_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
     name:p[0].trim(),
     desc:p[1].trim(),
     type:p[2].trim(),       // kill, collect
     target:p[3].trim(),     // 몬스터이름 또는 아이템id
-    count:parseInt(p[4])||1,
+    count:cnt,
     rewardType:p[5].trim(), // exp, gold, item
-    rewardAmount:p[6].trim(),
+    rewardAmount:capQuestReward(p[3].trim(),cnt,p[5].trim(),p[6].trim()),
     ready:false,            // 목표 달성 여부
   };
   return{clean:clean,quest:q};
