@@ -20,6 +20,7 @@ function changeRep(npcName,delta,reason){
     addChat('sys','[호감도]','<span style="color:'+color+'">'+npcName+' '+sign+delta+' ('+reason+')</span>');
   }
   if(typeof savePlayerData==='function')savePlayerData();
+  if(typeof sendRepUpdate==='function')sendRepUpdate();
 }
 
 /* 모든 NPC 호감도에 적용 (PK 등) */
@@ -38,6 +39,17 @@ function changeAllRep(delta,reason){
     addChat('sys','[호감도]','<span style="color:'+color+'">모든 NPC '+sign+delta+' ('+reason+')</span>');
   }
   if(typeof savePlayerData==='function')savePlayerData();
+}
+
+/* 모든 NPC 중 가장 낮은 호감도 */
+function getMinReputation(){
+  var keys=Object.keys(playerReputation);
+  if(keys.length===0)return 50;
+  var min=100;
+  for(var i=0;i<keys.length;i++){
+    if(playerReputation[keys[i]]<min)min=playerReputation[keys[i]];
+  }
+  return min;
 }
 
 /* 호감도 등급 */

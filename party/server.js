@@ -29,7 +29,7 @@ export default {
 
     if (data.type === 'join') {
       var uid = data.uid || conn.id;
-      var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry, cosmetics: data.cosmetics || {} };
+      var state = { uid: uid, name: data.name, level: data.level, x: data.x, z: data.z, ry: data.ry, cosmetics: data.cosmetics || {}, minRep: data.minRep };
       conn.serializeAttachment(state);
       if (!room._uidMap) room._uidMap = {};
       room._uidMap[uid] = conn.id;
@@ -37,7 +37,8 @@ export default {
         type: 'join', id: uid,
         name: data.name, level: data.level,
         x: data.x, z: data.z, ry: data.ry,
-        cosmetics: data.cosmetics || {}
+        cosmetics: data.cosmetics || {},
+        minRep: data.minRep
       }), [conn.id]);
     }
 
@@ -57,6 +58,14 @@ export default {
       var uid = st ? (st.uid || conn.id) : conn.id;
       room.broadcast(JSON.stringify({
         type: 'cosmetic_update', id: uid, cosmetics: data.cosmetics
+      }), [conn.id]);
+    }
+
+    if (data.type === 'rep_update') {
+      var stR = conn.deserializeAttachment();
+      var uidR = stR ? (stR.uid || conn.id) : conn.id;
+      room.broadcast(JSON.stringify({
+        type: 'rep_update', id: uidR, minRep: data.minRep
       }), [conn.id]);
     }
 

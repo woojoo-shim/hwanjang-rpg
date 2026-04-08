@@ -85,7 +85,8 @@ function connectParty(){
       x:+PL.group.position.x.toFixed(2),
       z:+PL.group.position.z.toFixed(2),
       ry:+PL.group.rotation.y.toFixed(2),
-      cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null}
+      cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null},
+      minRep:getMinReputation()
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
@@ -171,23 +172,34 @@ function sendCosmeticUpdate(){
   ws.send(JSON.stringify({type:'cosmetic_update',cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null}}));
 }
 
+function sendRepUpdate(){
+  if(!ws||ws.readyState!==1)return;
+  ws.send(JSON.stringify({type:'rep_update',minRep:getMinReputation()}));
+}
+
 function onMpMessage(data){
   if(data.type==='init'){
     for(var id in data.players){
       var p=data.players[id];
       spawnRemote(id,p.name,p.level,p.x,p.z,p.ry,p.y);
-      if(p.cosmetics&&remotePlayers[id]){
-        applyRemoteCosmetics(remotePlayers[id],p.cosmetics);
+      if(remotePlayers[id]){
+        if(p.cosmetics)applyRemoteCosmetics(remotePlayers[id],p.cosmetics);
+        if(p.minRep!==undefined)remotePlayers[id].minRep=p.minRep;
       }
     }
   }
   else if(data.type==='join'){
     var isNew=!remotePlayers[data.id];
     spawnRemote(data.id,data.name,data.level,data.x,data.z,data.ry,data.y);
-    if(data.cosmetics&&remotePlayers[data.id]){
-      applyRemoteCosmetics(remotePlayers[data.id],data.cosmetics);
+    if(remotePlayers[data.id]){
+      if(data.cosmetics)applyRemoteCosmetics(remotePlayers[data.id],data.cosmetics);
+      if(data.minRep!==undefined)remotePlayers[data.id].minRep=data.minRep;
     }
     if(isNew)addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
+  }
+  else if(data.type==='rep_update'){
+    var r=remotePlayers[data.id];
+    if(r)r.minRep=data.minRep;
   }
   else if(data.type==='move'){
     var r=remotePlayers[data.id];
@@ -483,6 +495,15 @@ function updateRemotePlayers(dt){
     var pdist=Math.sqrt(pdx*pdx+pdz*pdz);
     if(pdist<30){
       r.nameEl.style.display='';
+      /* 적대(호감도 20 미만) 표시 */
+      var baseName=r.name+' Lv.'+r.level;
+      if(r.minRep!==undefined&&r.minRep<20){
+        r.nameEl.innerHTML=baseName+' <span style="color:#ff4444;font-size:10px;">😡 적대 '+r.minRep+'</span>';
+        r.nameEl.style.color='#ff6666';
+      }else{
+        r.nameEl.textContent=baseName;
+        r.nameEl.style.color='';
+      }
       posEl(r.nameEl,r.group.position.x,r.group.position.y+2.4,r.group.position.z);
     }else{
       r.nameEl.style.display='none';

@@ -105,6 +105,15 @@ function updLabels(){
     var dist=Math.sqrt(dx*dx+dz*dz);
     if(dist<15){
       ne.style.display='';
+      /* 호감도 표시 */
+      if(typeof getRep==='function'&&NPC_AI&&NPC_AI[n.name]){
+        var _rep=getRep(n.name);
+        var _tier=getRepTier(n.name);
+        var _baseName=n.name;
+        /* 닉네임에서 이전 호감도 뱃지 제거 */
+        var cleanName=_baseName.replace(/\s*\[[^\]]+\]$/,'');
+        ne.innerHTML=cleanName+' <span style="color:'+_tier.color+';font-size:10px;">'+_tier.icon+' '+_rep+'</span>';
+      }
       posEl(ne,n.mesh.position.x,n.mesh.position.y+2.4,n.mesh.position.z);
       if(ie){
         if(n===closestNpc){ie.style.display='block';posEl(ie,n.mesh.position.x,n.mesh.position.y+3.1,n.mesh.position.z);}
