@@ -2143,16 +2143,27 @@ function updMonsters(dt,t){
     /* ── 비호스트: 호스트 위치로 보간 ── */
     if(isNH){
       var tx=m._targetX,tz=m._targetZ;
-      var lerpF=0.15;
+      var ty=(m._targetY!==undefined)?m._targetY:((typeof getTerrainY==='function')?getTerrainY(tx,tz):0);
+      var lerpF=0.2;
       m.mesh.position.x=mx+(tx-mx)*lerpF;
       m.mesh.position.z=mz+(tz-mz)*lerpF;
-      var ddx=tx-mx,ddz=tz-mz;
-      if(ddx*ddx+ddz*ddz>0.001){
-        var tRy=Math.atan2(ddx,ddz);
-        var dR=tRy-m.mesh.rotation.y;
-        while(dR>Math.PI)dR-=Math.PI*2;
-        while(dR<-Math.PI)dR+=Math.PI*2;
-        m.mesh.rotation.y+=dR*Math.min(1,10*dt);
+      m.mesh.position.y=m.mesh.position.y+(ty-m.mesh.position.y)*lerpF;
+      m.baseY=ty;
+      /* 회전: 호스트가 보낸 회전 우선, 없으면 이동 방향 */
+      if(m._targetRy!==undefined){
+        var dR2=m._targetRy-m.mesh.rotation.y;
+        while(dR2>Math.PI)dR2-=Math.PI*2;
+        while(dR2<-Math.PI)dR2+=Math.PI*2;
+        m.mesh.rotation.y+=dR2*Math.min(1,12*dt);
+      }else{
+        var ddx=tx-mx,ddz=tz-mz;
+        if(ddx*ddx+ddz*ddz>0.001){
+          var tRy=Math.atan2(ddx,ddz);
+          var dR=tRy-m.mesh.rotation.y;
+          while(dR>Math.PI)dR-=Math.PI*2;
+          while(dR<-Math.PI)dR+=Math.PI*2;
+          m.mesh.rotation.y+=dR*Math.min(1,10*dt);
+        }
       }
       /* 비호스트: 동기화된 상태 반영 */
       if(m._syncState)m.state=m._syncState;

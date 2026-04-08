@@ -112,10 +112,20 @@ function connectParty(){
           var p=parts[i].split(',');
           var idx=parseInt(p[0]);
           if(idx>=0&&idx<monsters.length&&monsters[idx].hp>0){
-            monsters[idx]._targetX=parseFloat(p[1]);
-            monsters[idx]._targetZ=parseFloat(p[2]);
-            monsters[idx]._syncState=p[3]||'idle';
-            monsters[idx]._targetPlayerId=p[4]||'';
+            /* 신 포맷: idx,x,y,z,ry,state,tid (7개) / 구 포맷: idx,x,z,state,tid (5개) */
+            if(p.length>=7){
+              monsters[idx]._targetX=parseFloat(p[1]);
+              monsters[idx]._targetY=parseFloat(p[2]);
+              monsters[idx]._targetZ=parseFloat(p[3]);
+              monsters[idx]._targetRy=parseFloat(p[4]);
+              monsters[idx]._syncState=p[5]||'idle';
+              monsters[idx]._targetPlayerId=p[6]||'';
+            }else{
+              monsters[idx]._targetX=parseFloat(p[1]);
+              monsters[idx]._targetZ=parseFloat(p[2]);
+              monsters[idx]._syncState=p[3]||'idle';
+              monsters[idx]._targetPlayerId=p[4]||'';
+            }
           }
         }
       }
@@ -312,12 +322,12 @@ function startMonsterSync(){
     for(var i=0;i<monsters.length;i++){
       var m=monsters[i];
       if(m.hp<=0||m.deathAnim>=0)continue;
-      /* 포맷: idx,x,z,state,targetPlayerId */
+      /* 포맷: idx,x,y,z,ry,state,targetPlayerId */
       var tid=m._chaseTargetId||'';
-      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.z.toFixed(1)+','+m.state+','+tid);
+      batch.push(i+','+m.mesh.position.x.toFixed(1)+','+m.mesh.position.y.toFixed(1)+','+m.mesh.position.z.toFixed(1)+','+m.mesh.rotation.y.toFixed(2)+','+m.state+','+tid);
     }
     if(batch.length>0)ws.send('mp|'+batch.join(';'));
-  },250);
+  },200);
 }
 
 /* ── 원격 플레이어 메쉬 ── */
