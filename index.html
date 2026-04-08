@@ -28,23 +28,61 @@ if('serviceWorker' in navigator){
 
 <div id="bg-stars"></div>
 
-<!-- 플로팅 설치 버튼 (PWA 설치 가능 시) -->
+<!-- 플로팅 설치 버튼 (로그인 화면에만 표시) -->
 <button id="pwa-install-btn" style="display:none;position:fixed;top:10px;right:10px;z-index:998;background:#c9a84c;color:#0c0c1e;border:none;padding:10px 16px;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:1px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.4);">📥 앱 설치</button>
 
 <script>
 var _deferredPrompt=null;
+var _isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+var _isAndroid=/Android/i.test(navigator.userAgent);
+var _isStandalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   _deferredPrompt=e;
   var btn=document.getElementById('pwa-install-btn');
   if(btn)btn.style.display='block';
 });
+
 window.addEventListener('load',function(){
   var btn=document.getElementById('pwa-install-btn');
   if(!btn)return;
+  /* iOS는 beforeinstallprompt를 지원 안 함 → 수동 안내용 버튼 표시 */
+  if(_isIOS&&!_isStandalone){
+    btn.style.display='block';
+  }
   btn.addEventListener('click',async function(){
+    if(_isIOS){
+      /* iOS: 설치 방법 안내 모달 재표시 */
+      var g=document.getElementById('install-guide');
+      if(g){
+        g.style.display='flex';
+        document.getElementById('install-pc').style.display='none';
+        document.getElementById('install-android').style.display='none';
+        document.getElementById('install-ios').style.display='block';
+      }
+      return;
+    }
+    if(_isAndroid&&!_deferredPrompt){
+      /* Android인데 prompt 이벤트가 아직 안 왔거나 이미 거절됨 */
+      var g2=document.getElementById('install-guide');
+      if(g2){
+        g2.style.display='flex';
+        document.getElementById('install-pc').style.display='none';
+        document.getElementById('install-android').style.display='block';
+        document.getElementById('install-ios').style.display='none';
+      }
+      return;
+    }
     if(!_deferredPrompt){
-      alert('이 브라우저에서는 설치가 지원되지 않거나, 이미 설치되어있습니다.\n\nChrome/Edge에서 주소창 오른쪽의 ⊕ 아이콘을 확인해보세요.');
+      /* PC: 이벤트가 안 왔으면 안내 모달 */
+      var g3=document.getElementById('install-guide');
+      if(g3){
+        g3.style.display='flex';
+        document.getElementById('install-pc').style.display='block';
+        document.getElementById('install-android').style.display='none';
+        document.getElementById('install-ios').style.display='none';
+      }
       return;
     }
     _deferredPrompt.prompt();
@@ -55,6 +93,7 @@ window.addEventListener('load',function(){
     _deferredPrompt=null;
   });
 });
+
 window.addEventListener('appinstalled',function(){
   var btn=document.getElementById('pwa-install-btn');
   if(btn)btn.style.display='none';
