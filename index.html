@@ -28,6 +28,58 @@ if('serviceWorker' in navigator){
 
 <div id="bg-stars"></div>
 
+<!-- 설치 안내 (첫 방문) -->
+<div id="install-guide" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#1a1a2e;border:2px solid #c9a84c;border-radius:14px;padding:28px;max-width:420px;width:100%;color:#f0e4bb;font-family:inherit;">
+    <div style="text-align:center;font-size:22px;color:#c9a84c;margin-bottom:16px;font-weight:bold;letter-spacing:2px;">▣ 포톤 RPG 설치 안내 ▣</div>
+    <div style="font-size:13px;line-height:1.8;margin-bottom:20px;">
+      앱으로 설치하면 홈 화면에서 바로 실행할 수 있어요!
+    </div>
+    <div id="install-pc" style="display:none;font-size:12px;line-height:1.7;margin-bottom:16px;padding:12px;background:rgba(201,168,76,0.08);border-radius:8px;">
+      <div style="color:#c9a84c;font-weight:bold;margin-bottom:6px;">💻 PC (Chrome/Edge)</div>
+      1. 주소창 오른쪽 <b>⊕ 설치</b> 아이콘 클릭<br>
+      2. "설치" 버튼 클릭
+    </div>
+    <div id="install-android" style="display:none;font-size:12px;line-height:1.7;margin-bottom:16px;padding:12px;background:rgba(201,168,76,0.08);border-radius:8px;">
+      <div style="color:#c9a84c;font-weight:bold;margin-bottom:6px;">📱 Android (Chrome)</div>
+      1. 우측 상단 <b>⋮ 메뉴</b> 클릭<br>
+      2. <b>"앱 설치"</b> 또는 <b>"홈 화면에 추가"</b> 선택
+    </div>
+    <div id="install-ios" style="display:none;font-size:12px;line-height:1.7;margin-bottom:16px;padding:12px;background:rgba(201,168,76,0.08);border-radius:8px;">
+      <div style="color:#c9a84c;font-weight:bold;margin-bottom:6px;">🍎 iPhone (Safari)</div>
+      1. 하단 <b>공유 📤</b> 버튼 클릭<br>
+      2. <b>"홈 화면에 추가"</b> 선택
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:16px;text-align:center;">
+      ※ 설치하지 않고 웹에서 바로 플레이도 가능해요
+    </div>
+    <button id="install-guide-close" style="width:100%;background:#c9a84c;color:#0c0c1e;border:none;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border-radius:8px;">시작하기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  if(localStorage.getItem('installGuideShown')==='1')return;
+  var ua=navigator.userAgent;
+  var isIOS=/iPhone|iPad|iPod/i.test(ua);
+  var isAndroid=/Android/i.test(ua);
+  var isStandalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;
+  if(isStandalone)return;/* 이미 설치한 상태 */
+  setTimeout(function(){
+    var g=document.getElementById('install-guide');
+    if(!g)return;
+    g.style.display='flex';
+    if(isIOS)document.getElementById('install-ios').style.display='block';
+    else if(isAndroid)document.getElementById('install-android').style.display='block';
+    else document.getElementById('install-pc').style.display='block';
+    document.getElementById('install-guide-close').addEventListener('click',function(){
+      g.style.display='none';
+      localStorage.setItem('installGuideShown','1');
+    });
+  },500);
+})();
+</script>
+
 <!-- 로그인 -->
 <div class="screen" id="login-screen">
   <div class="pwrap">
