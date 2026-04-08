@@ -1964,7 +1964,7 @@ function updVisualFX(t){
 }
 
 function chkNpc(){
-  closestNpc=null;var md=4.5;
+  closestNpc=null;var md=7.0;
   npcs.forEach(function(n){
     /* 내부 NPC(n.label 있음)는 건물 내부일 때만, 외부 NPC는 밖일 때만 감지 */
     var isInterior=!!(n.label);
