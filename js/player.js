@@ -838,6 +838,21 @@ function checkZone(){
 /* 물 속 여부 판정 */
 var _inWater=false;
 var _waterDepth=0;/* 0=지상, 양수=물에 잠긴 깊이 */
+var _dashActive=0;/* 대쉬 지속시간 타이머 */
+var _dashCooldown=0;/* 대쉬 쿨다운 */
+var _DASH_COOLDOWN=4;/* 4초 쿨다운 */
+var _DASH_DURATION=0.25;/* 0.25초 지속 */
+function tryDash(){
+  if(playerLevel<5)return false;
+  if(_dashCooldown>0)return false;
+  if(_dashActive>0)return false;
+  if(typeof insideBuilding!=='undefined'&&insideBuilding)return false;
+  _dashActive=_DASH_DURATION;
+  _dashCooldown=_DASH_COOLDOWN;
+  if(typeof SFX!=='undefined')SFX.teleport();
+  if(typeof addChat==='function')addChat('inf','','대쉬!');
+  return true;
+}
 
 var _BRIDGES=[
   /* [cx, cz, halfLen, halfWid, rotated] — rotated=true면 다리가 동서방향(90도회전) */
@@ -926,6 +941,12 @@ function handleMove(dt){
     if(keys['a']||keys['arrowleft']){dx-=Math.cos(cYaw);dz+=Math.sin(cYaw);}
     if(keys['d']||keys['arrowright']){dx+=Math.cos(cYaw);dz-=Math.sin(cYaw);}
   }
+  /* ── 대쉬 쿨다운 틱 ── */
+  if(_dashCooldown>0)_dashCooldown-=dt;
+  if(_dashActive>0){
+    _dashActive-=dt;
+    if(_dashActive<=0){_dashActive=0;}
+  }
   var moving=dx!==0||dz!==0;
   if(moving){
     if(typeof SFX!=='undefined')SFX.step();
@@ -933,6 +954,10 @@ function handleMove(dt){
     var spdMul=(CLASS_DEFS[playerClass]||CLASS_DEFS.none).spdMul;
     if(playerSlowed>0)spdMul*=0.4;/* 둔화 시 60% 감속 */
     if(_inWater)spdMul*=0.35;/* 물 속 65% 감속 */
+    /* ── 대쉬 ── */
+    if(_dashActive>0)spdMul*=3.5;/* 대쉬 중 3.5배 속도 */
+    /* ── 달리기 (Shift 홀드, 레벨 5+) ── */
+    else if(playerLevel>=5&&keys['shift']&&!_inWater)spdMul*=1.6;
     var spd=6.0*spdMul*dt,nx=PL.group.position.x+dx*spd,nz=PL.group.position.z+dz*spd;
     /* 건물 내부에서는 벽 안으로 제한 */
     if(typeof insideBuilding!=='undefined'&&insideBuilding){

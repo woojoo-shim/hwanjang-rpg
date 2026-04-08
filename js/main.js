@@ -255,6 +255,8 @@ function setupInput(){
       }
     }
     if(k==='f'&&!isInput){e.preventDefault();playerAttack();}
+    /* Space: 대쉬 (레벨 5+) */
+    if(k===' '&&!isInput){e.preventDefault();if(typeof tryDash==='function')tryDash();}
     /* 스킬 키: Q=0, R=1, T=2 */
     var skillMap={'q':0,'r':1,'t':2};
     var sk=skillMap[k];
