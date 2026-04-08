@@ -343,6 +343,19 @@ function openShop(npcName){
   updShopGold();
   var cl=document.getElementById('shop-chat-log');
   if(cl)cl.innerHTML='<div style="color:#c9a84c;">'+npcName+': 어서오세요~ 뭘 도와드릴까요?</div>';
+  /* 호감도 표시 */
+  if(typeof getRepTier==='function'){
+    var tier=getRepTier(npcName);
+    var rep=getRep(npcName);
+    var repEl=document.createElement('div');
+    repEl.id='shop-rep-display';
+    repEl.style.cssText='text-align:center;padding:6px;font-size:11px;color:'+tier.color+';border-bottom:1px solid #444;';
+    repEl.innerHTML=tier.icon+' 호감도: '+tier.name+' ('+rep+'/100)';
+    var wrap=document.getElementById('shop-items').parentElement;
+    var existing=document.getElementById('shop-rep-display');
+    if(existing)existing.remove();
+    if(wrap)wrap.insertBefore(repEl,wrap.firstChild);
+  }
   return true;
 }
 
@@ -464,6 +477,9 @@ function doBuy(){
   if(shopTab==='sell'){
     var slot=shopSelectedItem.slot,sellP=shopSelectedItem.sellP;
     var def=getItemFull(slot);
+    /* 호감도 기반 판매가 조정 */
+    var sellMul=typeof getSellMultiplier==='function'?getSellMultiplier(currentShopNpc)*2:1.0;
+    sellP=Math.floor(sellP*sellMul);
     slot.qty--;
     if(slot.qty<=0)inventory=inventory.filter(function(s){return s!==slot;});
     gold+=sellP;
@@ -474,7 +490,10 @@ function doBuy(){
   } else {
     var entry=shopSelectedItem;
     var def=getItemDef(entry.id);if(!def)return;
-    var finalPrice=entry._hagglePrice||entry.price;
+    var basePrice=entry._hagglePrice||entry.price;
+    /* 호감도 기반 가격 조정 */
+    var repMul=typeof getPriceMultiplier==='function'?getPriceMultiplier(currentShopNpc):1.0;
+    var finalPrice=Math.floor(basePrice*repMul);
     if(gold<finalPrice){addChat('inf','','골드가 부족합니다!');return;}
     gold-=finalPrice;
     if(typeof SFX!=='undefined')SFX.buy();
@@ -502,11 +521,19 @@ function haggle(){
   haggleCount++;
   /* 상인: 잘 안 깎아줌 (20% 확률), 대장장이: 좀 더 깎아줌 (40%) */
   var chance=isBlacksmith?0.4:isMerchant?0.2:0.3;
+  /* 호감도 보너스 */
+  if(typeof getHaggleBonus==='function')chance+=getHaggleBonus(currentShopNpc);
+  chance=Math.max(0.05,Math.min(0.8,chance));
   /* 3번 이상 시도하면 확률 감소 */
   if(haggleCount>3)chance*=0.5;
+  /* 과도한 흥정 → 호감도 하락 */
+  if(haggleCount>=3&&typeof changeRep==='function'){
+    changeRep(currentShopNpc,-2,'과도한 흥정');
+  }
   if(haggleCount>5){
     resultEl.textContent='"더 이상은 안 돼!" (흥정 실패)';
     resultEl.style.color='#ff5555';
+    if(typeof changeRep==='function')changeRep(currentShopNpc,-5,'집요한 흥정');
     return;
   }
   if(Math.random()<chance){

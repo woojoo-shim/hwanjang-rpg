@@ -118,7 +118,8 @@ async function savePlayerData(){
     zone:currentZone||'village',
     class:playerClass,
     visited_zones:visitedZones,
-    equipped_dur:equippedDur
+    equipped_dur:equippedDur,
+    reputation:playerReputation
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
@@ -138,6 +139,7 @@ function restoreGameState(){
   playerClass=playerData.class||'none';
   if(playerData.visited_zones)visitedZones=playerData.visited_zones;
   if(playerData.equipped_dur)equippedDur=playerData.equipped_dur;
+  if(playerData.reputation)playerReputation=playerData.reputation;
 }
 
 function startAutoSave(){

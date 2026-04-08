@@ -236,14 +236,16 @@ function onItemCollect(itemId,qty){
 function completeQuest(q){
   if(typeof SFX!=='undefined')SFX.questComplete();
   addChat('sys','[시스템]','✦ 퀘스트 완료: ['+q.name+'] ✦');
+  /* 호감도 기반 보상 배율 */
+  var repMul=(typeof getRewardMultiplier==='function'&&q.npc)?getRewardMultiplier(q.npc):1.0;
   // 보상 지급
   if(q.rewardType==='exp'){
-    var amt=parseInt(q.rewardAmount)||0;
+    var amt=Math.floor((parseInt(q.rewardAmount)||0)*repMul);
     playerEXP+=amt;
     addChat('sys','[시스템]','경험치 +'+amt+' 획득!');
     checkLevelUp();
   }else if(q.rewardType==='gold'){
-    var amt=parseInt(q.rewardAmount)||0;
+    var amt=Math.floor((parseInt(q.rewardAmount)||0)*repMul);
     gold+=amt;
     document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
     addChat('sys','[시스템]','골드 +'+amt+' 획득!');
@@ -252,6 +254,8 @@ function completeQuest(q){
     var def=getItemDef(q.rewardAmount);
     addChat('sys','[시스템]','아이템 ['+(def?def.name:q.rewardAmount)+'] 획득!');
   }
+  /* 퀘스트 완료 시 호감도 상승 */
+  if(q.npc&&typeof changeRep==='function')changeRep(q.npc,5,'퀘스트 완료');
   // 완료 이펙트
   showQuestComplete(q.name);
   // 완료 목록에 추가

@@ -471,6 +471,10 @@ function applyPriceChange(itemName,newPrice,npcName){
 async function askAI(npcName,userMsg){
   var npcData=NPC_AI[npcName];if(!npcData)return'...';
   var sys=npcData.system;
+  /* 호감도 기반 톤 조정 */
+  if(typeof getRepPromptSuffix==='function'){
+    sys+=getRepPromptSuffix(npcName);
+  }
   npcData.history.push({role:'user',content:userMsg});
   if(npcData.history.length>20)npcData.history=npcData.history.slice(-20);
   try{
