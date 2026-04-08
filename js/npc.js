@@ -392,16 +392,31 @@ function parseHiddenItem(reply){
   var clean=reply.replace(re,'').trim();
   var parts=m[1].split('|');
   if(parts.length<2)return{clean:clean,item:null};
-  var name=parts[0],desc=parts[1],iconKey=parts[2],statVal=parts[3];
+  var name=parts[0],desc=parts[1],iconKey=parts[2],statVal=parts[3],typeHint=parts[4];
   var statNum=parseInt(statVal)||Math.floor(Math.random()*30+5);
+  /* 이름/설명에서 무기/방어구 감지 */
+  var combined=(name+' '+desc).toLowerCase();
+  var detectedType='etc';
+  if(typeHint){
+    var th=typeHint.trim();
+    if(th==='weapon'||th==='armor'||th==='consume')detectedType=th;
+  }else if(/검|sword|활|bow|지팡이|staff|단검|dagger|창|spear|도끼|axe|해머|hammer|무기|weapon|칼/.test(combined)){
+    detectedType='weapon';
+  }else if(/갑옷|armor|방패|shield|투구|helm|로브|robe|방어|갑|옷/.test(combined)){
+    detectedType='armor';
+  }else if(/포션|potion|물약|영약|elixir/.test(combined)){
+    detectedType='consume';
+  }
   var item={
     id:'hidden_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
     name:name.trim(),
     icon:(iconKey&&iconKey.trim()in ICON)?iconKey.trim():'star',
-    type:'etc',
+    type:detectedType,
     rarity:'hidden',
     desc:(desc||'정체불명의 아이템.').trim(),
     stats:{'능력치':statNum},
+    atk:detectedType==='weapon'?statNum:0,
+    def:detectedType==='armor'?statNum:0
   };
   return{clean:clean,item:item};
 }
