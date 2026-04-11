@@ -45,8 +45,31 @@ function initMobileControls(){
     {id:'m-atk',label:'⚔️',key:'f',size:65,color:'rgba(220,50,50,0.5)'},
     {id:'m-talk',label:'💬',key:'e',size:55,color:'rgba(50,150,220,0.5)'},
     {id:'m-inv',label:'🎒',key:'i',size:55,color:'rgba(180,150,50,0.5)'},
-    {id:'m-tp',label:'🌀',key:'h',size:50,color:'rgba(100,50,200,0.5)'}
+    {id:'m-tp',label:'🌀',key:'h',size:50,color:'rgba(100,50,200,0.5)'},
+    {id:'m-dash',label:'💨',key:' ',size:50,color:'rgba(50,200,200,0.5)'}
   ];
+
+  /* 달리기 토글 버튼 (조이스틱 위) */
+  var runBtn=document.createElement('div');
+  runBtn.id='m-run';
+  runBtn.style.cssText='position:fixed;left:55px;bottom:270px;width:50px;height:50px;border-radius:50%;background:rgba(200,180,50,0.4);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;user-select:none;touch-action:none;z-index:51;';
+  runBtn.textContent='🏃';
+  runBtn.style.display='none';
+  var _runActive=false;
+  runBtn.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    _runActive=!_runActive;
+    if(_runActive){
+      keys['shift']=true;
+      runBtn.style.background='rgba(200,180,50,0.8)';
+      runBtn.style.border='2px solid #ffdd44';
+    }else{
+      keys['shift']=false;
+      runBtn.style.background='rgba(200,180,50,0.4)';
+      runBtn.style.border='2px solid rgba(255,255,255,0.3)';
+    }
+  },{passive:false});
+  document.body.appendChild(runBtn);
 
   btns.forEach(function(b){
     var btn=document.createElement('div');
@@ -171,14 +194,18 @@ function showMobileControls(){
   if(!isMobile)return;
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
+  var rb=document.getElementById('m-run');
   if(jw)jw.style.display='block';
   if(mb)mb.style.display='flex';
+  if(rb)rb.style.display='flex';
 }
 function hideMobileControls(){
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
+  var rb=document.getElementById('m-run');
   if(jw)jw.style.display='none';
   if(mb)mb.style.display='none';
+  if(rb)rb.style.display='none';
 }
 
 /* ════════════ 컨트롤 커스터마이즈 ════════════ */
