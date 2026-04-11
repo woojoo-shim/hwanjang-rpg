@@ -138,6 +138,7 @@ function enterGame(){
         if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
+      if(typeof buildDungeonEntrances==='function')buildDungeonEntrances();
       /* BGM 즉시 시작 — 로그인 과정에서 이미 유저 상호작용 발생했으므로 autoplay 허용됨 */
       _bgmZone='';
       if(typeof getAudioCtx==='function')getAudioCtx();/* AudioContext resume */
@@ -251,6 +252,8 @@ function setupInput(){
         }
       }else if(closestNpc&&!document.getElementById('dbox').classList.contains('show')){
         talk(closestNpc);
+      }else if(typeof tryEnterDungeon==='function'&&tryEnterDungeon()){
+        /* 던전 입장/탈출 */
       }else if(typeof tryEnterBuilding==='function'&&nearestDoor){
         tryEnterBuilding();
       }
@@ -338,6 +341,8 @@ function loop(){
     if(typeof updateLootGlows==='function')updateLootGlows(dt);
     checkZone();
     if(typeof checkBuildingDoors==='function')checkBuildingDoors();
+    if(typeof checkDungeonEntrance==='function')checkDungeonEntrance();
+    if(typeof checkDungeonProgress==='function')checkDungeonProgress();
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
     /* AFK 체크 */
     if(now-lastActivity>AFK_LIMIT){
