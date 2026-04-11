@@ -830,6 +830,24 @@ async function sendToNpc(){
   document.getElementById('dsend').disabled=true;
 
   addChat('plr',myName,msg);
+  /* ── 플레이어 메시지 호감도 분석 ── */
+  if(typeof changeRep==='function'){
+    var _rudeWords=['시발','씨발','개새','병신','ㅅㅂ','ㅂㅅ','꺼져','닥쳐','죽어','미친','바보','멍청'];
+    var _greedWords=['올려','비싸게','바가지','더 받아','두 배','세 배','10배'];
+    var _niceWords=['감사','고마워','좋아','멋져','최고','사랑','친절'];
+    var _msgLow=msg.toLowerCase();
+    var _repDelta=0;
+    for(var _ri=0;_ri<_rudeWords.length;_ri++){
+      if(_msgLow.indexOf(_rudeWords[_ri])!==-1){_repDelta-=8;break;}
+    }
+    for(var _gi=0;_gi<_greedWords.length;_gi++){
+      if(_msgLow.indexOf(_greedWords[_gi])!==-1){_repDelta-=3;break;}
+    }
+    for(var _ni=0;_ni<_niceWords.length;_ni++){
+      if(_msgLow.indexOf(_niceWords[_ni])!==-1){_repDelta+=2;break;}
+    }
+    if(_repDelta!==0)changeRep(activeNpc.name,_repDelta);
+  }
   showThinking();
   isAiThinking=true;
 
