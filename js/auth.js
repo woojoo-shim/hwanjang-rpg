@@ -121,7 +121,11 @@ async function savePlayerData(){
     equipped_dur:equippedDur,
     reputation:playerReputation,
     stats:playerStats,
-    stat_points:statPoints
+    stat_points:statPoints,
+    rank_points:playerRankPoints,
+    rank_tier:playerTier,
+    pvp_wins:pvpWins,
+    pvp_losses:pvpLosses
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
@@ -144,7 +148,12 @@ function restoreGameState(){
   if(playerData.reputation)playerReputation=playerData.reputation;
   if(playerData.stats)playerStats=playerData.stats;
   if(playerData.stat_points!==undefined)statPoints=playerData.stat_points;
+  if(playerData.rank_points!==undefined)playerRankPoints=playerData.rank_points;
+  if(playerData.rank_tier)playerTier=playerData.rank_tier;
+  if(playerData.pvp_wins!==undefined)pvpWins=playerData.pvp_wins;
+  if(playerData.pvp_losses!==undefined)pvpLosses=playerData.pvp_losses;
   if(typeof applyStatEffects==='function')applyStatEffects();
+  if(typeof updateRankDisplay==='function')setTimeout(updateRankDisplay,500);
 }
 
 function startAutoSave(){
