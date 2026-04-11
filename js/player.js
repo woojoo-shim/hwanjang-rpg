@@ -785,10 +785,36 @@ function doTeleport(zoneKey){
     if(slot2.qty<=0){var idx=inventory.indexOf(slot2);if(idx>=0)inventory.splice(idx,1);}
   }
   /* 텔레포트 */
-  PL.group.position.set(zi.tp[0],0,zi.tp[1]);
+  var tpX=zi.tp[0],tpZ=zi.tp[1];
+  var tpY=(typeof getTerrainY==='function')?getTerrainY(tpX,tpZ):0;
+  PL.group.position.set(tpX,tpY,tpZ);
   if(typeof SFX!=='undefined')SFX.teleport();
   closeTpModal();
   addChat('sys','[시스템]','★ '+zi.name+'(으)로 텔레포트!');
+  /* 무적 3초 */
+  invincibleTimer=3;
+  /* 주변 몬스터 밀어내기 (반경 15) */
+  if(typeof monsters!=='undefined'){
+    for(var mi=0;mi<monsters.length;mi++){
+      var mm=monsters[mi];
+      if(mm.hp<=0)continue;
+      var mdx=mm.mesh.position.x-tpX,mdz=mm.mesh.position.z-tpZ;
+      var mDist=Math.sqrt(mdx*mdx+mdz*mdz);
+      if(mDist<15){
+        /* 몬스터를 반경 밖으로 밀어냄 */
+        var pushDist=16;
+        if(mDist>0.1){
+          mm.mesh.position.x=tpX+mdx/mDist*pushDist;
+          mm.mesh.position.z=tpZ+mdz/mDist*pushDist;
+        }else{
+          mm.mesh.position.x=tpX+pushDist;
+          mm.mesh.position.z=tpZ;
+        }
+        mm.state='idle';
+        mm.attackTimer=2;
+      }
+    }
+  }
   /* 존 전환 트리거 */
   checkZone();
 }
