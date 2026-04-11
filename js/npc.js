@@ -470,7 +470,7 @@ function applyPriceChange(itemName,newPrice,npcName){
 
 async function askAI(npcName,userMsg){
   var npcData=NPC_AI[npcName];if(!npcData)return'...';
-  var sys=npcData.system;
+  var sys=(typeof WORLD_LORE!=='undefined'?WORLD_LORE:'')+npcData.system;
   /* 호감도 기반 톤 조정 */
   if(typeof getRepPromptSuffix==='function'){
     sys+=getRepPromptSuffix(npcName);
