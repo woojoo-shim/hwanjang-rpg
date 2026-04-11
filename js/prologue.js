@@ -108,7 +108,7 @@ function showPrologue(callback){
     starVerts.push((Math.random()-.5)*40,(Math.random()-.5)*20+5,(Math.random()-.5)*40-10);
   }
   starGeo.setAttribute('position',new THREE.Float32BufferAttribute(starVerts,3));
-  var starMat=new THREE.PointsMaterial({color:0x555566,size:0.08,transparent:true,opacity:0.6});
+  var starMat=new THREE.PointsMaterial({color:0x8888aa,size:0.15,transparent:true,opacity:0.8});
   var starField=new THREE.Points(starGeo,starMat);
   _pScene.add(starField);
 
