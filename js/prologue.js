@@ -61,10 +61,137 @@ function showPrologue(callback){
   });
   overlay.appendChild(skipBtn);
 
+  /* ── 배경 캔버스 애니메이션 ── */
+  var cvs=document.createElement('canvas');
+  cvs.id='prologue-canvas';
+  cvs.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;';
+  overlay.insertBefore(cvs,textEl);
+  textEl.style.position='relative';textEl.style.zIndex='1';
+
+  var ctx2d=cvs.getContext('2d');
+  var _pParts=[];/* 파티클 배열 */
+  var _pAnim=null;
+  var _photonOrb={x:0,y:0,r:0,glow:0,active:false};
+
+  function resizePCanvas(){
+    cvs.width=window.innerWidth;cvs.height=window.innerHeight;
+    _photonOrb.x=cvs.width/2;_photonOrb.y=cvs.height/2;
+  }
+  resizePCanvas();
+  window.addEventListener('resize',resizePCanvas);
+
+  /* 파티클 생성 */
+  function spawnPart(x,y,vx,vy,life,size,color){
+    _pParts.push({x:x,y:y,vx:vx,vy:vy,life:life,maxLife:life,size:size||1.5,color:color||'#ffffff'});
+  }
+
+  /* 슬라이드별 파티클 이벤트 */
+  function onSlideChange(idx){
+    var w=cvs.width,h=cvs.height;
+    if(idx===0){
+      /* 공허 — 느린 먼지 */
+      for(var i=0;i<30;i++)spawnPart(Math.random()*w,Math.random()*h,(Math.random()-.5)*.2,(Math.random()-.5)*.2,8+Math.random()*5,1,'#333333');
+    }
+    if(idx===3){
+      /* 포톤 등장 — 중앙 오브 + 폭발 */
+      _photonOrb.active=true;_photonOrb.r=0;_photonOrb.glow=0;
+      for(var j=0;j<50;j++){
+        var a=Math.random()*Math.PI*2;
+        spawnPart(w/2,h/2,Math.cos(a)*(1+Math.random()*2),Math.sin(a)*(1+Math.random()*2),3+Math.random()*2,2,'#c9a84c');
+      }
+    }
+    if(idx===5||idx===6){
+      /* 창조 — 빛 파티클 사방으로 */
+      for(var k=0;k<40;k++){
+        var a2=Math.random()*Math.PI*2;
+        spawnPart(w/2,h/2,Math.cos(a2)*(2+Math.random()*3),Math.sin(a2)*(2+Math.random()*3),4+Math.random()*3,2.5,['#88aaff','#aaccff','#ffddaa'][Math.floor(Math.random()*3)]);
+      }
+    }
+    if(idx===9||idx===10){
+      /* 거부 — 빨간 파티클 흩어짐 */
+      for(var l=0;l<25;l++)spawnPart(Math.random()*w,Math.random()*h,(Math.random()-.5)*3,(Math.random()-.5)*3,3,2,'#cc4433');
+    }
+    if(idx===11||idx===12){
+      /* 봉인 — 파티클이 중앙으로 수렴 */
+      for(var m=0;m<35;m++){
+        var sx=Math.random()*w,sy=Math.random()*h;
+        var dx2=w/2-sx,dy2=h/2-sy,dl=Math.sqrt(dx2*dx2+dy2*dy2)||1;
+        spawnPart(sx,sy,dx2/dl*2,dy2/dl*2,3+Math.random()*2,2,'#6666cc');
+      }
+    }
+    if(idx===14||idx===15){
+      /* 심연 — 어두운 소용돌이 */
+      for(var n=0;n<30;n++){
+        var a3=Math.random()*Math.PI*2,r3=50+Math.random()*150;
+        spawnPart(w/2+Math.cos(a3)*r3,h/2+Math.sin(a3)*r3,-Math.sin(a3)*1.5,Math.cos(a3)*1.5,5,2,'#4444aa');
+      }
+    }
+    if(idx>=17){
+      /* 균열 — 빨간 번개/균열 */
+      for(var q=0;q<20;q++){
+        var rx=w/2+(Math.random()-.5)*200,ry=h/2+(Math.random()-.5)*200;
+        spawnPart(rx,ry,(Math.random()-.5)*5,(Math.random()-.5)*5,2+Math.random(),3,'#ff3322');
+      }
+    }
+    if(idx===21){
+      /* 타이틀 — 금색 폭발 */
+      _photonOrb.active=true;_photonOrb.r=0;_photonOrb.glow=0;
+      for(var t=0;t<80;t++){
+        var a4=Math.random()*Math.PI*2;
+        spawnPart(w/2,h/2,Math.cos(a4)*(3+Math.random()*4),Math.sin(a4)*(3+Math.random()*4),3+Math.random()*3,3,Math.random()>.5?'#c9a84c':'#ffdd88');
+      }
+    }
+  }
+
+  /* 애니메이션 루프 */
+  function animPrologue(){
+    if(!_prologueActive){cancelAnimationFrame(_pAnim);return;}
+    _pAnim=requestAnimationFrame(animPrologue);
+    ctx2d.clearRect(0,0,cvs.width,cvs.height);
+
+    /* 포톤 오브 */
+    if(_photonOrb.active){
+      _photonOrb.r=Math.min(_photonOrb.r+0.3,25);
+      _photonOrb.glow=Math.min(_photonOrb.glow+0.02,0.6);
+      var grd=ctx2d.createRadialGradient(_photonOrb.x,_photonOrb.y,0,_photonOrb.x,_photonOrb.y,_photonOrb.r*3);
+      grd.addColorStop(0,'rgba(201,168,76,'+_photonOrb.glow+')');
+      grd.addColorStop(0.4,'rgba(201,168,76,'+(_photonOrb.glow*0.3)+')');
+      grd.addColorStop(1,'rgba(201,168,76,0)');
+      ctx2d.fillStyle=grd;
+      ctx2d.fillRect(_photonOrb.x-_photonOrb.r*3,_photonOrb.y-_photonOrb.r*3,_photonOrb.r*6,_photonOrb.r*6);
+      ctx2d.beginPath();
+      ctx2d.arc(_photonOrb.x,_photonOrb.y,_photonOrb.r,0,Math.PI*2);
+      ctx2d.fillStyle='rgba(201,168,76,'+(_photonOrb.glow*0.8)+')';
+      ctx2d.fill();
+    }
+
+    /* 파티클 업데이트 */
+    for(var i=_pParts.length-1;i>=0;i--){
+      var p=_pParts[i];
+      p.x+=p.vx;p.y+=p.vy;
+      p.life-=0.016;
+      if(p.life<=0){_pParts.splice(i,1);continue;}
+      var alpha=Math.min(1,p.life/p.maxLife*2);
+      ctx2d.globalAlpha=alpha;
+      ctx2d.fillStyle=p.color;
+      ctx2d.beginPath();
+      ctx2d.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx2d.fill();
+    }
+    ctx2d.globalAlpha=1;
+
+    /* 배경 별(항상) */
+    if(Math.random()<0.3){
+      spawnPart(Math.random()*cvs.width,Math.random()*cvs.height,0,0,2+Math.random()*3,0.5+Math.random(),'#222222');
+    }
+  }
+  _pAnim=requestAnimationFrame(animPrologue);
+  overlay._cleanupAnim=function(){cancelAnimationFrame(_pAnim);window.removeEventListener('resize',resizePCanvas);};
+
   document.body.appendChild(overlay);
 
   /* 첫 슬라이드 표시 */
-  setTimeout(function(){showSlide(0);},500);
+  setTimeout(function(){showSlide(0);onSlideChange(0);},500);
 
   /* 클릭/탭으로 다음 */
   overlay.addEventListener('click',function(){
@@ -111,6 +238,8 @@ function showSlide(idx){
     textEl.style.color=s.color||'#888';
     textEl.style.fontSize=(s.size||18)+'px';
     textEl.textContent=s.text;
+    /* 슬라이드별 애니메이션 트리거 */
+    if(typeof onSlideChange==='function')onSlideChange(idx);
     /* 페이드인 */
     setTimeout(function(){
       textEl.style.opacity='1';
@@ -123,6 +252,7 @@ function endPrologue(){
   localStorage.setItem('prologueSeen','1');
   var overlay=document.getElementById('prologue-overlay');
   if(overlay){
+    if(overlay._cleanupAnim)overlay._cleanupAnim();
     overlay.style.opacity='0';
     overlay.style.transition='opacity 1.5s';
     if(overlay._keyHandler)document.removeEventListener('keydown',overlay._keyHandler);
