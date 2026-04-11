@@ -139,6 +139,7 @@ function enterGame(){
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
       if(typeof buildDungeonEntrances==='function')buildDungeonEntrances();
+      if(typeof checkDailyLogin==='function')checkDailyLogin();
       /* BGM 즉시 시작 — 로그인 과정에서 이미 유저 상호작용 발생했으므로 autoplay 허용됨 */
       _bgmZone='';
       if(typeof getAudioCtx==='function')getAudioCtx();/* AudioContext resume */

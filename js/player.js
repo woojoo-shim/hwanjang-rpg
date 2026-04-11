@@ -644,6 +644,7 @@ function killMonster(m){
   checkLevelUp();
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
+  if(typeof checkDailyQuestProgress==='function')checkDailyQuestProgress('kill',m.def.name);
   if(typeof onMonsterKillForShaman==='function')onMonsterKillForShaman();
   /* ── 아이템 드롭: 인벤 직접 추가 대신 바닥 글로우 생성 ── */
   m.def.drops.forEach(function(drop){
