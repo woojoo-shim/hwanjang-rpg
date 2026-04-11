@@ -175,6 +175,43 @@ var ITEM_POOL=[
   {id:'dye_pink',     name:'핑크 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#dd55aa',desc:'캐릭터 몸 색을 핑크빛으로 염색한다.',         stats:{}},
   {id:'dye_black',    name:'검정 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'rare',     color:'#111111',desc:'캐릭터 몸 색을 검게 염색한다. 웅장해진다.',   stats:{}},
   {id:'dye_white',    name:'흰색 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#eeeeee',desc:'캐릭터 몸 색을 하얗게 염색한다.',             stats:{}},
+  // ─ 코스메틱 추가: 모자 ─
+  {id:'pirate_hat',   name:'해적 모자',        icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#3a2a1a',desc:'해적단 선장의 모자. 깃털이 달려있다.',         stats:{}},
+  {id:'cat_ears',     name:'고양이 귀',        icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'common',   color:'#886644',desc:'냐옹~ 귀여운 고양이 귀 머리띠.',              stats:{}},
+  {id:'devil_horns',  name:'악마 뿔',          icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#880022',desc:'붉은 악마의 뿔. 무시무시해 보인다.',           stats:{}},
+  {id:'angel_halo',   name:'천사 후광',        icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'epic',     color:'#ffffaa',desc:'머리 위에 빛나는 후광. 신성한 느낌.',           stats:{}},
+  {id:'chef_hat',     name:'요리사 모자',      icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'common',   color:'#ffffff',desc:'길쭉한 요리사 모자. 요리 실력과는 무관.',       stats:{}},
+  {id:'ninja_mask',   name:'닌자 마스크',      icon:'mask',  type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#1a1a1a',desc:'얼굴을 가리는 검은 마스크. 닌자 느낌.',        stats:{}},
+  {id:'flower_crown', name:'꽃 왕관',          icon:'crown', type:'cosmetic',slot:'hat',  rarity:'uncommon', color:'#ff88aa',desc:'들꽃으로 엮은 왕관. 봄의 향기가 난다.',        stats:{}},
+  {id:'pumpkin_hat',  name:'호박 머리',        icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#ff8800',desc:'호박을 뒤집어쓴다. 할로윈 한정.',              stats:{}},
+  {id:'ice_crown',    name:'얼음 왕관',        icon:'crown', type:'cosmetic',slot:'hat',  rarity:'legendary',color:'#88ccff',desc:'영원히 녹지 않는 얼음으로 만든 왕관.',          stats:{}},
+  {id:'dragon_helm',  name:'드래곤 투구',      icon:'helmet',type:'cosmetic',slot:'hat',  rarity:'legendary',color:'#cc2200',desc:'고대 용의 비늘로 제작된 투구. 포효가 들린다.', stats:{}},
+  {id:'mushroom_hat', name:'버섯 모자',        icon:'mushroom',type:'cosmetic',slot:'hat',rarity:'uncommon', color:'#dd4444',desc:'큰 버섯을 그대로 쓴다. 포자가 날린다.',        stats:{}},
+  {id:'star_tiara',   name:'별의 티아라',      icon:'star',  type:'cosmetic',slot:'hat',  rarity:'epic',     color:'#ffdd44',desc:'별빛으로 반짝이는 티아라.',                     stats:{}},
+  // ─ 코스메틱 추가: 망토 ─
+  {id:'fire_cape',    name:'화염 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'epic',     color:'#ff4400',desc:'불꽃이 타오르는 망토. 뜨겁지 않다.',           stats:{}},
+  {id:'ice_cape',     name:'얼음 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'epic',     color:'#44ccff',desc:'서리가 내려앉은 차가운 망토.',                   stats:{}},
+  {id:'nature_cape',  name:'자연의 망토',      icon:'cape',  type:'cosmetic',slot:'cape', rarity:'rare',     color:'#33aa33',desc:'나뭇잎과 덩굴로 이루어진 망토.',                stats:{}},
+  {id:'rainbow_cape', name:'무지개 망토',      icon:'cape',  type:'cosmetic',slot:'cape', rarity:'legendary',color:'#ff44ff',desc:'일곱 색깔로 빛나는 전설의 망토.',               stats:{}},
+  {id:'star_cape',    name:'별빛 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'epic',     color:'#2222aa',desc:'밤하늘의 별이 박힌 망토.',                       stats:{}},
+  {id:'blood_cape',   name:'혈색 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'rare',     color:'#880022',desc:'피로 물든 전사의 망토. 적을 두렵게 한다.',       stats:{}},
+  {id:'ghost_cape',   name:'유령 망토',        icon:'cape',  type:'cosmetic',slot:'cape', rarity:'rare',     color:'#aaaacc',desc:'반투명한 유령 망토. 살짝 비친다.',               stats:{}},
+  {id:'royal_cape',   name:'왕족의 망토',      icon:'cape',  type:'cosmetic',slot:'cape', rarity:'legendary',color:'#8b0000',desc:'왕가의 문장이 새겨진 진홍색 망토.',             stats:{}},
+  // ─ 코스메틱 추가: 염색약 ─
+  {id:'dye_purple',   name:'보라 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'uncommon', color:'#8833cc',desc:'신비로운 보라색으로 염색한다.',                   stats:{}},
+  {id:'dye_orange',   name:'주황 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'common',   color:'#ff8833',desc:'밝은 주황색으로 염색한다.',                       stats:{}},
+  {id:'dye_cyan',     name:'하늘색 염색약',    icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'uncommon', color:'#44dddd',desc:'시원한 하늘색으로 염색한다.',                     stats:{}},
+  {id:'dye_rainbow',  name:'무지개 염색약',    icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'legendary',color:'#ff00ff',desc:'무지개빛으로 반짝이는 전설의 염색약.',           stats:{}},
+  {id:'dye_crimson',  name:'진홍 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'rare',     color:'#aa0033',desc:'깊은 진홍색으로 염색한다. 고급스럽다.',          stats:{}},
+  {id:'dye_midnight', name:'한밤 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'rare',     color:'#0a0a3a',desc:'한밤의 어둠 색으로 염색한다.',                    stats:{}},
+  {id:'dye_emerald',  name:'에메랄드 염색약',  icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'epic',     color:'#00cc66',desc:'보석 같은 에메랄드 색으로 염색한다.',             stats:{}},
+  {id:'dye_silver',   name:'은빛 염색약',      icon:'dye',   type:'cosmetic',slot:'dye',  rarity:'uncommon', color:'#ccccdd',desc:'은빛으로 반짝이게 염색한다.',                     stats:{}},
+  // ─ 코스메틱 추가: 표정/이모트 아이템 ─
+  {id:'sunglasses',   name:'선글라스',          icon:'mask',  type:'cosmetic',slot:'hat',  rarity:'uncommon', color:'#222222',desc:'쿨한 선글라스. 멋짐 +100.',                      stats:{}},
+  {id:'monocle',      name:'외알 안경',        icon:'mask',  type:'cosmetic',slot:'hat',  rarity:'rare',     color:'#ddaa44',desc:'한쪽 눈에 쓰는 고급 안경. 신사의 품격.',         stats:{}},
+  {id:'bandana',      name:'두건',              icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'common',   color:'#cc4444',desc:'빨간 두건. 해적인가 산적인가.',                   stats:{}},
+  {id:'bear_hood',    name:'곰 후드',          icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'uncommon', color:'#8a5a2a',desc:'곰 귀가 달린 후드. 따뜻하고 귀엽다.',            stats:{}},
+  {id:'fox_ears',     name:'여우 귀',          icon:'hat',   type:'cosmetic',slot:'hat',  rarity:'uncommon', color:'#dd8833',desc:'주황색 여우 귀. 꼬리는 없다.',                    stats:{}},
 ];
 
 /* ════════════ 상점 재고 ════════════ */
