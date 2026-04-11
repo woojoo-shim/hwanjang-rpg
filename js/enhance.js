@@ -21,7 +21,7 @@ var ENHANCE_RATES=[
 
 /* 강화 비용 (골드) */
 function getEnhanceCost(level){
-  return Math.floor(100*Math.pow(1.8,level));
+  return Math.floor(150*Math.pow(2.2,level));
 }
 
 /* 강화 스탯 증가량 (%) */

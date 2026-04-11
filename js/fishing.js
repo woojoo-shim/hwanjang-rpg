@@ -17,20 +17,20 @@ var _fishDifficulty=1;
 /* ── 물고기 풀 ── */
 var FISH_POOL=[
   /* 일반 (강) */
-  {id:'fish_common',name:'붕어',icon:'fish',rarity:'common',zone:'any',value:15,exp:10,desc:'어디서나 잡히는 평범한 물고기.'},
-  {id:'fish_carp',name:'잉어',icon:'fish',rarity:'common',zone:'any',value:25,exp:15,desc:'힘이 센 민물고기.'},
-  {id:'fish_trout',name:'송어',icon:'fish',rarity:'uncommon',zone:'meadow',value:40,exp:25,desc:'맑은 물에서만 잡히는 물고기.'},
-  {id:'fish_catfish',name:'메기',icon:'fish',rarity:'uncommon',zone:'swamp',value:50,exp:30,desc:'늪지대의 큰 메기.'},
-  {id:'fish_eel',name:'장어',icon:'fish',rarity:'rare',zone:'swamp',value:80,exp:50,desc:'미끌미끌한 장어. 요리 재료로 최고.'},
-  {id:'fish_piranha',name:'피라냐',icon:'fish',rarity:'rare',zone:'jungle',value:90,exp:60,desc:'이빨이 날카로운 정글 물고기.'},
-  {id:'fish_golden',name:'황금 물고기',icon:'fish',rarity:'epic',zone:'any',value:300,exp:200,desc:'전설의 황금빛 물고기!'},
-  {id:'fish_dragon',name:'용의 물고기',icon:'fish',rarity:'legendary',zone:'volcano',value:1000,exp:500,desc:'용암 속에서 헤엄치는 전설의 물고기.'},
+  {id:'fish_common',name:'붕어',icon:'fish',rarity:'common',zone:'any',value:30,exp:10,desc:'어디서나 잡히는 평범한 물고기.'},
+  {id:'fish_carp',name:'잉어',icon:'fish',rarity:'common',zone:'any',value:50,exp:15,desc:'힘이 센 민물고기.'},
+  {id:'fish_trout',name:'송어',icon:'fish',rarity:'uncommon',zone:'meadow',value:100,exp:25,desc:'맑은 물에서만 잡히는 물고기.'},
+  {id:'fish_catfish',name:'메기',icon:'fish',rarity:'uncommon',zone:'swamp',value:120,exp:30,desc:'늪지대의 큰 메기.'},
+  {id:'fish_eel',name:'장어',icon:'fish',rarity:'rare',zone:'swamp',value:200,exp:50,desc:'미끌미끌한 장어. 요리 재료로 최고.'},
+  {id:'fish_piranha',name:'피라냐',icon:'fish',rarity:'rare',zone:'jungle',value:220,exp:60,desc:'이빨이 날카로운 정글 물고기.'},
+  {id:'fish_golden',name:'황금 물고기',icon:'fish',rarity:'epic',zone:'any',value:600,exp:200,desc:'전설의 황금빛 물고기!'},
+  {id:'fish_dragon',name:'용의 물고기',icon:'fish',rarity:'legendary',zone:'volcano',value:2000,exp:500,desc:'용암 속에서 헤엄치는 전설의 물고기.'},
   /* 쓰레기 */
-  {id:'fish_boot',name:'낡은 장화',icon:'boots',rarity:'common',zone:'any',value:2,exp:5,desc:'누군가 버린 장화...'},
-  {id:'fish_bone',name:'물고기 뼈',icon:'bone',rarity:'common',zone:'any',value:5,exp:8,desc:'이미 뼈만 남은 물고기.'},
+  {id:'fish_boot',name:'낡은 장화',icon:'boots',rarity:'common',zone:'any',value:5,exp:5,desc:'누군가 버린 장화...'},
+  {id:'fish_bone',name:'물고기 뼈',icon:'bone',rarity:'common',zone:'any',value:10,exp:8,desc:'이미 뼈만 남은 물고기.'},
   /* 보물 */
-  {id:'fish_chest',name:'수중 보물상자',icon:'gem',rarity:'epic',zone:'any',value:500,exp:300,desc:'물속에 가라앉은 보물상자!'},
-  {id:'fish_pearl',name:'진주',icon:'crystal',rarity:'rare',zone:'any',value:200,exp:100,desc:'조개 속 영롱한 진주.'},
+  {id:'fish_chest',name:'수중 보물상자',icon:'gem',rarity:'epic',zone:'any',value:800,exp:300,desc:'물속에 가라앉은 보물상자!'},
+  {id:'fish_pearl',name:'진주',icon:'crystal',rarity:'rare',zone:'any',value:350,exp:100,desc:'조개 속 영롱한 진주.'},
 ];
 
 /* ── 낚시 시작 조건 체크 ── */
@@ -227,13 +227,13 @@ function catchFish(){
 
   /* 경험치 + 골드 */
   playerEXP+=fish.exp;
-  gold+=Math.floor(fish.value*0.3);
+  gold+=Math.floor(fish.value*0.5);
   if(typeof checkLevelUp==='function')checkLevelUp();
   var ge=document.getElementById('inv-gold');
   if(ge)ge.textContent='💰 '+gold+' 골드';
 
   var rarityColors={common:'#ffffff',uncommon:'#44ff44',rare:'#4488ff',epic:'#aa44ff',legendary:'#ff8800'};
-  addChat('sys','[낚시]','🎣 <span style="color:'+rarityColors[fish.rarity]+'">'+fish.name+'</span> 낚았다! (+'+fish.exp+'EXP, +'+Math.floor(fish.value*0.3)+'골드)');
+  addChat('sys','[낚시]','🎣 <span style="color:'+rarityColors[fish.rarity]+'">'+fish.name+'</span> 낚았다! (+'+fish.exp+'EXP, +'+Math.floor(fish.value*0.5)+'골드)');
 
   /* 일일 퀘스트 체크 */
   if(typeof checkDailyQuestProgress==='function')checkDailyQuestProgress('collect',fish.id);

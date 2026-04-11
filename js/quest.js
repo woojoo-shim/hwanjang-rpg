@@ -17,7 +17,7 @@ function capQuestReward(target,count,rewardType,rewardAmount){
   var lv=mDef?(mDef.lv||1):1;
   var n=parseInt(rewardAmount)||0;
   if(rewardType==='gold'){
-    var maxGold=lv*count*30;/* 레벨당 마리당 30골드 */
+    var maxGold=lv*count*50;/* 레벨당 마리당 50골드 */
     if(n>maxGold)n=maxGold;
   }else if(rewardType==='exp'){
     var maxExp=lv*count*50;
@@ -86,7 +86,7 @@ function autoDetectQuest(reply,npcName){
       target:foundMonster,
       count:foundCount,
       rewardType:'gold',
-      rewardAmount:''+(foundCount*50),
+      rewardAmount:''+(foundCount*80),
       ready:false
     };
     return{clean:reply,quest:q};
@@ -101,7 +101,7 @@ function autoDetectQuest(reply,npcName){
       target:foundItem,
       count:foundCount,
       rewardType:'exp',
-      rewardAmount:''+(foundCount*100),
+      rewardAmount:''+(foundCount*150),
       ready:false
     };
     return{clean:reply,quest:q2};

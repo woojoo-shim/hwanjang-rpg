@@ -7,27 +7,27 @@ var _dailyData=null;
 
 /* ── 일일 퀘스트 풀 ── */
 var DAILY_QUEST_POOL=[
-  {name:'토끼 사냥꾼',desc:'토끼 5마리 처치',type:'kill',target:'토끼',count:5,reward:{gold:80,exp:150}},
-  {name:'사슴 퇴치',desc:'사슴 3마리 처치',type:'kill',target:'사슴',count:3,reward:{gold:120,exp:200}},
-  {name:'슬라임 청소',desc:'슬라임 5마리 처치',type:'kill',target:'슬라임',count:5,reward:{gold:100,exp:180}},
-  {name:'독두꺼비 토벌',desc:'독두꺼비 3마리 처치',type:'kill',target:'독두꺼비',count:3,reward:{gold:150,exp:250}},
-  {name:'고블린 소탕',desc:'고블린 4마리 처치',type:'kill',target:'고블린',count:4,reward:{gold:200,exp:350}},
-  {name:'늑대 사냥',desc:'늑대 3마리 처치',type:'kill',target:'늑대',count:3,reward:{gold:250,exp:400}},
-  {name:'사슴고기 수집',desc:'사슴고기 3개 수집',type:'collect',target:'deer_meat',count:3,reward:{gold:100,exp:150}},
-  {name:'마법 수정 수집',desc:'마법 수정 2개 수집',type:'collect',target:'magic_crystal',count:2,reward:{gold:200,exp:300}},
-  {name:'별 파편 수집',desc:'별 파편 1개 수집',type:'collect',target:'star_fragment',count:1,reward:{gold:300,exp:500}},
-  {name:'던전 도전',desc:'아무 던전 1회 클리어',type:'dungeon',target:'any',count:1,reward:{gold:500,exp:800}},
+  {name:'토끼 사냥꾼',desc:'토끼 5마리 처치',type:'kill',target:'토끼',count:5,reward:{gold:150,exp:200}},
+  {name:'사슴 퇴치',desc:'사슴 3마리 처치',type:'kill',target:'사슴',count:3,reward:{gold:200,exp:300}},
+  {name:'슬라임 청소',desc:'슬라임 5마리 처치',type:'kill',target:'슬라임',count:5,reward:{gold:180,exp:250}},
+  {name:'독두꺼비 토벌',desc:'독두꺼비 3마리 처치',type:'kill',target:'독두꺼비',count:3,reward:{gold:280,exp:400}},
+  {name:'고블린 소탕',desc:'고블린 4마리 처치',type:'kill',target:'고블린',count:4,reward:{gold:400,exp:600}},
+  {name:'늑대 사냥',desc:'늑대 3마리 처치',type:'kill',target:'늑대',count:3,reward:{gold:500,exp:700}},
+  {name:'사슴고기 수집',desc:'사슴고기 3개 수집',type:'collect',target:'deer_meat',count:3,reward:{gold:180,exp:200}},
+  {name:'마법 수정 수집',desc:'마법 수정 2개 수집',type:'collect',target:'magic_crystal',count:2,reward:{gold:400,exp:500}},
+  {name:'별 파편 수집',desc:'별 파편 1개 수집',type:'collect',target:'star_fragment',count:1,reward:{gold:600,exp:800}},
+  {name:'던전 도전',desc:'아무 던전 1회 클리어',type:'dungeon',target:'any',count:1,reward:{gold:1000,exp:1500}},
 ];
 
 /* ── 로그인 보상 (7일 주기) ── */
 var DAILY_LOGIN_REWARDS=[
-  {day:1,gold:50,exp:100,item:null,desc:'50 골드 + 100 EXP'},
-  {day:2,gold:80,exp:150,item:'red_potion',desc:'80 골드 + 빨간 포션'},
-  {day:3,gold:100,exp:200,item:null,desc:'100 골드 + 200 EXP'},
-  {day:4,gold:120,exp:250,item:'blue_potion',desc:'120 골드 + 파란 포션'},
-  {day:5,gold:150,exp:300,item:null,desc:'150 골드 + 300 EXP'},
-  {day:6,gold:200,exp:400,item:'ether',desc:'200 골드 + 에테르'},
-  {day:7,gold:500,exp:1000,item:'star_fragment',desc:'★ 500 골드 + 별 파편!'},
+  {day:1,gold:100,exp:150,item:null,desc:'100 골드 + 150 EXP'},
+  {day:2,gold:150,exp:200,item:'red_potion',desc:'150 골드 + 빨간 포션'},
+  {day:3,gold:200,exp:300,item:null,desc:'200 골드 + 300 EXP'},
+  {day:4,gold:250,exp:400,item:'blue_potion',desc:'250 골드 + 파란 포션'},
+  {day:5,gold:300,exp:500,item:null,desc:'300 골드 + 500 EXP'},
+  {day:6,gold:400,exp:700,item:'ether',desc:'400 골드 + 에테르'},
+  {day:7,gold:1000,exp:1500,item:'star_fragment',desc:'★ 1000 골드 + 별 파편!'},
 ];
 
 /* ── 오늘 날짜 키 (YYYY-MM-DD) ── */

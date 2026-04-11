@@ -262,7 +262,7 @@ function _rollPrice(itemId){
   var def=(typeof getItemDef==='function')?getItemDef(itemId):null;
   if(!def)return 100;
   var rarity=def.rarity||'common';
-  var base={common:40,uncommon:120,rare:400,epic:1200,legendary:3000,hidden:5000}[rarity]||100;
+  var base={common:60,uncommon:180,rare:500,epic:1800,legendary:5000,hidden:8000}[rarity]||100;
   var jitter=0.85+Math.random()*0.3;/* ±15% */
   return Math.floor(base*jitter);
 }
@@ -412,7 +412,7 @@ var NPC_AI={
 플레이어 요청 대응:
 - 플레이어가 특정 물건을 요청하면("화살 있어?", "포션 필요해") 상점에 있는 물건이면 가격 안내
 - 상점에 없는 물건을 요청하면 게임에 존재하는 아이템 중 하나를 희귀도에 맞는 가격으로 추가 가능
-- 희귀도별 기본 가격: common=30~80, rare=100~300, epic=400~800, legendary=1000~3000
+- 희귀도별 기본 가격: common=50~120, rare=400~700, epic=1500~2500, legendary=4000~7000
 - 상점에 추가할 때 대사 끝에: [SHOP_ADD:아이템id|가격]
 - 사용 가능한 아이템id: wooden_sword, bone_sword, iron_sword, steel_axe, hunting_bow, fire_staff, moonblade, dragonfang, eclipse_blade, death_scythe, leather_armor, iron_helmet, steel_boots, red_potion, blue_potion, ether, deer_meat, arrow, fire_arrow, rabbit_liver, deer_antler, magic_crystal, star_fragment, dragon_scale
 - 없는 아이템을 요청하면 "그건 구하기 어려운 물건이에요~" 하고 비슷한 걸 추천
@@ -447,7 +447,7 @@ var NPC_AI={
 - 정중하게 부탁하면 5~15% 정도만 깎아줌. 아부는 안 통함
 - 무례하면 "안 팔아요" 하면서 가격 30% 올림
 - 가격을 바꿀 때 대사 끝에: [PRICE:아이템이름|새가격]
-- 현재 판매 목록: 철검 180골드, 강철도끼 240골드, 철투구 160골드, 강철부츠 150골드, 가죽갑옷 130골드, 빨간포션 35골드
+- 현재 판매 목록: 철검 500골드, 강철도끼 650골드, 철투구 450골드, 강철부츠 400골드, 가죽갑옷 350골드, 빨간포션 60골드
 - 원가의 70% 아래로는 절대 안 깎아줌. 장인의 땀이 담겨있거든요.
 
 대화 거래 규칙:

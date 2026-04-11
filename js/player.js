@@ -638,9 +638,14 @@ function killMonster(m){
   var _expGain=m.def.exp;
   if(typeof getPartyExpShare==='function')_expGain=getPartyExpShare(_expGain);
   playerEXP+=_expGain;
+  /* 킬 골드 보상 — 몬스터 레벨 × 5 ~ ×8 */
+  var _killGold=Math.floor(m.def.lv*(5+Math.random()*3));
+  if(typeof getStatBonuses==='function'){var _sb=getStatBonuses();_killGold=Math.floor(_killGold*(1+_sb.goldBonus));}
+  gold+=_killGold;
+  var _ge=document.getElementById('inv-gold');if(_ge)_ge.textContent='💰 '+gold+' 골드';
   if(typeof partyId!=='undefined'&&partyId&&typeof partyMembers!=='undefined'&&partyMembers.length>1)
-    addChat('sys','[파티]',m.def.name+' 처치! (EXP +'+_expGain+' / '+partyMembers.length+'명 분배)');
-  else addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+_expGain+')');
+    addChat('sys','[파티]',m.def.name+' 처치! (EXP +'+_expGain+', 골드 +'+_killGold+' / '+partyMembers.length+'명 분배)');
+  else addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+_expGain+', 골드 +'+_killGold+')');
   checkLevelUp();
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
@@ -831,7 +836,7 @@ function checkLevelUp(){
     updPlayerHpBar();
     if(typeof SFX!=='undefined')SFX.levelUp();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
-    gold+=20;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    gold+=playerLevel*10;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
     /* 스탯 포인트 지급 */
     if(typeof grantStatPoints==='function')grantStatPoints(5);
     if(typeof applyStatEffects==='function')applyStatEffects();

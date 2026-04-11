@@ -11,7 +11,7 @@ var DUNGEONS=[
       {monsters:[{id:'goblin',count:5},{id:'wolf',count:2}],size:22},
       {monsters:[{id:'elite_wolf',count:1}],size:25,boss:true}
     ],
-    rewards:{gold:500,exp:2000,drops:['iron_sword','leather_armor','magic_crystal']}
+    rewards:{gold:800,exp:2500,drops:['iron_sword','leather_armor','magic_crystal']}
   },
   {
     id:'crystal_cave',name:'수정 동굴',minLevel:15,
@@ -21,7 +21,7 @@ var DUNGEONS=[
       {monsters:[{id:'jungle_ape',count:3},{id:'jungle_treant',count:2}],size:25},
       {monsters:[{id:'elite_ape',count:1}],size:28,boss:true}
     ],
-    rewards:{gold:1200,exp:5000,drops:['moonblade','star_fragment','dragon_scale']}
+    rewards:{gold:2500,exp:6000,drops:['moonblade','star_fragment','dragon_scale']}
   },
   {
     id:'lava_dungeon',name:'용암 심연',minLevel:25,
@@ -32,7 +32,7 @@ var DUNGEONS=[
       {monsters:[{id:'firedrake',count:2},{id:'golem',count:2}],size:25},
       {monsters:[{id:'elite_dragon',count:1}],size:30,boss:true}
     ],
-    rewards:{gold:3000,exp:10000,drops:['eclipse_blade','dragon_scale','immortal_potion']}
+    rewards:{gold:6000,exp:12000,drops:['eclipse_blade','dragon_scale','immortal_potion']}
   }
 ];
 

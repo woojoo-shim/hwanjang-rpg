@@ -77,7 +77,7 @@ function renderStatUI(el){
   });
 
   html+='<div style="display:flex;gap:8px;margin-top:12px;">';
-  html+='<button onclick="resetStats()" style="flex:1;background:transparent;color:#aa6666;border:1px solid #aa666644;padding:8px;font-size:12px;cursor:pointer;font-family:inherit;border-radius:6px;">초기화 (100골드)</button>';
+  html+='<button onclick="resetStats()" style="flex:1;background:transparent;color:#aa6666;border:1px solid #aa666644;padding:8px;font-size:12px;cursor:pointer;font-family:inherit;border-radius:6px;">초기화 (300골드)</button>';
   html+='<button onclick="closeStatUI()" style="flex:1;background:#c9a84c;color:#0c0c1e;border:none;padding:8px;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;border-radius:6px;">닫기</button>';
   html+='</div>';
 
@@ -94,20 +94,20 @@ function allocStat(key,amount){
   if(typeof savePlayerData==='function')savePlayerData();
 }
 
-/* 스탯 초기화 (100골드) */
+/* 스탯 초기화 (300골드) */
 function resetStats(){
-  if(typeof gold==='undefined'||gold<100){addChat('sys','[시스템]','골드가 부족합니다. (100골드 필요)');return;}
+  if(typeof gold==='undefined'||gold<300){addChat('sys','[시스템]','골드가 부족합니다. (300골드 필요)');return;}
   var total=playerStats.str+playerStats.dex+playerStats.int+playerStats.vit+playerStats.luk;
   statPoints+=total;
   playerStats={str:0,dex:0,int:0,vit:0,luk:0};
-  gold-=100;
+  gold-=300;
   if(typeof document.getElementById('inv-gold')!=='undefined'){
     var ge=document.getElementById('inv-gold');
     if(ge)ge.textContent='💰 '+gold+' 골드';
   }
   applyStatEffects();
   renderStatUI(document.getElementById('stat-panel'));
-  addChat('sys','[시스템]','스탯이 초기화되었습니다. (-100 골드)');
+  addChat('sys','[시스템]','스탯이 초기화되었습니다. (-300 골드)');
   if(typeof savePlayerData==='function')savePlayerData();
 }
 
