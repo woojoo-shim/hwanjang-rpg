@@ -2221,7 +2221,18 @@ function updMonsters(dt,t){
           if(chaseLocal){
             /* 로컬 플레이어가 타겟 → 직접 데미지 */
             if(invincibleTimer<=0){
-              playerHP=Math.max(0,playerHP-dmg);
+              /* 방어력 적용 — 장착된 방어구의 방어력 합산 */
+              var _playerDef=0;
+              if(typeof equipped!=='undefined'&&equipped.armor){
+                var _armDef=getItemDef(equipped.armor.id||equipped.armor);
+                if(_armDef&&_armDef.stats&&_armDef.stats['방어력'])_playerDef+=_armDef.stats['방어력'];
+                /* 강화 보너스 */
+                if(equipped.armor.enhLevel)_playerDef+=equipped.armor.enhLevel*2;
+              }
+              /* 방어력 공식: 데미지 = 원래데미지 * (100 / (100 + 방어력)) */
+              var _reducedDmg=Math.max(1,Math.floor(dmg*(100/(100+_playerDef))));
+              playerHP=Math.max(0,playerHP-_reducedDmg);
+              dmg=_reducedDmg;/* UI 표시용 */
               /* 방어구 내구도 감소 */
               if(typeof damageEquipment==='function')damageEquipment('armor',1);
               updPlayerHpBar();spawnDmgNum('-'+dmg,'#ff5555','player');
