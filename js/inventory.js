@@ -43,13 +43,12 @@ function isEquipped(slot){
 
 function equipItem(slot){
   var it=getItemFull(slot);
-  /* 클래스 무기 제한 */
+  /* 클래스 무기 — 비전공 무기는 장착 가능하지만 경고 */
   if(it.type==='weapon'&&playerClass!=='none'){
     var cls=CLASS_DEFS[playerClass];
     var def=getItemDef(slot.itemId);
     if(def&&cls&&cls.weapons.indexOf(def.icon)===-1){
-      addChat('sys','[시스템]',cls.name+'은(는) '+def.name+'을(를) 장착할 수 없습니다.');
-      return;
+      addChat('sys','[시스템]','⚠️ '+cls.name+'의 전공 무기가 아닙니다. 데미지가 40% 감소합니다.');
     }
   }
   /* 코스메틱: slot 필드로 슬롯 결정 */

@@ -385,6 +385,13 @@ function useSkill(slotIdx){
     if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
   }
   var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul*(sk.dmgMul||1));
+  /* 비전공 무기 패널티 */
+  if(playerClass!=='none'&&equipped.weapon){
+    var _wDef2=getItemDef(equipped.weapon);
+    if(_wDef2&&cls.weapons&&cls.weapons.indexOf(_wDef2.icon)===-1){
+      dmg=Math.floor(dmg*0.6);
+    }
+  }
 
   /* 자가 힐 */
   if(sk.selfHeal){
@@ -533,6 +540,13 @@ function playerAttack(){
   if(typeof damageEquipment==='function')damageEquipment('weapon',1);
   var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
   var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul);
+  /* 비전공 무기 패널티: 40% 데미지 감소 */
+  if(playerClass!=='none'&&equipped.weapon){
+    var _wDef=getItemDef(equipped.weapon);
+    if(_wDef&&cls.weapons&&cls.weapons.indexOf(_wDef.icon)===-1){
+      dmg=Math.floor(dmg*0.6);
+    }
+  }
   /* 광전사 패시브: HP 낮을수록 ATK 증가 */
   if(cls.passive==='rage'){var hpRatio=playerHP/playerMaxHP;dmg=Math.floor(dmg*(1+(1-hpRatio)*0.8));}
   /* 치명타 판정 */
