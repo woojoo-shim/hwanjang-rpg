@@ -360,7 +360,6 @@ function loop(){
 (function initApp(){
   initSupabase();
   if(!sbClient){
-    /* Supabase 미설정 → 기존 방식 (로그인 없이 닉네임 화면) */
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('nick-screen').classList.remove('hidden');
     return;
@@ -368,12 +367,20 @@ function loop(){
   checkSession().then(function(hasSession){
     document.getElementById('login-screen').classList.add('hidden');
     if(hasSession&&playerData){
+      /* 기존 플레이어 — 프롤로그 스킵, 바로 게임 */
       restoreGameState();
       startGame();
     }else if(hasSession&&!playerData){
       document.getElementById('nick-screen').classList.remove('hidden');
     }else{
-      document.getElementById('login-screen').classList.remove('hidden');
+      /* 신규/로그아웃 — 프롤로그 후 로그인 화면 */
+      if(typeof showPrologue==='function'){
+        showPrologue(function(){
+          document.getElementById('login-screen').classList.remove('hidden');
+        });
+      }else{
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
     }
   }).catch(function(e){
     console.error('initApp error',e);
