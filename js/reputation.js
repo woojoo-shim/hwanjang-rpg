@@ -101,3 +101,48 @@ function getRepPromptSuffix(npcName){
   if(r>=20)return '\n\n[플레이어 호감도: 냉담 '+r+'/100] 이 플레이어가 맘에 들지 않아. 차갑고 퉁명스럽게 대해. 가격 할인은 거의 안 해주고, 대화도 짧게 끊어. 비꼬는 말투를 써도 좋아.';
   return '\n\n[플레이어 호감도: 적대 '+r+'/100] 이 플레이어가 매우 싫어. 경멸하는 말투로 대해. 거래는 해주지만 최대한 불친절하게. 그가 떠나길 원해. 가격은 최고가로만 말하고, 흥정은 거부해. "꺼져", "돈이나 내놔" 같은 적대적 표현도 허용.';
 }
+
+/* ── NPC 소문 시스템: 10분마다 호감도가 마을 평균으로 수렴 ── */
+var _repGossipTimer=null;
+
+function startRepGossip(){
+  if(_repGossipTimer)clearInterval(_repGossipTimer);
+  _repGossipTimer=setInterval(function(){
+    var keys=Object.keys(playerReputation);
+    if(keys.length<2)return;
+    /* 전체 평균 계산 */
+    var sum=0;
+    for(var i=0;i<keys.length;i++)sum+=playerReputation[keys[i]];
+    var avg=Math.round(sum/keys.length);
+    /* 각 NPC 호감도를 평균 쪽으로 30% 수렴 */
+    var changed=false;
+    for(var j=0;j<keys.length;j++){
+      var old=playerReputation[keys[j]];
+      var diff=avg-old;
+      if(Math.abs(diff)<2)continue;
+      var shift=Math.round(diff*0.3);
+      playerReputation[keys[j]]=Math.max(0,Math.min(100,old+shift));
+      changed=true;
+    }
+    if(changed){
+      if(typeof addChat==='function'){
+        if(avg<40){
+          addChat('sys','[소문]','<span style="color:#ff8844">NPC들 사이에서 나쁜 소문이 퍼지고 있다...</span>');
+        }else if(avg>65){
+          addChat('sys','[소문]','<span style="color:#88ff88">NPC들 사이에서 좋은 평판이 퍼지고 있다.</span>');
+        }else{
+          addChat('sys','[소문]','<span style="color:#aaaaaa">NPC들이 당신에 대해 이야기하고 있다...</span>');
+        }
+      }
+      if(typeof savePlayerData==='function')savePlayerData();
+      if(typeof sendRepUpdate==='function')sendRepUpdate();
+    }
+  },600000);/* 10분 = 600,000ms */
+}
+
+/* 게임 시작 시 호출 */
+if(typeof document!=='undefined'){
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(startRepGossip,5000);
+  });
+}
