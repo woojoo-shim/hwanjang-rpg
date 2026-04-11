@@ -52,7 +52,7 @@ function parseQuest(reply){
 }
 
 /* ── AI 응답에서 퀘스트 자동 감지 ── */
-var _questMonsters=['토끼','사슴','슬라임','독두꺼비','고블린','늑대','용암 골렘','파이어드레이크','정글 거미','독사','숲 유인원','정글 표범','거대 모기','나무 정령'];
+var _questMonsters=['토끼','사슴','슬라임','독두꺼비','고블린','늑대','용암 골렘','파이어드레이크','정글 거미','독사','숲 유인원','정글 표범','거대 모기','나무 정령','타락한 포톤'];
 var _questItems=['deer_meat','rabbit_liver','magic_crystal','star_fragment','dragon_scale','deer_antler'];
 
 function autoDetectQuest(reply,npcName){
