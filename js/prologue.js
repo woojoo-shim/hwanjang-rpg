@@ -61,21 +61,70 @@ function showPrologue(callback){
   });
   overlay.appendChild(skipBtn);
 
-  /* ── 배경 캔버스 애니메이션 ── */
+  /* ── 배경: Three.js 3D 씬 + 2D 파티클 오버레이 ── */
+  /* 3D 배경 캔버스 */
+  var cvs3d=document.createElement('canvas');
+  cvs3d.id='prologue-3d';
+  cvs3d.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;';
+  overlay.insertBefore(cvs3d,textEl);
+
+  /* 2D 파티클 오버레이 */
   var cvs=document.createElement('canvas');
   cvs.id='prologue-canvas';
-  cvs.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;';
+  cvs.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;';
   overlay.insertBefore(cvs,textEl);
   textEl.style.position='relative';textEl.style.zIndex='1';
 
+  /* Three.js 프롤로그 씬 */
+  var _pScene=new THREE.Scene();
+  var _pCam=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,100);
+  _pCam.position.set(0,2,5);_pCam.lookAt(0,1.5,0);
+  var _pRenderer=new THREE.WebGLRenderer({canvas:cvs3d,antialias:true,alpha:true});
+  _pRenderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  _pRenderer.setSize(window.innerWidth,window.innerHeight);
+  _pRenderer.setClearColor(0x000000,0);
+
+  /* 프롤로그 조명 */
+  var _pAmb=new THREE.AmbientLight(0x111122,0.3);_pScene.add(_pAmb);
+  var _pSpot=new THREE.PointLight(0x4444aa,0.5,20);_pSpot.position.set(0,4,3);_pScene.add(_pSpot);
+
+  /* 포톤 모델들 (처음엔 숨김) */
+  var _pNormal=null,_pCorrupted=null;
+  if(typeof buildPhotonNormal==='function'){
+    _pNormal=buildPhotonNormal(0,0,0);
+    _pNormal.visible=false;
+    _pScene.add(_pNormal);
+  }
+  if(typeof buildPhotonCorrupted==='function'){
+    _pCorrupted=buildPhotonCorrupted(0,0,0);
+    _pCorrupted.visible=false;
+    _pScene.add(_pCorrupted);
+  }
+
+  /* 배경 별 파티클 (3D) */
+  var starGeo=new THREE.BufferGeometry();
+  var starVerts=[];
+  for(var si=0;si<200;si++){
+    starVerts.push((Math.random()-.5)*40,(Math.random()-.5)*20+5,(Math.random()-.5)*40-10);
+  }
+  starGeo.setAttribute('position',new THREE.Float32BufferAttribute(starVerts,3));
+  var starMat=new THREE.PointsMaterial({color:0x555566,size:0.08,transparent:true,opacity:0.6});
+  var starField=new THREE.Points(starGeo,starMat);
+  _pScene.add(starField);
+
   var ctx2d=cvs.getContext('2d');
-  var _pParts=[];/* 파티클 배열 */
+  var _pParts=[];
   var _pAnim=null;
   var _photonOrb={x:0,y:0,r:0,glow:0,active:false};
 
   function resizePCanvas(){
     cvs.width=window.innerWidth;cvs.height=window.innerHeight;
     _photonOrb.x=cvs.width/2;_photonOrb.y=cvs.height/2;
+    if(_pRenderer){
+      _pRenderer.setSize(window.innerWidth,window.innerHeight);
+      _pCam.aspect=window.innerWidth/window.innerHeight;
+      _pCam.updateProjectionMatrix();
+    }
   }
   resizePCanvas();
   window.addEventListener('resize',resizePCanvas);
@@ -88,6 +137,51 @@ function showPrologue(callback){
   /* 슬라이드별 파티클 이벤트 */
   function onSlideChange(idx){
     var w=cvs.width,h=cvs.height;
+
+    /* ── 3D 모델 표시 제어 ── */
+    if(_pNormal)_pNormal.visible=false;
+    if(_pCorrupted)_pCorrupted.visible=false;
+
+    /* 슬라이드 3~8: 일반 포톤 등장 (창조~고독) */
+    if(idx>=3&&idx<=8&&_pNormal){
+      _pNormal.visible=true;
+      _pNormal.position.set(0,0,0);
+      _pCam.position.set(0,2,4);_pCam.lookAt(0,1.5,0);
+      _pAmb.intensity=0.4;_pSpot.color.set(0x6666cc);_pSpot.intensity=0.6;
+    }
+    /* 슬라이드 9~11: 일반 포톤 (거부/고독) — 더 어둡게, 멀어지는 */
+    if(idx>=9&&idx<=11&&_pNormal){
+      _pNormal.visible=true;
+      _pNormal.position.set(0,0,-1);
+      _pCam.position.set(0,2,6);_pCam.lookAt(0,1.5,-1);
+      _pAmb.intensity=0.2;_pSpot.color.set(0x442222);_pSpot.intensity=0.3;
+    }
+    /* 슬라이드 12~15: 봉인 — 포톤이 작아지며 사라짐 */
+    if(idx>=12&&idx<=15&&_pNormal){
+      _pNormal.visible=true;
+      var shrink=1.0-(idx-12)*0.25;
+      _pNormal.scale.set(shrink,shrink,shrink);
+      _pNormal.position.set(0,-0.5*(1-shrink),0);
+      _pAmb.intensity=0.15;_pSpot.color.set(0x222244);_pSpot.intensity=0.2;
+    }
+    /* 슬라이드 17~20: 균열 — 타락 포톤 등장 */
+    if(idx>=17&&idx<=20&&_pCorrupted){
+      _pCorrupted.visible=true;
+      var emerge=(idx-17)/3;
+      _pCorrupted.position.set(0,-2+emerge*2,0);
+      _pCorrupted.scale.set(0.5+emerge*0.5,0.5+emerge*0.5,0.5+emerge*0.5);
+      _pCam.position.set(0,3,7);_pCam.lookAt(0,2,0);
+      _pAmb.intensity=0.1;_pSpot.color.set(0xff2200);_pSpot.intensity=0.8;
+    }
+    /* 슬라이드 21: 타이틀 — 타락 포톤 풀사이즈 */
+    if(idx===21&&_pCorrupted){
+      _pCorrupted.visible=true;
+      _pCorrupted.position.set(0,0,0);
+      _pCorrupted.scale.set(1,1,1);
+      _pCam.position.set(0,4,8);_pCam.lookAt(0,2.5,0);
+      _pAmb.intensity=0.05;_pSpot.color.set(0xff0000);_pSpot.intensity=1.0;
+    }
+
     if(idx===0){
       /* 공허 — 느린 먼지 */
       for(var i=0;i<30;i++)spawnPart(Math.random()*w,Math.random()*h,(Math.random()-.5)*.2,(Math.random()-.5)*.2,8+Math.random()*5,1,'#333333');
@@ -144,9 +238,24 @@ function showPrologue(callback){
   }
 
   /* 애니메이션 루프 */
+  var _pTime=0;
   function animPrologue(){
     if(!_prologueActive){cancelAnimationFrame(_pAnim);return;}
     _pAnim=requestAnimationFrame(animPrologue);
+    _pTime+=0.016;
+
+    /* ── 3D 씬 렌더링 ── */
+    if(_pRenderer&&_pScene&&_pCam){
+      /* 별 회전 */
+      if(starField)starField.rotation.y+=0.0003;
+      /* 포톤 애니메이션 */
+      if(_pNormal&&_pNormal.visible&&typeof animatePhoton==='function')animatePhoton(_pNormal,0.016,_pTime);
+      if(_pCorrupted&&_pCorrupted.visible&&typeof animatePhoton==='function')animatePhoton(_pCorrupted,0.016,_pTime);
+      /* 카메라 미세 흔들림 */
+      _pCam.position.x=Math.sin(_pTime*0.3)*0.1;
+      _pRenderer.render(_pScene,_pCam);
+    }
+
     ctx2d.clearRect(0,0,cvs.width,cvs.height);
 
     /* 포톤 오브 */
@@ -186,7 +295,12 @@ function showPrologue(callback){
     }
   }
   _pAnim=requestAnimationFrame(animPrologue);
-  overlay._cleanupAnim=function(){cancelAnimationFrame(_pAnim);window.removeEventListener('resize',resizePCanvas);};
+  overlay._cleanupAnim=function(){
+    cancelAnimationFrame(_pAnim);
+    window.removeEventListener('resize',resizePCanvas);
+    if(_pRenderer){_pRenderer.dispose();_pRenderer=null;}
+    _pScene=null;_pCam=null;
+  };
 
   document.body.appendChild(overlay);
 
