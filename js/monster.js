@@ -18,8 +18,8 @@ var currentZone='village';
 var targetedMonster=null;
 
 /* ── 성능 최적화: 상수 객체 — 매 프레임 생성 방지 ── */
-var _ATK_RANGES={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0};
-var _ATK_SPEEDS={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5};
+var _ATK_RANGES={toad:3.5,jungle_snake:3.0,golem:4.0,firedrake:5.0,jungle_treant:3.5,jungle_mosquito:2.5,elite_stag:3.0,elite_toad:4.5,elite_wolf:2.5,elite_ape:4.0,elite_dragon:6.0,photon_boss:8.0};
+var _ATK_SPEEDS={rabbit:0.6,jungle_mosquito:0.35,jungle_panther:0.3,wolf:0.5,goblin:0.7,deer:0.9,slime:1.0,toad:1.0,jungle_snake:0.8,jungle_spider:0.7,jungle_ape:1.3,jungle_treant:2.0,golem:2.5,firedrake:2.0,elite_stag:1.0,elite_toad:1.2,elite_wolf:0.7,elite_ape:1.5,elite_dragon:2.5,photon_boss:2.0};
 
 /* 몬스터별 추적 범위 (서식지 크기) */
 function getLeashRange(mid){
@@ -811,8 +811,15 @@ function addEliteEffects(g,def){
 }
 
 function spawnMonster(def,x,z,parent){
-  var mesh=mkMonsterMesh(def);
-  if(def.elite){mesh.scale.set(1.8,1.8,1.8);addEliteEffects(mesh,def);}
+  var mesh;
+  /* 포톤 보스는 커스텀 3D 모델 사용 */
+  if(def.id==='photon_boss'&&typeof buildPhotonCorrupted==='function'){
+    mesh=buildPhotonCorrupted(0,0,0);
+    mesh.scale.set(1.5,1.5,1.5);
+  }else{
+    mesh=mkMonsterMesh(def);
+  }
+  if(def.elite&&def.id!=='photon_boss'){mesh.scale.set(1.8,1.8,1.8);addEliteEffects(mesh,def);}
   var _spawnBaseY=(typeof getTerrainY==='function')?getTerrainY(x,z):0;
   mesh.position.set(x,_spawnBaseY,z);
   mesh.rotation.y=Math.random()*Math.PI*2;
@@ -822,19 +829,23 @@ function spawnMonster(def,x,z,parent){
   var wrap=document.createElement('div');
   wrap.style.cssText='position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;';
   var ntag=document.createElement('div');ntag.className='llabel npc';
-  if(def.elite){
+  if(def.id==='photon_boss'){
+    ntag.style.cssText+=';background:#0a0008ee;border:2px solid #ff0044;color:#ff2266;font-size:16px;font-weight:bold;text-shadow:0 0 12px #ff0044,0 0 24px #aa0022;padding:4px 12px;letter-spacing:2px;';
+  }else if(def.elite){
     ntag.style.cssText+=';background:#2a1a00ee;border:2px solid #ffaa00;color:#ffdd44;font-size:13px;font-weight:bold;text-shadow:0 0 8px #ffaa00,0 0 16px #ff8800;padding:3px 8px;letter-spacing:1px;';
   }else{
     ntag.style.cssText+=';background:#1a0808ee;border-color:#883333;color:#ff8888;font-size:10px;';
   }
   ntag.textContent=def.name+(def.lv?' Lv.'+def.lv:'');
   var hbw=document.createElement('div');
-  if(def.elite){
+  if(def.id==='photon_boss'){
+    hbw.style.cssText='width:120px;height:10px;background:#0a0008;border:2px solid #ff0044;overflow:hidden;border-radius:3px;';
+  }else if(def.elite){
     hbw.style.cssText='width:72px;height:7px;background:#2a1a00;border:1px solid #ffaa00;overflow:hidden;';
   }else{
     hbw.style.cssText='width:56px;height:5px;background:#2a0808;border:1px solid #551111;overflow:hidden;';
   }
-  var hbf=document.createElement('div');hbf.style.cssText='height:100%;background:'+(def.elite?'#ffaa00':'#cc2222')+';width:100%;transition:width .15s;';
+  var hbf=document.createElement('div');hbf.style.cssText='height:100%;background:'+(def.id==='photon_boss'?'#ff0044':def.elite?'#ffaa00':'#cc2222')+';width:100%;transition:width .15s;';
   hbw.appendChild(hbf);wrap.appendChild(ntag);wrap.appendChild(hbw);lov.appendChild(wrap);
   /* 애니메이션 상태 초기화 */
   var m={def:def,mesh:mesh,hp:def.hp,maxHp:def.hp,wrap:wrap,hbf:hbf,state:'idle',attackTimer:0,bobOff:Math.random()*Math.PI*2,spawnX:x,spawnZ:z,
@@ -1932,7 +1943,11 @@ function buildVolcano(){
   }
   /* ★ 엘리트: 고대 화염룡 — 보스 구역 */
   var ed=MONSTER_DEFS.find(function(x){return x.id==='elite_dragon';});
-  if(ed)spawnMonster(ed,BX,BZ,scene);
+  if(ed)spawnMonster(ed,BX-15,BZ-10,scene);
+
+  /* ★★★ 최종 보스: 타락한 포톤 — 보스 구역 중앙 */
+  var photonDef=MONSTER_DEFS.find(function(x){return x.id==='photon_boss';});
+  if(photonDef)spawnMonster(photonDef,BX,BZ,scene);
 }
 
 /* ════════════ 전체 오픈 월드 빌드 ════════════ */
@@ -1950,6 +1965,10 @@ function updateMonsterAnims(dt){
   monsters.forEach(function(m){
     m.animTime+=dt;
     var id=m.def.id;
+    /* 포톤 보스 커스텀 애니메이션 */
+    if(id==='photon_boss'&&typeof animatePhoton==='function'){
+      animatePhoton(m.mesh,dt,m.animTime);
+    }
 
     /* ── 1. 스폰 애니메이션 ── */
     if(m.spawnAnim>0){

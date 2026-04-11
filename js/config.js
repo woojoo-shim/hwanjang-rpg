@@ -654,6 +654,9 @@ var MONSTER_DEFS=[
    drops:[{id:'dragonfang',rate:.06,qty:1},{id:'star_fragment',rate:.6,qty:1},{id:'elixir',rate:.5,qty:1},{id:'golden_cape',rate:.1,qty:1}]},
   {id:'elite_dragon',name:'★ 고대 화염룡',lv:30, hp:5000,atk:150,exp:2000,spd:3.5,aggro:35,color:0x880000,hc:0xff2200,elite:true,
    drops:[{id:'eclipse_blade',rate:.03,qty:1},{id:'dragon_scale',rate:.4,qty:1},{id:'immortal_potion',rate:.1,qty:1},{id:'eternal_chain',rate:.08,qty:1},{id:'crown',rate:.08,qty:1},{id:'dye_gold',rate:.15,qty:1}]},
+  // ── 최종 보스: 타락한 포톤 ──
+  {id:'photon_boss',name:'타락한 포톤',lv:50, hp:20000,atk:300,exp:10000,spd:4.5,aggro:50,color:0x0a0008,hc:0xff0000,elite:true,boss:true,
+   drops:[{id:'eclipse_blade',rate:.3,qty:1},{id:'immortal_potion',rate:.5,qty:2},{id:'star_fragment',rate:1,qty:5},{id:'dragon_scale',rate:.8,qty:3},{id:'crown',rate:.25,qty:1}]},
 ];
 
 /* ════════════ 오픈 월드 설정 ════════════ */
