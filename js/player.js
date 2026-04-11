@@ -820,10 +820,13 @@ function doTeleport(zoneKey){
   checkZone();
 }
 
+var MAX_LEVEL=50;
 function checkLevelUp(){
+  if(playerLevel>=MAX_LEVEL){playerEXP=0;return;}
   var need=Math.floor(100*Math.pow(playerLevel,2.2));
   if(playerEXP>=need){
     playerEXP-=need;playerLevel++;var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;playerMaxHP+=Math.floor(12*cls.hpMul);playerHP=playerMaxHP;
+    if(playerLevel>=MAX_LEVEL){playerEXP=0;addChat('sys','[시스템]','★★★ 최대 레벨 달성! ★★★');}
     document.querySelector('.hlv').textContent='Lv.'+playerLevel;
     updPlayerHpBar();
     if(typeof SFX!=='undefined')SFX.levelUp();
