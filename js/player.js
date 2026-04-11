@@ -648,6 +648,32 @@ function killMonster(m){
       }
     }
   });
+  /* ── 무기/장비 랜덤 드롭 (5% 확률) ── */
+  if(Math.random()<0.05){
+    var _weaponPool=typeof ITEM_POOL!=='undefined'?ITEM_POOL.filter(function(it){return it.type==='weapon'||it.type==='armor';}):[];
+    if(_weaponPool.length>0){
+      /* 등급별 확률: common 60%, uncommon 25%, rare 10%, epic 4%, legendary 1% */
+      var _roll=Math.random();
+      var _rarity='common';
+      if(_roll>0.99)_rarity='legendary';
+      else if(_roll>0.95)_rarity='epic';
+      else if(_roll>0.85)_rarity='rare';
+      else if(_roll>0.60)_rarity='uncommon';
+      /* 몬스터 레벨에 맞는 등급 필터 */
+      var _filtered=_weaponPool.filter(function(it){return it.rarity===_rarity;});
+      if(_filtered.length===0)_filtered=_weaponPool.filter(function(it){return it.rarity==='common';});
+      if(_filtered.length>0){
+        var _picked=_filtered[Math.floor(Math.random()*_filtered.length)];
+        var _dropWx=mx+(Math.random()-.5)*2,_dropWz=mz+(Math.random()-.5)*2;
+        if(typeof spawnLootGlow==='function'){
+          spawnLootGlow(_dropWx,_dropWz,_picked,1);
+        }else{
+          addItem(_picked.id,1,_picked);
+          addChat('sys','[시스템]','['+_picked.name+'] 드롭!');
+        }
+      }
+    }
+  }
   setTimeout(function(){
     if(!m.mesh)return;
     m.hp=m.def.hp;var _respawnY=(typeof getTerrainY==='function')?getTerrainY(m.spawnX,m.spawnZ):0;m.mesh.position.set(m.spawnX,_respawnY,m.spawnZ);
