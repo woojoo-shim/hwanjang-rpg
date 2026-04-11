@@ -788,6 +788,9 @@ function checkLevelUp(){
     if(typeof SFX!=='undefined')SFX.levelUp();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
     gold+=20;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    /* 스탯 포인트 지급 */
+    if(typeof grantStatPoints==='function')grantStatPoints(5);
+    if(typeof applyStatEffects==='function')applyStatEffects();
   }
   var ef=document.getElementById('exp-bar-fill');
   if(ef)ef.style.width=Math.min(100,playerEXP/Math.floor(100*Math.pow(playerLevel,2.2))*100)+'%';

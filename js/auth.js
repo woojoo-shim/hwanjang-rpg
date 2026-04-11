@@ -119,7 +119,9 @@ async function savePlayerData(){
     class:playerClass,
     visited_zones:visitedZones,
     equipped_dur:equippedDur,
-    reputation:playerReputation
+    reputation:playerReputation,
+    stats:playerStats,
+    stat_points:statPoints
   };
   var r=await sbClient.from('players').upsert(data);
   if(r.error)console.warn('Save error',JSON.stringify(r.error));
@@ -140,6 +142,9 @@ function restoreGameState(){
   if(playerData.visited_zones)visitedZones=playerData.visited_zones;
   if(playerData.equipped_dur)equippedDur=playerData.equipped_dur;
   if(playerData.reputation)playerReputation=playerData.reputation;
+  if(playerData.stats)playerStats=playerData.stats;
+  if(playerData.stat_points!==undefined)statPoints=playerData.stat_points;
+  if(typeof applyStatEffects==='function')applyStatEffects();
 }
 
 function startAutoSave(){
