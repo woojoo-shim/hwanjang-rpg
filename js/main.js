@@ -233,6 +233,8 @@ function setupInput(){
         if(invOpen){closeInv();return;}
         if(shopOpen){closeShop();return;}
         if(typeof enhanceOpen!=='undefined'&&enhanceOpen){closeEnhance();return;}
+        if(typeof fishingActive!=='undefined'&&fishingActive){cancelFishing();return;}
+        if(typeof _statUIOpen!=='undefined'&&_statUIOpen){closeStatUI();return;}
         openEscMenu();
       }
       return;
@@ -260,8 +262,14 @@ function setupInput(){
       }
     }
     if(k==='f'&&!isInput){e.preventDefault();playerAttack();}
-    /* Space: 대쉬 (레벨 5+) */
-    if(k===' '&&!isInput){e.preventDefault();if(typeof tryDash==='function')tryDash();}
+    /* Space: 낚시 릴 감기 우선, 아니면 대쉬 */
+    if(k===' '&&!isInput){
+      e.preventDefault();
+      if(typeof fishingActive!=='undefined'&&fishingActive){if(typeof reelIn==='function')reelIn();}
+      else{if(typeof tryDash==='function')tryDash();}
+    }
+    /* G: 낚시 */
+    if(k==='g'&&!isInput){e.preventDefault();if(typeof startFishing==='function')startFishing();}
     /* N: 스탯 창 */
     if(k==='n'&&!isInput){e.preventDefault();if(typeof openStatUI==='function')openStatUI();}
     /* 스킬 키: Q=0, R=1, T=2 */
@@ -344,6 +352,7 @@ function loop(){
     if(typeof checkBuildingDoors==='function')checkBuildingDoors();
     if(typeof checkDungeonEntrance==='function')checkDungeonEntrance();
     if(typeof checkDungeonProgress==='function')checkDungeonProgress();
+    if(typeof tickFishing==='function')tickFishing(dt);
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
     /* AFK 체크 */
     if(now-lastActivity>AFK_LIMIT){
