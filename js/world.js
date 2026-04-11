@@ -479,6 +479,41 @@ function buildInterior(name,baseY){
     addPainting(9.65,baseY+3.5,0,-Math.PI/2,0x446688);
     /* ── 포인트라이트 (따뜻한 분위기 — 1개로 통합) ── */
     var libL1=new THREE.PointLight(0xffcc55,.8,20);libL1.position.set(0,baseY+4,0);scene.add(libL1);
+    /* ── 포톤 관련 고대 서적 코너 (동쪽 독서 책상 옆) ── */
+    var ancientBookM=new THREE.MeshLambertMaterial({color:0x1a0a2a});
+    var goldenBookM=new THREE.MeshLambertMaterial({color:0x8a6a10});
+    var redBookM=new THREE.MeshLambertMaterial({color:0x6a1020});
+    /* 고대 서적 1: "봉인의 기록" — 검보라색 */
+    var book1=new THREE.Mesh(new THREE.BoxGeometry(.4,1.0,.7),ancientBookM);book1.position.set(6,baseY+1.27,-7);book1.rotation.y=.1;scene.add(book1);
+    var book1Glow=new THREE.PointLight(0x6622aa,.15,3);book1Glow.position.set(6,baseY+1.5,-7);scene.add(book1Glow);
+    /* 고대 서적 2: "첫 번째 용사의 일지" — 금색 */
+    var book2=new THREE.Mesh(new THREE.BoxGeometry(.35,.9,.6),goldenBookM);book2.position.set(6.8,baseY+1.27,-7.2);book2.rotation.y=-.15;scene.add(book2);
+    /* 고대 서적 3: "심연에 대하여" — 빨간색 */
+    var book3=new THREE.Mesh(new THREE.BoxGeometry(.3,.85,.55),redBookM);book3.position.set(5.3,baseY+1.27,-6.8);book3.rotation.y=.25;scene.add(book3);
+    /* 서적 라벨 (3D 텍스트 대신 HTML 라벨) */
+    var bookLabels=[
+      {x:6,z:-7,text:'📕 봉인의 기록'},
+      {x:6.8,z:-7.2,text:'📗 첫 번째 용사의 일지'},
+      {x:5.3,z:-6.8,text:'📘 심연에 대하여'}
+    ];
+    bookLabels.forEach(function(bl){
+      var lbl=document.createElement('div');
+      lbl.className='nlabel';
+      lbl.style.cssText='color:#c9a84c;font-size:9px;background:#0a0a1acc;padding:2px 5px;border:1px solid #c9a84c44;border-radius:3px;pointer-events:none;';
+      lbl.textContent=bl.text;
+      lbl.dataset.wx=bl.x;lbl.dataset.wy=baseY+2;lbl.dataset.wz=bl.z;
+      lbl.classList.add('bld');
+      document.getElementById('lov').appendChild(lbl);
+    });
+    /* 벽에 포톤 관련 메모/지도 (북쪽 벽 책장 사이) */
+    var memoM=new THREE.MeshLambertMaterial({color:0xddcc88});
+    var memo1=new THREE.Mesh(new THREE.PlaneGeometry(.8,1.1),memoM);memo1.position.set(-5.5,baseY+3.2,-9.68);scene.add(memo1);
+    var memo2=new THREE.Mesh(new THREE.PlaneGeometry(.6,.8),new THREE.MeshLambertMaterial({color:0xccbb77}));memo2.position.set(-4.6,baseY+3.5,-9.68);scene.add(memo2);
+    /* 균열 표시 (빨간 실) */
+    var crackLineM=new THREE.MeshBasicMaterial({color:0xff2222,transparent:true,opacity:0.6});
+    var crack1=new THREE.Mesh(new THREE.PlaneGeometry(.05,.4),crackLineM);crack1.position.set(-5.2,baseY+3.3,-9.67);crack1.rotation.z=0.3;scene.add(crack1);
+    var crack2=new THREE.Mesh(new THREE.PlaneGeometry(.04,.35),crackLineM);crack2.position.set(-4.9,baseY+3.4,-9.67);crack2.rotation.z=-0.5;scene.add(crack2);
+
     /* ── 사서 NPC ── */
     mkInteriorNpc(-3,-5,baseY,0x4a5a8a,'(사서) 엘리노어');
 
