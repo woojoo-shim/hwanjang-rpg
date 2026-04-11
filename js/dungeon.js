@@ -42,7 +42,14 @@ var _dungeonMeshes=[];/* 던전 방 메쉬들 (정리용) */
 var _dungeonMonsters=[];/* 던전 몬스터 (별도 관리) */
 var _dungeonEntranceNpcs=[];/* 던전 입구 표시 */
 
-/* ── 던전 입구 빌드 (맵에 동굴 입구 표시) ── */
+/* ── 던전 NPC 이름 ── */
+var DUNGEON_NPC_NAMES={
+  'goblin_cave':'(던전지기) 고르딘',
+  'crystal_cave':'(던전지기) 크리스탈',
+  'lava_dungeon':'(던전지기) 이그니스'
+};
+
+/* ── 던전 입구 빌드 (NPC + 동굴 입구) ── */
 function buildDungeonEntrances(){
   var caveM=new THREE.MeshLambertMaterial({color:0x3a3a3a});
   var caveInnerM=new THREE.MeshLambertMaterial({color:0x0a0a0a});
@@ -74,7 +81,30 @@ function buildDungeonEntrances(){
     var light=new THREE.PointLight(0xff6600,.5,10);
     light.position.set(ex,ey+2.5,ez+1);scene.add(light);
 
-    /* 이름 라벨 */
+    /* ── 던전 NPC 스폰 (입구 앞) ── */
+    var npcName=DUNGEON_NPC_NAMES[dg.id]||'(던전지기)';
+    var npcX=ex+4,npcZ=ez+3;
+    var npcY=(typeof getTerrainY==='function')?getTerrainY(npcX,npcZ):ey;
+    var npcMesh=(typeof mkHuman==='function')?mkHuman(0x5a3a2a,0xddcc99):new THREE.Mesh(new THREE.BoxGeometry(.6,1.6,.4),new THREE.MeshLambertMaterial({color:0x5a3a2a}));
+    if(npcMesh.group){npcMesh=npcMesh.group;}
+    npcMesh.position.set(npcX,npcY,npcZ);
+    npcMesh.rotation.y=Math.PI;
+    scene.add(npcMesh);
+
+    var nameEl=document.createElement('div');nameEl.className='nlabel npc';
+    nameEl.style.cssText='background:#1a0a00ee;border:1px solid #ff8844;color:#ffaa44;padding:2px 6px;font-size:11px;';
+    nameEl.textContent=npcName;
+    document.getElementById('lov').appendChild(nameEl);
+
+    var intEl=document.createElement('div');intEl.className='linteract';
+    intEl.textContent='E 대화';intEl.style.display='none';
+    document.getElementById('lov').appendChild(intEl);
+
+    var npcObj={name:npcName,mesh:npcMesh,nameEl:nameEl,intEl:intEl,dungeonId:dg.id,bobOff:Math.random()*5};
+    npcs.push(npcObj);
+    dg._npc=npcObj;
+
+    /* 이름 라벨 (던전 이름) */
     var lbl=document.createElement('div');
     lbl.className='nlabel';
     lbl.style.cssText='color:#ff8844;font-size:12px;font-weight:bold;background:#1a0a00cc;padding:3px 8px;border:1px solid #ff6600;border-radius:4px;text-shadow:0 0 6px #ff4400;';
@@ -119,6 +149,55 @@ function checkDungeonEntrance(){
   }else{
     _dungeonHintEl.style.display='none';
   }
+}
+
+/* ── 던전 NPC 대화 → 입장 확인 UI ── */
+function showDungeonConfirm(npc){
+  var dgId=npc.dungeonId;
+  var dg=DUNGEONS.find(function(d){return d.id===dgId;});
+  if(!dg)return;
+
+  /* 레벨 체크 */
+  if(playerLevel<dg.minLevel){
+    addChat('npc',npc.name,'이봐, 아직 실력이 부족해. 레벨 '+dg.minLevel+' 이상이 되어야 입장할 수 있어.');
+    return;
+  }
+
+  var npcName=npc.name;
+  var roomCount=dg.rooms.length;
+  var rew=dg.rewards;
+
+  /* 대화 + 입장 확인 모달 */
+  addChat('npc',npcName,'어서와, 모험가. '+dg.name+'에 도전하겠나? '+roomCount+'개 방을 통과해야 하지.');
+
+  var modal=document.createElement('div');
+  modal.id='dungeon-confirm';
+  modal.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;background:#0c0c1eee;border:2px solid #ff660088;border-radius:12px;padding:20px;z-index:9999;color:#f0e4bb;text-align:center;font-family:inherit;';
+
+  modal.innerHTML=
+    '<div style="color:#ff8844;font-size:18px;font-weight:bold;margin-bottom:8px;">⚔ '+dg.name+'</div>'+
+    '<div style="color:#aaa;font-size:12px;margin-bottom:12px;">권장 레벨: Lv.'+dg.minLevel+'+</div>'+
+    '<div style="background:#1a1a2e;padding:10px;border-radius:8px;margin-bottom:12px;text-align:left;font-size:12px;">'+
+      '<div>📋 총 '+roomCount+'개 방</div>'+
+      '<div>💰 보상: '+rew.gold+' 골드</div>'+
+      '<div>⭐ 경험치: '+rew.exp+' EXP</div>'+
+      '<div>🎁 드롭: '+(rew.drops?rew.drops.map(function(d){var df=getItemDef(d);return df?df.name:d;}).join(', '):'없음')+'</div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;">'+
+      '<button id="dg-enter-btn" style="flex:1;background:#ff8844;color:#0c0c1e;border:none;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;border-radius:6px;">입장하기</button>'+
+      '<button id="dg-cancel-btn" style="flex:1;background:#333;color:#aaa;border:1px solid #555;padding:12px;font-size:13px;cursor:pointer;font-family:inherit;border-radius:6px;">취소</button>'+
+    '</div>';
+
+  document.body.appendChild(modal);
+
+  document.getElementById('dg-enter-btn').onclick=function(){
+    modal.remove();
+    enterDungeon(dg);
+  };
+  document.getElementById('dg-cancel-btn').onclick=function(){
+    modal.remove();
+    addChat('npc',npcName,'다음에 다시 오게, 모험가.');
+  };
 }
 
 /* ── 던전 입장 ── */

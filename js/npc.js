@@ -778,6 +778,11 @@ function buildSkillBar(){
 
 /* ── 대화창 ── */
 function talk(n){
+  /* 던전 NPC 체크 */
+  if(n.dungeonId){
+    showDungeonConfirm(n);
+    return;
+  }
   /* 전직 NPC 체크 — 동적 스폰 NPC도 n.classNpc 직접 확인 */
   var classKey=n.classNpc;
   if(!classKey){
