@@ -636,6 +636,104 @@ function showSingleClassSelect(classKey,npcName){
   modal.style.display='flex';
 }
 
+/* ── 마법사 전직: 수학 문제 3개 ── */
+var _mageMathState={started:false,current:0,total:3,correct:0,answer:0};
+
+function generateMathProblem(difficulty){
+  var a,b,op,answer;
+  if(difficulty===0){
+    /* 쉬움: 두 자리 덧셈/뺄셈 */
+    a=10+Math.floor(Math.random()*90);
+    b=10+Math.floor(Math.random()*90);
+    if(Math.random()>0.5){op='+';answer=a+b;}
+    else{if(a<b){var t=a;a=b;b=t;}op='-';answer=a-b;}
+  }else if(difficulty===1){
+    /* 중간: 곱셈 */
+    a=5+Math.floor(Math.random()*20);
+    b=3+Math.floor(Math.random()*15);
+    op='×';answer=a*b;
+  }else{
+    /* 어려움: 복합 */
+    a=10+Math.floor(Math.random()*50);
+    b=2+Math.floor(Math.random()*10);
+    var c=1+Math.floor(Math.random()*20);
+    op='혼합';
+    answer=a*b+c;
+    return{text:a+' × '+b+' + '+c+' = ?',answer:answer};
+  }
+  return{text:a+' '+op+' '+b+' = ?',answer:answer};
+}
+
+function handleMageClassQuest(npc,ck,cq){
+  if(!_mageMathState.started){
+    /* 시작 */
+    _mageMathState={started:true,current:0,total:3,correct:0,answer:0};
+    addChat('npc',npc.name,'마법사가 되려면 지혜를 증명해야 한다. 수학 문제 3개를 풀어라.');
+    var prob=generateMathProblem(0);
+    _mageMathState.answer=prob.answer;
+    addChat('npc',npc.name,'문제 1/3: '+prob.text);
+    addChat('sys','[시스템]','채팅으로 답을 입력하세요.');
+    /* 대화창 열기 */
+    activeNpc=npc;
+    document.getElementById('dwho-name').textContent='[ '+npc.name+' ]';
+    document.getElementById('dtxt').textContent='문제 1/3: '+prob.text;
+    document.getElementById('dbox').classList.add('show');
+    document.getElementById('dmsg').focus();
+    /* 전직 NPC AI 대화 비활성화 — 수학 모드 */
+    npc._mathMode=true;
+    return;
+  }
+  /* 이미 시작됨 — 대화창 재오픈 */
+  activeNpc=npc;
+  document.getElementById('dwho-name').textContent='[ '+npc.name+' ]';
+  var prob2=generateMathProblem(_mageMathState.current);
+  document.getElementById('dtxt').textContent='문제 '+(_mageMathState.current+1)+'/3: '+prob2.text;
+  _mageMathState.answer=prob2.answer;
+  document.getElementById('dbox').classList.add('show');
+  document.getElementById('dmsg').focus();
+  npc._mathMode=true;
+}
+
+function checkMageMathAnswer(msg){
+  var num=parseInt(msg.trim());
+  if(isNaN(num)){
+    addChat('npc',activeNpc.name,'숫자를 입력해라.');
+    return;
+  }
+  if(num===_mageMathState.answer){
+    _mageMathState.correct++;
+    _mageMathState.current++;
+    addChat('npc',activeNpc.name,'정답이다.');
+    if(typeof SFX!=='undefined')SFX.questAccept();
+    if(_mageMathState.current>=_mageMathState.total){
+      /* 3문제 모두 정답 → 전직 */
+      addChat('npc',activeNpc.name,'훌륭하다. 너에겐 마법사의 자질이 있다.');
+      activeNpc._mathMode=false;
+      _mageMathState.started=false;
+      /* 전직 실행 */
+      playerClass='mage';
+      if(typeof SFX!=='undefined')SFX.classChange();
+      addChat('sys','[시스템]','★ 마법사로 전직했습니다!');
+      if(typeof applyStatEffects==='function')applyStatEffects();
+      if(typeof refreshWeaponMesh==='function')refreshWeaponMesh();
+      if(typeof savePlayerData==='function')savePlayerData();
+      closeDialog();
+      return;
+    }
+    /* 다음 문제 */
+    var nextProb=generateMathProblem(_mageMathState.current);
+    _mageMathState.answer=nextProb.answer;
+    addChat('npc',activeNpc.name,'문제 '+(_mageMathState.current+1)+'/3: '+nextProb.text);
+    document.getElementById('dtxt').textContent='문제 '+(_mageMathState.current+1)+'/3: '+nextProb.text;
+  }else{
+    /* 오답 → 처음부터 */
+    addChat('npc',activeNpc.name,'틀렸다. 처음부터 다시.');
+    _mageMathState={started:false,current:0,total:3,correct:0,answer:0};
+    activeNpc._mathMode=false;
+    closeDialog();
+  }
+}
+
 function confirmClassSelect(){
   var btn=document.getElementById('class-confirm-btn');
   var cls=btn.dataset.cls;
@@ -700,6 +798,11 @@ function talk(n){
     }
     var ck=classKey;
     var cq=classQuestState[ck];
+    /* ── 마법사: 수학 문제 전직 ── */
+    if(ck==='mage'){
+      handleMageClassQuest(n,ck,cq);
+      return;
+    }
     /* 퀘스트 미수락 */
     if(!cq||cq.state==='none'){
       var q=CLASS_DEFS[ck].quest;
@@ -815,6 +918,13 @@ function showThinking(){
 
 async function sendToNpc(){
   if(!activeNpc||isAiThinking)return;
+  /* 마법사 수학 모드 */
+  if(activeNpc._mathMode){
+    var inp3=document.getElementById('dmsg');
+    var mathMsg=inp3.value.trim();inp3.value='';
+    if(mathMsg)checkMageMathAnswer(mathMsg);
+    return;
+  }
   /* 전직 NPC는 AI 대화 없음 */
   if(activeNpc.classNpc){
     var inp2=document.getElementById('dmsg');inp2.value='';return;
