@@ -2140,43 +2140,18 @@ function updMonsters(dt,t){
     var mid=m.def.id;
     var isNH=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
 
-    /* ── 비호스트: 호스트 위치로 보간 ── */
-    if(isNH){
+    /* ── 비호스트: 호스트 위치를 힌트로 부드럽게 보정 (로컬 AI도 돌림) ── */
+    if(isNH&&m._targetX!==undefined){
       var tx=m._targetX,tz=m._targetZ;
-      var ty=(m._targetY!==undefined)?m._targetY:((typeof getTerrainY==='function')?getTerrainY(tx,tz):0);
-      var lerpF=0.2;
-      m.mesh.position.x=mx+(tx-mx)*lerpF;
-      m.mesh.position.z=mz+(tz-mz)*lerpF;
-      m.mesh.position.y=m.mesh.position.y+(ty-m.mesh.position.y)*lerpF;
-      m.baseY=ty;
-      /* 회전: 호스트가 보낸 회전 우선, 없으면 이동 방향 */
-      if(m._targetRy!==undefined){
-        var dR2=m._targetRy-m.mesh.rotation.y;
-        while(dR2>Math.PI)dR2-=Math.PI*2;
-        while(dR2<-Math.PI)dR2+=Math.PI*2;
-        m.mesh.rotation.y+=dR2*Math.min(1,12*dt);
-      }else{
-        var ddx=tx-mx,ddz=tz-mz;
-        if(ddx*ddx+ddz*ddz>0.001){
-          var tRy=Math.atan2(ddx,ddz);
-          var dR=tRy-m.mesh.rotation.y;
-          while(dR>Math.PI)dR-=Math.PI*2;
-          while(dR<-Math.PI)dR+=Math.PI*2;
-          m.mesh.rotation.y+=dR*Math.min(1,10*dt);
-        }
+      var hostDx=tx-mx,hostDz=tz-mz;
+      var hostDist=Math.sqrt(hostDx*hostDx+hostDz*hostDz);
+      /* 호스트 위치와 3 이상 차이나면 보정 */
+      if(hostDist>3){
+        m.mesh.position.x+=(tx-mx)*0.1;
+        m.mesh.position.z+=(tz-mz)*0.1;
       }
-      /* 비호스트: 동기화된 상태 반영 */
-      if(m._syncState)m.state=m._syncState;
-      /* 비호스트: 몬스터가 나를 타겟하고 있으면 어그로 알림 */
-      var myUid3=(typeof currentUser!=='undefined'&&currentUser&&currentUser.id)?currentUser.id:myName;
-      if(m._targetPlayerId===myUid3&&m.state==='aggro'&&!m._aggroNotified){
-        addChat('inf','',m.def.name+'이(가) 달려온다!');
-        m._aggroNotified=true;
-      }
-      if(m.state!=='aggro')m._aggroNotified=false;
-      /* 데미지는 호스트의 mdmg 메시지로 처리 — 비호스트는 로컬 AI 안 돌림 */
-      return;
     }
+    /* 비호스트도 로컬 AI를 돌림 — 아래 코드로 계속 진행 */
 
     /* ── 호스트 (또는 솔로): 몬스터 AI ── */
     /* 어그로 감지 — 가장 가까운 플레이어 기준 */
