@@ -978,9 +978,9 @@ function mkFountain(parent){
 function mkStonePath(parent){
   var p=parent||scene;
   /* 광장 (마을 중심) — 확장 */
-  var pathM=new THREE.MeshLambertMaterial({color:0xc4a872});
+  var pathM=new THREE.MeshLambertMaterial({color:0xc4a872,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
   var plaza=new THREE.Mesh(new THREE.CylinderGeometry(14,14,.05,32),pathM);
-  plaza.position.set(-350,.15,-358);plaza.receiveShadow=true;p.add(plaza);
+  plaza.position.set(-350,.25,-358);plaza.receiveShadow=true;p.add(plaza);
 
   function lerpPath(pts,steps){
     var out=[];
@@ -1728,8 +1728,8 @@ function initScene(){
   sun.shadow.camera.right=80;
   sun.shadow.camera.top=80;
   sun.shadow.camera.bottom=-80;
-  sun.shadow.bias=-0.003;
-  sun.shadow.normalBias=0.02;
+  sun.shadow.bias=-0.005;
+  sun.shadow.normalBias=0.05;
   scene.add(sun);
   window._sun=sun;
 
@@ -3548,7 +3548,7 @@ function buildForestDecor(){
     forestPath.forEach(function(pt){
       var disc=new THREE.Mesh(new THREE.CircleGeometry(2,24),fpathM);
       disc.rotation.x=-Math.PI/2;
-      disc.position.set(pt[0],getTerrainY(pt[0],pt[1])+.012,pt[1]);
+      disc.position.set(pt[0],getTerrainY(pt[0],pt[1])+.06,pt[1]);
       disc.receiveShadow=true;scene.add(disc);
     });
     /* 보조 경로 */
@@ -3558,7 +3558,7 @@ function buildForestDecor(){
     forestPath2.forEach(function(pt){
       var disc=new THREE.Mesh(new THREE.CircleGeometry(1.8,24),fpathM);
       disc.rotation.x=-Math.PI/2;
-      disc.position.set(pt[0],getTerrainY(pt[0],pt[1])+.012,pt[1]);
+      disc.position.set(pt[0],getTerrainY(pt[0],pt[1])+.06,pt[1]);
       disc.receiveShadow=true;scene.add(disc);
     });
   })();
