@@ -1695,7 +1695,7 @@ function initScene(){
   /* ── 대기 안개 — 부드러운 블루-화이트 안개로 깊이감 강화 ── */
   scene.fog=new THREE.FogExp2(0xa8d8ea,.0015);
 
-  camera=new THREE.PerspectiveCamera(60,1,.1,1200);
+  camera=new THREE.PerspectiveCamera(60,1,1,1200);
   camera.position.set(-350,10,-332);
 
   /* ── 스카이돔 ── */
