@@ -358,11 +358,32 @@ function tickDynamicNpcs(dt){
   tickRuneCollect();
   tickArrowTrail();
   tickPaladin();
+  tickArcherMovingTarget(dt);
 }
 
 /* 몬스터 킬 시 전직 퀘스트 진행 체크 */
-function checkClassQuestKill(monsterName){
+function checkClassQuestKill(monsterName,wasOneShot){
+  /* ── 전사 특수: 황금 사슴왕 처치 ── */
+  if(monsterName==='★ 황금 사슴왕'&&classQuestState['warrior']&&classQuestState['warrior'].state==='active'){
+    warriorEliteKilled=true;
+    addChat('sys','[전사 퀘스트] ★ 황금 사슴왕 처치! (1/1)');
+    _checkWarriorQuestDone();
+  }
+  /* ── 궁수 특수: 독왕 두꺼비 처치 (phase 2) ── */
+  if(monsterName==='★ 독왕 두꺼비'&&classQuestState['archer']&&classQuestState['archer'].state==='active'&&(classQuestState['archer'].phase||0)>=2){
+    classQuestState['archer'].state='done';
+    addChat('sys','[궁수 퀘스트] ★ 독왕 두꺼비 처치! 퀘스트 완료!');
+    addChat('sys','[시스템]','★ 궁수 전직 퀘스트 완료! (사냥꾼) 한시우를 찾아라.');
+    var tqA=activeQuests.find(function(q){return q.id==='class_archer';});
+    if(tqA){tqA.ready=true;tqA.desc='(사냥꾼) 한시우에게 돌아가세요!';renderQuestTracker();}
+  }
+  /* ── 암살자 특수: 비밀 구역 원샷킬 ── */
+  if(wasOneShot&&assassinSecretAreaActive&&classQuestState['assassin']&&classQuestState['assassin'].state==='active'){
+    checkAssassinOneShot(monsterName);
+  }
+  /* 일반 클래스 퀘스트 킬 체크 */
   for(var k in classQuestState){
+    if(k==='warrior'||k==='archer'||k==='assassin'||k==='mage')continue;
     var cq=classQuestState[k];
     if(cq.state==='active'&&cq.target===monsterName){
       cq.progress++;
@@ -636,8 +657,222 @@ function showSingleClassSelect(classKey,npcName){
   modal.style.display='flex';
 }
 
-/* ── 마법사 전직: 수학 문제 3개 ── */
-var _mageMathState={started:false,current:0,total:3,correct:0,answer:0};
+/* ════════════ 전사 특수 전직 퀘스트 ════════════ */
+/* 조건 1: ★ 황금 사슴왕 처치 / 조건 2: 오버헤드 슬래시(shield_bash) 200회 */
+var warriorSlashCount=0;
+var warriorEliteKilled=false;
+
+function onWarriorSlashUse(){
+  /* player.js useSkill에서 호출 — shield_bash(Q) 사용 시 전직 퀘스트 카운트 */
+  if(!classQuestState['warrior']||classQuestState['warrior'].state!=='active')return;
+  warriorSlashCount++;
+  classQuestState['warrior'].slashProgress=warriorSlashCount;
+  /* 25회마다 알림 */
+  if(warriorSlashCount%25===0)
+    addChat('sys','[전사 퀘스트] 오버헤드 슬래시 '+warriorSlashCount+'/200');
+  /* 퀘스트 트래커 업데이트 */
+  var tq=activeQuests.find(function(q){return q.id==='class_warrior';});
+  if(tq){tq.desc='황금 사슴왕:'+(warriorEliteKilled?'✓':'✗')+' 슬래시:'+warriorSlashCount+'/200';renderQuestTracker();}
+  _checkWarriorQuestDone();
+}
+
+function _checkWarriorQuestDone(){
+  if(!classQuestState['warrior']||classQuestState['warrior'].state!=='active')return;
+  if(warriorEliteKilled&&warriorSlashCount>=200){
+    classQuestState['warrior'].state='done';
+    addChat('sys','[시스템]','★ 전사 전직 퀘스트 완료! (검술사범) 최무현에게 돌아가세요.');
+    var tq=activeQuests.find(function(q){return q.id==='class_warrior';});
+    if(tq){tq.ready=true;tq.desc='(검술사범) 최무현에게 돌아가세요!';renderQuestTracker();}
+  }
+}
+
+/* ════════════ 궁수 특수 전직 퀘스트 ════════════ */
+/* 단계 1: 텔레포트 + 이동 표적 명중 / 단계 2: ★ 독왕 두꺼비 처치 */
+var archerQuestPhase=0; /* 0=미시작 1=이동표적대기 2=표적명중(두꺼비대기) 3=완료 */
+var archerMovingTarget=null; /* {mesh, x, z, vx, vz, alive} */
+var archerMovingTargetTimer=0;
+
+function startArcherMovingTarget(){
+  /* 플레이어를 초원 랜덤 위치로 텔레포트 */
+  var tx=(Math.random()-0.5)*80;
+  var tz=20+Math.random()*40;
+  if(PL.group){PL.group.position.x=tx;PL.group.position.z=tz;}
+  addChat('sys','[궁수 시험] 순식간에 어딘가로 이동했다!');
+  addChat('sys','[궁수 시험] 저 멀리 움직이는 표적이 보인다. 화살로 명중시켜라!');
+  /* 이동 표적 생성 */
+  var tg=new THREE.Group();
+  var tm=new THREE.MeshLambertMaterial({color:0xff4400,emissive:new THREE.Color(0x441100),emissiveIntensity:.5});
+  var body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.8,8),tm);
+  body.position.y=.4;tg.add(body);
+  var head=new THREE.Mesh(new THREE.SphereGeometry(.25,8,8),tm);
+  head.position.y=1.1;tg.add(head);
+  /* 십자 표시 */
+  var xm=new THREE.MeshBasicMaterial({color:0xffffff});
+  var hb=new THREE.Mesh(new THREE.BoxGeometry(.6,.05,.05),xm);hb.position.y=.8;tg.add(hb);
+  var vb=new THREE.Mesh(new THREE.BoxGeometry(.05,.6,.05),xm);vb.position.y=.8;tg.add(vb);
+  /* 발광 링 */
+  var rm=new THREE.MeshBasicMaterial({color:0xff4400,transparent:true,opacity:.4,side:THREE.DoubleSide});
+  var ring=new THREE.Mesh(new THREE.RingGeometry(.4,.7,16),rm);
+  ring.rotation.x=-Math.PI/2;ring.position.y=.05;tg.add(ring);
+  var sx=tx+10+(Math.random()-0.5)*20;
+  var sz=tz+(Math.random()-0.5)*15;
+  tg.position.set(sx,.0,sz);
+  scene.add(tg);
+  var speed=5+Math.random()*3;
+  var ang=Math.random()*Math.PI*2;
+  archerMovingTarget={mesh:tg,x:sx,z:sz,vx:Math.sin(ang)*speed,vz:Math.cos(ang)*speed,alive:true,ring:ring};
+  archerMovingTargetTimer=20;/* 20초 제한 */
+  archerQuestPhase=1;
+}
+
+function tickArcherMovingTarget(dt){
+  if(archerQuestPhase!==1||!archerMovingTarget||!archerMovingTarget.alive)return;
+  archerMovingTargetTimer-=dt;
+  if(archerMovingTargetTimer<=0){
+    /* 시간 초과 — 실패 */
+    scene.remove(archerMovingTarget.mesh);
+    archerMovingTarget=null;
+    archerQuestPhase=0;
+    if(classQuestState['archer'])classQuestState['archer'].state='active';
+    addChat('sys','[궁수 시험] 표적을 놓쳤다. (검술사범)에게 다시 시험받아라.');
+    /* 퀘스트 상태 리셋해서 다시 시작 가능하게 */
+    classQuestState['archer']={state:'active',phase:0,progress:0,target:'★ 독왕 두꺼비',count:1};
+    return;
+  }
+  /* 이동 */
+  archerMovingTarget.x+=archerMovingTarget.vx*dt;
+  archerMovingTarget.z+=archerMovingTarget.vz*dt;
+  /* 경계 반사 */
+  if(archerMovingTarget.x<-60||archerMovingTarget.x>60)archerMovingTarget.vx*=-1;
+  if(archerMovingTarget.z<10||archerMovingTarget.z>70)archerMovingTarget.vz*=-1;
+  archerMovingTarget.mesh.position.set(archerMovingTarget.x,0,archerMovingTarget.z);
+  /* 회전 애니 */
+  archerMovingTarget.ring.rotation.z+=dt*2;
+  /* 화살 충돌 체크 — arrows 배열은 player.js 소유 */
+  if(typeof arrows!=='undefined'){
+    for(var ai=0;ai<arrows.length;ai++){
+      var ar=arrows[ai];
+      if(!ar.mesh)continue;
+      var adx=ar.mesh.position.x-archerMovingTarget.x;
+      var adz=ar.mesh.position.z-archerMovingTarget.z;
+      if(adx*adx+adz*adz<1.5){
+        /* 명중! */
+        archerMovingTarget.alive=false;
+        scene.remove(archerMovingTarget.mesh);
+        archerMovingTarget=null;
+        archerQuestPhase=2;
+        addChat('sys','[궁수 시험] ★ 명중! 이동 표적을 맞췄다!');
+        addChat('sys','[궁수 시험] 이제 늪 지역의 ★ 독왕 두꺼비를 처치하라.');
+        spawnDmgNum('정밀 사격!','#ffdd44');
+        if(classQuestState['archer'])classQuestState['archer'].phase=2;
+        /* 퀘스트 트래커 업데이트 */
+        var tq=activeQuests.find(function(q){return q.id==='class_archer';});
+        if(tq){tq.desc='★ 독왕 두꺼비를 처치하라';renderQuestTracker();}
+        if(typeof SFX!=='undefined')SFX.questAccept();
+        return;
+      }
+    }
+  }
+}
+
+/* ════════════ 암살자 특수 전직 퀘스트 ════════════ */
+/* 단계: (???) NPC에서 암호 구입 → 동굴 앞에서 채팅으로 암호 외침 → 비밀 구역 진입 → 원샷킬 20 */
+var assassinPassword='';
+var assassinPasswordBought=false;
+var assassinSecretAreaActive=false;
+var assassinOneShotCount=0;
+/* 동굴 입구 위치 (어두운 숲 지역) */
+var ASSASSIN_CAVE_X=-80, ASSASSIN_CAVE_Z=155;
+var assassinCaveMarker=null;
+
+function generateAssassinPassword(){
+  var words=['흑야','그림자','달빛','침묵','독침','어둠','은신','단검'];
+  return words[Math.floor(Math.random()*words.length)]+Math.floor(Math.random()*900+100);
+}
+
+function spawnAssassinCaveMarker(){
+  if(assassinCaveMarker)return;
+  var g=new THREE.Group();
+  var stonM=new THREE.MeshLambertMaterial({color:0x444455});
+  /* 동굴 아치 */
+  var archL=new THREE.Mesh(new THREE.BoxGeometry(.3,2.5,.3),stonM);
+  archL.position.set(-1,1.25,0);g.add(archL);
+  var archR=new THREE.Mesh(new THREE.BoxGeometry(.3,2.5,.3),stonM);
+  archR.position.set(1,1.25,0);g.add(archR);
+  var archTop=new THREE.Mesh(new THREE.BoxGeometry(2.3,.3,.3),stonM);
+  archTop.position.set(0,2.6,0);g.add(archTop);
+  /* 어두운 내부 */
+  var innerM=new THREE.MeshBasicMaterial({color:0x000000});
+  var inner=new THREE.Mesh(new THREE.BoxGeometry(1.6,2.2,.1),innerM);
+  inner.position.set(0,1.1,.1);g.add(inner);
+  /* 발광 눈 */
+  var eyeM=new THREE.MeshBasicMaterial({color:0xff0000});
+  var eyeL=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),eyeM);eyeL.position.set(-.25,1.5,.15);g.add(eyeL);
+  var eyeR=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),eyeM);eyeR.position.set(.25,1.5,.15);g.add(eyeR);
+  g.position.set(ASSASSIN_CAVE_X,0,ASSASSIN_CAVE_Z);
+  scene.add(g);
+  assassinCaveMarker=g;
+  addChat('sys','[시스템]','어두운 숲 깊은 곳에서 수상한 동굴 입구가 보인다...');
+}
+
+function checkAssassinCaveChat(msg){
+  /* 플레이어가 채팅으로 암호를 외치는지 확인 */
+  if(!assassinPasswordBought||!assassinPassword)return;
+  if(assassinSecretAreaActive)return;
+  if(msg.trim()!==assassinPassword)return;
+  /* 위치 체크 — 동굴 입구 근처 */
+  if(!PL.group)return;
+  var dx=PL.group.position.x-ASSASSIN_CAVE_X;
+  var dz=PL.group.position.z-ASSASSIN_CAVE_Z;
+  if(dx*dx+dz*dz>100){
+    addChat('sys','[시스템]','암호는 맞지만 동굴 앞에서 외쳐야 한다...');
+    return;
+  }
+  /* 비밀 구역 진입! */
+  assassinSecretAreaActive=true;
+  addChat('sys','[암살자 시험] ★ 암호가 맞다! 비밀 구역에 진입했다!');
+  addChat('sys','[암살자 시험] 이 구역의 적 20마리를 원샷킬하라.');
+  if(classQuestState['assassin'])classQuestState['assassin'].phase=2;
+  /* 퀘스트 트래커 업데이트 */
+  var tq=activeQuests.find(function(q){return q.id==='class_assassin';});
+  if(tq){tq.desc='원샷킬 '+assassinOneShotCount+'/20';renderQuestTracker();}
+  if(typeof SFX!=='undefined')SFX.questAccept();
+  /* 비밀 구역 몬스터 추가 스폰 */
+  _spawnAssassinSecretMonsters();
+}
+
+function _spawnAssassinSecretMonsters(){
+  /* 동굴 입구 주변에 늑대/고블린 10마리 스폰 */
+  var defs=[
+    MONSTER_DEFS.find(function(x){return x.id==='goblin';}),
+    MONSTER_DEFS.find(function(x){return x.id==='wolf';})
+  ];
+  for(var i=0;i<10;i++){
+    var def=defs[i%2];
+    if(!def)continue;
+    var sx=ASSASSIN_CAVE_X+(Math.random()-0.5)*20;
+    var sz=ASSASSIN_CAVE_Z+(Math.random()-0.5)*20;
+    if(typeof spawnMonster==='function')spawnMonster(def,sx,sz,scene);
+  }
+}
+
+function checkAssassinOneShot(monster,dmg){
+  /* monster.js killMonster 이후 호출 — 한 방에 처치했는지 여부를 monster._oneShot 플래그로 체크 */
+  if(!assassinSecretAreaActive)return;
+  if(!classQuestState['assassin']||classQuestState['assassin'].state!=='active')return;
+  assassinOneShotCount++;
+  addChat('sys','[암살자 시험] 원샷킬! ('+assassinOneShotCount+'/20)');
+  var tq=activeQuests.find(function(q){return q.id==='class_assassin';});
+  if(tq){tq.desc='원샷킬 '+assassinOneShotCount+'/20';tq.progress=assassinOneShotCount;tq.count=20;renderQuestTracker();}
+  if(assassinOneShotCount>=20){
+    classQuestState['assassin'].state='done';
+    addChat('sys','[시스템]','★ 암살자 전직 퀘스트 완료! (그림자) 임카이를 찾아라.');
+    if(tq){tq.ready=true;tq.desc='(그림자) 임카이에게 보고하라!';renderQuestTracker();}
+  }
+}
+
+/* ════════════ 마법사 전직: 수학 문제 5개 (난이도 점층) ════════════ */
+var _mageMathState={started:false,current:0,total:5,correct:0,answer:0};
 
 function generateMathProblem(difficulty){
   var a,b,op,answer;
@@ -647,36 +882,51 @@ function generateMathProblem(difficulty){
     b=10+Math.floor(Math.random()*90);
     if(Math.random()>0.5){op='+';answer=a+b;}
     else{if(a<b){var t=a;a=b;b=t;}op='-';answer=a-b;}
+    return{text:a+' '+op+' '+b+' = ?',answer:answer};
   }else if(difficulty===1){
-    /* 중간: 곱셈 */
+    /* 중간: 두 자리 곱셈 */
     a=5+Math.floor(Math.random()*20);
     b=3+Math.floor(Math.random()*15);
     op='×';answer=a*b;
-  }else{
-    /* 어려움: 복합 */
+    return{text:a+' × '+b+' = ?',answer:answer};
+  }else if(difficulty===2){
+    /* 중상: 복합 혼합 */
     a=10+Math.floor(Math.random()*50);
     b=2+Math.floor(Math.random()*10);
     var c=1+Math.floor(Math.random()*20);
-    op='혼합';
     answer=a*b+c;
     return{text:a+' × '+b+' + '+c+' = ?',answer:answer};
+  }else if(difficulty===3){
+    /* 어려움: 3단 복합 */
+    a=3+Math.floor(Math.random()*12);
+    b=2+Math.floor(Math.random()*8);
+    var c2=5+Math.floor(Math.random()*20);
+    var d=1+Math.floor(Math.random()*10);
+    answer=a*b*c2-d;
+    return{text:'('+a+' × '+b+' × '+c2+') - '+d+' = ?',answer:answer};
+  }else{
+    /* 최고 난이도: 제곱 + 혼합 */
+    a=2+Math.floor(Math.random()*8);
+    b=3+Math.floor(Math.random()*15);
+    var c3=2+Math.floor(Math.random()*10);
+    answer=a*a+b*c3;
+    return{text:a+'² + '+b+' × '+c3+' = ?',answer:answer};
   }
-  return{text:a+' '+op+' '+b+' = ?',answer:answer};
 }
 
 function handleMageClassQuest(npc,ck,cq){
   if(!_mageMathState.started){
     /* 시작 */
-    _mageMathState={started:true,current:0,total:3,correct:0,answer:0};
-    addChat('npc',npc.name,'마법사가 되려면 지혜를 증명해야 한다. 수학 문제 3개를 풀어라.');
+    _mageMathState={started:true,current:0,total:5,correct:0,answer:0};
+    addChat('npc',npc.name,'마법사가 되려면 지혜를 증명해야 한다. 마법 언어 시험 5문제를 풀어라. 하나라도 틀리면 처음부터다.');
     var prob=generateMathProblem(0);
     _mageMathState.answer=prob.answer;
-    addChat('npc',npc.name,'문제 1/3: '+prob.text);
-    addChat('sys','[시스템]','채팅으로 답을 입력하세요.');
+    addChat('npc',npc.name,'[문제 1/5] '+prob.text);
+    addChat('sys','[시스템]','채팅으로 답을 입력하세요. 오답 시 처음부터 시작합니다.');
     /* 대화창 열기 */
     activeNpc=npc;
     document.getElementById('dwho-name').textContent='[ '+npc.name+' ]';
-    document.getElementById('dtxt').textContent='문제 1/3: '+prob.text;
+    document.getElementById('dtxt').textContent='[마법 언어 시험 1/5] '+prob.text;
     document.getElementById('dbox').classList.add('show');
     document.getElementById('dmsg').focus();
     /* 전직 NPC AI 대화 비활성화 — 수학 모드 */
@@ -687,8 +937,8 @@ function handleMageClassQuest(npc,ck,cq){
   activeNpc=npc;
   document.getElementById('dwho-name').textContent='[ '+npc.name+' ]';
   var prob2=generateMathProblem(_mageMathState.current);
-  document.getElementById('dtxt').textContent='문제 '+(_mageMathState.current+1)+'/3: '+prob2.text;
   _mageMathState.answer=prob2.answer;
+  document.getElementById('dtxt').textContent='[마법 언어 시험 '+(_mageMathState.current+1)+'/5] '+prob2.text;
   document.getElementById('dbox').classList.add('show');
   document.getElementById('dmsg').focus();
   npc._mathMode=true;
@@ -697,17 +947,16 @@ function handleMageClassQuest(npc,ck,cq){
 function checkMageMathAnswer(msg){
   var num=parseInt(msg.trim());
   if(isNaN(num)){
-    addChat('npc',activeNpc.name,'숫자를 입력해라.');
+    addChat('npc',activeNpc.name,'숫자를 입력해라. 마법 언어는 수식으로 이루어진다.');
     return;
   }
   if(num===_mageMathState.answer){
     _mageMathState.correct++;
     _mageMathState.current++;
-    addChat('npc',activeNpc.name,'정답이다.');
     if(typeof SFX!=='undefined')SFX.questAccept();
     if(_mageMathState.current>=_mageMathState.total){
-      /* 3문제 모두 정답 → 전직 */
-      addChat('npc',activeNpc.name,'훌륭하다. 너에겐 마법사의 자질이 있다.');
+      /* 5문제 모두 정답 → 전직 */
+      addChat('npc',activeNpc.name,'완벽하다. 너의 지혜는 마법사의 경지에 달했다. 이제 마법의 길을 걸어라.');
       activeNpc._mathMode=false;
       _mageMathState.started=false;
       /* 전직 실행 */
@@ -723,12 +972,12 @@ function checkMageMathAnswer(msg){
     /* 다음 문제 */
     var nextProb=generateMathProblem(_mageMathState.current);
     _mageMathState.answer=nextProb.answer;
-    addChat('npc',activeNpc.name,'문제 '+(_mageMathState.current+1)+'/3: '+nextProb.text);
-    document.getElementById('dtxt').textContent='문제 '+(_mageMathState.current+1)+'/3: '+nextProb.text;
+    addChat('npc',activeNpc.name,'정답! [문제 '+(_mageMathState.current+1)+'/5] '+nextProb.text);
+    document.getElementById('dtxt').textContent='[마법 언어 시험 '+(_mageMathState.current+1)+'/5] '+nextProb.text;
   }else{
     /* 오답 → 처음부터 */
-    addChat('npc',activeNpc.name,'틀렸다. 처음부터 다시.');
-    _mageMathState={started:false,current:0,total:3,correct:0,answer:0};
+    addChat('npc',activeNpc.name,'틀렸다! 마법사의 지혜는 완벽해야 한다. 처음부터 다시.');
+    _mageMathState={started:false,current:0,total:5,correct:0,answer:0};
     activeNpc._mathMode=false;
     closeDialog();
   }
@@ -813,7 +1062,112 @@ function talk(n){
       handleMageClassQuest(n,ck,cq);
       return;
     }
-    /* 퀘스트 미수락 */
+    /* ── 전사: 황금 사슴왕 + 오버헤드 슬래시 200회 ── */
+    if(ck==='warrior'){
+      if(!cq||cq.state==='none'){
+        addChat('npc',n.name,'전사가 되고 싶은가? 두 가지 시험을 통과해야 한다.');
+        addChat('npc',n.name,'① 초원에서 ★ 황금 사슴왕을 찾아 처치하라.');
+        addChat('npc',n.name,'② 방패 강타(Q스킬)를 200번 사용하여 근육을 단련하라.');
+        classQuestState['warrior']={state:'active',progress:0,target:'★ 황금 사슴왕',count:1,slashProgress:0,phase:0};
+        warriorSlashCount=0;warriorEliteKilled=false;
+        addChat('sys','[시스템]','전사 전직 퀘스트 수락: 황금 사슴왕 처치 + 방패 강타 200회');
+        var tq={id:'class_warrior',name:'[전직] 전사',desc:'황금 사슴왕 처치 & 방패 강타 200회',
+          type:'special',target:'★ 황금 사슴왕',count:1,progress:0,
+          rewardType:'exp',rewardAmount:'0',npc:n.name,ready:false,isClassQuest:true,classKey:'warrior'};
+        activeQuests.push(tq);renderQuestTracker();
+        if(n===berserkerNpc){despawnDynamicNpc(berserkerNpc);berserkerNpc=null;berserkerSpawned=false;}
+        return;
+      }
+      if(cq.state==='active'){
+        var elkilled=warriorEliteKilled?'✓':'✗';
+        var slashDone=warriorSlashCount>=200?'✓':'✗';
+        addChat('npc',n.name,'아직 끝나지 않았군. ★황금 사슴왕 처치:'+elkilled+' | 방패 강타:'+warriorSlashCount+'/200 '+slashDone);
+        if(n===berserkerNpc){despawnDynamicNpc(berserkerNpc);berserkerNpc=null;berserkerSpawned=false;}
+        return;
+      }
+      if(cq.state==='done'){
+        activeQuests=activeQuests.filter(function(q){return q.id!=='class_warrior';});
+        renderQuestTracker();
+        showSingleClassSelect('warrior',n.name);
+        if(n===berserkerNpc){despawnDynamicNpc(berserkerNpc);berserkerNpc=null;berserkerSpawned=false;}
+        return;
+      }
+      return;
+    }
+    /* ── 궁수: 텔레포트 + 이동 표적 + 독왕 두꺼비 ── */
+    if(ck==='archer'){
+      if(!cq||cq.state==='none'){
+        addChat('npc',n.name,'궁수가 되고 싶은가? 정밀 사격과 강적 처치 두 가지 시험이 있다.');
+        addChat('npc',n.name,'준비가 됐다면... 지금 바로 시험을 시작한다!');
+        classQuestState['archer']={state:'active',phase:1,progress:0,target:'★ 독왕 두꺼비',count:1};
+        archerQuestPhase=0;
+        addChat('sys','[시스템]','궁수 전직 퀘스트 수락. 이동 표적 명중 시험 시작!');
+        var tq2={id:'class_archer',name:'[전직] 궁수',desc:'이동 표적 명중 시험',
+          type:'special',target:'표적',count:1,progress:0,
+          rewardType:'exp',rewardAmount:'0',npc:n.name,ready:false,isClassQuest:true,classKey:'archer'};
+        activeQuests.push(tq2);renderQuestTracker();
+        /* 즉시 텔레포트 & 표적 생성 */
+        setTimeout(function(){startArcherMovingTarget();},500);
+        if(n===archerNpc){despawnDynamicNpc(archerNpc);archerNpc=null;archerNpcSpawned=false;}
+        return;
+      }
+      if(cq.state==='active'){
+        var ph=cq.phase||1;
+        if(ph===1){
+          addChat('npc',n.name,'표적을 화살로 맞춰라! 이동하는 표적을 명중시켜야 한다.');
+        }else if(ph===2){
+          addChat('npc',n.name,'잘 했다! 이제 늪 지역의 ★ 독왕 두꺼비를 처치하라.');
+        }
+        if(n===archerNpc){despawnDynamicNpc(archerNpc);archerNpc=null;archerNpcSpawned=false;}
+        return;
+      }
+      if(cq.state==='done'){
+        activeQuests=activeQuests.filter(function(q){return q.id!=='class_archer';});
+        renderQuestTracker();
+        showSingleClassSelect('archer',n.name);
+        if(n===archerNpc){despawnDynamicNpc(archerNpc);archerNpc=null;archerNpcSpawned=false;}
+        return;
+      }
+      return;
+    }
+    /* ── 암살자: (???) NPC 암호 구입 → 동굴 진입 → 원샷킬 20 ── */
+    if(ck==='assassin'){
+      if(!cq||cq.state==='none'){
+        addChat('npc',n.name,'암살자가 되려면... 어둠 속으로 숨어들어야 한다.');
+        addChat('npc',n.name,'마을의 (???) 정체불명 NPC에게 찾아가 암호를 구입하라. 비용이 들 것이다.');
+        addChat('npc',n.name,'그리고 어두운 숲 깊은 곳의 동굴 앞에서 그 암호를 외쳐라.');
+        classQuestState['assassin']={state:'active',phase:1,progress:0,oneShotKills:0};
+        assassinOneShotCount=0;assassinPasswordBought=false;assassinSecretAreaActive=false;assassinPassword='';
+        addChat('sys','[시스템]','암살자 전직 퀘스트 수락. (???) 정체불명 NPC에게 암호를 구입하라.');
+        var tq3={id:'class_assassin',name:'[전직] 암살자',desc:'(???) NPC에게 암호 구입',
+          type:'special',target:'원샷킬',count:20,progress:0,
+          rewardType:'exp',rewardAmount:'0',npc:n.name,ready:false,isClassQuest:true,classKey:'assassin'};
+        activeQuests.push(tq3);renderQuestTracker();
+        spawnAssassinCaveMarker();
+        if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
+        return;
+      }
+      if(cq.state==='active'){
+        var aph=cq.phase||1;
+        if(aph===1&&!assassinPasswordBought)
+          addChat('npc',n.name,'(???) 정체불명 NPC에게 암호를 구입했는가?');
+        else if(aph===1&&assassinPasswordBought)
+          addChat('npc',n.name,'이제 어두운 숲의 동굴 앞에서 암호를 채팅으로 외쳐라.');
+        else if(aph===2)
+          addChat('npc',n.name,'비밀 구역에서 원샷킬 '+assassinOneShotCount+'/20. 계속하라.');
+        if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
+        return;
+      }
+      if(cq.state==='done'){
+        activeQuests=activeQuests.filter(function(q){return q.id!=='class_assassin';});
+        renderQuestTracker();
+        showSingleClassSelect('assassin',n.name);
+        if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
+        return;
+      }
+      return;
+    }
+    /* 퀘스트 미수락 (일반 클래스) */
     if(!cq||cq.state==='none'){
       var q=CLASS_DEFS[ck].quest;
       addChat('npc',n.name,CLASS_DEFS[ck].name+'이(가) 되고 싶은가? 먼저 시험을 통과해야 한다.');
@@ -852,6 +1206,35 @@ function talk(n){
       if(n===assassinNpc){despawnDynamicNpc(assassinNpc);assassinNpc=null;assassinSpawned=false;}
       return;
     }
+    return;
+  }
+  /* (???) 정체불명: 암살자 암호 판매 */
+  if(n.name==='(???) 정체불명'){
+    /* 암살자 전직 퀘스트 진행 중인 경우 */
+    var acq=classQuestState['assassin'];
+    if(acq&&acq.state==='active'&&acq.phase===1&&!assassinPasswordBought){
+      if(gold>=500){
+        gold-=500;
+        var _gg=document.getElementById('inv-gold');if(_gg)_gg.textContent='💰 '+gold+' 골드';
+        assassinPassword=generateAssassinPassword();
+        assassinPasswordBought=true;
+        addChat('npc',n.name,'...500골드. 거스름돈은 없어.');
+        addChat('npc',n.name,'암호는 ['+assassinPassword+']. 잊지 마라.');
+        addChat('sys','[시스템]','암호 ['+assassinPassword+'] 획득! 어두운 숲 동굴 앞에서 채팅으로 외쳐라.');
+        var tqAss=activeQuests.find(function(q){return q.id==='class_assassin';});
+        if(tqAss){tqAss.desc='동굴 앞에서 암호 외치기: '+assassinPassword;renderQuestTracker();}
+      }else{
+        addChat('npc',n.name,'...돈이 없네. 500골드를 가져와.');
+      }
+      return;
+    }
+    if(acq&&acq.state==='active'&&assassinPasswordBought&&!assassinSecretAreaActive){
+      addChat('npc',n.name,'...암호는 ['+assassinPassword+']. 잊었어?');
+      addChat('npc',n.name,'동굴 앞에서 채팅창에 암호를 그대로 입력해.');
+      return;
+    }
+    /* 암살자 퀘스트 없는 경우 — 기본 대사 */
+    addChat('npc',n.name,'...뭘 원하지?');
     return;
   }
   /* 대장장이: 강화 UI 열기 */
@@ -1050,6 +1433,8 @@ document.addEventListener('keydown',function(e){
 function sendChat(){
   var ci=document.getElementById('cin'),v=ci.value.trim();if(!v)return;
   ci.value='';
+  /* 암살자 암호 체크 */
+  if(assassinPasswordBought&&!assassinSecretAreaActive)checkAssassinCaveChat(v);
   /* 이모트 커맨드 */
   if(typeof parseEmoteCommand==='function'){
     var emoteCmd=parseEmoteCommand(v);

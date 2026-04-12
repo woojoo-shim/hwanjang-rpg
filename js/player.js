@@ -383,10 +383,20 @@ function isRangedWeapon(){
 
 /* ═══════════ 스킬 시스템 ═══════════ */
 function useSkill(slotIdx){
-  if(playerClass==='none')return;
+  if(playerClass==='none'){
+    /* 무직 상태에서도 전직 퀘스트용 오버헤드 슬래시 카운트 — 쿨 없이 사용 */
+    if(typeof classQuestState!=='undefined'&&classQuestState['warrior']&&classQuestState['warrior'].state==='active'){
+      if(slotIdx===0&&typeof onWarriorSlashUse==='function')onWarriorSlashUse();
+    }
+    return;
+  }
   var skills=CLASS_SKILLS[playerClass];
   if(!skills||slotIdx>=skills.length)return;
   var sk=skills[slotIdx];
+  /* 전사 오버헤드 슬래시 카운트 (shield_bash) */
+  if(playerClass==='warrior'&&sk.id==='shield_bash'){
+    if(typeof onWarriorSlashUse==='function')onWarriorSlashUse();
+  }
   /* 쿨다운 체크 */
   if(skillCooldowns[sk.id]&&skillCooldowns[sk.id]>0){
     addChat('inf','','쿨다운 중 ('+Math.ceil(skillCooldowns[sk.id])+'초)');
@@ -649,6 +659,8 @@ function playerAttack(){
   }
   target.hp=Math.max(0,target.hp-dmg);
   target.hbf.style.width=Math.max(0,target.hp/target.maxHp*100)+'%';
+  /* 원샷킬 감지용 히트 카운터 */
+  target._hitCount=(target._hitCount||0)+1;
   if(typeof SFX!=='undefined')SFX.hit();
   triggerHitStop();
   /* 성기사 패시브: 흡혈 */
@@ -702,7 +714,8 @@ function killMonster(m){
   else addChat('sys','[시스템]',m.def.name+' 처치! (EXP +'+_expGain+', 골드 +'+_killGold+')');
   checkLevelUp();
   if(typeof onMonsterKill==='function')onMonsterKill(m.def.name);
-  if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name);
+  var _wasOneShot=(m._hitCount||0)<=1;
+  if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name,_wasOneShot);
   if(typeof checkDailyQuestProgress==='function')checkDailyQuestProgress('kill',m.def.name);
   if(typeof onMonsterKillForShaman==='function')onMonsterKillForShaman();
   /* ── 아이템 드롭: 인벤 직접 추가 대신 바닥 글로우 생성 ── */

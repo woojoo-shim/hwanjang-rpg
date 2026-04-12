@@ -50,15 +50,15 @@ var ICON={
 
 var ITEM_POOL=[
   // ─ 무기 ─
-  {id:'wooden_sword',   name:'낡은 나무 검',    icon:'sword',  type:'weapon',  rarity:'common',   desc:'뭔가 때리기엔 좋다. 뭔가를.',     stats:{공격력:3}},
-  {id:'bone_sword',     name:'뼈 검',           icon:'bone',   type:'weapon',  rarity:'common',   desc:'고대 거인의 뼈. 의외로 날카롭다.',stats:{공격력:7}},
-  {id:'iron_sword',     name:'철 검',           icon:'sword',  type:'weapon',  rarity:'rare',     desc:'기본은 하는 무기.',               stats:{공격력:15,내구도:80}},
-  {id:'steel_axe',      name:'강철 도끼',        icon:'axe',   type:'weapon',  rarity:'rare',     desc:'무식하게 강하다.',                stats:{공격력:18,공격속도:-5}},
-  {id:'hunting_bow',    name:'사냥꾼의 활',      icon:'bow',   type:'weapon',  rarity:'rare',     desc:'원거리 공격이 가능하다.',          stats:{공격력:13,사거리:10}},
-  {id:'fire_staff',     name:'화염 지팡이',      icon:'staff', type:'weapon',  rarity:'epic',     desc:'끝에 불꽃이 항상 타오른다.',       stats:{마법공격:28,화염데미지:12}},
-  {id:'moonblade',      name:'달빛 검',          icon:'sword', type:'weapon',  rarity:'epic',     desc:'달이 뜨면 공격력이 2배가 된다.',   stats:{공격력:35,야간공격력:70}},
-  {id:'dragonfang',     name:'용의 송곳니',      icon:'dagger',type:'weapon',  rarity:'legendary',desc:'진짜 용의 이빨로 만들었다. 아파.',  stats:{공격력:60,관통:25}},
-  {id:'eclipse_blade',  name:'이클립스',         icon:'sword', type:'weapon',  rarity:'legendary',desc:'동양 검사 최고의 검. 어디서 났지?',stats:{공격력:88,발도술:50}},
+  {id:'wooden_sword',   name:'낡은 나무 검',    icon:'sword',  type:'weapon',  rarity:'common',   desc:'뭔가 때리기엔 좋다. 뭔가를.',     stats:{공격력:3},   reqLevel:1,  durability:25,  bonuses:[],                                         flavor:'어딘가의 헛간에서 주워온 나뭇조각이다.'},
+  {id:'bone_sword',     name:'뼈 검',           icon:'bone',   type:'weapon',  rarity:'common',   desc:'고대 거인의 뼈. 의외로 날카롭다.',stats:{공격력:7},   reqLevel:1,  durability:30,  bonuses:['+5% 독 내성'],                            flavor:'거인의 뼈를 갈아 만든 원시적인 무기. 쉽게 부러질 것 같지만 아직은 멀쩡하다.'},
+  {id:'iron_sword',     name:'철 검',           icon:'sword',  type:'weapon',  rarity:'rare',     desc:'기본은 하는 무기.',               stats:{공격력:15,내구도:80}, reqLevel:5, durability:80, bonuses:['+3% 치명타 확률'],                       flavor:'단조된 철의 무게가 손에 전해진다. 믿을 수 있는 무기다.'},
+  {id:'steel_axe',      name:'강철 도끼',        icon:'axe',   type:'weapon',  rarity:'rare',     desc:'무식하게 강하다.',                stats:{공격력:18,공격속도:-5}, reqLevel:7, durability:90, bonuses:['+15% 방어구 무시'],                  flavor:'대장장이 발두르가 사흘 밤을 새워 만들었다고 한다.'},
+  {id:'hunting_bow',    name:'사냥꾼의 활',      icon:'bow',   type:'weapon',  rarity:'rare',     desc:'원거리 공격이 가능하다.',          stats:{공격력:13,사거리:10}, reqLevel:5, durability:60, bonuses:['+10% 이동속도','사냥 시 드롭률 +10%'],  flavor:'숲의 사냥꾼이 10년간 사용한 활. 나무에는 세월의 흔적이 새겨져 있다.'},
+  {id:'fire_staff',     name:'화염 지팡이',      icon:'staff', type:'weapon',  rarity:'epic',     desc:'끝에 불꽃이 항상 타오른다.',       stats:{마법공격:28,화염데미지:12}, reqLevel:18, durability:75, bonuses:['+20% 화염 마법 강화','마나 자동 회복 +5'], flavor:'불의 정령이 깃든 지팡이. 쥐면 손바닥이 따뜻해진다.'},
+  {id:'moonblade',      name:'달빛 검',          icon:'sword', type:'weapon',  rarity:'epic',     desc:'달이 뜨면 공격력이 2배가 된다.',   stats:{공격력:35,야간공격력:70}, reqLevel:20, durability:110, bonuses:['야간 공격력 +100%','적 처치 시 HP +5 흡수'], flavor:'보름달 아래 단조된 검. 달빛이 닿으면 희미하게 빛난다.'},
+  {id:'dragonfang',     name:'용의 송곳니',      icon:'dagger',type:'weapon',  rarity:'legendary',desc:'진짜 용의 이빨로 만들었다. 아파.',  stats:{공격력:60,관통:25}, reqLevel:30, durability:200, bonuses:['+25% 방어 관통','용족 몬스터에 3배 피해','치명타 시 화염 폭발'], flavor:'살아있는 용의 이빨을 직접 뽑아 만들었다. 용은 아직도 찾고 있다.'},
+  {id:'eclipse_blade',  name:'이클립스',         icon:'sword', type:'weapon',  rarity:'legendary',desc:'동양 검사 최고의 검. 어디서 났지?',stats:{공격력:88,발도술:50}, reqLevel:35, durability:180, bonuses:['발도 스킬 피해 +50%','치명타 확률 +20%','이동속도 +12%'], flavor:'천하제일 검사가 남긴 유물. 검집에서 뽑는 순간 시간이 멈춘다.'},
   // ─ 추가 무기: Common ─
   {id:'wood_sword',     name:'나무 검',          icon:'sword', type:'weapon',  rarity:'common',   desc:'그냥 나무를 깎아서 만든 검. 그래도 안 아프지는 않다.',  stats:{공격력:4,내구도:20}},
   {id:'rusty_dagger',   name:'녹슨 단검',        icon:'dagger',type:'weapon',  rarity:'common',   desc:'녹이 잔뜩 슨 단검. 파상풍이 걱정된다.',              stats:{공격력:5,공격속도:10}},
@@ -603,14 +603,14 @@ var NPC_AI={
 /* ════════════ 직업 시스템 ════════════ */
 var CLASS_DEFS={
   none:{name:'무직',color:0x2a5a3a,hc:0xddcc99,hpMul:1,atkMul:1,spdMul:1,crit:0,critDmg:2,weapons:['sword','axe','bow','staff','dagger'],passive:null,desc:'아직 전직하지 않은 모험가',quest:null},
-  warrior:{name:'전사',color:0x8b0000,hc:0xddcc99,hpMul:1.5,atkMul:1.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:'defense',desc:'높은 HP와 방어력의 근접 탱커',quest:{type:'kill',target:'사슴',count:5,desc:'사슴 5마리를 처치하라'}},
-  mage:{name:'마법사',color:0x1a1a8b,hc:0xaabbee,hpMul:0.8,atkMul:2.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['staff'],passive:'mana_burst',desc:'강력한 원거리 마법 공격',quest:{type:'kill',target:'슬라임',count:8,desc:'슬라임 8마리를 처치하라'}},
-  archer:{name:'궁수',color:0x2a6a2a,hc:0xddcc99,hpMul:1.0,atkMul:1.0,spdMul:1.5,crit:0.15,critDmg:2,weapons:['bow'],passive:'rapid_fire',desc:'빠른 공격속도의 원거리 딜러',quest:{type:'kill',target:'토끼',count:10,desc:'토끼 10마리를 사냥하라'}},
+  warrior:{name:'전사',color:0x8b0000,hc:0xddcc99,hpMul:1.5,atkMul:1.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:'defense',desc:'높은 HP와 방어력의 근접 탱커',quest:{type:'special',subtype:'warrior',target:'★ 황금 사슴왕',count:1,slashCount:200,desc:'★ 황금 사슴왕을 처치하고, 오버헤드 슬래시를 200회 사용하라'}},
+  mage:{name:'마법사',color:0x1a1a8b,hc:0xaabbee,hpMul:0.8,atkMul:2.0,spdMul:1.0,crit:0.05,critDmg:2,weapons:['staff'],passive:'mana_burst',desc:'강력한 원거리 마법 공격',quest:{type:'special',subtype:'mage',desc:'늪의 현자 NPC를 찾아 마법 언어 시험 5문제를 모두 맞춰라'}},
+  archer:{name:'궁수',color:0x2a6a2a,hc:0xddcc99,hpMul:1.0,atkMul:1.0,spdMul:1.5,crit:0.15,critDmg:2,weapons:['bow'],passive:'rapid_fire',desc:'빠른 공격속도의 원거리 딜러',quest:{type:'special',subtype:'archer',target:'★ 독왕 두꺼비',count:1,desc:'정밀 사격 미니게임을 통과하고, ★ 독왕 두꺼비를 처치하라'}},
   rogue:{name:'도적',color:0x3a2a3a,hc:0xccbbaa,hpMul:0.9,atkMul:1.2,spdMul:1.3,crit:0.3,critDmg:2.5,weapons:['dagger'],passive:'stealth',desc:'높은 치명타와 빠른 이동',quest:{type:'kill',target:'독두꺼비',count:6,desc:'독두꺼비 6마리를 처치하라'}},
   paladin:{name:'성기사',color:0xccaa33,hc:0xeeddaa,hpMul:1.3,atkMul:0.9,spdMul:0.9,crit:0.05,critDmg:2,weapons:['sword'],passive:'lifesteal',desc:'공격 시 HP를 흡수하는 성전사',quest:{type:'kill',target:'사슴',count:8,desc:'사슴 8마리를 처치하여 자비를 증명하라'}},
   berserker:{name:'광전사',color:0x990000,hc:0xdd8866,hpMul:0.7,atkMul:2.0,spdMul:1.1,crit:0.1,critDmg:2.5,weapons:['axe'],passive:'rage',desc:'HP가 낮을수록 공격력 증가',quest:{type:'kill',target:'고블린',count:5,desc:'고블린 5마리를 처치하라'}},
   shaman:{name:'주술사',color:0x336633,hc:0x99cc99,hpMul:0.9,atkMul:1.3,spdMul:1.0,crit:0.1,critDmg:2,weapons:['staff'],passive:'poison',desc:'공격 시 지속 독 데미지',quest:{type:'kill',target:'슬라임',count:10,desc:'슬라임 10마리를 처치하여 독의 힘을 깨달아라'}},
-  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단',quest:{type:'kill',target:'늑대',count:5,desc:'늑대 5마리를 은밀히 처치하라'}},
+  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단',quest:{type:'special',subtype:'assassin',oneShotCount:20,desc:'(???) 정체불명 NPC에게 암호를 구입하고, 동굴 앞에서 암호를 외쳐 비밀 구역에 진입한 뒤 적 20마리를 원샷킬하라'}},
   cook:{name:'요리사',color:0xff8800,hc:0xffddaa,hpMul:1.0,atkMul:0.9,spdMul:1.0,defMul:0.9,magMul:0.7,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:null,desc:'프라이팬과 요리 기술로 싸우는 독특한 전투사',quest:{type:'kill',target:'사슴',count:3,desc:'사슴 3마리를 처치하여 재료를 구해라'}},
   fisher:{name:'낚시꾼',color:0x2255aa,hc:0xaaccee,hpMul:0.9,atkMul:0.8,spdMul:1.0,defMul:0.8,magMul:0.6,crit:0.08,critDmg:2,weapons:['bow'],passive:null,desc:'낚싯줄과 물의 힘으로 싸우는 자연인',quest:{type:'kill',target:'슬라임',count:4,desc:'슬라임 4마리를 처치하라'}},
   clown:{name:'광대',color:0xff44cc,hc:0xffbbdd,hpMul:0.8,atkMul:1.0,spdMul:1.2,defMul:0.5,magMul:1.0,crit:0.15,critDmg:2,weapons:['dagger','staff'],passive:null,desc:'예측불가한 랜덤 스킬과 혼돈의 광대',quest:{type:'kill',target:'고블린',count:3,desc:'고블린 3마리를 처치하라'}},
