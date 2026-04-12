@@ -448,7 +448,25 @@ function parsePrice(reply){
   var clean=reply.replace(/\[PRICE:([^\]]+)\]/g,function(_,m){
     var p=m.split('|');
     if(p.length>=2){
-      changes.push({item:p[0].trim(),price:parseInt(p[1])||0});
+      var price=parseInt(p[1])||0;
+      /* 안티치트: 가격 하한 — 원래 가격의 30% 미만으로 못 내림 */
+      if(price<1)price=1;
+      /* 안티치트: 흥정 횟수 제한 — NPC당 5분에 3번 */
+      if(!window._haggleCount)window._haggleCount={};
+      if(!window._haggleTime)window._haggleTime={};
+      var itemKey=p[0].trim();
+      var now=Date.now();
+      if(window._haggleTime[itemKey]&&now-window._haggleTime[itemKey]<300000){
+        window._haggleCount[itemKey]=(window._haggleCount[itemKey]||0)+1;
+        if(window._haggleCount[itemKey]>3){
+          addChat('sys','[시스템]','너무 자주 흥정합니다. 잠시 후 다시 시도하세요.');
+          return '';
+        }
+      }else{
+        window._haggleTime[itemKey]=now;
+        window._haggleCount[itemKey]=1;
+      }
+      changes.push({item:itemKey,price:price});
     }
     return '';
   }).trim();
@@ -528,7 +546,24 @@ async function askAI(npcName,userMsg){
     var raw=data.content[0].text;
     var parsed=parseHiddenItem(raw);
     if(parsed.item){
-      setTimeout(function(){addItem(parsed.item.id,1,parsed.item);flashHiddenItem(parsed.item.name);},800);
+      /* 안티치트: 히든 아이템 스팸 방지 — 10분에 1개 제한 */
+      if(!window._lastHiddenTime)window._lastHiddenTime=0;
+      if(!window._hiddenCount)window._hiddenCount=0;
+      var now=Date.now();
+      if(now-window._lastHiddenTime>600000){window._hiddenCount=0;}
+      if(window._hiddenCount>=1){
+        addChat('sys','[시스템]','히든 아이템은 10분에 1개만 얻을 수 있습니다.');
+        parsed.item=null;
+      }else{
+        /* 안티치트: 히든 아이템 스탯 상한 — 레벨 기반 */
+        var maxStat=Math.min(playerLevel*8,200);
+        if(parsed.item.atk>maxStat)parsed.item.atk=maxStat;
+        if(parsed.item.def>maxStat)parsed.item.def=maxStat;
+        if(parsed.item.stats&&parsed.item.stats['능력치']>maxStat)parsed.item.stats['능력치']=maxStat;
+        window._lastHiddenTime=now;
+        window._hiddenCount++;
+        setTimeout(function(){addItem(parsed.item.id,1,parsed.item);flashHiddenItem(parsed.item.name);},800);
+      }
     }
     var pp=parsePrice(parsed.clean);
     if(pp.changes.length>0){
@@ -555,11 +590,19 @@ async function askAI(npcName,userMsg){
       return '';
     }).trim();
     /* 대화 거래 파싱 [TRADE_BUY:아이템id|가격] [TRADE_SELL:아이템id|가격] */
+    /* 안티치트: 거래 쿨다운 3초 */
+    if(!window._lastTradeTime)window._lastTradeTime=0;
     pp.clean=pp.clean.replace(/\[TRADE_BUY:([^\]]+)\]/g,function(_,m){
       var p=m.split('|');if(p.length>=2){
+        var now2=Date.now();
+        if(now2-window._lastTradeTime<3000){addChat('sys','[거래]','거래 쿨다운 중...');return '';}
+        window._lastTradeTime=now2;
         var itemId=p[0].trim(),price=parseInt(p[1])||0;
         var def=getItemDef(itemId);
         if(!def){addChat('sys','[거래]','알 수 없는 아이템입니다.');return '';}
+        /* 안티치트: 최소 가격 — 아이템 기본 가격의 20% 이상 */
+        var basePrice=def.price||50;
+        if(price<Math.floor(basePrice*0.2)){price=Math.floor(basePrice*0.2);}
         if(gold<price){addChat('sys','[거래]','골드가 부족합니다! ('+gold+'/'+price+')');return '';}
         gold-=price;addItem(itemId,1);
         addChat('sys','[거래]',def.name+'을(를) '+price+'골드에 구매했습니다!');

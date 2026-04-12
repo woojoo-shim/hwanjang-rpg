@@ -103,6 +103,17 @@ async function createPlayer(name){
 async function savePlayerData(){
   if(!sbClient||!currentUser)return;
   if(typeof PL==='undefined'||!PL.group)return;
+  /* 안티치트: 저장 전 값 범위 체크 */
+  if(playerLevel<1)playerLevel=1;
+  if(playerLevel>50)playerLevel=50;
+  if(playerHP<0)playerHP=0;
+  if(playerHP>99999)playerHP=playerMaxHP;
+  if(playerMaxHP>99999)playerMaxHP=100+playerLevel*20;
+  if(playerEXP<0)playerEXP=0;
+  if(gold<0)gold=0;
+  if(gold>9999999)gold=9999999;
+  if(inventory.length>200)inventory=inventory.slice(0,200);
+
   var data={
     id:currentUser.id,
     name:myName,
