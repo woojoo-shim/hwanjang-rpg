@@ -1259,9 +1259,10 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
 function buildGroundPlanes(){
   /* 기본 바닥 제거 — 존별 바닥만 사용 (z-fighting 방지) */
 
-  /* 마을 (NW): 평탄 (-350,-350 중심) — 3-4배 확장 */
-  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x4a8a3a}));
-  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.01,-350);villGnd.receiveShadow=true;scene.add(villGnd);
+  /* 마을 (NW): 평탄 (-350,-350 중심) — 3-4배 확장, 다른 바닥보다 높게 */
+  var villMat=new THREE.MeshLambertMaterial({color:0x4a8a3a,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+  var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(480,480),villMat);
+  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.05,-350);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원: x:-270~170, z:-520~-80 — 중심 (-50,-300) */
   makeDisplacedGround(440,440,24,24,0x5a9a3a, -50,0.01,-300);
