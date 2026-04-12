@@ -1164,9 +1164,9 @@ function mkWaterRiver(parent){
   [-11,11].forEach(function(bx){
     var bank=new THREE.Mesh(new THREE.PlaneGeometry(5,vmLen),bankM);bank.rotation.x=-Math.PI/2;bank.position.set(-200+bx,.005,-325);p.add(bank);
   });
-  /* 마을↔초원 다리 (강이 남북으로 흐르므로 다리는 동서 방향 = rotY 0) */
-  woodBridge(-200,-350,0);
-  woodBridge(-200,-250,0);
+  /* 마을↔초원 다리 (강이 남북으로 흐르므로 다리는 동서 방향 = rotY PI/2) */
+  woodBridge(-200,-350,Math.PI/2);
+  woodBridge(-200,-250,Math.PI/2);
 
   /* ── 존 경계 강: 늪↔정글 (z=100, x:-200~200) 이미 동서강이 커버 ── */
   /* ── 존 경계 강: 어두운숲↔화산 (z=375, x:-100~200) ── */
@@ -1176,9 +1176,9 @@ function mkWaterRiver(parent){
   waterMeshes.push(dfvRiver);
   var dfvDepth=new THREE.Mesh(new THREE.PlaneGeometry(dfvLen,14),depthM);
   dfvDepth.rotation.x=-Math.PI/2;dfvDepth.position.set(25,-.06,375);p.add(dfvDepth);
-  /* 어두운숲↔화산 다리 (강이 동서로 흐르므로 다리는 남북 방향) */
-  woodBridge(0,375,Math.PI/2);
-  woodBridge(100,375,Math.PI/2);
+  /* 어두운숲↔화산 다리 (강이 동서로 흐르므로 다리는 남북 방향 = rotY 0) */
+  woodBridge(0,375,0);
+  woodBridge(100,375,0);
 }
 
 /* ════════════ 지면 디테일 유틸 ════════════ */
