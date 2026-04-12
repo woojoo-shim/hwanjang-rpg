@@ -367,6 +367,7 @@ function loop(){
     if(typeof tickRaidBoss==='function')tickRaidBoss(dt);
     if(typeof checkRaidProgress==='function')checkRaidProgress();
     if(typeof tickFishing==='function')tickFishing(dt);
+    if(typeof checkFetchPickup==='function')checkFetchPickup();
     if(typeof checkKingdomTriggers==='function')checkKingdomTriggers(dt);
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
     if(typeof tickDayNight==='function')tickDayNight(dt);

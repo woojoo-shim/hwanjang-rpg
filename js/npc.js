@@ -653,6 +653,10 @@ async function askAI(npcName,userMsg){
     if(qp.quest){
       setTimeout(function(){showQuestNotif(qp.quest,npcName);},800);
     }
+    /* 페치 퀘스트 키워드 자동 감지 */
+    if(typeof autoDetectFetchQuest==='function'){
+      autoDetectFetchQuest(qp.clean,npcName);
+    }
     var finalText=qp.clean;
     npcData.history.push({role:'assistant',content:finalText});
     return finalText;
@@ -669,6 +673,8 @@ function npcFallback(npcName){
     '(상인) 김도윤':['아, 죄송해요 잠깐 딴 생각했어요 ㅎㅎ. 뭐 필요하세요?','좋은 물건 많이 있어요~ 구경해보세요!','오늘 특가 있는데 관심 없으세요?'],
     '(대장장이) 이태산':['...','강화 필요하면 말해요.','장비 없으면 싸워도 소용없어요.'],
     '(???) 정체불명':['...','뉴비네.','레벨이나 올려.'],
+    '(사서) 엘리노어':['도서관은 언제나 열려 있어요.','책에 모든 답이 있답니다!','...안경을 고쳐 쓰며... 잠깐, 뭐라고 하셨죠?'],
+    '(길드장) 오세준':['...','의뢰가 있으면 말하게.','길드의 명예를 잊지 말게나.'],
   };
   var list=fallbacks[npcName]||['...'];
   return list[Math.floor(Math.random()*list.length)];
@@ -1312,8 +1318,9 @@ function talk(n){
     return;
   }
   if(typeof SFX!=='undefined')SFX.talkStart();
-  /* 완료된 퀘스트 수령 체크 */
+  /* 완료된 퀘스트 수령 체크 (일반 + 페치) */
   var turned=tryTurnInQuests(n.name);
+  if(!turned&&typeof tryTurnInFetchQuests==='function')turned=tryTurnInFetchQuests(n.name);
   activeNpc=n;
   document.getElementById('dwho-name').textContent='[ '+n.name+' ]';
   var te=document.getElementById('dtxt');
@@ -1331,7 +1338,9 @@ function talk(n){
       '(이장) 박건호':'어서 오게, 새 모험가여! 오늘은 어떤 일로 찾아왔나?',
       '(상인) 김도윤':'어서오세요~ 뭐 필요하세요? 가격은 협상 가능해요 ㅎㅎ',
       '(대장장이) 이태산':'뭐 필요해요. 가격은... 얘기해봐요.',
-      '(???) 정체불명':'...'
+      '(???) 정체불명':'...',
+      '(사서) 엘리노어':'안녕하세요! 도서관에 오신 걸 환영해요. 뭔가 찾고 계신가요?',
+      '(길드장) 오세준':'어서 오게. 길드에 용무가 있는 건가?'
     };
     greeting=rogueHint||greetings[n.name]||'...';
   }
