@@ -2157,22 +2157,7 @@ function updMonsters(dt,t){
     }
     if(distToLocal<md){md=distToLocal;closestMonster=m;}
     var mid=m.def.id;
-    var isNH=(typeof isMonsterHost!=='undefined'&&!isMonsterHost&&m._targetX!==undefined);
-
-    /* ── 비호스트: 호스트 위치를 힌트로 부드럽게 보정 (로컬 AI도 돌림) ── */
-    if(isNH&&m._targetX!==undefined){
-      var tx=m._targetX,tz=m._targetZ;
-      var hostDx=tx-mx,hostDz=tz-mz;
-      var hostDist=Math.sqrt(hostDx*hostDx+hostDz*hostDz);
-      /* 호스트 위치와 3 이상 차이나면 보정 */
-      if(hostDist>3){
-        m.mesh.position.x+=(tx-mx)*0.1;
-        m.mesh.position.z+=(tz-mz)*0.1;
-      }
-    }
-    /* 비호스트도 로컬 AI를 돌림 — 아래 코드로 계속 진행 */
-
-    /* ── 호스트 (또는 솔로): 몬스터 AI ── */
+    /* ── 모든 클라이언트: 로컬 AI 실행 (호스트 보정 없음) ── */
     /* 어그로 감지 — 가장 가까운 플레이어 기준 */
     if(m.state==='idle'&&chaseDist<m.def.aggro){
       m.state='aggro';
