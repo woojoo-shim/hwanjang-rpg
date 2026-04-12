@@ -1091,6 +1091,8 @@ function talk(n){
     showDungeonConfirm(n);
     return;
   }
+  /* 왕국 스토리 NPC 후크 */
+  if(typeof onKingdomNpcInteract==='function')onKingdomNpcInteract(n.name);
   /* 전직 NPC 체크 — 동적 스폰 NPC도 n.classNpc 직접 확인 */
   var classKey=n.classNpc;
   if(!classKey){

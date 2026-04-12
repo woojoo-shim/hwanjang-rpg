@@ -718,6 +718,7 @@ function killMonster(m){
   if(typeof checkClassQuestKill==='function')checkClassQuestKill(m.def.name,_wasOneShot);
   if(typeof checkDailyQuestProgress==='function')checkDailyQuestProgress('kill',m.def.name);
   if(typeof onMonsterKillForShaman==='function')onMonsterKillForShaman();
+  if(typeof onKingdomMonsterKill==='function')onKingdomMonsterKill(m.def.name);
   /* ── 아이템 드롭: 인벤 직접 추가 대신 바닥 글로우 생성 ── */
   m.def.drops.forEach(function(drop){
     if(Math.random()<drop.rate){
