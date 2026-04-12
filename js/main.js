@@ -196,6 +196,18 @@ function openEscMenu(){
   /* 모바일에서만 컨트롤 설정 버튼 표시 */
   var ctrlBtn=document.getElementById('esc-ctrl');
   if(ctrlBtn)ctrlBtn.style.display=(typeof isMobile!=='undefined'&&isMobile)?'block':'none';
+  /* 개발자만 개발자 서버 버튼 표시 */
+  var devBtn=document.getElementById('esc-dev');
+  if(devBtn){
+    devBtn.style.display=(typeof isDev==='function'&&isDev())?'block':'none';
+    if(typeof _isDevServer!=='undefined'&&_isDevServer){
+      devBtn.textContent='🔧 본 서버로 돌아가기';
+      devBtn.style.color='#44ff44';devBtn.style.borderColor='#44ff4444';
+    }else{
+      devBtn.textContent='🔧 개발자 서버';
+      devBtn.style.color='#aa44ff';devBtn.style.borderColor='#aa44ff44';
+    }
+  }
 }
 function closeEscMenu(){
   document.getElementById('esc-menu').style.display='none';

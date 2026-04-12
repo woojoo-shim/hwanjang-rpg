@@ -1,9 +1,34 @@
 /* ════════════ 멀티플레이어 시스템 (PartyKit) ════════════ */
 var PARTY_HOST='hwanjang-rpg.woojoo-shim.partykit.dev';
+var PARTY_ROOM_MAIN='hwanjang-rpg';
+var PARTY_ROOM_DEV='hwanjang-rpg-dev';
+var _isDevServer=false;
+var _currentRoom=PARTY_ROOM_MAIN;
 var ws=null;
 var remotePlayers={};
 var mpSendTimer=null;
 var mpReconnectTimer=null;
+
+/* ── 개발자 서버 전환 ── */
+function toggleDevServer(){
+  if(typeof isDev!=='function'||!isDev())return;
+  _isDevServer=!_isDevServer;
+  _currentRoom=_isDevServer?PARTY_ROOM_DEV:PARTY_ROOM_MAIN;
+  /* 기존 연결 종료 */
+  if(ws){try{ws.close();}catch(e){}}
+  ws=null;
+  /* 원격 플레이어 정리 */
+  for(var id in remotePlayers){
+    var r=remotePlayers[id];
+    if(r.group)scene.remove(r.group);
+    if(r.nameEl)r.nameEl.remove();
+  }
+  remotePlayers={};
+  /* 재연결 */
+  setTimeout(function(){connectParty();},500);
+  var serverName=_isDevServer?'개발자 서버':'본 서버';
+  addChat('sys','[시스템]',serverName+'에 접속합니다...');
+}
 
 /* ── 모든 플레이어 위치 (몬스터 AI용) ── */
 /* 호스트가 몬스터 AI 계산 시 모든 플레이어 위치를 고려하기 위한 배열 */
@@ -74,7 +99,7 @@ document.addEventListener('keyup',function(e){
 function connectParty(){
   if(ws&&ws.readyState<=2)return;/* 연결 중(0), 열림(1), 닫힘 중(2) — 중복 연결 방지 */
   try{
-    ws=new WebSocket('wss://'+PARTY_HOST+'/party/main');
+    ws=new WebSocket('wss://'+PARTY_HOST+'/party/'+_currentRoom);
   }catch(e){console.warn('WS connect error',e);return;}
 
   ws.onopen=function(){

@@ -265,6 +265,7 @@ window.addEventListener('appinstalled',function(){
       <input type="range" id="esc-cam-sens" min="10" max="200" value="100" style="width:200px;accent-color:#c9a84c;"/>
     </div>
     <button id="esc-ctrl" onclick="if(typeof openControlSettings==='function'){closeEscMenu();openControlSettings();}" style="width:100%;background:transparent;color:#c9a84c;border:1px solid #c9a84c44;padding:10px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;margin-bottom:8px;border-radius:6px;display:none;">🎮 컨트롤 설정 (모바일)</button>
+    <button id="esc-dev" onclick="if(typeof toggleDevServer==='function'){closeEscMenu();toggleDevServer();}" style="width:100%;background:#1a0a2e;color:#aa44ff;border:1px solid #aa44ff44;padding:10px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;margin-bottom:8px;border-radius:6px;display:none;">🔧 개발자 서버</button>
     <button id="esc-resume" style="width:100%;background:#c9a84c;color:#1a1a2e;border:none;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-bottom:8px;border-radius:6px;">게임으로 돌아가기</button>
     <button id="esc-logout" style="width:100%;background:transparent;color:#aa6666;border:1px solid #aa666644;padding:10px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;border-radius:6px;">로그아웃</button>
   </div>
