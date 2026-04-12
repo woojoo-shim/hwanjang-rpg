@@ -2183,6 +2183,8 @@ function updMonsters(dt,t){
         /* 추적 대상 갱신 — 더 가까운 플레이어가 있으면 스위치 */
         m._chaseTargetId=chaseId;
         var spd=m.def.spd;
+        /* 야간 속도 버프 (+10%) */
+        if(typeof getNightMonsterSpdMul==='function')spd*=getNightMonsterSpdMul();
         /* 사슴: 돌진 — 거리 4~8일 때 속도 3배 */
         if(mid==='deer'&&chaseDist>4&&chaseDist<15)spd=m.def.spd*3;
         /* 몬스터별 공격 범위 + 공격 속도 (모듈 상단 상수 참조) */
@@ -2202,6 +2204,8 @@ function updMonsters(dt,t){
           m.attackTimer=atkCooldown;
           m.isAttacking=true;m.attackAnimT=0.4;
           var dmg=Math.max(1,m.def.atk+Math.floor(Math.random()*4)-2);
+          /* 야간 ATK 버프 (+20%) */
+          if(typeof getNightMonsterAtkMul==='function')dmg=Math.floor(dmg*getNightMonsterAtkMul());
           /* 고블린: 데미지 1.5배 */
           if(mid==='goblin')dmg=Math.floor(dmg*1.5);
           /* 특수 효과 수집 */

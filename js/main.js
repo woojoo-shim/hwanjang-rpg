@@ -132,6 +132,7 @@ function enterGame(){
   setTimeout(function(){
     try{
       initScene();
+      if(typeof initDayNight==='function')initDayNight();
       if(playerData&&PL.group){
         PL.group.position.set(WORLD_SPAWN[0],0,WORLD_SPAWN[1]);
         refreshWeaponMesh();
@@ -170,8 +171,12 @@ function enterGame(){
   if(currentUser)startAutoSave();
 }
 function updTime(){
-  var n=new Date();
-  document.getElementById('htime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  /* 게임 시간은 daynight.js의 _updateGameClock()이 담당
+     daynight.js가 없을 경우 실제 시간으로 폴백 */
+  if(typeof gameTime==='undefined'){
+    var n=new Date();
+    document.getElementById('htime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  }
 }
 
 /* ── 입력 ── */
@@ -358,6 +363,8 @@ function loop(){
     if(typeof checkRaidProgress==='function')checkRaidProgress();
     if(typeof tickFishing==='function')tickFishing(dt);
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
+    if(typeof tickDayNight==='function')tickDayNight(dt);
+    if(typeof _updateNightNpcVisibility==='function')_updateNightNpcVisibility();
     /* AFK 체크 */
     if(now-lastActivity>AFK_LIMIT){
       addChat('sys','[시스템]','20분간 활동이 없어 자동 로그아웃됩니다.');
