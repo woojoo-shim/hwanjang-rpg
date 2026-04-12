@@ -210,6 +210,13 @@ function onMpMessage(data){
     var r=remotePlayers[data.id];
     if(r&&data.cosmetics)applyRemoteCosmetics(r,data.cosmetics);
   }
+  else if(data.type==='emote'){
+    var re=remotePlayers[data.id];
+    if(re&&typeof applyRemoteEmote==='function')applyRemoteEmote(re,data.emote);
+    var eName=data.emote;
+    var eInfo=(typeof EMOTES!=='undefined')?EMOTES[eName]:null;
+    if(re&&eInfo)addChat('emote','',re.name+'이(가) '+eInfo.icon+' '+eInfo.name+'을(를) 합니다.');
+  }
   else if(data.type==='chat'){
     addChat('plr',data.name,data.text);
   }
@@ -490,6 +497,8 @@ function updateRemotePlayers(dt){
       }
     }
 
+    /* 원격 이모트 애니메이션 */
+    if(typeof tickRemoteEmote==='function')tickRemoteEmote(r,dt);
     /* 이름표: 30유닛 이내만 표시 */
     var pdx=PL.group.position.x-r.group.position.x,pdz=PL.group.position.z-r.group.position.z;
     var pdist=Math.sqrt(pdx*pdx+pdz*pdz);

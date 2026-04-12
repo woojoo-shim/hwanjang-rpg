@@ -69,6 +69,14 @@ export default {
       }), [conn.id]);
     }
 
+    if (data.type === 'emote') {
+      var stE = conn.deserializeAttachment();
+      var uidE = stE ? (stE.uid || conn.id) : conn.id;
+      room.broadcast(JSON.stringify({
+        type: 'emote', id: uidE, emote: data.emote
+      }), [conn.id]);
+    }
+
     if (data.type === 'chat') {
       room.broadcast(JSON.stringify({
         type: 'chat', id: conn.id, name: data.name, text: data.text

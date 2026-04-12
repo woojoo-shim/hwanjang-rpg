@@ -1045,6 +1045,11 @@ document.addEventListener('keydown',function(e){
 function sendChat(){
   var ci=document.getElementById('cin'),v=ci.value.trim();if(!v)return;
   ci.value='';
+  /* 이모트 커맨드 */
+  if(typeof parseEmoteCommand==='function'){
+    var emoteCmd=parseEmoteCommand(v);
+    if(emoteCmd){triggerEmote(emoteCmd);ci.focus();return;}
+  }
   /* 파티 채팅: /p 로 시작하면 파티원에게만 */
   if(v.indexOf('/p ')=== 0||v.indexOf('/ㅔ ')===0){
     var ptxt=v.substring(3);
