@@ -86,7 +86,8 @@ function connectParty(){
       z:+PL.group.position.z.toFixed(2),
       ry:+PL.group.rotation.y.toFixed(2),
       cosmetics:{hat:equipped.hat||null,cape:equipped.cape||null,dye:equipped.dye||null},
-      minRep:getMinReputation()
+      minRep:getMinReputation(),
+      pvpRank:typeof pvpRank!=='undefined'?pvpRank:0
     }));
     if(mpSendTimer)clearInterval(mpSendTimer);
     mpSendTimer=setInterval(sendPosition,100);
@@ -185,6 +186,7 @@ function onMpMessage(data){
       if(remotePlayers[id]){
         if(p.cosmetics)applyRemoteCosmetics(remotePlayers[id],p.cosmetics);
         if(p.minRep!==undefined)remotePlayers[id].minRep=p.minRep;
+        if(p.pvpRank!==undefined)remotePlayers[id].pvpRank=p.pvpRank;
       }
     }
   }
@@ -194,6 +196,7 @@ function onMpMessage(data){
     if(remotePlayers[data.id]){
       if(data.cosmetics)applyRemoteCosmetics(remotePlayers[data.id],data.cosmetics);
       if(data.minRep!==undefined)remotePlayers[data.id].minRep=data.minRep;
+      if(data.pvpRank!==undefined)remotePlayers[data.id].pvpRank=data.pvpRank;
     }
     if(isNew)addChat('sys','[시스템]',data.name+'이(가) 접속했습니다.');
   }
@@ -506,11 +509,21 @@ function updateRemotePlayers(dt){
       r.nameEl.style.display='';
       /* 적대(호감도 20 미만) 표시 */
       var baseName=r.name+' Lv.'+r.level;
+      /* 랭크 티어 표시 */
+      var rankHtml='';
+      if(r.pvpRank!==undefined&&typeof PVP_TIERS!=='undefined'){
+        for(var ti=PVP_TIERS.length-1;ti>=0;ti--){
+          if(r.pvpRank>=PVP_TIERS[ti].min){
+            rankHtml=' <span style="color:'+PVP_TIERS[ti].color+';font-size:9px;">'+PVP_TIERS[ti].icon+PVP_TIERS[ti].name+'</span>';
+            break;
+          }
+        }
+      }
       if(r.minRep!==undefined&&r.minRep<20){
-        r.nameEl.innerHTML=baseName+' <span style="color:#ff4444;font-size:10px;">😡 적대 '+r.minRep+'</span>';
+        r.nameEl.innerHTML=baseName+rankHtml+' <span style="color:#ff4444;font-size:10px;">😡 적대</span>';
         r.nameEl.style.color='#ff6666';
       }else{
-        r.nameEl.textContent=baseName;
+        r.nameEl.innerHTML=baseName+rankHtml;
         r.nameEl.style.color='';
       }
       posEl(r.nameEl,r.group.position.x,r.group.position.y+2.4,r.group.position.z);

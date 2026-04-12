@@ -87,9 +87,28 @@ function posEl(el,wx,wy,wz){
   else el.style.display='none';
 }
 
+var _lastPleUpdate=0;
 function updLabels(){
   var ple=document.getElementById('ple');
-  if(ple&&PL.group)posEl(ple,PL.group.position.x,PL.group.position.y+2.4,PL.group.position.z);
+  if(ple&&PL.group){
+    posEl(ple,PL.group.position.x,PL.group.position.y+2.4,PL.group.position.z);
+    /* 0.5초마다 이름표 갱신 */
+    var now=Date.now();
+    if(now-_lastPleUpdate>500){
+      _lastPleUpdate=now;
+      var lvText=' Lv.'+playerLevel;
+      var rankText='';
+      if(typeof pvpRank!=='undefined'&&typeof PVP_TIERS!=='undefined'){
+        for(var ri=PVP_TIERS.length-1;ri>=0;ri--){
+          if(pvpRank>=PVP_TIERS[ri].min){
+            rankText=' <span style="color:'+PVP_TIERS[ri].color+';font-size:9px;">'+PVP_TIERS[ri].icon+PVP_TIERS[ri].name+'</span>';
+            break;
+          }
+        }
+      }
+      ple.innerHTML=myName+'<span style="color:#aaa;font-size:10px;">'+lvText+'</span>'+rankText;
+    }
+  }
   if(!PL.group)return;
   var _inside=(typeof insideBuilding!=='undefined')&&insideBuilding;
   npcs.forEach(function(n){
