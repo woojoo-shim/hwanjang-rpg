@@ -1070,6 +1070,17 @@ function buildSkillBar(){
 
 /* ── 대화창 ── */
 function talk(n){
+  /* 야간 전용 NPC: 낮에는 대화 불가 */
+  if(n.nightOnly&&typeof isNight==='function'&&!isNight()){
+    addChat('npc',n.name,'...');
+    addChat('sys','[시스템]','이 NPC는 밤에만 대화할 수 있습니다.');
+    return;
+  }
+  /* 수면 중인 NPC 체크 (22시~6시) */
+  if(typeof isNpcSleeping==='function'&&isNpcSleeping(n.name)){
+    addChat('npc',n.name,'Zzz... 내일 다시 오세요.');
+    return;
+  }
   /* 레이드 NPC 체크 */
   if(n.raidId){
     if(typeof showRaidConfirm==='function')showRaidConfirm(n);
@@ -1286,7 +1297,7 @@ function talk(n){
     if(typeof openEnhance==='function'){openEnhance(n.name);return;}
   }
   /* 상인 계열: 모두 동일한 상점 UI로 열기 */
-  var isMerchant=n.name.indexOf('(상인)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0;
+  var isMerchant=n.name.indexOf('(상인)')===0||n.name.indexOf('(코디샵)')===0||n.name.indexOf('(방어구상인)')===0||n.name.indexOf('(무기상인)')===0||n.nightMerchant===true;
   if(isMerchant){
     activeNpc=n;
     var opened=openShop(n.name);

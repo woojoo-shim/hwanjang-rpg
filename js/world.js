@@ -122,8 +122,10 @@ function exitBuilding(){
     /* 카메라 즉시 복귀 */
     camera.position.set(_savedOutdoorPos.x,oy+12,_savedOutdoorPos.z+10);
     camera.lookAt(_savedOutdoorPos.x,oy+1,_savedOutdoorPos.z);
-    /* 안개+그림자+배경+하늘 복원 */
-    scene.fog=new THREE.FogExp2(0x88aa88,.002);
+    /* 안개+그림자+배경+하늘 복원 — daynight.js가 있으면 다음 틱에 갱신됨 */
+    var _fogRestoreColor=(typeof gamePhase!=='undefined'&&gamePhase==='night')?0x030510:0xa8d8ea;
+    var _fogRestoreDensity=(typeof gamePhase!=='undefined'&&gamePhase==='night')?0.0025:0.0015;
+    scene.fog=new THREE.FogExp2(_fogRestoreColor,_fogRestoreDensity);
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.needsUpdate=true;
     renderer.setClearColor(0x000000,0);
@@ -1734,6 +1736,7 @@ function initScene(){
   /* 달 + 별 */
   var moon=new THREE.Mesh(new THREE.SphereGeometry(10,16,16),new THREE.MeshBasicMaterial({color:0xfffde8}));
   moon.position.set(-200,280,-400);scene.add(moon);
+  window._moonMesh=moon;
   /* moonL 제거 — 성능 최적화 */
 
   var STAR_COUNT=4000,sp=new Float32Array(STAR_COUNT*3);
@@ -1742,7 +1745,9 @@ function initScene(){
     sp[i*3]=r*Math.sin(ph)*Math.cos(th);sp[i*3+1]=r*Math.abs(Math.cos(ph))+5;sp[i*3+2]=r*Math.sin(ph)*Math.sin(th);
   }
   var sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
-  scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:.3,sizeAttenuation:true})));
+  var starPoints=new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:.3,sizeAttenuation:true}));
+  scene.add(starPoints);
+  window._starPoints=starPoints;
 
   /* 바다/해양 경계 (지면보다 먼저 렌더) */
   buildOcean();
@@ -1985,8 +1990,8 @@ function updVisualFX(t){
     }
   }
 
-  /* ── 스카이 미묘한 낮 변화 (sin 주기 160초) ── */
-  if(_skyUniforms&&_vfxFrame%10===0){
+  /* ── 스카이 낮 변화 — daynight.js가 없을 때만 폴백 ── */
+  if(_skyUniforms&&_vfxFrame%10===0&&typeof tickDayNight==='undefined'){
     var dayT=(Math.sin(t/160*Math.PI*2)*0.5+0.5);
     var tc=new THREE.Color(0x3a8fd8).lerp(new THREE.Color(0x1a4a88),dayT*0.25);
     var hc=new THREE.Color(0xa8d8ea).lerp(new THREE.Color(0xeeddbb),dayT*0.2);
