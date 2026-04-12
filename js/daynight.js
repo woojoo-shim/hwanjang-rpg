@@ -21,7 +21,7 @@ var _starPointsRef=null;
 var _nightMonstersSpawned=false;
 
 /* ── 상수 ── */
-var GAME_SPEED=1/60; /* 1 실제 초 = 1/60 게임 시간 (60초=1시간) */
+var GAME_SPEED=24/(10*60); /* 10분 실시간 = 1 게임일 (24시간) → 1초=0.04시간 */
 
 /* ─── 페이즈 색상 정의 ─── */
 var PHASE_DATA={
