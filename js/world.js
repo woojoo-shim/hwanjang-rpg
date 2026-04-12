@@ -1013,7 +1013,7 @@ function mkStonePath(parent){
   /* 광장 ↔ 무기/방어구 상점 (동쪽) */
   drawPath([[-350,-358],[-338,-358],[-325,-360],[-312,-360]],4,3);
   /* 광장 남북 메인도로 → 게이트 */
-  drawPath([[-350,-370],[-350,-390],[-350,-410],[-350,-430],[-350,-450]],5,4);
+  /* 남쪽 길 제거됨 */
   /* 광장 ↔ 모험가 길드 */
   drawPath([[-350,-370],[-352,-385],[-354,-400],[-354,-418],[-352,-430]],4,3);
   /* 시장 구역 (서쪽 상인 구역 내부) */
@@ -1029,10 +1029,7 @@ function mkStonePath(parent){
 
   /* ═══ 존 연결 도로 (강 다리 경유) ═══ */
 
-  /* 마을 남쪽 문(-350,-445) → 남쪽으로 나가서 → 동쪽으로 꺾어 → 다리(-200,-350) */
-  drawPath([[-350,-450],[-350,-460],[-340,-470],[-320,-475],[-300,-470],[-280,-460],[-260,-440],[-240,-420],[-220,-390],[-210,-370],[-200,-350]],5,4);
-  /* 다리 이후 → 동쪽으로 → 중앙 교차로 */
-  drawPath([[-200,-350],[-180,-340],[-160,-310],[-130,-270],[-100,-220],[-70,-160],[-40,-90],[0,0]],5,4);
+  /* 남쪽 문 폐쇄 — 길 없음 */
 
   /* 마을 동쪽 문(-255,-350) → 동쪽으로 → 다리(-200,-250) */
   drawPath([[-252,-350],[-240,-340],[-230,-320],[-220,-300],[-210,-280],[-200,-250]],4,3);
@@ -2273,16 +2270,15 @@ function mkFences(parent){
   /* 마을 둘레 벽 — 문 부분만 비움 */
   /* 북쪽 벽 */
   wallSegment(VX-R,VZ+R, VX+R,VZ+R);
-  /* 남쪽 벽 — 문 (중앙 8유닛 비움) */
-  wallSegment(VX-R,VZ-R, VX-6,VZ-R);
-  wallSegment(VX+6,VZ-R, VX+R,VZ-R);
+  /* 남쪽 벽 — 막힌 벽 (문 없음) */
+  wallSegment(VX-R,VZ-R, VX+R,VZ-R);
   /* 서쪽 벽 */
   wallSegment(VX-R,VZ-R, VX-R,VZ+R);
   /* 동쪽 벽 — 문 (중앙 8유닛 비움, 초원 방향) */
   wallSegment(VX+R,VZ-R, VX+R,VZ-6);
   wallSegment(VX+R,VZ+6, VX+R,VZ+R);
 
-  /* 남쪽 문 — 열린 입구 (기둥/빔 없음) */
+  /* 남쪽 벽 — 막힌 벽 (문/기둥 없음) */
 
   /* 동쪽 문 기둥 */
   [-6,6].forEach(function(gz){
@@ -2296,10 +2292,7 @@ function mkFences(parent){
 
   /* 횃불 (문 양쪽) */
   var torchM=new THREE.MeshLambertMaterial({color:0xff6600,emissive:new THREE.Color(0xff4400),emissiveIntensity:.8});
-  [[-6,VZ-R],[6,VZ-R]].forEach(function(tp){
-    var flame=new THREE.Mesh(new THREE.SphereGeometry(.2,5,4),torchM);
-    flame.position.set(VX+tp[0],wallH+1.5,tp[1]);p.add(flame);
-  });
+  /* 남쪽 횃불 제거됨 */
   [[VX+R,-6],[VX+R,6]].forEach(function(tp){
     var flame=new THREE.Mesh(new THREE.SphereGeometry(.2,5,4),torchM);
     flame.position.set(tp[0],wallH+1.5,VZ+tp[1]);p.add(flame);
