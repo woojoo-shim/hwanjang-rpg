@@ -139,6 +139,7 @@ function enterGame(){
       }
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
       if(typeof buildDungeonEntrances==='function')buildDungeonEntrances();
+      if(typeof buildRaidNPCs==='function')buildRaidNPCs();
       if(typeof checkDailyLogin==='function')checkDailyLogin();
       /* BGM 즉시 시작 — 로그인 과정에서 이미 유저 상호작용 발생했으므로 autoplay 허용됨 */
       _bgmZone='';
@@ -353,6 +354,8 @@ function loop(){
     if(typeof checkBuildingDoors==='function')checkBuildingDoors();
     if(typeof checkDungeonEntrance==='function')checkDungeonEntrance();
     if(typeof checkDungeonProgress==='function')checkDungeonProgress();
+    if(typeof tickRaidBoss==='function')tickRaidBoss(dt);
+    if(typeof checkRaidProgress==='function')checkRaidProgress();
     if(typeof tickFishing==='function')tickFishing(dt);
     if(typeof updateRemotePlayers==='function')updateRemotePlayers(dt);
     /* AFK 체크 */

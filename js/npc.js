@@ -778,6 +778,11 @@ function buildSkillBar(){
 
 /* ── 대화창 ── */
 function talk(n){
+  /* 레이드 NPC 체크 */
+  if(n.raidId){
+    if(typeof showRaidConfirm==='function')showRaidConfirm(n);
+    return;
+  }
   /* 던전 NPC 체크 */
   if(n.dungeonId){
     showDungeonConfirm(n);

@@ -589,8 +589,46 @@ function playerAttack(){
     var d=Math.sqrt(dx*dx+dz*dz);
     if(d<bestDist){bestDist=d;target=m;}
   });
+  /* 레이드 보스 공격 체크 */
+  if(!target&&typeof currentRaid!=='undefined'&&currentRaid&&currentRaid.bossObj&&!currentRaid.defeated){
+    var rb=currentRaid.bossObj;
+    if(rb.mesh){
+      var rbdx=PL.group.position.x-rb.mesh.position.x;
+      var rbdz=PL.group.position.z-rb.mesh.position.z;
+      var rbdist=Math.sqrt(rbdx*rbdx+rbdz*rbdz);
+      if(rbdist<currentRaid.def.scale*3.5){
+        if(typeof damageRaidBoss==='function')damageRaidBoss(dmg);
+        if(typeof SFX!=='undefined')SFX.hit();
+        triggerHitStop();
+        spawnDmgNum(dmg,_isCrit);
+        attackCooldown=.5/cls.spdMul;
+        triggerAtkAnim();
+        return;
+      }
+    }
+    /* 어드(추가 몬스터) 공격 */
+    var addTarget=null,addBestDist=6.0;
+    currentRaid.addsAlive.forEach(function(add){
+      if(add.hp<=0)return;
+      var dx=PL.group.position.x-add.mesh.position.x;
+      var dz=PL.group.position.z-add.mesh.position.z;
+      var d=Math.sqrt(dx*dx+dz*dz);
+      if(d<addBestDist){addBestDist=d;addTarget=add;}
+    });
+    if(addTarget){
+      addTarget.hp=Math.max(0,addTarget.hp-dmg);
+      if(typeof SFX!=='undefined')SFX.hit();
+      spawnDmgNum(dmg,_isCrit);
+      attackCooldown=.5/cls.spdMul;
+      triggerAtkAnim();
+      return;
+    }
+  }
   if(!target){
-    addChat('inf','','근처에 공격할 대상이 없다.');
+    /* 레이드 중이 아닐 때만 메시지 */
+    if(typeof currentRaid==='undefined'||!currentRaid){
+      addChat('inf','','근처에 공격할 대상이 없다.');
+    }
     return;
   }
   target.hp=Math.max(0,target.hp-dmg);
