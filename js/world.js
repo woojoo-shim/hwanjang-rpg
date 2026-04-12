@@ -2282,16 +2282,7 @@ function mkFences(parent){
   wallSegment(VX+R,VZ-R, VX+R,VZ-6);
   wallSegment(VX+R,VZ+6, VX+R,VZ+R);
 
-  /* 문 기둥 (남쪽) */
-  [-6,6].forEach(function(gx){
-    var gatePost=new THREE.Mesh(new THREE.CylinderGeometry(.4,.5,wallH+1,8),logDarkM);
-    gatePost.position.set(VX+gx,(wallH+1)/2,VZ-R);gatePost.castShadow=true;p.add(gatePost);
-    var gateTop=new THREE.Mesh(new THREE.SphereGeometry(.5,6,4),logM);
-    gateTop.position.set(VX+gx,wallH+1,VZ-R);p.add(gateTop);
-  });
-  /* 문 상단 아치 (남쪽) */
-  var gateBeam=new THREE.Mesh(new THREE.BoxGeometry(12,.4,.5),logDarkM);
-  gateBeam.position.set(VX,wallH+.5,VZ-R);gateBeam.castShadow=true;p.add(gateBeam);
+  /* 남쪽 문 — 열린 입구 (기둥/빔 없음) */
 
   /* 동쪽 문 기둥 */
   [-6,6].forEach(function(gz){
