@@ -46,7 +46,8 @@ function initMobileControls(){
     {id:'m-talk',label:'💬',key:'e',size:55,color:'rgba(50,150,220,0.5)'},
     {id:'m-inv',label:'🎒',key:'i',size:55,color:'rgba(180,150,50,0.5)'},
     {id:'m-tp',label:'🌀',key:'h',size:50,color:'rgba(100,50,200,0.5)'},
-    {id:'m-dash',label:'💨',key:' ',size:50,color:'rgba(50,200,200,0.5)'}
+    {id:'m-dash',label:'💨',key:' ',size:50,color:'rgba(50,200,200,0.5)'},
+    {id:'m-tab',label:'👥',key:'Tab',size:45,color:'rgba(100,100,200,0.5)'}
   ];
 
   /* 달리기 토글 버튼 (조이스틱 위) */
@@ -79,14 +80,16 @@ function initMobileControls(){
     btn.addEventListener('touchstart',function(e){
       e.preventDefault();
       /* 키 이벤트 시뮬레이션 */
-      var ev=new KeyboardEvent('keydown',{key:b.key,code:'Key'+b.key.toUpperCase(),bubbles:true});
+      var code=b.key==='Tab'?'Tab':b.key===' '?'Space':'Key'+b.key.toUpperCase();
+      var ev=new KeyboardEvent('keydown',{key:b.key,code:code,bubbles:true});
       document.dispatchEvent(ev);
       btn.style.transform='scale(0.85)';
       btn.style.background=b.color.replace('0.5','0.8');
     },{passive:false});
     btn.addEventListener('touchend',function(e){
       e.preventDefault();
-      var ev=new KeyboardEvent('keyup',{key:b.key,code:'Key'+b.key.toUpperCase(),bubbles:true});
+      var code2=b.key==='Tab'?'Tab':b.key===' '?'Space':'Key'+b.key.toUpperCase();
+      var ev=new KeyboardEvent('keyup',{key:b.key,code:code2,bubbles:true});
       document.dispatchEvent(ev);
       btn.style.transform='scale(1)';
       btn.style.background=b.color;
