@@ -2363,7 +2363,7 @@ function mkGate(parent){
     stepB.position.set(0,0.1+i*0.2,-0.7-i*0.7);stepB.castShadow=true;stepB.receiveShadow=true;g.add(stepB);
   });
 
-  g.position.set(-350,0,-448);p.add(g);
+  g.position.set(-255,0,-350);g.rotation.y=Math.PI/2;p.add(g);
 }
 
 /* ── 화단/꽃밭 ── */
