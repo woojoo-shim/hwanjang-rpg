@@ -307,54 +307,55 @@ function tickDayNight(dt){
     _dnCacheLights();
   }
 
-  /* 매 60프레임마다 시각 업데이트 (번쩍거림 방지) */
+  /* 매 프레임 목표 색상 계산, 현재 색상에서 3%씩 보간 (부드러운 전환) */
   _dnFrame++;
-  if(_dnFrame%60!==0)return;
-
   var pair=_getPhasePair();
   var t=_getPhaseBlend();
   var A=pair[0],B=pair[1];
+  var SMOOTH=0.03;/* 매 프레임 3%씩 접근 */
 
   /* 스카이 유니폼 */
   if(typeof _skyUniforms!=='undefined'&&_skyUniforms){
-    var topC=_lerpColor(A.skyTop,B.skyTop,t);
-    var horC=_lerpColor(A.skyHorizon,B.skyHorizon,t);
-    _skyUniforms.topColor.value.setHex(topC);
-    _skyUniforms.horizonColor.value.setHex(horC);
+    var _tc=new THREE.Color(_lerpColor(A.skyTop,B.skyTop,t));
+    var _hc=new THREE.Color(_lerpColor(A.skyHorizon,B.skyHorizon,t));
+    _skyUniforms.topColor.value.lerp(_tc,SMOOTH);
+    _skyUniforms.horizonColor.value.lerp(_hc,SMOOTH);
   }
 
   /* 씬 배경색 */
   if(typeof scene!=='undefined'&&scene&&scene.background){
-    var bgC=_lerpColor(A.bgColor,B.bgColor,t);
-    scene.background.setHex(bgC);
+    var _bgT=new THREE.Color(_lerpColor(A.bgColor,B.bgColor,t));
+    scene.background.lerp(_bgT,SMOOTH);
   }
 
   /* 안개 */
   if(typeof scene!=='undefined'&&scene&&scene.fog){
-    var fogC=_lerpColor(A.fogColor,B.fogColor,t);
-    var fogD=_lerpN(A.fogDensity,B.fogDensity,t);
-    scene.fog.color.setHex(fogC);
-    scene.fog.density=fogD;
+    var _fogT=new THREE.Color(_lerpColor(A.fogColor,B.fogColor,t));
+    scene.fog.color.lerp(_fogT,SMOOTH);
+    var targetFogD=_lerpN(A.fogDensity,B.fogDensity,t);
+    scene.fog.density+=(targetFogD-scene.fog.density)*SMOOTH;
   }
 
   /* 앰비언트 라이트 */
   if(_dnAmbientLight){
-    _dnAmbientLight.intensity=_lerpN(A.ambientIntensity,B.ambientIntensity,t);
+    var targetAmb=_lerpN(A.ambientIntensity,B.ambientIntensity,t);
+    _dnAmbientLight.intensity+=(targetAmb-_dnAmbientLight.intensity)*SMOOTH;
   }
 
   /* 헤미스피어 라이트 */
   if(_dnHemiLight){
-    var hSkyC=_lerpColor(A.hemiSkyColor,B.hemiSkyColor,t);
-    var hGndC=_lerpColor(A.hemiGroundColor,B.hemiGroundColor,t);
-    _dnHemiLight.color.setHex(hSkyC);
-    _dnHemiLight.groundColor.setHex(hGndC);
-    _dnHemiLight.intensity=_lerpN(A.ambientIntensity*1.6,B.ambientIntensity*1.6,t);
+    var _hsT=new THREE.Color(_lerpColor(A.hemiSkyColor,B.hemiSkyColor,t));
+    var _hgT=new THREE.Color(_lerpColor(A.hemiGroundColor,B.hemiGroundColor,t));
+    _dnHemiLight.color.lerp(_hsT,SMOOTH);
+    _dnHemiLight.groundColor.lerp(_hgT,SMOOTH);
+    var targetHI=_lerpN(A.ambientIntensity*1.6,B.ambientIntensity*1.6,t);
+    _dnHemiLight.intensity+=(targetHI-_dnHemiLight.intensity)*SMOOTH;
   }
 
-  /* 태양(방향광) */
-  if(_dnSunLight){
-    var sunC=_lerpColor(A.sunColor,B.sunColor,t);
-    _dnSunLight.color.setHex(sunC);
+  /* 태양(방향광) — 매 10프레임 (덜 중요) */
+  if(_dnSunLight&&_dnFrame%10===0){
+    var _sunT=new THREE.Color(_lerpColor(A.sunColor,B.sunColor,t));
+    _dnSunLight.color.lerp(_sunT,0.1);
     _dnSunLight.intensity=_lerpN(A.sunIntensity,B.sunIntensity,t);
   }
 
