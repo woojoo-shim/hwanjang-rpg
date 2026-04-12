@@ -994,11 +994,11 @@ function mkStonePath(parent){
     return out;
   }
   function drawPath(pts,steps,radius){
-    var sm=lerpPath(pts,steps);
+    var sm=lerpPath(pts,steps*2);/* 2배 촘촘하게 */
     for(var i=0;i<sm.length;i++){
       var _px=sm[i][0],_pz=sm[i][1];
       var _py=getTerrainY(_px,_pz)+.08;
-      var disc=new THREE.Mesh(new THREE.CircleGeometry(radius||4,16),pathM);
+      var disc=new THREE.Mesh(new THREE.CircleGeometry(radius||4,32),pathM);
       disc.rotation.x=-Math.PI/2;disc.position.set(_px,_py,_pz);
       p.add(disc);
     }
