@@ -174,45 +174,84 @@ function tickAtkAnim(dt){
 }
 
 function tickSwordAnim(dt,spdMul){
-  /* 단순 내려치기 — 위에서 아래로 */
+  /* 3타 콤보: 0=오른쪽 횡베기, 1=왼쪽 횡베기, 2=내려치기 */
+  var combo=_atkCombo%3;
 
   if(PL.atkPhase===1){
-    /* 준비 — 팔을 위로 들기 */
-    var dur=0.18/spdMul;
+    /* ── 준비 ── */
+    var dur=0.15/spdMul;
     var t=Math.min(1,atkAnimTimer/dur);
     var et=easeOutQuad(t);
-    PL.armRPivot.rotation.x=et*(-Math.PI*0.8);
-    PL.armRPivot.rotation.z=0;
-    _atkBodyYaw=0;
-    if(PL.armL)PL.armL.rotation.x=et*(-.1);
-    if(PL.legL)PL.legL.rotation.x=et*(-.1);
-    if(PL.legR)PL.legR.rotation.x=et*(.05);
+
+    if(combo===0){
+      /* 오른쪽 베기 준비: 팔을 오른쪽 뒤로 */
+      PL.armRPivot.rotation.x=et*(-Math.PI*0.3);
+      PL.armRPivot.rotation.z=et*(-0.5);
+      _atkBodyYaw=et*(-0.2);
+      if(PL.armL)PL.armL.rotation.x=et*(-0.08);
+    }else if(combo===1){
+      /* 왼쪽 베기 준비: 팔을 왼쪽 뒤로 */
+      PL.armRPivot.rotation.x=et*(-Math.PI*0.3);
+      PL.armRPivot.rotation.z=et*(0.5);
+      _atkBodyYaw=et*(0.2);
+      if(PL.armL)PL.armL.rotation.x=et*(0.08);
+    }else{
+      /* 내려치기 준비: 팔을 높이 들기 */
+      PL.armRPivot.rotation.x=et*(-Math.PI*0.85);
+      PL.armRPivot.rotation.z=0;
+      _atkBodyYaw=0;
+      if(PL.armL)PL.armL.rotation.x=et*(-0.15);
+    }
+    /* 다리: 살짝 웅크리기 */
+    if(PL.legL)PL.legL.rotation.x=et*(-0.12);
+    if(PL.legR)PL.legR.rotation.x=et*(0.08);
+
     if(atkAnimTimer>=dur){PL.atkPhase=2;atkAnimTimer=0;}
 
   }else if(PL.atkPhase===2){
-    /* 스윙 — 위에서 아래로 빠르게 내려치기 */
-    var dur=0.1/spdMul;
+    /* ── 스윙 (빠르게) ── */
+    var dur=0.08/spdMul;
     var t=Math.min(1,atkAnimTimer/dur);
     var et=easeInQuad(t);
-    PL.armRPivot.rotation.x=(-Math.PI*0.8)+(et*(Math.PI*1.2));
-    PL.armRPivot.rotation.z=0;
-    _atkBodyYaw=et*(-.05);
-    if(PL.armL)PL.armL.rotation.x=(-.1)+(et*.15);
-    if(PL.legL)PL.legL.rotation.x=(-.1)+(et*.15);
-    if(PL.legR)PL.legR.rotation.x=(.05)+(et*(-.1));
+
+    if(combo===0){
+      /* 오른→왼 횡베기 */
+      PL.armRPivot.rotation.x=(-Math.PI*0.3)+(et*(Math.PI*0.35));
+      PL.armRPivot.rotation.z=(-0.5)+(et*1.0);
+      _atkBodyYaw=(-0.2)+(et*0.4);
+      if(PL.armL)PL.armL.rotation.x=(-0.08)+(et*0.16);
+    }else if(combo===1){
+      /* 왼→오른 횡베기 */
+      PL.armRPivot.rotation.x=(-Math.PI*0.3)+(et*(Math.PI*0.35));
+      PL.armRPivot.rotation.z=(0.5)+(et*(-1.0));
+      _atkBodyYaw=(0.2)+(et*(-0.4));
+      if(PL.armL)PL.armL.rotation.x=(0.08)+(et*(-0.16));
+    }else{
+      /* 위→아래 내려치기 */
+      PL.armRPivot.rotation.x=(-Math.PI*0.85)+(et*(Math.PI*1.1));
+      PL.armRPivot.rotation.z=0;
+      _atkBodyYaw=et*(-0.06);
+      if(PL.armL)PL.armL.rotation.x=(-0.15)+(et*0.25);
+    }
+    /* 다리: 전진 스텝 */
+    if(PL.legL)PL.legL.rotation.x=(-0.12)+(et*0.24);
+    if(PL.legR)PL.legR.rotation.x=(0.08)+(et*(-0.16));
+
     if(atkAnimTimer>=dur){PL.atkPhase=3;atkAnimTimer=0;}
 
   }else if(PL.atkPhase===3){
-    /* 복귀 — 부드럽게 원위치 */
-    var dur=0.25/spdMul;
+    /* ── 복귀 ── */
+    var dur=0.2/spdMul;
     var t=Math.min(1,atkAnimTimer/dur);
     var et=easeOutQuad(t);
+
     PL.armRPivot.rotation.x*=(1-et);
     PL.armRPivot.rotation.z*=(1-et);
     _atkBodyYaw*=(1-et);
     if(PL.armL)PL.armL.rotation.x*=(1-et);
     if(PL.legL)PL.legL.rotation.x*=(1-et);
     if(PL.legR)PL.legR.rotation.x*=(1-et);
+
     if(atkAnimTimer>=dur){
       PL.atkPhase=0;atkAnimTimer=0;
       PL.armRPivot.rotation.x=0;PL.armRPivot.rotation.z=0;
