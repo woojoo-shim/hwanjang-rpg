@@ -1681,9 +1681,8 @@ function initScene(){
   renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,logarithmicDepthBuffer:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 
-  /* ── 그림자 활성화 ── */
-  renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  /* ── 그림자 비활성화 — 성능 + 깜빡임 방지 ── */
+  renderer.shadowMap.enabled=false;
 
   /* ── 톤매핑 제거 (성능 최적화) ── */
   /* renderer.toneMapping=THREE.ACESFilmicToneMapping; */
