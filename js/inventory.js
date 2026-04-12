@@ -269,28 +269,114 @@ function renderInv(){
   });
 }
 
+/* 레어리티별 글로우 색상 (Diablo 2 스타일 테두리용) */
+var RARITY_GLOW={
+  common:   '#888888',
+  uncommon: '#55bb55',
+  rare:     '#5588ff',
+  epic:     '#aa55ff',
+  legendary:'#c9a84c',
+  hidden:   '#ff44ff',
+};
+
 function showDetail(slot){
   selectedItem=slot;
   var it=getItemFull(slot);
   var r=RARITIES[it.rarity]||RARITIES.common;
+  var rColor=RARITY_GLOW[it.rarity]||'#888';
   var eq=isEquipped(slot);
+
   document.getElementById('inv-detail-empty').style.display='none';
-  document.getElementById('inv-detail-content').style.display='block';
+  var content=document.getElementById('inv-detail-content');
+  content.style.display='block';
+
+  /* 레어리티 테두리 글로우 */
+  var detailPanel=document.getElementById('inv-detail');
+  detailPanel.style.borderLeft='1px solid '+rColor+'55';
+  detailPanel.style.boxShadow='inset -3px 0 12px '+rColor+'11';
+
+  /* 아이콘 */
   document.getElementById('inv-detail-icon').textContent=ICON[it.icon]||'📦';
-  document.getElementById('inv-detail-name').textContent=it.name;
-  document.getElementById('inv-detail-name').style.color=r.color;
-  document.getElementById('inv-detail-rarity').textContent='[ '+r.name+' ]'+(eq?' ✦ 장착중':'');
-  document.getElementById('inv-detail-rarity').style.color=eq?'#90ffa0':r.color;
+
+  /* 이름 — 레어리티 색상 */
+  var nameEl=document.getElementById('inv-detail-name');
+  nameEl.textContent=it.name;
+  nameEl.style.color=rColor;
+  nameEl.style.textShadow='0 0 8px '+rColor+'66';
+
+  /* 레어리티 뱃지 */
+  var rarEl=document.getElementById('inv-detail-rarity');
+  rarEl.textContent='[ '+r.name+' ]'+(eq?' ✦ 장착중':'');
+  rarEl.style.color=eq?'#90ffa0':rColor;
+
+  /* 아이템 타입 */
   document.getElementById('inv-detail-type').textContent=ITEM_TYPES[it.type]||'기타';
-  document.getElementById('inv-detail-desc').textContent=it.desc;
+
+  /* stats 영역을 Diablo 2 스타일로 재구성 */
   var statsEl=document.getElementById('inv-detail-stats');
   statsEl.innerHTML='';
-  Object.entries(it.stats||{}).forEach(function(pair){
-    statsEl.innerHTML+='<div class="stat-row"><span class="stat-label">'+pair[0]+'</span><span class="stat-val">'+pair[1]+'</span></div>';
+
+  /* ── 구분선 ── */
+  statsEl.innerHTML+='<div class="d2-divider"></div>';
+
+  /* ── 기본 스탯 (흰색) ── */
+  var baseStats=it.stats||{};
+  var hasStats=false;
+  Object.entries(baseStats).forEach(function(pair){
+    hasStats=true;
+    var k=pair[0];var v=pair[1];
+    var prefix=(typeof v==='number'&&v>0)?'+':'';
+    statsEl.innerHTML+='<div class="d2-stat-row"><span class="d2-stat-label">'+k+'</span><span class="d2-stat-base">'+prefix+v+'</span></div>';
   });
-  if(slot.qty>1){
-    statsEl.innerHTML+='<div class="stat-row"><span class="stat-label">수량</span><span class="stat-val">x'+slot.qty+'</span></div>';
+
+  /* ── 내구도 표시 (장착중이면 현재/최대) ── */
+  var dur=it.durability||null;
+  if(dur){
+    var curDur=dur;
+    if(eq){
+      var slotType=it.type;
+      if(equippedDur[slotType]!==undefined)curDur=equippedDur[slotType];
+    }
+    var durPct=curDur/dur;
+    var durColor=durPct>0.5?'#88cc88':durPct>0.2?'#ffaa22':'#ff4444';
+    statsEl.innerHTML+='<div class="d2-stat-row"><span class="d2-stat-label">내구도</span><span style="color:'+durColor+';font-weight:700;">'+curDur+' / '+dur+'</span></div>';
   }
+
+  /* ── 요구 레벨 ── */
+  var rl=it.reqLevel||null;
+  if(rl){
+    var plvl=(typeof playerLevel!=='undefined'?playerLevel:1);
+    var lvColor=plvl>=rl?'#aaaaaa':'#ff5555';
+    statsEl.innerHTML+='<div class="d2-stat-row"><span class="d2-stat-label">요구 레벨</span><span style="color:'+lvColor+';font-weight:700;">'+rl+'</span></div>';
+  }
+
+  /* ── 특수 보너스 (파란색) ── */
+  var bonuses=it.bonuses||[];
+  if(bonuses.length>0){
+    statsEl.innerHTML+='<div class="d2-divider"></div>';
+    bonuses.forEach(function(b){
+      statsEl.innerHTML+='<div class="d2-bonus-row">'+b+'</div>';
+    });
+  }
+
+  /* ── 수량 ── */
+  if(slot.qty>1){
+    statsEl.innerHTML+='<div class="d2-divider"></div>';
+    statsEl.innerHTML+='<div class="d2-stat-row"><span class="d2-stat-label">수량</span><span class="d2-stat-base">x'+slot.qty+'</span></div>';
+  }
+
+  /* ── 설명 텍스트 ── */
+  if(it.desc){
+    statsEl.innerHTML+='<div class="d2-divider"></div>';
+    statsEl.innerHTML+='<div class="d2-desc">'+it.desc+'</div>';
+  }
+
+  /* ── 플레이버 텍스트 (이탤릭 회색) ── */
+  if(it.flavor){
+    statsEl.innerHTML+='<div class="d2-flavor">"'+it.flavor+'"</div>';
+  }
+
+  /* ── 버튼 영역 ── */
   var btnArea=document.getElementById('inv-detail-btns');
   btnArea.innerHTML='';
   if(it.type==='weapon'||it.type==='armor'||it.type==='cosmetic'){

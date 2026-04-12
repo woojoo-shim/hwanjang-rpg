@@ -499,3 +499,127 @@ html,body{width:100%;height:100%;overflow:hidden;background:#06060f;font-family:
   /* 퀘스트 트래커 */
   .quest-tracker{font-size:9px!important;max-width:150px!important;}
 }
+
+/* ════════════ Diablo 2 스타일 아이템 상세 패널 ════════════ */
+
+/* 상세 패널 전체 너비 확장 */
+#inv-detail{
+  width:220px;
+  min-width:200px;
+  border-left:1px solid #c9a84c22;
+  padding:16px 14px;
+  flex-shrink:0;
+  overflow-y:auto;
+  transition:border-left .2s,box-shadow .2s;
+}
+
+/* 아이콘 */
+#inv-detail-icon{
+  font-size:40px;
+  text-align:center;
+  margin-bottom:8px;
+  filter:drop-shadow(0 0 6px currentColor);
+}
+
+/* 이름 */
+#inv-detail-name{
+  font-size:14px;
+  font-weight:700;
+  text-align:center;
+  margin-bottom:3px;
+  letter-spacing:1px;
+  line-height:1.3;
+}
+
+/* 레어리티 */
+#inv-detail-rarity{
+  font-size:10px;
+  letter-spacing:2px;
+  text-align:center;
+  margin-bottom:6px;
+}
+
+/* 타입 */
+#inv-detail-type{
+  font-size:10px;
+  color:#8a8aaa;
+  letter-spacing:2px;
+  text-align:center;
+  margin-bottom:0;
+}
+
+/* 구분선 (Diablo 2 스타일 황금 수평선) */
+.d2-divider{
+  width:100%;
+  height:1px;
+  background:linear-gradient(90deg,transparent 0%,#c9a84c66 30%,#c9a84c99 50%,#c9a84c66 70%,transparent 100%);
+  margin:7px 0;
+}
+
+/* 기본 스탯 행 */
+.d2-stat-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  padding:1px 0;
+  font-size:11px;
+  line-height:1.7;
+}
+
+/* 스탯 라벨 (회색) */
+.d2-stat-label{
+  color:#9a9ab0;
+  letter-spacing:0.5px;
+}
+
+/* 스탯 값 (흰색) */
+.d2-stat-base{
+  color:#e8e8e8;
+  font-weight:700;
+  letter-spacing:0.5px;
+}
+
+/* 보너스 행 (파란색) */
+.d2-bonus-row{
+  color:#88aaff;
+  font-size:10px;
+  line-height:1.7;
+  padding:1px 0;
+  letter-spacing:0.3px;
+}
+.d2-bonus-row::before{
+  content:'';
+}
+
+/* 설명 텍스트 */
+.d2-desc{
+  font-size:10px;
+  color:#9a9ab0;
+  line-height:1.7;
+  padding:2px 0;
+}
+
+/* 플레이버 텍스트 (이탤릭 황금빛 회색) */
+.d2-flavor{
+  font-size:10px;
+  color:#c9a84c88;
+  font-style:italic;
+  line-height:1.7;
+  margin-top:4px;
+  padding:4px 0;
+  border-top:1px solid #2a2a4a;
+  letter-spacing:0.3px;
+}
+
+/* 레어리티별 이름 텍스트 그로우 (CSS only fallback, JS에서도 설정) */
+#inv-detail-name.rarity-common  {color:#aaaaaa;}
+#inv-detail-name.rarity-uncommon{color:#55bb55;}
+#inv-detail-name.rarity-rare    {color:#5588ff;}
+#inv-detail-name.rarity-epic    {color:#aa55ff;}
+#inv-detail-name.rarity-legendary{color:#c9a84c;}
+#inv-detail-name.rarity-hidden  {color:#ff44ff;animation:d2HiddenNamePulse 1.5s ease-in-out infinite alternate;}
+@keyframes d2HiddenNamePulse{from{text-shadow:0 0 6px #ff44ff44}to{text-shadow:0 0 14px #ff44ffaa}}
+
+/* 상세 패널 스크롤바 */
+#inv-detail::-webkit-scrollbar{width:3px;}
+#inv-detail::-webkit-scrollbar-thumb{background:#c9a84c44;}
