@@ -369,6 +369,7 @@ function loop(){
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
     if(typeof tickScreenShake==='function')tickScreenShake(dt);
     if(typeof tickCapeAnim==='function')tickCapeAnim(dt);
+    if(typeof tickTorchLight==='function')tickTorchLight(dt);
     if(typeof tickEmote==='function')tickEmote(dt);
     if(typeof updateKillParticles==='function')updateKillParticles(dt);
     if(typeof updateLootGlows==='function')updateLootGlows(dt);

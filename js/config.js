@@ -49,6 +49,10 @@ var ICON={
 };
 
 var ITEM_POOL=[
+  // ─ 횃불 ─
+  {id:'torch',name:'횃불',icon:'🔥',type:'accessory',rarity:'common',desc:'밤에 장착하면 주변을 밝힌다.',stats:{},reqLevel:1,durability:100,bonuses:['밤에 주변 조명'],flavor:'기름에 적신 천을 감은 나뭇가지. 어둠 속에서 유일한 빛.',slot:'torch',shopPrice:30},
+  {id:'bright_torch',name:'밝은 횃불',icon:'🔥',type:'accessory',rarity:'uncommon',desc:'더 넓은 범위를 밝힌다.',stats:{},reqLevel:5,durability:200,bonuses:['밤에 넓은 조명','야간 이동속도 +5%'],flavor:'연금술사가 특수 기름을 발라 만든 횃불. 불꽃이 푸르스름하다.',slot:'torch',shopPrice:120},
+  {id:'eternal_torch',name:'영원의 횃불',icon:'🔥',type:'accessory',rarity:'epic',desc:'절대 꺼지지 않는 마법 횃불.',stats:{},reqLevel:15,durability:9999,bonuses:['밤에 매우 넓은 조명','야간 이동속도 +10%','야간 공격력 +5%'],flavor:'고대 마법사가 영원한 불꽃을 봉인한 횃불. 비가 와도 꺼지지 않는다.',slot:'torch',shopPrice:2000},
   // ─ 무기 ─
   {id:'wooden_sword',   name:'낡은 나무 검',    icon:'sword',  type:'weapon',  rarity:'common',   desc:'뭔가 때리기엔 좋다. 뭔가를.',     stats:{공격력:3},   reqLevel:1,  durability:25,  bonuses:[],                                         flavor:'어딘가의 헛간에서 주워온 나뭇조각이다.'},
   {id:'bone_sword',     name:'뼈 검',           icon:'bone',   type:'weapon',  rarity:'common',   desc:'고대 거인의 뼈. 의외로 날카롭다.',stats:{공격력:7},   reqLevel:1,  durability:30,  bonuses:['+5% 독 내성'],                            flavor:'거인의 뼈를 갈아 만든 원시적인 무기. 쉽게 부러질 것 같지만 아직은 멀쩡하다.'},

@@ -1256,6 +1256,57 @@ function refreshCosmeticMesh(){
       PL.capeMesh=capeG;
     }
   }
+
+  /* ── 횃불 라이트 ── */
+  if(PL._torchLight){PL.group.remove(PL._torchLight);PL._torchLight=null;}
+  if(PL._torchMesh){PL.group.remove(PL._torchMesh);PL._torchMesh=null;}
+  var torchId=equipped.torch;
+  if(torchId&&PL.group){
+    var torchDef=getItemDef(torchId);
+    if(torchDef){
+      /* 횃불 메쉬 (왼손에 들기) */
+      var tg=new THREE.Group();
+      var stick=new THREE.Mesh(new THREE.CylinderGeometry(.03,.04,.8,5),new THREE.MeshLambertMaterial({color:0x6a4a1a}));
+      stick.position.set(0,.4,0);tg.add(stick);
+      var flameColor=(torchId==='bright_torch')?0x4488ff:(torchId==='eternal_torch')?0xaa44ff:0xff6600;
+      var flameMat=new THREE.MeshBasicMaterial({color:flameColor,transparent:true,opacity:.8});
+      var flame=new THREE.Mesh(new THREE.SphereGeometry(.08,6,5),flameMat);
+      flame.position.set(0,.85,0);flame.scale.y=1.5;tg.add(flame);
+      tg.position.set(-.35,0,.15);
+      PL.group.add(tg);
+      PL._torchMesh=tg;
+
+      /* PointLight — 밤에만 활성화 */
+      var lightRange=(torchId==='eternal_torch')?25:(torchId==='bright_torch')?18:12;
+      var lightIntensity=(torchId==='eternal_torch')?1.2:(torchId==='bright_torch')?0.9:0.6;
+      var tLight=new THREE.PointLight(flameColor,0,lightRange);/* intensity 0으로 시작 — tickTorchLight에서 제어 */
+      tLight.position.set(-.35,1.2,.15);
+      PL.group.add(tLight);
+      PL._torchLight=tLight;
+      PL._torchIntensity=lightIntensity;
+    }
+  }
+}
+
+/* ── 횃불 라이트 업데이트 (밤에만 켜짐) ── */
+var _torchFlickerT=0;
+function tickTorchLight(dt){
+  if(!PL._torchLight)return;
+  _torchFlickerT+=dt*8;
+  /* 밤 체크 (gameTime 19~5) */
+  var isNight=(typeof gameTime!=='undefined')&&(gameTime>=19||gameTime<5);
+  var targetI=isNight?PL._torchIntensity:0;
+  /* 부드럽게 전환 */
+  PL._torchLight.intensity+=(targetI-PL._torchLight.intensity)*0.1;
+  /* 불꽃 깜빡임 */
+  if(isNight&&PL._torchMesh){
+    var flicker=0.85+Math.sin(_torchFlickerT)*0.1+Math.sin(_torchFlickerT*2.3)*0.05;
+    PL._torchLight.intensity=targetI*flicker;
+  }
+  /* 불꽃 메쉬 표시/숨김 */
+  if(PL._torchMesh){
+    PL._torchMesh.visible=true;/* 항상 보이되 빛만 밤에 */
+  }
 }
 
 function tickCapeAnim(dt){
