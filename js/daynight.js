@@ -289,7 +289,7 @@ function tickDayNight(dt){
   if(typeof insideBuilding!=='undefined'&&insideBuilding)return;
 
   /* 시간 진행 */
-  gameTime+=dt*GAME_SPEED*60; /* dt초 * (1시간/60초) */
+  gameTime+=dt*GAME_SPEED; /* dt초 * (24시간/600초) = 10분에 하루 */
   if(gameTime>=24)gameTime-=24;
 
   gamePhase=getGamePhase();
