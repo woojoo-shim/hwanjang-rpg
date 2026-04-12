@@ -146,6 +146,7 @@ function enterGame(){
       _bgmZone='';
       if(typeof getAudioCtx==='function')getAudioCtx();/* AudioContext resume */
       if(typeof playBGM==='function')playBGM(currentZone||'village');
+      if(typeof initMinimap==='function')initMinimap();
       loop();
     }catch(e){console.error('initScene error',e);}
   },100);
@@ -241,6 +242,7 @@ function setupInput(){
         if(typeof enhanceOpen!=='undefined'&&enhanceOpen){closeEnhance();return;}
         if(typeof fishingActive!=='undefined'&&fishingActive){cancelFishing();return;}
         if(typeof _statUIOpen!=='undefined'&&_statUIOpen){closeStatUI();return;}
+        if(typeof fullmapOpen!=='undefined'&&fullmapOpen){toggleFullMap();return;}
         openEscMenu();
       }
       return;
@@ -278,6 +280,8 @@ function setupInput(){
     if(k==='g'&&!isInput){e.preventDefault();if(typeof startFishing==='function')startFishing();}
     /* N: 스탯 창 */
     if(k==='n'&&!isInput){e.preventDefault();if(typeof openStatUI==='function')openStatUI();}
+    /* M: 전체 지도 */
+    if(k==='m'&&!isInput){e.preventDefault();if(typeof toggleFullMap==='function')toggleFullMap();}
     /* 스킬 키: Q=0, R=1, T=2 */
     var skillMap={'q':0,'r':1,'t':2};
     var sk=skillMap[k];
@@ -377,6 +381,7 @@ function loop(){
     }
     updLabels();
     if(typeof updVisualFX==='function')updVisualFX(now/1000);
+    if(typeof tickMinimap==='function')tickMinimap();
     if(composer)composer.render();
     else renderer.render(scene,camera);
   }catch(e){console.error('loop error:',e);}
