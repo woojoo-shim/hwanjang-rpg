@@ -994,12 +994,16 @@ function mkStonePath(parent){
     return out;
   }
   function drawPath(pts,steps,radius){
-    var sm=lerpPath(pts,steps*2);/* 2배 촘촘하게 */
+    var sm=lerpPath(pts,steps*2);
     for(var i=0;i<sm.length;i++){
       var _px=sm[i][0],_pz=sm[i][1];
-      var _py=getTerrainY(_px,_pz)+.08;
+      /* 물 위 구간 스킵 */
+      if(typeof isOverWater==='function'&&isOverWater(_px,_pz))continue;
+      var _py=getTerrainY(_px,_pz);
+      /* 지형이 너무 높으면(산) 스킵 */
+      if(_py>5)continue;
       var disc=new THREE.Mesh(new THREE.CircleGeometry(radius||4,32),pathM);
-      disc.rotation.x=-Math.PI/2;disc.position.set(_px,_py,_pz);
+      disc.rotation.x=-Math.PI/2;disc.position.set(_px,_py+.08,_pz);
       p.add(disc);
     }
   }
