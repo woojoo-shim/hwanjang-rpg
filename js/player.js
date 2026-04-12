@@ -858,6 +858,11 @@ function doTeleport(zoneKey){
     slot2.qty--;
     if(slot2.qty<=0){var idx=inventory.indexOf(slot2);if(idx>=0)inventory.splice(idx,1);}
   }
+  /* 건물 내부에서 텔레포트 시 건물 상태 초기화 */
+  if(typeof insideBuilding!=='undefined'&&insideBuilding){
+    insideBuilding=null;
+    if(typeof _doorCooldown!=='undefined')_doorCooldown=2;
+  }
   /* 텔레포트 */
   var tpX=zi.tp[0],tpZ=zi.tp[1];
   var tpY=(typeof getTerrainY==='function')?getTerrainY(tpX,tpZ):0;
