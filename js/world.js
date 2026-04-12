@@ -1257,33 +1257,33 @@ function makeDisplacedGround(w,h,segW,segH,color,worldCX,worldCY,worldCZ){
 
 /* ════════════ 바이옴 지면 빌드 (섬형 맵) ════════════ */
 function buildGroundPlanes(){
-  /* 기본 바닥 — 전체 월드 커버 */
-  var baseMat=new THREE.MeshLambertMaterial({color:0x2a5a1a});
-  var baseGeo=new THREE.PlaneGeometry(1400,1400);
-  var baseMesh=new THREE.Mesh(baseGeo,baseMat);
-  baseMesh.rotation.x=-Math.PI/2;baseMesh.position.set(0,-0.02,50);baseMesh.receiveShadow=true;scene.add(baseMesh);
+  /* 기본 바닥 제거 — 존별 바닥만 사용 (z-fighting 방지) */
 
   /* 마을 (NW): 평탄 (-350,-350 중심) — 3-4배 확장 */
   var villGnd=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x4a8a3a}));
-  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.03,-350);villGnd.receiveShadow=true;scene.add(villGnd);
+  villGnd.rotation.x=-Math.PI/2;villGnd.position.set(-350,.01,-350);villGnd.receiveShadow=true;scene.add(villGnd);
 
   /* 초원: x:-270~170, z:-520~-80 — 중심 (-50,-300) */
   makeDisplacedGround(440,440,24,24,0x5a9a3a, -50,0.01,-300);
 
   /* 늪 (W): x:-600~-200, z:-100~300 */
-  makeDisplacedGround(440,440,24,24,0x3a5a2a, -400,0.01,100);
+  makeDisplacedGround(440,440,24,24,0x3a5a2a, -400,0.015,100);
 
   /* 정글 (E): x:200~600, z:-100~300 */
-  makeDisplacedGround(440,440,24,24,0x2a6a1a, 400,0.01,100);
+  makeDisplacedGround(440,440,24,24,0x2a6a1a, 400,0.015,100);
 
   /* 어두운 숲 (SW): x:-500~-100, z:200~500 */
-  makeDisplacedGround(440,340,24,20,0x1a3a12, -300,0.01,350);
+  makeDisplacedGround(440,340,24,20,0x1a3a12, -300,0.015,350);
 
   /* 화산 (SE): x:150~550, z:250~550 */
-  makeDisplacedGround(440,340,24,20,0x2a1208, 350,0.01,400);
+  makeDisplacedGround(440,340,24,20,0x2a1208, 350,0.015,400);
 
   /* 보스 (S center): x:-80~80, z:500~600 */
-  makeDisplacedGround(180,120,12,8,0x1a0808, 0,0.01,550);
+  makeDisplacedGround(180,120,12,8,0x1a0808, 0,0.015,550);
+
+  /* 바다 밑 커버 (깊은 곳, 겹침 없음) */
+  var deepGnd=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshLambertMaterial({color:0x1a3a0a}));
+  deepGnd.rotation.x=-Math.PI/2;deepGnd.position.set(0,-1,50);scene.add(deepGnd);
 }
 
 /* ════════════ 경계 산맥 빌드 (시각적 장벽) ════════════ */
