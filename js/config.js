@@ -610,7 +610,23 @@ var CLASS_DEFS={
   paladin:{name:'성기사',color:0xccaa33,hc:0xeeddaa,hpMul:1.3,atkMul:0.9,spdMul:0.9,crit:0.05,critDmg:2,weapons:['sword'],passive:'lifesteal',desc:'공격 시 HP를 흡수하는 성전사',quest:{type:'kill',target:'사슴',count:8,desc:'사슴 8마리를 처치하여 자비를 증명하라'}},
   berserker:{name:'광전사',color:0x990000,hc:0xdd8866,hpMul:0.7,atkMul:2.0,spdMul:1.1,crit:0.1,critDmg:2.5,weapons:['axe'],passive:'rage',desc:'HP가 낮을수록 공격력 증가',quest:{type:'kill',target:'고블린',count:5,desc:'고블린 5마리를 처치하라'}},
   shaman:{name:'주술사',color:0x336633,hc:0x99cc99,hpMul:0.9,atkMul:1.3,spdMul:1.0,crit:0.1,critDmg:2,weapons:['staff'],passive:'poison',desc:'공격 시 지속 독 데미지',quest:{type:'kill',target:'슬라임',count:10,desc:'슬라임 10마리를 처치하여 독의 힘을 깨달아라'}},
-  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단',quest:{type:'kill',target:'늑대',count:5,desc:'늑대 5마리를 은밀히 처치하라'}}
+  assassin:{name:'암살자',color:0x1a1a2a,hc:0xbbbbcc,hpMul:0.7,atkMul:1.5,spdMul:1.4,crit:0.5,critDmg:3,weapons:['dagger'],passive:'execute',desc:'극치명타로 적을 처단',quest:{type:'kill',target:'늑대',count:5,desc:'늑대 5마리를 은밀히 처치하라'}},
+  cook:{name:'요리사',color:0xff8800,hc:0xffddaa,hpMul:1.0,atkMul:0.9,spdMul:1.0,defMul:0.9,magMul:0.7,crit:0.05,critDmg:2,weapons:['sword','axe'],passive:null,desc:'프라이팬과 요리 기술로 싸우는 독특한 전투사',quest:{type:'kill',target:'사슴',count:3,desc:'사슴 3마리를 처치하여 재료를 구해라'}},
+  fisher:{name:'낚시꾼',color:0x2255aa,hc:0xaaccee,hpMul:0.9,atkMul:0.8,spdMul:1.0,defMul:0.8,magMul:0.6,crit:0.08,critDmg:2,weapons:['bow'],passive:null,desc:'낚싯줄과 물의 힘으로 싸우는 자연인',quest:{type:'kill',target:'슬라임',count:4,desc:'슬라임 4마리를 처치하라'}},
+  clown:{name:'광대',color:0xff44cc,hc:0xffbbdd,hpMul:0.8,atkMul:1.0,spdMul:1.2,defMul:0.5,magMul:1.0,crit:0.15,critDmg:2,weapons:['dagger','staff'],passive:null,desc:'예측불가한 랜덤 스킬과 혼돈의 광대',quest:{type:'kill',target:'고블린',count:3,desc:'고블린 3마리를 처치하라'}},
+  reaper:{name:'사신',color:0x220022,hc:0x9966bb,hpMul:0.8,atkMul:1.5,spdMul:1.1,defMul:0.4,magMul:1.2,crit:0.2,critDmg:3,weapons:['axe','dagger'],passive:null,desc:'죽음의 낫을 휘두르는 공포의 사신',quest:{type:'kill',target:'늑대',count:3,desc:'늑대 3마리를 처치하라'}},
+  bard:{name:'음유시인',color:0xdd9933,hc:0xffeeaa,hpMul:0.9,atkMul:0.6,spdMul:1.0,defMul:0.7,magMul:1.3,crit:0.05,critDmg:2,weapons:['staff'],passive:null,desc:'노래와 춤으로 동료를 강화하고 적을 약화',quest:{type:'kill',target:'토끼',count:5,desc:'토끼 5마리를 처치하여 노래 소재를 구해라'}},
+  tamer:{name:'조련사',color:0x448833,hc:0xaaddaa,hpMul:1.0,atkMul:0.7,spdMul:1.0,defMul:0.8,magMul:0.8,crit:0.05,critDmg:2,weapons:['bow','sword'],passive:null,desc:'야수를 조련하여 함께 싸우는 자',quest:{type:'kill',target:'토끼',count:6,desc:'토끼 6마리를 처치하라'}},
+  bomber:{name:'폭파공',color:0xcc5500,hc:0xffaa44,hpMul:0.8,atkMul:1.3,spdMul:0.9,defMul:0.5,magMul:0.8,crit:0.1,critDmg:2,weapons:['axe'],passive:null,desc:'폭탄과 지뢰로 광역 피해를 주는 폭발 전문가',quest:{type:'kill',target:'고블린',count:4,desc:'고블린 4마리를 처치하라'}},
+  knight:{name:'기사',color:0x4466cc,hc:0xaabbee,hpMul:1.6,atkMul:1.1,spdMul:0.8,defMul:1.8,magMul:0.4,crit:0.05,critDmg:2,weapons:['sword'],passive:'defense',desc:'방패와 갑옷으로 무장한 철벽 수호기사',quest:{type:'kill',target:'사슴',count:5,desc:'사슴 5마리를 처치하여 기사 서약을 완성하라'}},
+  alchemist:{name:'연금술사',color:0x88cc44,hc:0xccee99,hpMul:0.9,atkMul:0.7,spdMul:1.0,defMul:0.7,magMul:1.4,crit:0.08,critDmg:2,weapons:['staff'],passive:null,desc:'물약과 플라스크로 싸우는 과학 마법사',quest:{type:'kill',target:'슬라임',count:6,desc:'슬라임 6마리를 처치하여 재료를 구해라'}},
+  scholar:{name:'학자',color:0x3366ff,hc:0x99bbff,hpMul:0.8,atkMul:0.5,spdMul:0.9,defMul:0.6,magMul:1.6,crit:0.1,critDmg:2.5,weapons:['staff'],passive:null,desc:'지식의 힘으로 적을 분석하고 경험치를 극대화',quest:{type:'kill',target:'슬라임',count:5,desc:'슬라임 5마리를 연구하라'}},
+  fighter:{name:'격투가',color:0xff3322,hc:0xffaa99,hpMul:1.1,atkMul:1.4,spdMul:1.3,defMul:0.8,magMul:0.3,crit:0.15,critDmg:2.5,weapons:['sword','axe','dagger'],passive:null,desc:'맨손과 육체로 싸우는 무술의 달인',quest:{type:'kill',target:'고블린',count:4,desc:'고블린 4마리를 격파하라'}},
+  moonblade:{name:'월광술사',color:0x6633cc,hc:0xbbaaee,hpMul:0.9,atkMul:1.2,spdMul:1.1,defMul:0.7,magMul:1.3,crit:0.12,critDmg:2.5,weapons:['sword','staff'],passive:null,desc:'달빛의 힘으로 물리와 마법을 동시에 다루는 자',quest:{type:'kill',target:'늑대',count:4,desc:'늑대 4마리를 달빛 아래 처치하라'}},
+  gambler:{name:'도박사',color:0xddaa00,hc:0xffeeaa,hpMul:0.9,atkMul:0.8,spdMul:1.0,defMul:0.6,magMul:0.8,crit:0.25,critDmg:3,weapons:['dagger','bow'],passive:null,desc:'운명을 걸고 싸우는 카드와 주사위의 달인',quest:{type:'kill',target:'토끼',count:8,desc:'토끼 8마리를 처치하라'}},
+  necromancer:{name:'강령술사',color:0x442266,hc:0x9966cc,hpMul:0.8,atkMul:0.6,spdMul:0.9,defMul:0.6,magMul:1.5,crit:0.05,critDmg:2,weapons:['staff'],passive:null,desc:'죽은 자를 소환하여 군단을 이루는 어둠의 술사',quest:{type:'kill',target:'고블린',count:6,desc:'고블린 6마리의 영혼을 수집하라'}},
+  druid:{name:'드루이드',color:0x228833,hc:0x88cc66,hpMul:1.1,atkMul:1.0,spdMul:1.0,defMul:1.0,magMul:1.0,crit:0.08,critDmg:2,weapons:['staff','bow'],passive:null,desc:'자연의 균형을 수호하며 변신하는 자연 마법사',quest:{type:'kill',target:'사슴',count:4,desc:'사슴 4마리를 처치하여 자연의 순환을 이해하라'}},
+  engineer:{name:'기술자',color:0x998855,hc:0xccbbaa,hpMul:1.0,atkMul:0.8,spdMul:0.9,defMul:0.9,magMul:0.7,crit:0.05,critDmg:2,weapons:['bow','sword'],passive:null,desc:'기계와 전기로 전투하는 발명 천재',quest:{type:'kill',target:'고블린',count:3,desc:'고블린 3마리를 기계로 처치하라'}}
 };
 var playerClass='none';
 
@@ -656,6 +672,86 @@ var CLASS_SKILLS={
     {id:'shadow_strike',name:'그림자 일격',key:'Q',cd:3,desc:'순간이동 후 공격 (ATK x5)',dmgMul:5,range:10,teleport:true,color:'#6644aa'},
     {id:'vanish',name:'은신',key:'R',cd:18,desc:'5초간 투명+다음 공격 치명타 확정',buff:'stealth',buffDur:5,color:'#444466'},
     {id:'death_mark',name:'죽음의 표식',key:'T',cd:20,desc:'대상에 표식, 5초 후 ATK x8 폭발',markDmg:8,markDur:5,range:8,color:'#aa0044'}
+  ],
+  cook:[
+    {id:'frying_pan',name:'프라이팬 강타',key:'Q',cd:8,desc:'프라이팬으로 강타 (ATK x2)',dmgMul:2,range:4,color:'#ff8800'},
+    {id:'hot_oil',name:'뜨거운 기름',key:'R',cd:15,desc:'주변에 뜨거운 기름 뿌리기 (범위 DoT 5초)',dmgMul:1.2,aoe:7,poisonDur:5,color:'#ffaa33'},
+    {id:'full_course',name:'풀코스 요리',key:'T',cd:25,desc:'풀코스 요리로 HP 40% 회복',selfHeal:0.4,color:'#ffdd88'}
+  ],
+  fisher:[
+    {id:'fishing_line',name:'낚싯줄 던지기',key:'Q',cd:10,desc:'낚싯줄로 원거리 적을 끌어당기기 (ATK x1.5)',dmgMul:1.5,range:18,projectile:true,color:'#2255aa',pColor:0x4488cc},
+    {id:'big_fish',name:'대어 소환',key:'R',cd:18,desc:'거대한 물고기로 강타 (ATK x4)',dmgMul:4,range:6,color:'#3366bb'},
+    {id:'water_bomb',name:'물폭탄',key:'T',cd:20,desc:'물폭탄 투척으로 범위 공격 (ATK x2.5)',dmgMul:2.5,aoe:8,color:'#66aaff'}
+  ],
+  clown:[
+    {id:'random_box',name:'랜덤 박스',key:'Q',cd:8,desc:'랜덤 효과 발동 (데미지/힐/버프 중 하나)',dmgMul:2.5,range:5,color:'#ff44cc'},
+    {id:'pie_throw',name:'파이 던지기',key:'R',cd:12,desc:'파이를 던져 적에게 혼란 유발 (ATK x2)',dmgMul:2,range:16,projectile:true,debuff:'confuse',debuffDur:4,color:'#ffccee',pColor:0xffaacc},
+    {id:'fireworks',name:'폭죽',key:'T',cd:20,desc:'폭죽 폭발로 범위 공격+스턴 (ATK x3)',dmgMul:3,aoe:9,color:'#ff88ff'}
+  ],
+  reaper:[
+    {id:'reaper_scythe',name:'사신의 낫',key:'Q',cd:8,desc:'관통하는 낫 공격 (ATK x3)',dmgMul:3,range:6,color:'#9933cc'},
+    {id:'soul_harvest',name:'영혼 수확',key:'R',cd:15,desc:'킬 시 HP 흡수 버프 10초',buff:'lifesteal',buffDur:10,color:'#660099'},
+    {id:'death_sentence',name:'죽음의 선고',key:'T',cd:25,desc:'즉사 3% 확률 + ATK x4 공격',dmgMul:4,range:8,instaKill:0.03,color:'#440066'}
+  ],
+  bard:[
+    {id:'war_song',name:'전쟁의 노래',key:'Q',cd:10,desc:'전쟁 노래로 ATK +60% 버프 8초',buff:'atkUp',buffDur:8,color:'#dd9933'},
+    {id:'lullaby',name:'자장가',key:'R',cd:18,desc:'가장 가까운 적 수면 5초',debuff:'sleep',debuffDur:5,range:12,color:'#bbaa44'},
+    {id:'fire_dance',name:'불의 춤',key:'T',cd:22,desc:'불꽃 춤으로 범위 데미지 (ATK x2.5)',dmgMul:2.5,aoe:9,color:'#ff6622'}
+  ],
+  tamer:[
+    {id:'whip',name:'채찍',key:'Q',cd:8,desc:'채찍으로 기본 공격 (ATK x2)',dmgMul:2,range:7,color:'#448833'},
+    {id:'summon_beast',name:'야수 소환',key:'R',cd:20,desc:'임시 야수 소환 15초간',summon:'beast',dur:15,color:'#886633'},
+    {id:'beast_roar',name:'맹수의 포효',key:'T',cd:18,desc:'맹수의 포효로 적 공포 유발 5초',debuff:'fear',debuffDur:5,aoe:12,color:'#cc8844'}
+  ],
+  bomber:[
+    {id:'bomb_throw',name:'폭탄 투척',key:'Q',cd:8,desc:'폭탄 투척으로 범위 공격 (ATK x2.5)',dmgMul:2.5,aoe:8,projectile:true,color:'#cc5500',pColor:0xff4400},
+    {id:'land_mine',name:'지뢰 설치',key:'R',cd:15,desc:'지뢰 설치 트랩 (ATK x4)',summon:'mine',dur:20,dmgMul:4,color:'#aa3300'},
+    {id:'self_destruct',name:'자폭',key:'T',cd:25,desc:'자폭으로 큰 범위 데미지 (ATK x6, HP 50% 소모)',dmgMul:6,aoe:12,selfDmg:0.5,color:'#ff2200'}
+  ],
+  knight:[
+    {id:'shield_charge',name:'방패 돌진',key:'Q',cd:8,desc:'방패로 돌진하여 스턴 (ATK x2)',dmgMul:2,range:8,color:'#4466cc'},
+    {id:'guardian_oath',name:'수호의 맹세',key:'R',cd:18,desc:'10초간 피격 데미지 30% 반사',buff:'reflect',buffDur:10,color:'#6688dd'},
+    {id:'iron_fortress',name:'철벽',key:'T',cd:22,desc:'3초간 완전 무적',buff:'invincible',buffDur:3,color:'#aabbee'}
+  ],
+  alchemist:[
+    {id:'acid_flask',name:'산성 플라스크',key:'Q',cd:10,desc:'산성 플라스크 투척 (ATK x2, 적 방어 감소)',dmgMul:2,range:14,projectile:true,debuff:'defDown',debuffDur:6,color:'#88cc44',pColor:0x66aa22},
+    {id:'healing_potion',name:'치유의 물약',key:'R',cd:15,desc:'HP 40% 회복',selfHeal:0.4,color:'#44ff88'},
+    {id:'transmute',name:'변환',key:'T',cd:20,desc:'주변 재료를 골드로 변환 (+200골드)',goldGain:200,color:'#ffdd44'}
+  ],
+  scholar:[
+    {id:'weakness_analysis',name:'약점 분석',key:'Q',cd:10,desc:'적 약점 분석으로 크릿률 +50% 버프 10초',buff:'critUp',buffDur:10,color:'#3366ff'},
+    {id:'knowledge_light',name:'지식의 빛',key:'R',cd:15,desc:'지식의 빛으로 적 스턴 4초 (ATK x1.5)',dmgMul:1.5,range:10,color:'#6699ff'},
+    {id:'encyclopedia',name:'백과사전',key:'T',cd:25,desc:'30초간 획득 경험치 2배',buff:'expUp',buffDur:30,color:'#aaccff'}
+  ],
+  fighter:[
+    {id:'rapid_combo',name:'연타',key:'Q',cd:8,desc:'3연속 타격 (각 ATK x1.8)',multiHit:3,dmgMul:1.8,range:4,color:'#ff3322'},
+    {id:'high_kick',name:'상단 발차기',key:'R',cd:12,desc:'강력한 발차기로 넉백 (ATK x3)',dmgMul:3,range:4,color:'#ff5544'},
+    {id:'secret_art',name:'오의:백열권',key:'T',cd:22,desc:'최종 비기 백열권 (ATK x7)',dmgMul:7,range:5,color:'#ff8866'}
+  ],
+  moonblade:[
+    {id:'moonlight_slash',name:'달빛 베기',key:'Q',cd:8,desc:'달빛 마법 데미지 (ATK x2.5)',dmgMul:2.5,range:6,color:'#6633cc'},
+    {id:'lunar_eclipse',name:'월식',key:'R',cd:18,desc:'어둠의 월식 범위 공격 (ATK x2)',dmgMul:2,aoe:10,color:'#443388'},
+    {id:'full_moon',name:'만월',key:'T',cd:25,desc:'10초간 ATK+MAG 2배 강화',buff:'atkUp2',buffDur:10,color:'#bbaaee'}
+  ],
+  gambler:[
+    {id:'card_throw',name:'카드 던지기',key:'Q',cd:8,desc:'카드 원거리 공격 (ATK x2)',dmgMul:2,range:16,projectile:true,color:'#ddaa00',pColor:0xffcc22},
+    {id:'double_or_nothing',name:'더블 오어 낫싱',key:'R',cd:12,desc:'50% 확률로 ATK x4 또는 미스',dmgMul:4,range:5,gamble:0.5,color:'#ffcc44'},
+    {id:'jackpot',name:'잭팟',key:'T',cd:20,desc:'골드 소모하여 초강력 공격 (ATK x6, 골드 -100)',dmgMul:6,range:5,goldCost:100,color:'#ffaa00'}
+  ],
+  necromancer:[
+    {id:'summon_skeleton',name:'해골 소환',key:'Q',cd:10,desc:'해골 2마리 소환 15초',summon:'skeleton',summonCount:2,dur:15,color:'#442266'},
+    {id:'hex',name:'저주',key:'R',cd:15,desc:'적 약화 (ATK/DEF -30%) 8초',debuff:'weaken',debuffDur:8,range:12,color:'#661188'},
+    {id:'undead_army',name:'언데드 군단',key:'T',cd:25,desc:'해골 5마리 소환 20초',summon:'skeleton',summonCount:5,dur:20,color:'#8844aa'}
+  ],
+  druid:[
+    {id:'nature_wrath',name:'자연의 분노',key:'Q',cd:8,desc:'자연의 힘으로 범위 공격 (ATK x2)',dmgMul:2,aoe:8,color:'#228833'},
+    {id:'wolf_form',name:'늑대 변신',key:'R',cd:20,desc:'15초간 늑대 변신 ATK 2배',buff:'atkUp2',buffDur:15,color:'#448822'},
+    {id:'healing_rain',name:'치유의 비',key:'T',cd:22,desc:'치유의 비로 HP 35% 회복',selfHeal:0.35,color:'#66cc44'}
+  ],
+  engineer:[
+    {id:'turret',name:'터렛 설치',key:'Q',cd:12,desc:'자동 공격 터렛 설치 20초',summon:'turret',dur:20,color:'#998855'},
+    {id:'electric_shock',name:'전기 충격',key:'R',cd:15,desc:'전기 충격으로 스턴 4초 (ATK x2)',dmgMul:2,range:8,color:'#bbaa66'},
+    {id:'robot_summon',name:'로봇 소환',key:'T',cd:25,desc:'강력한 전투 로봇 소환 25초',summon:'robot',dur:25,color:'#ccbb88'}
   ]
 };
 
@@ -676,6 +772,38 @@ var NPC_DEF=[
   {name:'(코디샵) 루나',px:-358, pz:-380,bc:0xcc44aa,hc:0xffaadd},
   /* 정체불명 — 마을 북쪽 외곽 골목 (숨어있는 느낌) */
   {name:'(???) 정체불명',px:-380, pz:-310,  bc:0x1a1030,hc:0xaaaacc},
+  /* 요리사 — 마을 주방 구역 */
+  {name:'(요리사) 김향분',px:-355, pz:-395, bc:0xff8800,hc:0xffddaa, classNpc:'cook'},
+  /* 낚시꾼 — 강가 */
+  {name:'(낚시꾼) 박강수',px:-280, pz:-360, bc:0x2255aa,hc:0xaaccee, classNpc:'fisher'},
+  /* 광대 — 초원 (z ~30) */
+  {name:'(광대) 트릭스터',px:-200, pz:30,   bc:0xff44cc,hc:0xffbbdd, classNpc:'clown'},
+  /* 음유시인 — 마을 선술집 */
+  {name:'(음유시인) 나루율',px:-368, pz:-355, bc:0xdd9933,hc:0xffeeaa, classNpc:'bard'},
+  /* 기사 — 마을 성 */
+  {name:'(기사) 이수호',px:-325, pz:-340,  bc:0x4466cc,hc:0xaabbee, classNpc:'knight'},
+  /* 도박사 — 마을 뒷골목 */
+  {name:'(도박사) 최운수',px:-400, pz:-355, bc:0xddaa00,hc:0xffeeaa, classNpc:'gambler'},
+  /* 학자 — 마을 도서관 */
+  {name:'(학자) 정지식',px:-342, pz:-385,  bc:0x3366ff,hc:0x99bbff, classNpc:'scholar'},
+  /* 사신 — 어두운 숲 깊은 곳 (z ~170) */
+  {name:'(사신) 그림',px:-150, pz:170,     bc:0x220022,hc:0x9966bb, classNpc:'reaper'},
+  /* 월광술사 — 어두운 숲 달빛 공터 (z ~145) */
+  {name:'(월광술사) 달하',px:-120, pz:145,  bc:0x6633cc,hc:0xbbaaee, classNpc:'moonblade'},
+  /* 격투가 — 초원 훈련장 (z ~50) */
+  {name:'(격투가) 강철권',px:-240, pz:50,   bc:0xff3322,hc:0xffaa99, classNpc:'fighter'},
+  /* 조련사 — 정글 (x>80, z ~350) */
+  {name:'(조련사) 야수리',px:100,  pz:350,  bc:0x448833,hc:0xaaddaa, classNpc:'tamer'},
+  /* 드루이드 — 정글 깊은 곳 (x>80, z ~500) */
+  {name:'(드루이드) 숲의령',px:120, pz:500, bc:0x228833,hc:0x88cc66, classNpc:'druid'},
+  /* 폭파공 — 화산 지대 경계 (z ~210) */
+  {name:'(폭파공) 터지박',px:-80,  pz:210,  bc:0xcc5500,hc:0xffaa44, classNpc:'bomber'},
+  /* 기술자 — 화산 작업장 (z ~240) */
+  {name:'(기술자) 오발명',px:-60,  pz:240,  bc:0x998855,hc:0xccbbaa, classNpc:'engineer'},
+  /* 연금술사 — 독 늪 (z ~90) */
+  {name:'(연금술사) 변환사',px:-180, pz:90,  bc:0x88cc44,hc:0xccee99, classNpc:'alchemist'},
+  /* 강령술사 — 독 늪 묘지 (z ~110) */
+  {name:'(강령술사) 사령공',px:-160, pz:110, bc:0x442266,hc:0x9966cc, classNpc:'necromancer'},
 ];
 
 /* ════════════ 몬스터 정의 ════════════ */
