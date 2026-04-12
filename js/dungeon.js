@@ -104,17 +104,8 @@ function buildDungeonEntrances(){
     npcs.push(npcObj);
     dg._npc=npcObj;
 
-    /* 이름 라벨 (던전 이름) */
-    var lbl=document.createElement('div');
-    lbl.className='nlabel';
-    lbl.style.cssText='color:#ff8844;font-size:12px;font-weight:bold;background:#1a0a00cc;padding:3px 8px;border:1px solid #ff6600;border-radius:4px;text-shadow:0 0 6px #ff4400;';
-    lbl.textContent='⚔ '+dg.name+' (Lv.'+dg.minLevel+'+)';
-    lbl.dataset.wx=ex;lbl.dataset.wy=ey+5;lbl.dataset.wz=ez;
-    lbl.classList.add('bld');
-    document.getElementById('lov').appendChild(lbl);
-
-    /* 입장 트리거 등록 */
-    dg._entranceLabel=lbl;
+    /* 던전 표시 — NPC 이름에 포함 (별도 라벨 없음) */
+    dg._entranceLabel=null;
   });
 }
 
