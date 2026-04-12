@@ -307,9 +307,9 @@ function tickDayNight(dt){
     _dnCacheLights();
   }
 
-  /* 매 3프레임마다 시각 업데이트 (성능) */
+  /* 매 60프레임마다 시각 업데이트 (번쩍거림 방지) */
   _dnFrame++;
-  if(_dnFrame%3!==0)return;
+  if(_dnFrame%60!==0)return;
 
   var pair=_getPhasePair();
   var t=_getPhaseBlend();
