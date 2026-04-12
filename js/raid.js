@@ -162,14 +162,7 @@ function _spawnRaidNpc(rd){
   };
   npcs.push(npcObj);
 
-  /* 레이드 표시 라벨 */
-  var lbl=document.createElement('div');
-  lbl.className='nlabel';
-  lbl.style.cssText='color:#cc88ff;font-size:12px;font-weight:bold;background:#0a001acc;padding:3px 8px;border:1px solid #8844cc;border-radius:4px;text-shadow:0 0 6px #8800ff;';
-  lbl.textContent='★ 레이드: '+rd.name+' (Lv.'+rd.minLevel+'+)';
-  lbl.dataset.wx=rx; lbl.dataset.wy=ry+6; lbl.dataset.wz=rz;
-  lbl.classList.add('bld');
-  lov.appendChild(lbl);
+  /* 레이드 표시 — NPC 이름에 포함 (별도 라벨 없음) */
 }
 
 /* ── 레이드 확인 모달 ── */
