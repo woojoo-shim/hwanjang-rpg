@@ -328,6 +328,72 @@ var arrows=[];
 var _arrowMat=new THREE.MeshLambertMaterial({color:0x8B4513});
 var _arrowHeadMat=new THREE.MeshLambertMaterial({color:0xaabbcc});
 
+/* ── 마법 투사체 (파이어볼 등) ── */
+var magicProjectiles=[];
+function shootMagicProjectile(dirX,dirZ,dmg,color,range,skillName){
+  var g=new THREE.Group();
+  /* 빛나는 구체 */
+  var coreMat=new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:0.9});
+  var core=new THREE.Mesh(new THREE.SphereGeometry(.25,8,6),coreMat);
+  g.add(core);
+  /* 외곽 글로우 */
+  var glowMat=new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:0.3});
+  var glow=new THREE.Mesh(new THREE.SphereGeometry(.45,6,5),glowMat);
+  g.add(glow);
+  /* PointLight */
+  var light=new THREE.PointLight(color,1.0,8);
+  g.add(light);
+  /* 꼬리 파티클 (작은 구 3개) */
+  var tailMat=new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:0.5});
+  for(var ti=0;ti<3;ti++){
+    var tail=new THREE.Mesh(new THREE.SphereGeometry(.1-ti*.02,5,4),tailMat);
+    tail.position.set(-dirX*(ti+1)*.2,0,-dirZ*(ti+1)*.2);
+    g.add(tail);
+  }
+  var py=(typeof insideBuilding!=='undefined'&&insideBuilding)?PL.group.position.y+1:1.2;
+  g.position.set(PL.group.position.x,py,PL.group.position.z);
+  g.rotation.y=Math.atan2(dirX,dirZ);
+  scene.add(g);
+  magicProjectiles.push({mesh:g,dx:dirX,dz:dirZ,dmg:dmg,life:range/18,speed:18,color:color,name:skillName||'마법'});
+}
+
+function updateMagicProjectiles(dt){
+  for(var i=magicProjectiles.length-1;i>=0;i--){
+    var p=magicProjectiles[i];
+    p.mesh.position.x+=p.dx*p.speed*dt;
+    p.mesh.position.z+=p.dz*p.speed*dt;
+    /* 구체 회전 + 크기 맥동 */
+    p.mesh.rotation.y+=dt*5;
+    var scale=1+Math.sin(Date.now()*0.01)*0.1;
+    p.mesh.scale.set(scale,scale,scale);
+    p.life-=dt;
+    /* 몬스터 충돌 */
+    var hit=false;
+    for(var j=0;j<monsters.length;j++){
+      var m=monsters[j];
+      if(m.hp<=0)continue;
+      var dx=p.mesh.position.x-m.mesh.position.x,dz=p.mesh.position.z-m.mesh.position.z;
+      if(dx*dx+dz*dz<4){
+        m.hp=Math.max(0,m.hp-p.dmg);
+        m.hbf.style.width=Math.max(0,m.hp/m.maxHp*100)+'%';
+        flashMonster(m);m.state='aggro';
+        spawnDmgNum('-'+p.dmg,p.color?('#'+p.color.toString(16).padStart(6,'0')):'#ff6600');
+        if(typeof SFX!=='undefined')SFX.hit();
+        if(m.hp<=0)killMonster(m);
+        hit=true;break;
+      }
+    }
+    if(hit||p.life<=0){
+      /* 히트 이펙트: 작은 폭발 */
+      if(hit&&typeof spawnKillParticles==='function'){
+        spawnKillParticles(p.mesh.position.x,p.mesh.position.y,p.mesh.position.z,p.color||0xff4400);
+      }
+      scene.remove(p.mesh);
+      magicProjectiles.splice(i,1);
+    }
+  }
+}
+
 function shootArrow(dirX,dirZ,dmg){
   var g=new THREE.Group();
   var shaft=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.6,4),_arrowMat);
@@ -464,9 +530,9 @@ function useSkill(slotIdx){
     if(len<0.1){dx=0;dz=1;len=1;}
     dx/=len;dz/=len;
     PL.group.rotation.y=Math.atan2(dx,dz);
-    shootArrow(dx,dz,dmg);
+    shootMagicProjectile(dx,dz,dmg,sk.pColor||0xff4400,sk.range||20,sk.name);
     triggerAtkAnim();
-    spawnDmgNum(sk.name+'!',sk.color||'#ffdd44');
+    if(typeof SFX!=='undefined')SFX.skill();
     return;
   }
   /* 멀티샷 (궁수) */

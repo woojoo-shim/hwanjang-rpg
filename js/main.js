@@ -365,6 +365,7 @@ function loop(){
     if(typeof updateGroundEffects==='function')updateGroundEffects(dt);
     if(typeof tickDynamicNpcs==='function')tickDynamicNpcs(dt);
     if(typeof updateArrows==='function')updateArrows(dt);
+    if(typeof updateMagicProjectiles==='function')updateMagicProjectiles(dt);
     if(typeof updateSkills==='function')updateSkills(dt);
     if(typeof updateMonsterAnims==='function')updateMonsterAnims(dt);
     if(typeof tickScreenShake==='function')tickScreenShake(dt);
