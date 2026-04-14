@@ -390,14 +390,8 @@ var SLEEPING_NPCS=[
 
 /* 밤 22시 ~ 아침 6시 수면 */
 function isNpcSleeping(npcName){
-  /* 수면 NPC 목록에 없으면 false */
-  var found=false;
-  for(var i=0;i<SLEEPING_NPCS.length;i++){
-    if(SLEEPING_NPCS[i]===npcName){found=true;break;}
-  }
-  if(!found)return false;
-  var h=gameTime;
-  return h>=22||h<6;
+  /* NPC는 밤에도 항상 일함 — 수면 비활성화 */
+  return false;
 }
 
 /* ─── 야간 전용 NPC: ??? 수수께끼 상인 ─── */
