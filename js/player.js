@@ -762,6 +762,30 @@ function killMonster(m){
       }
     }
   }
+  /* ── 야간 특수 드롭 (밤에만, 8% 확률) ── */
+  var _isNightDrop=(typeof gameTime!=='undefined')&&(gameTime>=19||gameTime<5);
+  if(_isNightDrop&&Math.random()<0.08){
+    var _nightItems=[
+      {id:'moon_shard',rate:0.4},
+      {id:'shadow_essence',rate:0.3},
+      {id:'night_crystal',rate:0.2},
+      {id:'starlight_dust',rate:0.08},
+      {id:'void_fragment',rate:0.02}
+    ];
+    var _nightRoll=Math.random(),_nightCum=0,_nightPick=null;
+    for(var _ni=0;_ni<_nightItems.length;_ni++){
+      _nightCum+=_nightItems[_ni].rate;
+      if(_nightRoll<_nightCum){_nightPick=_nightItems[_ni].id;break;}
+    }
+    if(_nightPick){
+      var _ndf=getItemDef(_nightPick);
+      if(_ndf){
+        var _ndx=mx+(Math.random()-.5)*2,_ndz=mz+(Math.random()-.5)*2;
+        if(typeof spawnLootGlow==='function')spawnLootGlow(_ndx,_ndz,_ndf,1);
+        else{addItem(_nightPick,1);addChat('sys','[시스템]','🌙 ['+_ndf.name+'] 획득!');}
+      }
+    }
+  }
   setTimeout(function(){
     if(!m.mesh)return;
     m.hp=m.def.hp;var _respawnY=(typeof getTerrainY==='function')?getTerrainY(m.spawnX,m.spawnZ):0;m.mesh.position.set(m.spawnX,_respawnY,m.spawnZ);

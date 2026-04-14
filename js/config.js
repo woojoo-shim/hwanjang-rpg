@@ -49,6 +49,12 @@ var ICON={
 };
 
 var ITEM_POOL=[
+  // ─ 야간 전용 드롭 ─
+  {id:'moon_shard',name:'달빛 파편',icon:'🌙',type:'material',rarity:'uncommon',desc:'밤에만 떨어지는 신비로운 파편.',stats:{},reqLevel:1,durability:0,bonuses:[],flavor:'달빛이 응축된 결정. 연금술 재료로 귀하다.',shopPrice:80},
+  {id:'shadow_essence',name:'그림자 정수',icon:'🖤',type:'material',rarity:'rare',desc:'어둠에서 태어난 에너지.',stats:{},reqLevel:5,durability:0,bonuses:['강화 성공률 +5%'],flavor:'만지면 손끝이 차가워진다. 강화에 사용하면 성공률이 올라간다.',shopPrice:300},
+  {id:'night_crystal',name:'야광 수정',icon:'💎',type:'material',rarity:'rare',desc:'밤하늘의 빛을 품은 수정.',stats:{},reqLevel:8,durability:0,bonuses:['제작 재료'],flavor:'어둠 속에서 스스로 빛나는 보석.',shopPrice:200},
+  {id:'starlight_dust',name:'별빛 가루',icon:'✨',type:'material',rarity:'epic',desc:'별이 부서질 때 생기는 가루.',stats:{},reqLevel:15,durability:0,bonuses:['전설 장비 강화 재료','야간 EXP +10%'],flavor:'하늘에서 떨어진 별의 잔해.',shopPrice:1500},
+  {id:'void_fragment',name:'공허의 조각',icon:'🕳️',type:'material',rarity:'legendary',desc:'세계가 만들어지기 전의 조각.',stats:{},reqLevel:25,durability:0,bonuses:['포톤 퀘스트 재료','모든 스탯 +3'],flavor:'포톤이 봉인된 심연에서 흘러나온 파편.',shopPrice:5000},
   // ─ 횃불 ─
   {id:'torch',name:'횃불',icon:'🔥',type:'accessory',rarity:'common',desc:'밤에 장착하면 주변을 밝힌다.',stats:{},reqLevel:1,durability:100,bonuses:['밤에 주변 조명'],flavor:'기름에 적신 천을 감은 나뭇가지. 어둠 속에서 유일한 빛.',slot:'torch',shopPrice:30},
   {id:'bright_torch',name:'밝은 횃불',icon:'🔥',type:'accessory',rarity:'uncommon',desc:'더 넓은 범위를 밝힌다.',stats:{},reqLevel:5,durability:200,bonuses:['밤에 넓은 조명','야간 이동속도 +5%'],flavor:'연금술사가 특수 기름을 발라 만든 횃불. 불꽃이 푸르스름하다.',slot:'torch',shopPrice:120},
