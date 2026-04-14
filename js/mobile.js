@@ -50,6 +50,39 @@ function initMobileControls(){
     {id:'m-tab',label:'👥',key:'Tab',size:45,color:'rgba(100,100,200,0.5)'}
   ];
 
+  /* ── 스킬 버튼 (Q, R, T) ── */
+  var skillWrap=document.createElement('div');
+  skillWrap.id='mobile-skills';
+  skillWrap.style.cssText='position:fixed;right:100px;bottom:100px;z-index:50;display:flex;flex-direction:row;gap:8px;pointer-events:auto;';
+  var skillBtns=[
+    {id:'m-skill-q',label:'Q',key:'q',size:45,color:'rgba(255,100,0,0.5)'},
+    {id:'m-skill-r',label:'R',key:'r',size:45,color:'rgba(0,150,255,0.5)'},
+    {id:'m-skill-t',label:'T',key:'t',size:45,color:'rgba(150,0,255,0.5)'}
+  ];
+  skillBtns.forEach(function(b){
+    var btn=document.createElement('div');
+    btn.id=b.id;
+    btn.style.cssText='width:'+b.size+'px;height:'+b.size+'px;border-radius:50%;background:'+b.color+';border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;color:#fff;user-select:none;touch-action:none;';
+    btn.textContent=b.label;
+    btn.addEventListener('touchstart',function(e){
+      e.preventDefault();
+      var ev=new KeyboardEvent('keydown',{key:b.key,code:'Key'+b.key.toUpperCase(),bubbles:true});
+      document.dispatchEvent(ev);
+      btn.style.transform='scale(0.85)';
+      btn.style.background=b.color.replace('0.5','0.8');
+    },{passive:false});
+    btn.addEventListener('touchend',function(e){
+      e.preventDefault();
+      var ev=new KeyboardEvent('keyup',{key:b.key,code:'Key'+b.key.toUpperCase(),bubbles:true});
+      document.dispatchEvent(ev);
+      btn.style.transform='scale(1)';
+      btn.style.background=b.color;
+    },{passive:false});
+    skillWrap.appendChild(btn);
+  });
+  skillWrap.style.display='none';
+  document.body.appendChild(skillWrap);
+
   /* 달리기 토글 버튼 (조이스틱 위) */
   var runBtn=document.createElement('div');
   runBtn.id='m-run';
@@ -198,16 +231,20 @@ function showMobileControls(){
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
   var rb=document.getElementById('m-run');
+  var sk=document.getElementById('mobile-skills');
   if(jw)jw.style.display='block';
   if(mb)mb.style.display='flex';
   if(rb)rb.style.display='flex';
+  if(sk)sk.style.display='flex';
 }
 function hideMobileControls(){
   var jw=document.getElementById('joy-wrap');
   var mb=document.getElementById('mobile-btns');
   var rb=document.getElementById('m-run');
+  var sk=document.getElementById('mobile-skills');
   if(jw)jw.style.display='none';
   if(mb)mb.style.display='none';
+  if(sk)sk.style.display='none';
   if(rb)rb.style.display='none';
 }
 
