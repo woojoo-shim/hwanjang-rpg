@@ -509,13 +509,17 @@ function applyPriceChange(itemName,newPrice,npcName){
 
 async function askAI(npcName,userMsg){
   var npcData=NPC_AI[npcName];if(!npcData)return'...';
-  var sys=(typeof WORLD_LORE!=='undefined'?WORLD_LORE:'')+npcData.system;
+  /* 토큰 절약: 시스템 프롬프트에 짧게 답하도록 강제 */
+  var sys='[중요] 반드시 1~2문장으로 짧게 답해. 긴 설명, *행동묘사*, 이모티콘 금지.\n'+npcData.system;
+  /* 세계관은 필요시에만 (첫 대화에만) */
+  if(npcData.history.length<=2&&typeof WORLD_LORE!=='undefined')sys=WORLD_LORE+sys;
   /* 호감도 기반 톤 조정 */
   if(typeof getRepPromptSuffix==='function'){
     sys+=getRepPromptSuffix(npcName);
   }
   npcData.history.push({role:'user',content:userMsg});
-  if(npcData.history.length>20)npcData.history=npcData.history.slice(-20);
+  /* 토큰 절약: 대화 기록 6개만 유지 */
+  if(npcData.history.length>6)npcData.history=npcData.history.slice(-6);
   try{
     var apiUrl=location.hostname==='localhost'||location.hostname==='127.0.0.1'
       ?'https://api.anthropic.com/v1/messages'
@@ -529,7 +533,7 @@ async function askAI(npcName,userMsg){
     var res=await fetch(apiUrl,{
       method:'POST',
       headers:headers,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,system:sys,messages:npcData.history})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:150,system:sys,messages:npcData.history})
     });
     if(!res.ok){
       var err=await res.text();
