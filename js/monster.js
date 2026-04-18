@@ -2213,7 +2213,8 @@ function updateMonsterAnims(dt){
       if(id==='rabbit'||id==='wolf'||id==='elite_wolf'){
         m.mesh.traverse(function(c){
           if(c._isEar){
-            c.rotation.z+=Math.sin(m.animTime*3.5+m.bobOff+c._earSide)*0.04;
+            if(c._baseEarZ===undefined)c._baseEarZ=c.rotation.z;
+            c.rotation.z=c._baseEarZ+Math.sin(m.animTime*3.5+m.bobOff+c._earSide)*0.08;
           }
         });
       }
