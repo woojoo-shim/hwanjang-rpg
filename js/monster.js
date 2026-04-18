@@ -382,135 +382,258 @@ function mkMonsterMesh(def){
     /* fireLight 제거 — 성능 최적화 */
 
   } else if(def.id==='jungle_spider'){
-    /* 거미 — 8다리 */
+    /* 거미 — 복부+두흉부+8다리(2분절)+6눈+실샘+독니 */
+    /* 총 메쉬: 복부(1)+무늬(1)+실샘(1)+두흉부(1)+눈(6)+다리(8x2=16)+독니(2x2=4) = 30 */
     var spBody=new THREE.MeshLambertMaterial({color:0x2a1a00});
+    var spMark=new THREE.MeshLambertMaterial({color:0xcc2200}); /* 붉은 모래시계 무늬 */
     var spEye=new THREE.MeshBasicMaterial({color:0xff0000});
-    var ab=new THREE.Mesh(new THREE.SphereGeometry(.4,8,6),spBody);ab.scale.set(1,.7,1.2);ab.position.set(0,.4,-.25);g.add(ab);
-    var ceph=new THREE.Mesh(new THREE.SphereGeometry(.28,8,6),spBody);ceph.position.set(0,.45,.2);g.add(ceph);
-    for(var si=0;si<4;si++){[-1,1].forEach(function(side){
-      var ang=(-0.6+si*0.4);
-      var leg=new THREE.Mesh(new THREE.CylinderGeometry(.025,.02,.7,4),spBody);
-      leg.position.set(side*(.2+si*.05),.5,.1-si*.12);leg.rotation.z=side*(.4+si*.15);leg.rotation.x=ang;g.add(leg);
-    });}
-    [-0.08,0.08].forEach(function(ex){
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),spEye);eye.position.set(ex,.52,.42);g.add(eye);
+    var spFangM=new THREE.MeshLambertMaterial({color:0x3a3300});
+    /* 복부 — 붉은 모래시계 무늬 */
+    var ab=new THREE.Mesh(new THREE.SphereGeometry(.42,8,6),spBody);ab.scale.set(1,.72,1.25);ab.position.set(0,.42,-.28);g.add(ab);
+    var hourgl=new THREE.Mesh(new THREE.SphereGeometry(.18,6,6),spMark);hourgl.scale.set(.5,1,.4);hourgl.position.set(0,.38,-.26);g.add(hourgl);
+    /* 실샘 (방적 돌기) */
+    var spinn=new THREE.Mesh(new THREE.CylinderGeometry(.04,.03,.12,5),spBody);spinn.position.set(0,.32,-.52);spinn.rotation.x=.5;g.add(spinn);
+    /* 두흉부 — 눈 달린 앞부분 */
+    var ceph=new THREE.Mesh(new THREE.SphereGeometry(.3,8,6),spBody);ceph.scale.set(1,.78,1.1);ceph.position.set(0,.48,.2);g.add(ceph);
+    /* 눈 6개 — 3쌍 */
+    [-.12,0,.12].forEach(function(ex){
+      var ey=new THREE.Mesh(new THREE.SphereGeometry(.038,5,5),spEye);ey.position.set(ex,.58,.44);g.add(ey);
     });
-    /* 독니 */
-    [-0.06,0.06].forEach(function(fx){
-      var fang=new THREE.Mesh(new THREE.ConeGeometry(.02,.12,4),new THREE.MeshLambertMaterial({color:0x444400}));
-      fang.position.set(fx,.38,.42);fang.rotation.x=Math.PI;g.add(fang);
+    [-.07,.07].forEach(function(ex){
+      var ey2=new THREE.Mesh(new THREE.SphereGeometry(.03,4,4),spEye);ey2.position.set(ex,.54,.48);g.add(ey2);
+    });
+    /* 8다리 — 상하 2분절 무릎 각도 */
+    [0,1,2,3].forEach(function(si){[-1,1].forEach(function(side){
+      var ox=side*(.2+si*.05);var oz=.12-si*.13;var oy=.5;
+      var legU=new THREE.Mesh(new THREE.CylinderGeometry(.025,.018,.42,4),spBody);
+      legU.position.set(ox+side*.14,oy-.05,oz);legU.rotation.z=side*(.5+si*.12);legU.rotation.x=(-0.5+si*.18);g.add(legU);
+      var legL=new THREE.Mesh(new THREE.CylinderGeometry(.016,.01,.4,4),spBody);
+      legL.position.set(ox+side*.34,oy-.28,oz+.12);legL.rotation.z=side*(.15+si*.04);legL.rotation.x=.55;g.add(legL);
+    });});
+    /* 독니 협각 */
+    [-0.07,0.07].forEach(function(fx){
+      var chelM=new THREE.Mesh(new THREE.CylinderGeometry(.03,.02,.18,5),spBody);
+      chelM.position.set(fx,.42,.4);chelM.rotation.x=.4;g.add(chelM);
+      var fang=new THREE.Mesh(new THREE.ConeGeometry(.02,.1,4),spFangM);
+      fang.position.set(fx,.34,.48);fang.rotation.x=Math.PI+.3;g.add(fang);
     });
 
   } else if(def.id==='jungle_snake'){
-    /* 독사 — 구불구불한 몸 */
+    /* 독사 — 구불구불한 몸통 + 후드 목 + 배 무늬 + 방울 꼬리 */
     var snM=new THREE.MeshLambertMaterial({color:0x225511});
     var snM2=new THREE.MeshLambertMaterial({color:0x33aa22});
+    var snBelly=new THREE.MeshLambertMaterial({color:0xaaccaa}); /* 밝은 배 */
     var snEye=new THREE.MeshBasicMaterial({color:0xffff00});
-    for(var seg=0;seg<6;seg++){
-      var sz=.15-.01*seg;
-      var sp2=new THREE.Mesh(new THREE.SphereGeometry(sz,6,6),seg%2===0?snM:snM2);
-      sp2.position.set(Math.sin(seg*.8)*.15,.15,seg*-.18);sp2.scale.y=.7;g.add(sp2);
+    var snPupil=new THREE.MeshBasicMaterial({color:0x000000});
+    /* 몸통 — 8분절, S자 곡선, 앞쪽이 두꺼움 */
+    for(var seg=0;seg<8;seg++){
+      var sz=.17-.015*seg;
+      var sp2=new THREE.Mesh(new THREE.SphereGeometry(sz,7,6),seg%2===0?snM:snM2);
+      sp2.position.set(Math.sin(seg*.7)*.2,.14+seg*.01,seg*-.16);sp2.scale.y=.6;g.add(sp2);
+      /* 배 줄무늬 */
+      if(seg<6){
+        var belly2=new THREE.Mesh(new THREE.SphereGeometry(sz*.6,5,4),snBelly);
+        belly2.position.set(Math.sin(seg*.7)*.2,.09,seg*-.16);belly2.scale.set(.8,.3,1);g.add(belly2);
+      }
     }
-    var head2=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),snM);head2.position.set(0,.2,.15);head2.scale.set(1,.7,1.3);g.add(head2);
+    /* 후드 목 플레어 — 목이 넓어지는 부분 */
+    var hood=new THREE.Mesh(new THREE.SphereGeometry(.22,8,6),snM);hood.scale.set(1.4,.5,1);hood.position.set(0,.2,.18);g.add(hood);
+    /* 머리 — 삼각형에 가까운 뱀 머리 */
+    var head2=new THREE.Mesh(new THREE.BoxGeometry(.24,.14,.32),snM);head2.position.set(0,.2,.28);g.add(head2);
+    /* 아래턱 */
+    var jaw2=new THREE.Mesh(new THREE.BoxGeometry(.2,.07,.26),snBelly);jaw2.position.set(0,.13,.28);g.add(jaw2);
+    /* 눈 — 세로 눈동자 */
     [-0.07,0.07].forEach(function(ex){
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.035,5,5),snEye);eye.position.set(ex,.26,.32);g.add(eye);
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),snEye);eye.position.set(ex,.25,.38);g.add(eye);
+      var pupil=new THREE.Mesh(new THREE.BoxGeometry(.015,.06,.015),snPupil);pupil.position.set(ex,.25,.42);g.add(pupil);
     });
-    /* 혀 */
-    var tongue=new THREE.Mesh(new THREE.BoxGeometry(.02,.01,.15),new THREE.MeshBasicMaterial({color:0xff2222}));
-    tongue.position.set(0,.18,.38);g.add(tongue);
+    /* 혀 — 두 갈래 */
+    [-0.03,0.03].forEach(function(tx){
+      var tFork=new THREE.Mesh(new THREE.BoxGeometry(.008,.006,.1),new THREE.MeshBasicMaterial({color:0xff2222}));
+      tFork.position.set(tx,.16,.44);tFork.rotation.z=tx>0?.2:-.2;g.add(tFork);
+    });
+    /* 방울 꼬리 끝 */
+    var rattle=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),new THREE.MeshLambertMaterial({color:0xbbaa66}));
+    rattle.scale.set(1,.6,1);rattle.position.set(Math.sin(7*.7)*.2,.14,-7*.16);g.add(rattle);
 
   } else if(def.id==='jungle_ape'){
-    /* 유인원 — 큰 근육질 */
+    /* 유인원 — 큰 근육질 + 귀 + 눈썹 + 관절 */
     var apeM=new THREE.MeshLambertMaterial({color:0x5a3a1a});
     var apeDM=new THREE.MeshLambertMaterial({color:0x3a2210});
+    var apeFaceM=new THREE.MeshLambertMaterial({color:0x6a4a28}); /* 얼굴 밝은색 */
     var apeEye=new THREE.MeshBasicMaterial({color:0x221100});
-    var body2=new THREE.Mesh(new THREE.BoxGeometry(.7,.8,.5),apeM);body2.position.set(0,.8,0);g.add(body2);
-    var chest=new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.35),apeDM);chest.position.set(0,.85,.1);g.add(chest);
-    var head3=new THREE.Mesh(new THREE.SphereGeometry(.3,8,8),apeM);head3.position.set(0,1.5,0);g.add(head3);
-    var jaw=new THREE.Mesh(new THREE.BoxGeometry(.28,.15,.2),apeDM);jaw.position.set(0,1.32,.18);g.add(jaw);
+    /* 몸통 — 통이 큰 */
+    var body2=new THREE.Mesh(new THREE.BoxGeometry(.72,.82,.52),apeM);body2.position.set(0,.8,0);g.add(body2);
+    /* 가슴 근육 — 두꺼운 판 */
+    var chest=new THREE.Mesh(new THREE.BoxGeometry(.52,.52,.36),apeDM);chest.position.set(0,.86,.12);g.add(chest);
+    /* 어깨 근육 */
+    [-1,1].forEach(function(s){
+      var sh=new THREE.Mesh(new THREE.SphereGeometry(.2,6,6),apeM);sh.position.set(s*.42,1.1,0);g.add(sh);
+    });
+    /* 머리 */
+    var head3=new THREE.Mesh(new THREE.SphereGeometry(.3,8,8),apeM);head3.position.set(0,1.52,0);g.add(head3);
+    /* 이마 눈썹 융기 */
+    var brow=new THREE.Mesh(new THREE.BoxGeometry(.4,.1,.16),apeDM);brow.position.set(0,1.66,.22);g.add(brow);
+    /* 얼굴 — 주둥이 돌출 */
+    var muzzle=new THREE.Mesh(new THREE.SphereGeometry(.18,7,6),apeFaceM);muzzle.scale.set(1,.75,1.1);muzzle.position.set(0,1.44,.24);g.add(muzzle);
+    var jaw=new THREE.Mesh(new THREE.BoxGeometry(.26,.14,.2),apeDM);jaw.position.set(0,1.3,.2);g.add(jaw);
+    /* 귀 — 원형 귀 */
+    [-0.3,0.3].forEach(function(ex){
+      var earO=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),apeM);earO.scale.set(1,1,.4);earO.position.set(ex,1.55,-.02);g.add(earO);
+      var earI=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),apeFaceM);earI.scale.set(1,1,.4);earI.position.set(ex,1.55,.01);g.add(earI);
+    });
+    /* 눈 */
     [-0.12,0.12].forEach(function(ex){
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.05,6,6),apeEye);eye.position.set(ex,1.55,.25);g.add(eye);
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.055,6,6),apeEye);eye.position.set(ex,1.57,.25);g.add(eye);
+      var eyeW=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),new THREE.MeshBasicMaterial({color:0xffffff}));eyeW.position.set(ex,1.61,.27);g.add(eyeW);
     });
-    /* 팔 — 길고 굵음 */
+    /* 팔 — 상완+하완 2분절, 길게 늘어짐 */
     [-1,1].forEach(function(side){
-      var arm=new THREE.Mesh(new THREE.BoxGeometry(.22,.9,.2),apeM);arm.position.set(side*.5,.7,0);g.add(arm);
-      var fist=new THREE.Mesh(new THREE.SphereGeometry(.14,6,6),apeDM);fist.position.set(side*.5,.2,0);g.add(fist);
+      var upperArm=new THREE.Mesh(new THREE.BoxGeometry(.22,.45,.2),apeM);upperArm.position.set(side*.52,.92,0);g.add(upperArm);
+      var elbow=new THREE.Mesh(new THREE.SphereGeometry(.12,6,6),apeDM);elbow.position.set(side*.52,.66,0);g.add(elbow);
+      var forearm=new THREE.Mesh(new THREE.BoxGeometry(.18,.42,.18),apeM);forearm.position.set(side*.52,.42,0);g.add(forearm);
+      var fist=new THREE.Mesh(new THREE.SphereGeometry(.14,6,6),apeDM);fist.position.set(side*.52,.18,0);g.add(fist);
     });
+    /* 다리 + 발 */
     [-0.18,0.18].forEach(function(lx){
-      var leg=new THREE.Mesh(new THREE.BoxGeometry(.2,.45,.2),apeM);leg.position.set(lx,.22,0);g.add(leg);
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(.21,.46,.21),apeM);leg.position.set(lx,.23,0);g.add(leg);
+      var foot=new THREE.Mesh(new THREE.BoxGeometry(.2,.1,.28),apeDM);foot.position.set(lx,.04,.06);g.add(foot);
     });
 
   } else if(def.id==='jungle_panther'){
-    /* 표범 — 검은 빠른 고양이 */
+    /* 표범 — 검은 근육질 고양이 + 주둥이 + 배 + 관절 다리 + 꼬리 끝 */
     var panM=new THREE.MeshLambertMaterial({color:0x1a1a1a});
+    var panUndM=new THREE.MeshLambertMaterial({color:0x2a2a2a}); /* 배 밝은색 */
     var panEM=new THREE.MeshBasicMaterial({color:0x44ff44});
-    var body3=new THREE.Mesh(new THREE.BoxGeometry(.4,.35,.85),panM);body3.position.set(0,.5,0);g.add(body3);
-    var head4=new THREE.Mesh(new THREE.BoxGeometry(.32,.28,.3),panM);head4.position.set(0,.72,.42);g.add(head4);
-    [-0.1,0.1].forEach(function(ex){
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),panEM);eye.position.set(ex,.78,.54);g.add(eye);
+    var panNoseM=new THREE.MeshLambertMaterial({color:0xff3366});
+    /* 몸통 — 유선형 */
+    var body3=new THREE.Mesh(new THREE.BoxGeometry(.42,.38,.9),panM);body3.position.set(0,.52,0);g.add(body3);
+    /* 배 — 밝음 */
+    var belly3=new THREE.Mesh(new THREE.BoxGeometry(.28,.24,.72),panUndM);belly3.position.set(0,.42,.02);g.add(belly3);
+    /* 목 */
+    var neck3=new THREE.Mesh(new THREE.BoxGeometry(.24,.24,.28),panM);neck3.position.set(0,.66,.38);neck3.rotation.x=-.2;g.add(neck3);
+    /* 머리 */
+    var head4=new THREE.Mesh(new THREE.SphereGeometry(.22,8,7),panM);head4.position.set(0,.76,.54);g.add(head4);
+    /* 주둥이 */
+    var snout3=new THREE.Mesh(new THREE.BoxGeometry(.18,.14,.18),panM);snout3.position.set(0,.7,.7);g.add(snout3);
+    var nose3=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),panNoseM);nose3.position.set(0,.74,.78);g.add(nose3);
+    /* 눈 — 녹색 빛나는 */
+    [-0.09,0.09].forEach(function(ex){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.045,6,6),panEM);eye.position.set(ex,.82,.66);g.add(eye);
+      var pupil=new THREE.Mesh(new THREE.BoxGeometry(.015,.07,.015),new THREE.MeshBasicMaterial({color:0x000000}));pupil.position.set(ex,.82,.7);g.add(pupil);
     });
+    /* 귀 — 뾰족 고양이 귀 */
     [-0.12,0.12].forEach(function(ex){
-      var ear=new THREE.Mesh(new THREE.ConeGeometry(.05,.12,4),panM);ear.position.set(ex,.9,.38);g.add(ear);
+      var earO=new THREE.Mesh(new THREE.ConeGeometry(.06,.16,4),panM);earO.position.set(ex,.94,.46);earO.rotation.z=ex>0?.2:-.2;g.add(earO);
+      var earI=new THREE.Mesh(new THREE.ConeGeometry(.03,.1,4),new THREE.MeshLambertMaterial({color:0x3a1a1a}));earI.position.set(ex,.94,.47);earI.rotation.z=ex>0?.2:-.2;g.add(earI);
     });
-    [[-0.15,.35],[-0.15,-.35],[.15,.35],[.15,-.35]].forEach(function(p){
-      var leg=new THREE.Mesh(new THREE.BoxGeometry(.1,.35,.1),panM);leg.position.set(p[0],.18,p[1]);g.add(leg);
+    /* 다리 — 4개, 상하 2분절 + 발톱 */
+    [[-0.16,.38,.45],[-0.16,-.38,.3],[.16,.38,.45],[.16,-.38,.3]].forEach(function(p){
+      var lx=p[0],lz=p[1],topY=p[2];
+      var thigh=new THREE.Mesh(new THREE.BoxGeometry(.11,.22,.11),panM);thigh.position.set(lx,topY-.1,lz);g.add(thigh);
+      var shin=new THREE.Mesh(new THREE.BoxGeometry(.09,.2,.09),panM);shin.position.set(lx,topY-.32,lz+(lz>0?.04:-.04));g.add(shin);
+      var paw=new THREE.Mesh(new THREE.BoxGeometry(.14,.07,.18),panM);paw.position.set(lx,topY-.46,lz+(lz>0?.08:-.08));g.add(paw);
     });
-    var tail2=new THREE.Mesh(new THREE.CylinderGeometry(.03,.02,.7,5),panM);
-    tail2.position.set(0,.55,-.62);tail2.rotation.x=.6;g.add(tail2);
+    /* 꼬리 — 3분절, 끝이 두꺼워짐 */
+    var tail2a=new THREE.Mesh(new THREE.CylinderGeometry(.04,.03,.35,5),panM);
+    tail2a.position.set(0,.56,-.55);tail2a.rotation.x=.5;g.add(tail2a);
+    var tail2b=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.32,5),panM);
+    tail2b.position.set(0,.64,-.82);tail2b.rotation.x=-.2;g.add(tail2b);
+    var tail2c=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),panM);
+    tail2c.position.set(0,.7,-.98);g.add(tail2c);
 
   } else if(def.id==='jungle_mosquito'){
-    /* 거대 모기 — 날개 달린 곤충 */
+    /* 거대 모기 — 흉부+복부 분리 + 4날개 + 6다리 분절 + 큰 겹눈 + 침 */
     var mqM=new THREE.MeshLambertMaterial({color:0x554400});
-    var mqWing=new THREE.MeshLambertMaterial({color:0xaaddff,transparent:true,opacity:.4});
-    var mqBody=new THREE.Mesh(new THREE.CylinderGeometry(.06,.12,.5,6),mqM);
-    mqBody.position.set(0,.8,0);mqBody.rotation.x=.3;g.add(mqBody);
-    var mqHead=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),mqM);mqHead.position.set(0,.95,.15);g.add(mqHead);
-    [-0.08,0.08].forEach(function(ex){
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),new THREE.MeshBasicMaterial({color:0xff0000}));
-      eye.position.set(ex,.98,.22);g.add(eye);
+    var mqDkM=new THREE.MeshLambertMaterial({color:0x332200});
+    var mqWing=new THREE.MeshLambertMaterial({color:0xbbddff,transparent:true,opacity:.35,side:THREE.DoubleSide});
+    var mqEyeM=new THREE.MeshBasicMaterial({color:0xcc0000});
+    /* 복부 — 분절된 원통형 */
+    var mqAb=new THREE.Mesh(new THREE.CylinderGeometry(.05,.13,.55,7),mqM);
+    mqAb.position.set(0,.78,-.18);mqAb.rotation.x=.4;g.add(mqAb);
+    var mqAb2=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),mqDkM);mqAb2.scale.set(1,.6,1);mqAb2.position.set(0,.72,-.46);g.add(mqAb2);
+    /* 복부 줄무늬 */
+    [0,1,2].forEach(function(i){
+      var band=new THREE.Mesh(new THREE.CylinderGeometry(.052,.052,.04,7),mqDkM);
+      band.position.set(0,.88-.12*i,-.1-.1*i);band.rotation.x=.4;g.add(band);
     });
-    /* 침 */
-    var needle=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.25,4),new THREE.MeshLambertMaterial({color:0x333333}));
-    needle.position.set(0,.92,.32);needle.rotation.x=Math.PI/2;g.add(needle);
-    /* 날개 */
+    /* 흉부 */
+    var mqThorax=new THREE.Mesh(new THREE.SphereGeometry(.13,7,7),mqM);mqThorax.scale.set(1,.8,1.2);mqThorax.position.set(0,.9,.08);g.add(mqThorax);
+    /* 머리 */
+    var mqHead=new THREE.Mesh(new THREE.SphereGeometry(.1,7,6),mqM);mqHead.position.set(0,1.0,.22);g.add(mqHead);
+    /* 겹눈 — 크고 붉은 복안 */
+    [-0.1,0.1].forEach(function(ex){
+      var compEye=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),mqEyeM);compEye.scale.set(1,.8,.7);compEye.position.set(ex,1.02,.3);g.add(compEye);
+    });
+    /* 침 — 긴 주둥이 */
+    var needle=new THREE.Mesh(new THREE.CylinderGeometry(.01,.005,.4,5),new THREE.MeshLambertMaterial({color:0x222222}));
+    needle.position.set(0,.96,.46);needle.rotation.x=Math.PI/2+.1;g.add(needle);
+    /* 더듬이 */
+    [-0.05,0.05].forEach(function(ax){
+      var ant=new THREE.Mesh(new THREE.CylinderGeometry(.006,.004,.22,4),mqDkM);ant.position.set(ax,1.1,.22);ant.rotation.z=ax>0?.4:-.4;g.add(ant);
+    });
+    /* 날개 — 앞뒤 2쌍 (4개), 가늘고 투명 */
     [-1,1].forEach(function(side){
-      var wing=new THREE.Mesh(new THREE.PlaneGeometry(.4,.2),mqWing);
-      wing.position.set(side*.25,.95,-.05);wing.rotation.y=side*.3;g.add(wing);
+      var fw=new THREE.Mesh(new THREE.PlaneGeometry(.52,.18),mqWing);
+      fw.position.set(side*.3,.97,.0);fw.rotation.y=side*-.25;fw.rotation.z=side*.05;g.add(fw);
+      var hw=new THREE.Mesh(new THREE.PlaneGeometry(.38,.14),mqWing);
+      hw.position.set(side*.26,.93,-.1);hw.rotation.y=side*-.3;hw.rotation.z=side*.08;g.add(hw);
     });
-    /* 다리 */
-    for(var li=0;li<3;li++){[-1,1].forEach(function(side){
-      var mleg=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,.35,3),mqM);
-      mleg.position.set(side*.1,.65+li*.08,-.02);mleg.rotation.z=side*.5;g.add(mleg);
-    });}
+    /* 다리 — 6개, 상하 2분절 */
+    [0,1,2].forEach(function(li){[-1,1].forEach(function(side){
+      var lox=side*.12;var loz=.06-li*.08;
+      var upper=new THREE.Mesh(new THREE.CylinderGeometry(.012,.01,.22,4),mqM);
+      upper.position.set(lox+side*.1,.86-.02*li,loz);upper.rotation.z=side*.6+side*li*.1;g.add(upper);
+      var lower=new THREE.Mesh(new THREE.CylinderGeometry(.009,.007,.28,4),mqDkM);
+      lower.position.set(lox+side*.22,.66-.02*li,loz-.04);lower.rotation.z=side*(.3+li*.08);lower.rotation.x=.3;g.add(lower);
+    });});
 
   } else if(def.id==='jungle_treant'){
-    /* 나무 정령 — 나무 형태 */
+    /* 나무 정령 — 뒤틀린 몸통 + 가지 팔 손가락 + 잎 군집 + 뿌리 다리 */
+    /* 총: 몸통(2)+옹이(1)+팔(4x2=8)+손가락잎(2x2=4)+잎머리(3)+눈(4)+뿌리(4) = 26 */
     var trunkM=new THREE.MeshLambertMaterial({color:0x3a2a10});
+    var trunkDkM=new THREE.MeshLambertMaterial({color:0x2a1a08}); /* 어두운 나무 결 */
     var leafM=new THREE.MeshLambertMaterial({color:0x1a6622});
+    var leafLtM=new THREE.MeshLambertMaterial({color:0x2a8833});
     var eyeGM=new THREE.MeshBasicMaterial({color:0x88ff44});
-    var trunk2=new THREE.Mesh(new THREE.CylinderGeometry(.25,.35,1.4,8),trunkM);trunk2.position.set(0,.7,0);g.add(trunk2);
-    /* 가지 팔 */
+    /* 몸통 — 원통 */
+    var trunk2=new THREE.Mesh(new THREE.CylinderGeometry(.24,.36,1.45,9),trunkM);trunk2.position.set(0,.72,0);g.add(trunk2);
+    /* 옹이 — 둥근 혹 */
+    var knot=new THREE.Mesh(new THREE.SphereGeometry(.1,6,5),trunkDkM);knot.position.set(.2,.9,.3);knot.scale.z=.5;g.add(knot);
+    /* 나무결 장식 */
+    var grain=new THREE.Mesh(new THREE.BoxGeometry(.04,.9,.04),trunkDkM);grain.position.set(-.1,.72,.3);g.add(grain);
+    /* 가지 팔 — 위아래 2분절 + 손가락+잎 */
     [-1,1].forEach(function(side){
-      var arm2=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.8,5),trunkM);
-      arm2.position.set(side*.45,1.1,0);arm2.rotation.z=side*.6;g.add(arm2);
-      var fingers=new THREE.Mesh(new THREE.SphereGeometry(.12,5,5),trunkM);
-      fingers.position.set(side*.85,.9,0);g.add(fingers);
+      /* 상완 */
+      var armUp=new THREE.Mesh(new THREE.CylinderGeometry(.07,.1,.55,6),trunkM);
+      armUp.position.set(side*.42,1.22,0);armUp.rotation.z=side*.5;g.add(armUp);
+      /* 팔꿈치 혹 */
+      var elbK=new THREE.Mesh(new THREE.SphereGeometry(.08,5,5),trunkDkM);elbK.position.set(side*.66,1.03,0);g.add(elbK);
+      /* 하완 */
+      var armLo=new THREE.Mesh(new THREE.CylinderGeometry(.05,.07,.42,6),trunkM);
+      armLo.position.set(side*.84,.88,0);armLo.rotation.z=side*.3;g.add(armLo);
+      /* 손가락 가지 — 하나의 분기 구체 */
+      var fingers=new THREE.Mesh(new THREE.SphereGeometry(.1,5,5),trunkDkM);
+      fingers.position.set(side*1.0,.74,0);g.add(fingers);
+      /* 팔끝 잎 */
+      var armLeaf=new THREE.Mesh(new THREE.SphereGeometry(.16,5,5),leafM);armLeaf.scale.set(1.3,.6,1);
+      armLeaf.position.set(side*1.0,.82,0);g.add(armLeaf);
     });
-    /* 잎 머리 */
-    var crown=new THREE.Mesh(new THREE.SphereGeometry(.5,8,6),leafM);crown.position.set(0,1.7,0);crown.scale.y=.7;g.add(crown);
-    var crown2=new THREE.Mesh(new THREE.SphereGeometry(.35,6,5),new THREE.MeshLambertMaterial({color:0x228833}));
-    crown2.position.set(.15,2.0,.1);crown2.scale.y=.6;g.add(crown2);
+    /* 잎 머리 — 3겹 구 */
+    var crown=new THREE.Mesh(new THREE.SphereGeometry(.52,8,6),leafM);crown.position.set(0,1.75,0);crown.scale.y=.72;g.add(crown);
+    var crown2=new THREE.Mesh(new THREE.SphereGeometry(.36,7,5),leafLtM);crown2.position.set(.16,2.06,.1);crown2.scale.y=.62;g.add(crown2);
+    var crown3=new THREE.Mesh(new THREE.SphereGeometry(.28,6,5),leafM);crown3.position.set(-.12,2.0,-.1);crown3.scale.y=.55;g.add(crown3);
     /* 눈 — 나무 구멍에서 빛나는 */
     [-0.1,0.1].forEach(function(ex){
-      var hole=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),new THREE.MeshBasicMaterial({color:0x111100}));
-      hole.position.set(ex,1.2,.26);g.add(hole);
-      var glow=new THREE.Mesh(new THREE.SphereGeometry(.04,5,5),eyeGM);
-      glow.position.set(ex,1.2,.28);g.add(glow);
+      var hole=new THREE.Mesh(new THREE.SphereGeometry(.07,5,5),new THREE.MeshBasicMaterial({color:0x0a0800}));
+      hole.position.set(ex,1.22,.28);g.add(hole);
+      var glow=new THREE.Mesh(new THREE.SphereGeometry(.05,5,5),eyeGM);
+      glow.position.set(ex,1.22,.3);g.add(glow);
     });
-    /* 뿌리 다리 */
-    [-0.15,0,0.15].forEach(function(rx){
-      var root=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.3,5),trunkM);
-      root.position.set(rx,.1,rx===0?-.1:0);g.add(root);
+    /* 뿌리 다리 — 4개 */
+    [[-0.2,-.1],[.2,-.1],[-.1,.18],[.1,.18]].forEach(function(rp){
+      var root=new THREE.Mesh(new THREE.CylinderGeometry(.055,.09,.3,5),trunkM);
+      root.position.set(rp[0],.14,rp[1]);root.rotation.z=rp[0]*1.5;root.rotation.x=rp[1]*1.5;g.add(root);
     });
 
   } else if(def.id==='elite_stag'){
