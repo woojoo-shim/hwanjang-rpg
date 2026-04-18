@@ -1308,6 +1308,11 @@ function buildGroundPlanes(){
   /* 보스 (S center): x:-80~80, z:500~600 */
   makeDisplacedGround(180,120,12,8,0x1a0808, 0,0.015,550);
 
+  /* 중앙 교차로 & 존 사이 간격 커버 — 섬 전체 바닥 */
+  var centralMat=new THREE.MeshLambertMaterial({color:0x4a8030});
+  var centralGnd=new THREE.Mesh(new THREE.PlaneGeometry(1400,1400),centralMat);
+  centralGnd.rotation.x=-Math.PI/2;centralGnd.position.set(0,0,50);centralGnd.receiveShadow=true;scene.add(centralGnd);
+
   /* 바다 밑 커버 (깊은 곳, 겹침 없음) */
   var deepGnd=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshLambertMaterial({color:0x1a3a0a}));
   deepGnd.rotation.x=-Math.PI/2;deepGnd.position.set(0,-1,50);scene.add(deepGnd);
