@@ -128,7 +128,7 @@ function mkMonsterMesh(def){
     var belly=new THREE.Mesh(new THREE.SphereGeometry(.22,8,8),bellyM);
     belly.scale.set(1,.7,1);belly.position.set(0,.38,.22);g.add(belly);
     var head=new THREE.Mesh(new THREE.SphereGeometry(.26,8,8),bodyM);
-    head.position.set(0,.82,.12);g.add(head);
+    head.position.set(0,.82,.12);head._isHead=true;g.add(head);
     var nose=new THREE.Mesh(new THREE.SphereGeometry(.05,6,6),bellyM);
     nose.position.set(0,.82,.36);g.add(nose);
     [-0.1,0.1].forEach(function(ex){
@@ -139,7 +139,7 @@ function mkMonsterMesh(def){
     var earInM=new THREE.MeshLambertMaterial({color:0xffaaaa});
     [-0.1,0.1].forEach(function(ex){
       var earOut=new THREE.Mesh(new THREE.BoxGeometry(.1,.5,.06),earM);
-      earOut.position.set(ex,1.28,.06);g.add(earOut);
+      earOut.position.set(ex,1.28,.06);earOut._isEar=true;earOut._earSide=(ex>0?0:Math.PI);g.add(earOut);
       var earIn=new THREE.Mesh(new THREE.BoxGeometry(.06,.36,.04),earInM);
       earIn.position.set(ex,1.28,.07);g.add(earIn);
     });
@@ -168,7 +168,7 @@ function mkMonsterMesh(def){
     var neck=new THREE.Mesh(new THREE.BoxGeometry(.22,.4,.22),bodyM);
     neck.position.set(0,1.18,.3);neck.rotation.x=-.35;g.add(neck);
     var head=new THREE.Mesh(new THREE.BoxGeometry(.32,.3,.38),bodyM);
-    head.position.set(0,1.42,.52);g.add(head);
+    head.position.set(0,1.42,.52);head._isHead=true;g.add(head);
     var snout=new THREE.Mesh(new THREE.BoxGeometry(.2,.2,.24),bellyM);
     snout.position.set(0,1.36,.7);g.add(snout);
     [-0.12,0.12].forEach(function(ex){
@@ -229,7 +229,7 @@ function mkMonsterMesh(def){
     var body=new THREE.Mesh(new THREE.BoxGeometry(.5,.7,.32),clothM);
     body.position.set(0,.68,0);g.add(body);
     var head=new THREE.Mesh(new THREE.BoxGeometry(.48,.44,.44),skinM);
-    head.position.set(0,1.26,0);g.add(head);
+    head.position.set(0,1.26,0);head._isHead=true;g.add(head);
     var nose=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),darkM);
     nose.scale.set(1.2,.8,1.4);nose.position.set(0,1.24,.24);g.add(nose);
     [-0.13,0.13].forEach(function(ex){
@@ -301,14 +301,14 @@ function mkMonsterMesh(def){
     var body=new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.9),furM);body.position.set(0,.7,0);g.add(body);
     var belly=new THREE.Mesh(new THREE.BoxGeometry(.3,.28,.65),bellyM);belly.position.set(0,.6,.05);g.add(belly);
     var neck=new THREE.Mesh(new THREE.BoxGeometry(.24,.32,.3),furM);neck.position.set(0,.98,.4);neck.rotation.x=-.2;g.add(neck);
-    var head=new THREE.Mesh(new THREE.BoxGeometry(.36,.32,.3),furM);head.position.set(0,1.15,.62);g.add(head);
+    var head=new THREE.Mesh(new THREE.BoxGeometry(.36,.32,.3),furM);head.position.set(0,1.15,.62);head._isHead=true;g.add(head);
     var snout=new THREE.Mesh(new THREE.BoxGeometry(.22,.2,.38),darkM);snout.position.set(0,1.06,.86);g.add(snout);
     [-0.13,0.13].forEach(function(ex){
       var eye=new THREE.Mesh(new THREE.SphereGeometry(.06,6,6),eyeM);eye.position.set(ex,1.24,.72);g.add(eye);
     });
     [-0.14,0.14].forEach(function(ex){
       var ear=new THREE.Mesh(new THREE.ConeGeometry(.08,.2,4),furM);
-      ear.position.set(ex,1.4,.54);ear.rotation.z=ex>0?.2:-.2;g.add(ear);
+      ear.position.set(ex,1.4,.54);ear.rotation.z=ex>0?.2:-.2;ear._isEar=true;ear._earSide=(ex>0?0:Math.PI);g.add(ear);
     });
     [-0.06,0.06].forEach(function(tx){
       var fang=new THREE.Mesh(new THREE.ConeGeometry(.03,.1,4),fangM);
@@ -320,7 +320,7 @@ function mkMonsterMesh(def){
       var paw=new THREE.Mesh(new THREE.BoxGeometry(.18,.1,.22),darkM);paw.position.set(lx,.02,lz+.06);g.add(paw);
     });
     var tail=new THREE.Mesh(new THREE.CylinderGeometry(.05,.08,.6,6),furM);
-    tail.position.set(0,.92,-.52);tail.rotation.x=.8;g.add(tail);
+    tail.position.set(0,.92,-.52);tail.rotation.x=.8;tail._isTail=true;g.add(tail);
 
   } else if(def.id==='golem'){
     var rockM=new THREE.MeshLambertMaterial({color:0x443322});
@@ -403,12 +403,16 @@ function mkMonsterMesh(def){
       var ey2=new THREE.Mesh(new THREE.SphereGeometry(.03,4,4),spEye);ey2.position.set(ex,.54,.48);g.add(ey2);
     });
     /* 8다리 — 상하 2분절 무릎 각도 */
+    var _spLegIdx=0;
     [0,1,2,3].forEach(function(si){[-1,1].forEach(function(side){
       var ox=side*(.2+si*.05);var oz=.12-si*.13;var oy=.5;
       var legU=new THREE.Mesh(new THREE.CylinderGeometry(.025,.018,.42,4),spBody);
-      legU.position.set(ox+side*.14,oy-.05,oz);legU.rotation.z=side*(.5+si*.12);legU.rotation.x=(-0.5+si*.18);g.add(legU);
+      legU.position.set(ox+side*.14,oy-.05,oz);legU.rotation.z=side*(.5+si*.12);legU.rotation.x=(-0.5+si*.18);
+      legU._isSpiderLeg=_spLegIdx;g.add(legU);
       var legL=new THREE.Mesh(new THREE.CylinderGeometry(.016,.01,.4,4),spBody);
-      legL.position.set(ox+side*.34,oy-.28,oz+.12);legL.rotation.z=side*(.15+si*.04);legL.rotation.x=.55;g.add(legL);
+      legL.position.set(ox+side*.34,oy-.28,oz+.12);legL.rotation.z=side*(.15+si*.04);legL.rotation.x=.55;
+      legL._isSpiderLeg=_spLegIdx;g.add(legL);
+      _spLegIdx++;
     });});
     /* 독니 협각 */
     [-0.07,0.07].forEach(function(fx){
@@ -536,11 +540,11 @@ function mkMonsterMesh(def){
     });
     /* 꼬리 — 3분절, 끝이 두꺼워짐 */
     var tail2a=new THREE.Mesh(new THREE.CylinderGeometry(.04,.03,.35,5),panM);
-    tail2a.position.set(0,.56,-.55);tail2a.rotation.x=.5;g.add(tail2a);
+    tail2a.position.set(0,.56,-.55);tail2a.rotation.x=.5;tail2a._isTail=true;g.add(tail2a);
     var tail2b=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.32,5),panM);
-    tail2b.position.set(0,.64,-.82);tail2b.rotation.x=-.2;g.add(tail2b);
+    tail2b.position.set(0,.64,-.82);tail2b.rotation.x=-.2;tail2b._isTail=true;g.add(tail2b);
     var tail2c=new THREE.Mesh(new THREE.SphereGeometry(.06,5,5),panM);
-    tail2c.position.set(0,.7,-.98);g.add(tail2c);
+    tail2c.position.set(0,.7,-.98);tail2c._isTail=true;g.add(tail2c);
 
   } else if(def.id==='jungle_mosquito'){
     /* 거대 모기 — 흉부+복부 분리 + 4날개 + 6다리 분절 + 큰 겹눈 + 침 */
@@ -648,7 +652,7 @@ function mkMonsterMesh(def){
     var belly=new THREE.Mesh(new THREE.BoxGeometry(.5,.35,.85),whiteM);belly.position.set(0,.76,.05);g.add(belly);
     /* 목+머리 */
     var neck=new THREE.Mesh(new THREE.BoxGeometry(.28,.5,.28),goldM);neck.position.set(0,1.3,.35);neck.rotation.x=-.3;g.add(neck);
-    var head=new THREE.Mesh(new THREE.BoxGeometry(.4,.35,.45),goldM);head.position.set(0,1.55,.55);g.add(head);
+    var head=new THREE.Mesh(new THREE.BoxGeometry(.4,.35,.45),goldM);head.position.set(0,1.55,.55);head._isHead=true;g.add(head);
     var snout=new THREE.Mesh(new THREE.BoxGeometry(.24,.22,.28),whiteM);snout.position.set(0,1.48,.78);g.add(snout);
     /* 눈 — 불타는 눈 */
     [-0.14,0.14].forEach(function(ex){
@@ -750,7 +754,7 @@ function mkMonsterMesh(def){
     /* 목 */
     var neck=new THREE.Mesh(new THREE.BoxGeometry(.3,.35,.3),furM);neck.position.set(0,1,.35);neck.rotation.x=-.2;g.add(neck);
     /* 머리 — 날카로운 */
-    var head=new THREE.Mesh(new THREE.BoxGeometry(.38,.3,.5),furM);head.position.set(0,1.2,.55);g.add(head);
+    var head=new THREE.Mesh(new THREE.BoxGeometry(.38,.3,.5),furM);head.position.set(0,1.2,.55);head._isHead=true;g.add(head);
     var snout=new THREE.Mesh(new THREE.BoxGeometry(.2,.18,.35),furM);snout.position.set(0,1.12,.82);g.add(snout);
     /* 이빨 */
     [-0.06,0.06].forEach(function(tx){
@@ -764,7 +768,7 @@ function mkMonsterMesh(def){
     /* 귀 — 뾰족 */
     [-0.14,0.14].forEach(function(ex){
       var ear=new THREE.Mesh(new THREE.ConeGeometry(.06,.2,4),furM);
-      ear.position.set(ex,1.48,.45);g.add(ear);
+      ear.position.set(ex,1.48,.45);ear._isEar=true;ear._earSide=(ex>0?0:Math.PI);g.add(ear);
     });
     /* 다리 — 4개, 날카로운 발톱 */
     [[-0.2,.3],[-0.2,-.35],[.2,.3],[.2,-.35]].forEach(function(p){
@@ -776,7 +780,7 @@ function mkMonsterMesh(def){
       });
     });
     /* 꼬리 — 거대한 */
-    var tail=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.5),furM);tail.position.set(0,.75,-.7);tail.rotation.x=.3;g.add(tail);
+    var tail=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.5),furM);tail.position.set(0,.75,-.7);tail.rotation.x=.3;tail._isTail=true;g.add(tail);
     /* 흉터 */
     var scarM=new THREE.MeshBasicMaterial({color:0x660000});
     var scar=new THREE.Mesh(new THREE.BoxGeometry(.02,.2,.02),scarM);scar.position.set(-.1,1.25,.76);scar.rotation.z=.3;g.add(scar);
@@ -2179,14 +2183,46 @@ function updateMonsterAnims(dt){
       var swaAmp=(id==='golem')?0.008:0.015;
       m.mesh.position.y=m.baseY+Math.sin(m.animTime*idleFreq*2+m.bobOff)*idleAmp;
       m.mesh.rotation.z=Math.sin(m.animTime*swaFreq+m.bobOff)*swaAmp;
-      /* 슬라임: 스케일 박동 */
+      /* 슬라임: 강한 스케일 박동 */
       if(id==='slime'||id==='toad'){
-        var pulse=1+Math.sin(m.animTime*2.5+m.bobOff)*0.04;
+        var pulse=1+Math.sin(m.animTime*2.5+m.bobOff)*0.055;
         m.mesh.scale.set(pulse,1/pulse,pulse);
       } else if(id!=='golem'){
-        /* 숨쉬기 스케일 */
-        var breath=1+Math.sin(m.animTime*1.4+m.bobOff)*0.02;
+        /* 숨쉬기 스케일: 가슴 위아래 */
+        var breath=1+Math.sin(m.animTime*1.4+m.bobOff)*0.025;
         if(!m.def.elite)m.mesh.scale.set(breath,breath,breath);
+      }
+      /* ── 꼬리 흔들기: 늑대/표범/엘리트 늑대 ── */
+      if(id==='wolf'||id==='elite_wolf'){
+        m.mesh.traverse(function(c){
+          if(c._isTail){
+            c.rotation.x=0.8+Math.sin(m.animTime*2.5+m.bobOff)*0.28;
+            c.rotation.z=Math.sin(m.animTime*1.8+m.bobOff)*0.15;
+          }
+        });
+      }else if(id==='jungle_panther'){
+        var ptSwish=Math.sin(m.animTime*2.2+m.bobOff);
+        m.mesh.traverse(function(c){
+          if(c._isTail){
+            /* 표범 꼬리: 기존 rotation.x 유지 + Z 흔들기 */
+            c.rotation.z=ptSwish*0.22;
+          }
+        });
+      }
+      /* ── 귀 씰룩: 토끼/늑대 ── */
+      if(id==='rabbit'||id==='wolf'||id==='elite_wolf'){
+        m.mesh.traverse(function(c){
+          if(c._isEar){
+            c.rotation.z+=Math.sin(m.animTime*3.5+m.bobOff+c._earSide)*0.04;
+          }
+        });
+      }
+      /* ── 가끔 고개 돌리기 (alert 몬스터) ── */
+      if(id==='goblin'||id==='wolf'||id==='deer'||id==='rabbit'||id==='jungle_panther'||id==='elite_stag'){
+        var headTurn=Math.sin(m.animTime*0.3+m.bobOff)*0.18;
+        m.mesh.traverse(function(c){
+          if(c._isHead){c.rotation.y=headTurn;}
+        });
       }
     }
     /* 엘리트 파티클 회전 + 오라 펄스 */
@@ -2209,25 +2245,78 @@ function updateMonsterAnims(dt){
 
     /* ── 6. 이동(추적) 애니메이션 ── */
     if(m.state==='aggro'){
-      /* 슬라임/두꺼비: 통통 튀기 */
+      /* 슬라임/두꺼비: 통통 튀기 + 스쿼시-스트레치 */
       if(id==='slime'||id==='toad'){
-        var bFreq=6.5,bAmp=0.12;
+        var bFreq=6.5,bAmp=0.15;
         var by=Math.max(0,Math.sin(m.animTime*bFreq+m.bobOff))*bAmp;
         m.mesh.position.y=m.baseY+by;
-        var sqBounce=1-by*0.5;
-        m.mesh.scale.set(1+by*0.3,sqBounce,1+by*0.3);
-      } else {
-        /* 기타 몬스터: 위아래 바운스 */
-        var wFreq=(id==='golem')?3.5:5.5;
-        var wAmp=(id==='golem')?0.06:0.08;
-        m.mesh.position.y=m.baseY+Math.abs(Math.sin(m.animTime*wFreq+m.bobOff))*wAmp;
-        /* 이동 방향으로 몸통 기울기 */
-        var leanAmt=(id==='golem')?0.05:0.1;
-        m.mesh.rotation.x=Math.sin(m.animTime*wFreq+m.bobOff)*leanAmt;
-        /* 불 드레이크/파이어드레이크: 날개 퍼덕임 */
-        if(id==='firedrake'){
-          m.mesh.rotation.z=Math.sin(m.animTime*8+m.bobOff)*0.08;
+        /* 착지 순간 납작해지고, 공중에서 세로로 늘어남 */
+        var airFrac=by/bAmp;
+        var sqX=1+by*0.35-airFrac*0.08;
+        var sqY=Math.max(0.55,1-by*0.6+airFrac*0.12);
+        if(m.spawnAnim<=0&&m.hitFlash<=0)m.mesh.scale.set(sqX,sqY,sqX);
+
+      /* 거대 거미: 8다리 웨이브 패턴 (leg 메시가 많아서 인덱스로) */
+      } else if(id==='jungle_spider'){
+        var wFreq=7.0;
+        var by2=Math.abs(Math.sin(m.animTime*wFreq+m.bobOff))*0.05;
+        m.mesh.position.y=m.baseY+by2;
+        /* 다리 메시들에 웨이브 적용 */
+        var legIdx=0;
+        m.mesh.traverse(function(c){
+          if(c._isSpiderLeg!==undefined){
+            var phase=m.animTime*wFreq+c._isSpiderLeg*0.55+m.bobOff;
+            c.rotation.x+=Math.sin(phase)*0.22;
+            legIdx++;
+          }
+        });
+
+      /* 4족 보행 (늑대/사슴/표범/원숭이/드레이크): 대각선 보행 */
+      } else if(id==='wolf'||id==='deer'||id==='jungle_panther'||id==='jungle_ape'||
+                id==='firedrake'||id==='elite_stag'||id==='elite_wolf'||id==='elite_ape'){
+        var gFreq=(id==='jungle_panther'||id==='elite_wolf')?8.5:6.5;
+        var gAmp=(id==='jungle_ape'||id==='elite_ape')?0.1:0.07;
+        var sinG=Math.sin(m.animTime*gFreq+m.bobOff);
+        /* 몸통 위아래 바운스 — 대각선 쌍에 맞춰 이중 주파수 */
+        m.mesh.position.y=m.baseY+Math.abs(sinG)*gAmp;
+        /* 몸통 롤(좌우 기울기): 대각선 걸음걸이 느낌 */
+        m.mesh.rotation.z=sinG*0.04;
+        /* 전진 방향 기울기 */
+        m.mesh.rotation.x=Math.abs(sinG)*(-0.08);
+        /* 꼬리 흔들기 (이동 중) */
+        if(id==='wolf'||id==='elite_wolf'){
+          m.mesh.traverse(function(c){
+            if(c._isTail){
+              c.rotation.x=0.8+Math.sin(m.animTime*gFreq*0.8+m.bobOff)*0.35;
+              c.rotation.z=sinG*0.2;
+            }
+          });
+        }else if(id==='jungle_panther'){
+          var ptGSin=Math.sin(m.animTime*gFreq*0.7+m.bobOff);
+          m.mesh.traverse(function(c){
+            if(c._isTail){c.rotation.z=ptGSin*0.3;}
+          });
         }
+        /* 드레이크: 날개 퍼덕임 */
+        if(id==='firedrake'){
+          m.mesh.rotation.z+=Math.sin(m.animTime*8+m.bobOff)*0.08;
+        }
+
+      /* 2족 보행 (고블린/골렘): 인간형 걸음 */
+      } else if(id==='goblin'||id==='golem'){
+        var wFreq2=(id==='golem')?3.5:6.0;
+        var wAmp2=(id==='golem')?0.06:0.07;
+        var sinW=Math.sin(m.animTime*wFreq2+m.bobOff);
+        m.mesh.position.y=m.baseY+Math.abs(sinW)*wAmp2;
+        /* 상체 좌우 스웨이 */
+        m.mesh.rotation.z=sinW*0.06;
+        m.mesh.rotation.x=Math.abs(sinW)*(-0.06);
+
+      /* 기타 몬스터: 기본 바운스 */
+      } else {
+        var wFreq3=5.5,wAmp3=0.08;
+        m.mesh.position.y=m.baseY+Math.abs(Math.sin(m.animTime*wFreq3+m.bobOff))*wAmp3;
+        m.mesh.rotation.x=Math.sin(m.animTime*wFreq3+m.bobOff)*0.1;
       }
     }
   });

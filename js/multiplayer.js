@@ -495,17 +495,47 @@ function updateRemotePlayers(dt){
 
     var baseY=(r.ty!==undefined?r.ty:0);
     r.group.position.y+=(baseY-r.group.position.y)*0.25;
+
+    /* 이동 상태별 애니메이션 — 로컬 플레이어와 동일한 품질 */
     if(r.moving){
-      r.bobT+=dt*9;
+      r.bobT=(r.bobT||0)+dt*9;
+      if(!r._hipSwayT)r._hipSwayT=0;r._hipSwayT+=dt*9;
       var wa=0.32;
-      r.legL.rotation.x=Math.sin(r.bobT)*wa;
-      r.legR.rotation.x=-Math.sin(r.bobT)*wa;
-      r.armL.rotation.x=-Math.sin(r.bobT)*wa*0.5;
-      if(r.atkPhase===0)r.armRPivot.rotation.x=Math.sin(r.bobT)*wa*0.5;
+      var sinB=Math.sin(r.bobT);
+      var armAmp=wa*0.65;
+      r.legL.rotation.x=sinB*wa;
+      r.legR.rotation.x=-sinB*wa;
+      /* 팔: 다리 반대 방향 스윙 */
+      r.armL.rotation.x=sinB*armAmp;
+      r.armL.rotation.z=-Math.cos(r.bobT)*0.04;
+      if(r.atkPhase===0){
+        r.armRPivot.rotation.x=-sinB*armAmp;
+        r.armRPivot.rotation.z=Math.cos(r.bobT)*0.04;
+      }
+      /* 힙 스웨이 */
+      if(r.body)r.body.rotation.z=Math.sin(r._hipSwayT*0.5)*0.025;
+      /* 아이들 타이머 리셋 */
+      r._idleTimer=0;r._breathT=r._breathT||0;
     }else{
+      /* 부드러운 귀환 */
       r.legL.rotation.x*=0.8;r.legR.rotation.x*=0.8;
-      r.armL.rotation.x*=0.8;
-      if(r.atkPhase===0)r.armRPivot.rotation.x*=0.8;
+      r.armL.rotation.x*=0.8;r.armL.rotation.z*=0.85;
+      if(r.atkPhase===0){r.armRPivot.rotation.x*=0.8;r.armRPivot.rotation.z*=0.85;}
+      /* 호흡 애니메이션 */
+      if(!r._breathT)r._breathT=0;r._breathT+=dt;
+      if(!r._idleTimer)r._idleTimer=0;r._idleTimer+=dt;
+      if(r.body){
+        var rBreath=1+Math.sin(r._breathT*1.5)*0.012;
+        r.body.scale.y=rBreath;r.body.scale.x=1-Math.sin(r._breathT*1.5)*0.006;
+        r.body.rotation.z=Math.sin(r._breathT*0.6)*0.008;
+      }
+      /* 눈 깜빡임 */
+      if(!r._blinkTimer)r._blinkTimer=2+Math.random()*2;
+      if(!r._blinkOpen)r._blinkOpen=1;
+      r._blinkTimer-=dt;
+      if(r._blinkTimer<=0){r._blinkTimer=2.5+Math.random()*2.5;r._blinkOpen=0.15;}
+      else if(r._blinkOpen<1){r._blinkOpen=Math.min(1,r._blinkOpen+dt*12);}
+      if(r.head)r.head.scale.y=r._blinkOpen;
     }
 
     if(r.atkPhase>0){

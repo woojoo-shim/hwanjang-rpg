@@ -5,7 +5,19 @@
    선언: PL, playerHP, playerMaxHP, playerEXP, playerLevel, attackCooldown, invincibleTimer
    참조: monsters (monster.js), scene (world.js), keys/cYaw (main.js) — 런타임 참조 */
 
-var PL={group:null,legL:null,legR:null,armL:null,armR:null,armRPivot:null,weaponMesh:null,bobT:0,atkAnim:0,atkPhase:0};
+var PL={group:null,legL:null,legR:null,armL:null,armR:null,armRPivot:null,weaponMesh:null,bobT:0,atkAnim:0,atkPhase:0,head:null,body:null,bodyMat:null};
+
+/* ── 이동/아이들 애니메이션 상태 ── */
+var _idleTimer=0;          /* 가만히 있은 시간 */
+var _prevYaw=0;            /* 이전 프레임 회전 — 방향 변화 감지 */
+var _turnVel=0;            /* 방향 전환 속도 — 몸통 기울기 */
+var _blinkTimer=3;         /* 눈 깜빡임 타이머 */
+var _blinkOpen=1;          /* 눈 열림 상태 (scale.y) */
+var _longIdleT=0;          /* 장시간 아이들 타이머 */
+var _longIdlePhase=0;      /* 장시간 아이들 단계 */
+var _breathT=0;            /* 호흡 타이머 (아이들) */
+var _hipSwayT=0;           /* 힙 스웨이 타이머 */
+var _footPlant=0;          /* 발 착지 이전 Y — 발 착지감 */
 var playerHP=100,playerMaxHP=100,playerEXP=0,playerLevel=1;
 var attackCooldown=0,invincibleTimer=0;
 
@@ -1221,22 +1233,107 @@ function handleMove(dt){
       if(_exN*_exN+_ezN*_ezN<1&&!hitCollider(nx,PL.group.position.z))PL.group.position.x=nx;
       if(_exC*_exC+_ezZ*_ezZ<1&&!hitCollider(PL.group.position.x,nz))PL.group.position.z=nz;
     }
-    PL.group.rotation.y=Math.atan2(dx,dz);PL.bobT+=dt*9;
-    var wa=.32;
-    PL.legL.rotation.x=Math.sin(PL.bobT)*wa;
-    PL.legR.rotation.x=-Math.sin(PL.bobT)*wa;
-    PL.armL.rotation.x=-Math.sin(PL.bobT)*wa*.5;
-    if(PL.atkPhase===0)PL.armRPivot.rotation.x=Math.sin(PL.bobT)*wa*.5;
+    var newYaw=Math.atan2(dx,dz);
+    PL.group.rotation.y=newYaw;
+    /* 방향 전환 속도 계산 — 각도 델타 누적 */
+    var yawDelta=newYaw-_prevYaw;
+    if(yawDelta>Math.PI)yawDelta-=Math.PI*2;
+    if(yawDelta<-Math.PI)yawDelta+=Math.PI*2;
+    _turnVel=_turnVel*0.7+yawDelta*0.3/Math.max(dt,0.001);
+    _prevYaw=newYaw;
+    _idleTimer=0;_longIdleT=0;_longIdlePhase=0;
+    var isSprint=(playerLevel>=5&&keys['shift']&&!_inWater);
+    var walkSpeed=isSprint?12:9;
+    PL.bobT+=dt*walkSpeed;
+    _hipSwayT+=dt*walkSpeed;
+    var wa=isSprint?0.44:0.32;
+    var sinB=Math.sin(PL.bobT);
+    /* 다리: 정상 보행 */
+    PL.legL.rotation.x=sinB*wa;
+    PL.legR.rotation.x=-sinB*wa;
+    /* 팔: 다리 반대 방향 스윙 (더 자연스러운 진자) */
+    var armAmp=wa*0.65;
+    PL.armL.rotation.x=sinB*armAmp;    /* 오른 다리와 동위상 */
+    if(PL.atkPhase===0)PL.armRPivot.rotation.x=-sinB*armAmp; /* 왼 다리와 동위상 */
+    /* 어깨(armRPivot) Z 방향 미세 움직임 */
+    if(PL.atkPhase===0)PL.armRPivot.rotation.z=Math.cos(PL.bobT)*0.04;
+    PL.armL.rotation.z=-Math.cos(PL.bobT)*0.04;
+    /* 힙 스웨이: 몸통 Z 기울기 */
+    if(PL.body)PL.body.rotation.z=Math.sin(_hipSwayT*0.5)*0.025;
+    /* 방향 전환 시 몸통 기울기 */
+    var tiltClamp=Math.max(-0.12,Math.min(0.12,_turnVel*0.02));
+    if(PL.body)PL.body.rotation.z+=tiltClamp;
+    /* 머리 bob: 위아래 약간 + 진행 방향으로 살짝 앞으로 기울기 */
+    if(PL.head){
+      PL.head.rotation.x=Math.abs(sinB)*(-0.04);
+      PL.head.rotation.z=-tiltClamp*0.5;
+      /* 눈 깜빡임 리셋 */
+      PL.head.scale.y=_blinkOpen;
+    }
     if(!_inWater&&!(typeof insideBuilding!=='undefined'&&insideBuilding)){
       var _ty=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
-      PL.group.position.y=_ty+Math.abs(Math.sin(PL.bobT))*.06;
+      /* 발 착지 Y 딥: 발이 바닥에 닿는 순간 약간 낮아짐 */
+      var footPhase=Math.abs(sinB);
+      var plantDip=footPhase<0.15?(0.015*(1-footPhase/0.15)):0;
+      PL.group.position.y=_ty+Math.abs(sinB)*0.055-plantDip;
     }
   }else{
-    PL.legL.rotation.x*=.8;PL.legR.rotation.x*=.8;PL.armL.rotation.x*=.8;
-    if(PL.atkPhase===0)PL.armRPivot.rotation.x*=.8;
+    /* ── 아이들 상태 ── */
+    _idleTimer+=dt;
+    _turnVel*=0.85;
+    /* 다리/팔 부드럽게 귀환 */
+    PL.legL.rotation.x*=0.8;PL.legR.rotation.x*=0.8;
+    PL.armL.rotation.x*=0.8;PL.armL.rotation.z*=0.85;
+    if(PL.atkPhase===0){PL.armRPivot.rotation.x*=0.8;PL.armRPivot.rotation.z*=0.85;}
+    /* 호흡 애니메이션 (body scale.y 미세 맥동) */
+    _breathT+=dt;
+    if(PL.body){
+      var breathAmp=0.012;
+      PL.body.scale.y=1+Math.sin(_breathT*1.5)*breathAmp;
+      PL.body.scale.x=1-Math.sin(_breathT*1.5)*breathAmp*0.5;
+      /* 몸통 좌우 스웨이 */
+      PL.body.rotation.z=Math.sin(_breathT*0.6)*0.008;
+    }
+    /* 머리 아이들 */
+    if(PL.head){
+      PL.head.rotation.x=Math.sin(_breathT*1.5)*0.012;
+      PL.head.rotation.z*=0.9;
+    }
+    /* 눈 깜빡임: 평균 3초에 한번, 0.1초 동안 */
+    _blinkTimer-=dt;
+    if(_blinkTimer<=0){
+      _blinkTimer=2.5+Math.random()*2.5;
+      _blinkOpen=0.15;/* 눈 감기 */
+    }else if(_blinkOpen<1){
+      _blinkOpen=Math.min(1,_blinkOpen+dt*12);/* 눈 뜨기 */
+    }
+    if(PL.head)PL.head.scale.y=_blinkOpen;
+    /* ── 장시간 아이들 (10초 이상) ── */
+    if(_idleTimer>10){
+      _longIdleT+=dt;
+      /* 팔 스트레칭: 양팔 올라갔다 내려오는 cycle */
+      var litCycle=_longIdleT%8;
+      if(litCycle<1){
+        /* 서서히 양팔 올리기 */
+        var lp=litCycle;
+        if(PL.atkPhase===0)PL.armRPivot.rotation.x+=-lp*0.5;
+        PL.armL.rotation.x+=lp*0.3;
+      }else if(litCycle<1.8){
+        /* 양팔 올린 상태 유지 */
+      }else if(litCycle<2.8){
+        /* 내리기 */
+        var lp2=(litCycle-1.8);
+        if(PL.atkPhase===0)PL.armRPivot.rotation.x+=(lp2-1)*0.5;
+      }
+      /* 고개 천천히 돌리기 */
+      if(PL.head)PL.head.rotation.y=Math.sin(_longIdleT*0.4)*0.25;
+    }else{
+      _longIdleT=0;
+      if(PL.head)PL.head.rotation.y=Math.sin(_breathT*0.3)*0.04;
+    }
     if(!_inWater&&!(typeof insideBuilding!=='undefined'&&insideBuilding)){
       var _ty2=typeof getTerrainY==='function'?getTerrainY(PL.group.position.x,PL.group.position.z):0;
-      PL.group.position.y=_ty2+(PL.group.position.y-_ty2)*.8;
+      PL.group.position.y=_ty2+(PL.group.position.y-_ty2)*0.8;
     }
   }
 }
