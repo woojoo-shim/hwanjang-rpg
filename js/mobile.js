@@ -47,7 +47,8 @@ function initMobileControls(){
     {id:'m-inv',label:'🎒',key:'i',size:55,color:'rgba(180,150,50,0.5)'},
     {id:'m-tp',label:'🌀',key:'h',size:50,color:'rgba(100,50,200,0.5)'},
     {id:'m-dash',label:'💨',key:' ',size:50,color:'rgba(50,200,200,0.5)'},
-    {id:'m-tab',label:'👥',key:'Tab',size:45,color:'rgba(100,100,200,0.5)'}
+    {id:'m-tab',label:'👥',key:'Tab',size:45,color:'rgba(100,100,200,0.5)'},
+    {id:'m-party',label:'🤝',key:'p',size:45,color:'rgba(150,200,80,0.5)'}
   ];
 
   /* ── 스킬 버튼 (Q, R, T) ── */
