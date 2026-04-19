@@ -255,9 +255,9 @@ function refreshWeaponMesh(){
     wm.position.set(0, -0.65, -0.15);
     wm.rotation.set(Math.PI/2, Math.PI/2, 0);
   }else if(icon==='axe'||icon==='hammer'){
-    /* 도끼: 자루 수직, 날이 아래를 향함 */
+    /* 도끼: 검과 같은 자세 + Z축 180° (상하 반전) */
     wm.position.set(0, -0.65, -0.15);
-    wm.rotation.set(Math.PI, Math.PI/2, 0);
+    wm.rotation.set(Math.PI/2, Math.PI/2, Math.PI);
   }else if(icon==='bow'){
     /* 활: 손에 세로로 들고 옆에 (활대가 앞뒤) */
     wm.position.set(0, -0.45, 0);
