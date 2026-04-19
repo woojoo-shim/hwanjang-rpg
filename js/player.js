@@ -290,6 +290,104 @@ function triggerAtkAnim(){
 
 function triggerHitStop(){_hitStop=0.08;}
 
+/* ════════════ 검 잔상 (Sword Trail) ════════════ */
+var _trailPoints=[];/* 칼날 끝 위치 히스토리 (max 12) */
+var _trailMesh=null;
+var _trailMat=null;
+var _trailGeo=null;
+var _trailLifetime=0;
+
+function _initTrail(){
+  if(_trailMat)return;
+  _trailMat=new THREE.MeshBasicMaterial({color:0xaaeeff,transparent:true,opacity:0.6,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+  _trailGeo=new THREE.BufferGeometry();
+  /* 12개 segment, 각 4 vertex (quad strip) → 24 vertex */
+  var maxVerts=24;
+  _trailGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(maxVerts*3),3));
+  _trailMesh=new THREE.Mesh(_trailGeo,_trailMat);
+  _trailMesh.frustumCulled=false;
+  _trailMesh.visible=false;
+}
+
+function _getBladeTipWorld(offset){
+  /* 칼날 끝 (sword grip+blade length) — 무기 메쉬의 로컬 (0, 0.7, 0)이 칼끝 */
+  if(!PL.weaponMesh)return null;
+  var v=new THREE.Vector3(0,0.7,0);/* 검의 칼끝 (로컬) */
+  PL.weaponMesh.localToWorld(v);
+  return v;
+}
+
+function _getBladeBaseWorld(){
+  /* 칼날 시작 (그립 부분) */
+  if(!PL.weaponMesh)return null;
+  var v=new THREE.Vector3(0,0.0,0);
+  PL.weaponMesh.localToWorld(v);
+  return v;
+}
+
+function tickSwordTrail(dt){
+  if(!_trailMesh){_initTrail();if(typeof scene!=='undefined'&&scene)scene.add(_trailMesh);}
+  /* 무기 + 공격 중일 때만 기록 */
+  var def=equipped&&equipped.weapon?getItemDef(equipped.weapon):null;
+  var icon=def?def.icon:'';
+  var isMelee=(icon==='sword'||icon==='dagger'||icon==='axe'||icon==='hammer');
+  if(isMelee&&PL.atkPhase>=1&&PL.atkPhase<=2&&PL.weaponMesh){
+    var tip=_getBladeTipWorld();
+    var base=_getBladeBaseWorld();
+    if(tip&&base){
+      _trailPoints.push({tip:tip.clone(),base:base.clone(),age:0});
+      if(_trailPoints.length>10)_trailPoints.shift();
+      _trailLifetime=0.25;
+    }
+  }
+  /* 잔상 페이드 */
+  for(var i=0;i<_trailPoints.length;i++){
+    _trailPoints[i].age+=dt;
+  }
+  /* 오래된 점 제거 */
+  _trailPoints=_trailPoints.filter(function(p){return p.age<0.25;});
+  /* 메쉬 업데이트 */
+  if(_trailPoints.length>=2){
+    _trailMesh.visible=true;
+    var posAttr=_trailGeo.attributes.position;
+    var arr=posAttr.array;
+    var n=Math.min(_trailPoints.length,12);
+    /* triangle strip: 각 점마다 (tip, base) 2개 vertex */
+    for(var pi=0;pi<n;pi++){
+      var p=_trailPoints[pi];
+      arr[pi*6+0]=p.tip.x;arr[pi*6+1]=p.tip.y;arr[pi*6+2]=p.tip.z;
+      arr[pi*6+3]=p.base.x;arr[pi*6+4]=p.base.y;arr[pi*6+5]=p.base.z;
+    }
+    /* 나머지는 마지막 점으로 */
+    for(var pj=n;pj<12;pj++){
+      var lp=_trailPoints[n-1];
+      arr[pj*6+0]=lp.tip.x;arr[pj*6+1]=lp.tip.y;arr[pj*6+2]=lp.tip.z;
+      arr[pj*6+3]=lp.base.x;arr[pj*6+4]=lp.base.y;arr[pj*6+5]=lp.base.z;
+    }
+    posAttr.needsUpdate=true;
+    /* 인덱스 — triangle strip */
+    if(!_trailGeo.index||_trailGeo.index.count===0){
+      var idx=[];
+      for(var ii=0;ii<11;ii++){
+        idx.push(ii*2,ii*2+1,(ii+1)*2);
+        idx.push(ii*2+1,(ii+1)*2+1,(ii+1)*2);
+      }
+      _trailGeo.setIndex(idx);
+    }
+    /* 색상 — 무기 등급에 따라 */
+    if(def){
+      var rarityColors={common:0xccddee,uncommon:0xaaffaa,rare:0xaaccff,epic:0xddaaff,legendary:0xffddaa,hidden:0xff66aa};
+      _trailMat.color.setHex(rarityColors[def.rarity]||0xaaeeff);
+    }
+    /* 페이드 */
+    var lifeRatio=Math.max(0,_trailLifetime/0.25);
+    _trailMat.opacity=0.5*lifeRatio;
+    _trailLifetime=Math.max(0,_trailLifetime-dt);
+  }else{
+    _trailMesh.visible=false;
+  }
+}
+
 /* 이징 함수 */
 function easeOutBack(t){var s=1.7;return 1+(t-1)*(t-1)*((s+1)*(t-1)+s);}
 function easeInQuad(t){return t*t;}

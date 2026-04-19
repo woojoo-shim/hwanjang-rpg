@@ -385,6 +385,7 @@ function loop(){
     if(typeof tickScreenShake==='function')tickScreenShake(dt);
     if(typeof tickCapeAnim==='function')tickCapeAnim(dt);
     if(typeof tickTorchLight==='function')tickTorchLight(dt);
+    if(typeof tickSwordTrail==='function')tickSwordTrail(dt);
     if(typeof tickEmote==='function')tickEmote(dt);
     if(typeof updateKillParticles==='function')updateKillParticles(dt);
     if(typeof updateLootGlows==='function')updateLootGlows(dt);
