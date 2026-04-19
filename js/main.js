@@ -297,6 +297,7 @@ function setupInput(){
       }
     }
     if(k==='f'&&!isInput){e.preventDefault();playerAttack();}
+    if(k==='v'&&!isInput){e.preventDefault();if(typeof toggleCameraMode==='function')toggleCameraMode();}
     /* Space: 낚시 릴 감기 우선, 아니면 대쉬 */
     if(k===' '&&!isInput){
       e.preventDefault();

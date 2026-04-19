@@ -1925,6 +1925,22 @@ function onResize(){
   }
 }
 
+/* 카메라 모드: 'follow' (기본, 플레이어 따라감) / 'fixed' (고정 위치) */
+var cameraMode='follow';
+var _fixedCamPos=null;
+var _fixedCamTarget=null;
+function toggleCameraMode(){
+  if(cameraMode==='follow'){
+    cameraMode='fixed';
+    _fixedCamPos={x:camera.position.x,y:camera.position.y,z:camera.position.z};
+    _fixedCamTarget={x:PL.group.position.x,y:PL.group.position.y+1.2,z:PL.group.position.z};
+    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 고정 모드');
+  }else{
+    cameraMode='follow';
+    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 기본 모드');
+  }
+}
+
 function updCam(){
   var p=PL.group.position;
   if(insideBuilding){
@@ -1935,6 +1951,17 @@ function updCam(){
     camera.position.y+=(ity-camera.position.y)*.2;
     camera.position.z+=(itz-camera.position.z)*.2;
     camera.lookAt(p.x,p.y,p.z);
+    return;
+  }
+  /* 고정 카메라 모드 */
+  if(cameraMode==='fixed'&&_fixedCamPos){
+    camera.position.set(_fixedCamPos.x,_fixedCamPos.y,_fixedCamPos.z);
+    camera.lookAt(p.x,p.y+1.2,p.z);
+    if(window._sun){
+      window._sun.position.set(p.x-60,p.y+120,p.z+80);
+      window._sun.target.position.set(p.x,p.y,p.z);
+      window._sun.target.updateMatrixWorld();
+    }
     return;
   }
   var tx=p.x+14*Math.sin(cYaw)*Math.cos(cPitch);
