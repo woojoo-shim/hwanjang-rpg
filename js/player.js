@@ -940,23 +940,30 @@ function playerAttack(){
     return;
   }
 
-  /* 근접 무기: 기존 로직 */
+  /* 근접 무기: 플레이어 전방 부채꼴 범위 내 몬스터만 타격 */
   var target=null,bestDist=6.0;
+  var fx=Math.sin(PL.group.rotation.y);
+  var fz=Math.cos(PL.group.rotation.y);
   monsters.forEach(function(m){
     if(m.state==='dead')return;
-    var dx=PL.group.position.x-m.mesh.position.x;
-    var dz=PL.group.position.z-m.mesh.position.z;
-    var d=Math.sqrt(dx*dx+dz*dz);
-    if(d<bestDist){bestDist=d;target=m;}
+    var mx=m.mesh.position.x-PL.group.position.x;
+    var mz=m.mesh.position.z-PL.group.position.z;
+    var d=Math.sqrt(mx*mx+mz*mz);
+    if(d<0.1||d>=bestDist)return;
+    /* 전방 체크: dot product > cos(60°) ≈ 0.5 (전방 120° 부채꼴) */
+    var dot=(mx*fx+mz*fz)/d;
+    if(dot<0.5)return;
+    bestDist=d;target=m;
   });
-  /* 레이드 보스 공격 체크 */
+  /* 레이드 보스 공격 체크 (전방 체크 포함) */
   if(!target&&typeof currentRaid!=='undefined'&&currentRaid&&currentRaid.bossObj&&!currentRaid.defeated){
     var rb=currentRaid.bossObj;
     if(rb.mesh){
-      var rbdx=PL.group.position.x-rb.mesh.position.x;
-      var rbdz=PL.group.position.z-rb.mesh.position.z;
+      var rbdx=rb.mesh.position.x-PL.group.position.x;
+      var rbdz=rb.mesh.position.z-PL.group.position.z;
       var rbdist=Math.sqrt(rbdx*rbdx+rbdz*rbdz);
-      if(rbdist<currentRaid.def.scale*3.5){
+      var rbDot=rbdist>0.1?(rbdx*fx+rbdz*fz)/rbdist:1;
+      if(rbdist<currentRaid.def.scale*3.5&&rbDot>=0.5){
         if(typeof damageRaidBoss==='function')damageRaidBoss(dmg);
         if(typeof SFX!=='undefined')SFX.hit();
         triggerHitStop();
