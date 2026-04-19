@@ -992,10 +992,10 @@ function playerAttack(){
     }
   }
   if(!target){
-    /* 레이드 중이 아닐 때만 메시지 */
-    if(typeof currentRaid==='undefined'||!currentRaid){
-      addChat('inf','','근처에 공격할 대상이 없다.');
-    }
+    /* 타겟 없어도 스윙 애니메이션은 재생 (허공 베기) */
+    triggerAtkAnim();
+    if(typeof SFX!=='undefined')SFX.swing();
+    attackCooldown=.5/cls.spdMul;
     return;
   }
   target.hp=Math.max(0,target.hp-dmg);
