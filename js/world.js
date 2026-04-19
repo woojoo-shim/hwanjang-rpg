@@ -763,32 +763,94 @@ function mkHuman(bc,hc){
   var g=new THREE.Group();
   var bm=new THREE.MeshLambertMaterial({color:bc});
   var hm=new THREE.MeshLambertMaterial({color:hc});
+  var pantsMat=new THREE.MeshLambertMaterial({color:0x2a2a3a});
+  var bootMat=new THREE.MeshLambertMaterial({color:0x3a2a18});
+  var hairMat=new THREE.MeshLambertMaterial({color:0x2a1a08});
+  var eyeMat=new THREE.MeshBasicMaterial({color:0x1a1a1a});
+  var belt=new THREE.MeshLambertMaterial({color:0x4a2e12});
 
-  var body=new THREE.Mesh(new THREE.BoxGeometry(.6,1.0,.35),bm);
-  body.position.set(0,.95,0);
+  /* 몸통 — 상의 + 하복부 */
+  var body=new THREE.Mesh(new THREE.BoxGeometry(.58,.75,.34),bm);
+  body.position.set(0,1.15,0);
   body.castShadow=true;body.receiveShadow=true;
   g.add(body);
+  /* 벨트 */
+  var beltMesh=new THREE.Mesh(new THREE.BoxGeometry(.62,.08,.36),belt);
+  beltMesh.position.set(0,.78,0);g.add(beltMesh);
+  /* 하복부 */
+  var waist=new THREE.Mesh(new THREE.BoxGeometry(.54,.22,.32),pantsMat);
+  waist.position.set(0,.63,0);g.add(waist);
 
-  var head=new THREE.Mesh(new THREE.BoxGeometry(.45,.45,.45),hm);
-  head.position.set(0,1.65,0);
+  /* 머리 */
+  var head=new THREE.Mesh(new THREE.BoxGeometry(.42,.42,.42),hm);
+  head.position.set(0,1.75,0);
   head.castShadow=true;head.receiveShadow=true;
   g.add(head);
+  /* 머리카락 (윗부분) */
+  var hair=new THREE.Mesh(new THREE.BoxGeometry(.44,.16,.44),hairMat);
+  hair.position.set(0,.24,0);head.add(hair);
+  /* 머리카락 앞머리 */
+  var bangs=new THREE.Mesh(new THREE.BoxGeometry(.44,.1,.05),hairMat);
+  bangs.position.set(0,.15,.21);head.add(bangs);
+  /* 눈 2개 */
+  var eyeL=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,.02),eyeMat);
+  eyeL.position.set(-.09,0,.22);head.add(eyeL);
+  var eyeR=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,.02),eyeMat);
+  eyeR.position.set(.09,0,.22);head.add(eyeR);
 
-  var legG=new THREE.BoxGeometry(.22,.68,.22);
-  var legL=new THREE.Mesh(legG,bm);legL.position.set(-.16,.34,0);legL.castShadow=true;g.add(legL);
-  var legR=new THREE.Mesh(legG,bm);legR.position.set(.16,.34,0);legR.castShadow=true;g.add(legR);
+  /* 목 */
+  var neck=new THREE.Mesh(new THREE.BoxGeometry(.2,.1,.2),hm);
+  neck.position.set(0,1.52,0);g.add(neck);
 
-  var armG=new THREE.BoxGeometry(.2,.7,.2);
-  var armL=new THREE.Mesh(armG,bm);armL.position.set(-.4,.95,0);armL.castShadow=true;g.add(armL);
+  /* 다리 — 바지 + 부츠 */
+  var legGeo=new THREE.BoxGeometry(.2,.55,.2);
+  var bootGeo=new THREE.BoxGeometry(.24,.15,.28);
+  var legL=new THREE.Group();
+  var legLMesh=new THREE.Mesh(legGeo,pantsMat);
+  legLMesh.position.set(0,-.28,0);legLMesh.castShadow=true;legL.add(legLMesh);
+  var bootL=new THREE.Mesh(bootGeo,bootMat);
+  bootL.position.set(0,-.63,.04);bootL.castShadow=true;legL.add(bootL);
+  legL.position.set(-.14,.55,0);g.add(legL);
 
+  var legR=new THREE.Group();
+  var legRMesh=new THREE.Mesh(legGeo,pantsMat);
+  legRMesh.position.set(0,-.28,0);legRMesh.castShadow=true;legR.add(legRMesh);
+  var bootR=new THREE.Mesh(bootGeo,bootMat);
+  bootR.position.set(0,-.63,.04);bootR.castShadow=true;legR.add(bootR);
+  legR.position.set(.14,.55,0);g.add(legR);
+
+  /* 팔 — 어깨 + 상박 + 손 */
+  var upperArmGeo=new THREE.BoxGeometry(.18,.5,.2);
+  var foreArmGeo=new THREE.BoxGeometry(.16,.3,.18);
+  var handGeo=new THREE.BoxGeometry(.2,.18,.2);
+  var shoulderGeo=new THREE.SphereGeometry(.13,8,6);
+
+  /* 왼팔 */
+  var armL=new THREE.Group();
+  var armLShoulder=new THREE.Mesh(shoulderGeo,bm);
+  armLShoulder.position.set(0,.02,0);armL.add(armLShoulder);
+  var armLUpper=new THREE.Mesh(upperArmGeo,bm);
+  armLUpper.position.set(0,-.27,0);armLUpper.castShadow=true;armL.add(armLUpper);
+  var armLFore=new THREE.Mesh(foreArmGeo,hm);
+  armLFore.position.set(0,-.68,0);armL.add(armLFore);
+  var handL=new THREE.Mesh(handGeo,hm);
+  handL.position.set(0,-.9,0);armL.add(handL);
+  armL.position.set(-.36,1.32,0);g.add(armL);
+
+  /* 오른팔 (pivot) */
   var armRPivot=new THREE.Group();
-  armRPivot.position.set(.4,1.3,0);
-  var armR=new THREE.Mesh(armG,bm);
-  armR.position.set(0,-.35,0);armR.castShadow=true;
-  armRPivot.add(armR);
+  armRPivot.position.set(.36,1.32,0);
+  var armRShoulder=new THREE.Mesh(shoulderGeo,bm);
+  armRShoulder.position.set(0,.02,0);armRPivot.add(armRShoulder);
+  var armRUpper=new THREE.Mesh(upperArmGeo,bm);
+  armRUpper.position.set(0,-.27,0);armRUpper.castShadow=true;armRPivot.add(armRUpper);
+  var armRFore=new THREE.Mesh(foreArmGeo,hm);
+  armRFore.position.set(0,-.68,0);armRPivot.add(armRFore);
+  var handR=new THREE.Mesh(handGeo,hm);
+  handR.position.set(0,-.9,0);armRPivot.add(handR);
   g.add(armRPivot);
 
-  return{group:g,body:body,head:head,legL:legL,legR:legR,armL:armL,armR:armR,armRPivot:armRPivot,bodyMat:bm};
+  return{group:g,body:body,head:head,legL:legL,legR:legR,armL:armL,armR:armRPivot,armRPivot:armRPivot,bodyMat:bm,handR:handR,handL:handL};
 }
 
 /* 공유 나무 머티리얼 — 함수 호출마다 생성 방지 */
