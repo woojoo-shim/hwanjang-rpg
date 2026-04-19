@@ -1428,19 +1428,16 @@ function handleMove(dt){
     var hasWeapon=equipped&&equipped.weapon;
     if(PL.atkPhase===0){
       if(hasWeapon){
-        /* 오른팔: 앞으로 더 크게 내밀고 (전투 그립) */
-        var tgtRX=-0.7,tgtRZ=0.35;
-        PL.armRPivot.rotation.x+=(tgtRX-PL.armRPivot.rotation.x)*0.12;
-        PL.armRPivot.rotation.z+=(tgtRZ-PL.armRPivot.rotation.z)*0.12;
-        /* 왼팔: 앞쪽 가드 자세 (균형) */
-        var tgtLX=-0.45,tgtLZ=-0.3;
-        PL.armL.rotation.x+=(tgtLX-PL.armL.rotation.x)*0.12;
-        PL.armL.rotation.z+=(tgtLZ-PL.armL.rotation.z)*0.12;
-        /* 몸통 비스듬히 (사이드 가드) */
-        if(PL.body)PL.body.rotation.y+=(0.28-PL.body.rotation.y)*0.08;
-        /* 다리: 양다리 약간 벌림 (안정 자세) */
-        PL.legL.rotation.x+=(-0.05-PL.legL.rotation.x)*0.1;
-        PL.legR.rotation.x+=(0.08-PL.legR.rotation.x)*0.1;
+        /* 오른팔: 살짝 앞으로 (자연스러운 검 잡기) */
+        var tgtRX=-0.25,tgtRZ=0.05;
+        PL.armRPivot.rotation.x+=(tgtRX-PL.armRPivot.rotation.x)*0.1;
+        PL.armRPivot.rotation.z+=(tgtRZ-PL.armRPivot.rotation.z)*0.1;
+        /* 왼팔: 자연스럽게 옆에 (살짝 안쪽) */
+        var tgtLX=0,tgtLZ=-0.05;
+        PL.armL.rotation.x+=(tgtLX-PL.armL.rotation.x)*0.1;
+        PL.armL.rotation.z+=(tgtLZ-PL.armL.rotation.z)*0.1;
+        /* 몸통 살짝만 비스듬히 */
+        if(PL.body)PL.body.rotation.y+=(0.08-PL.body.rotation.y)*0.06;
       }else{
         PL.armRPivot.rotation.x*=0.8;PL.armRPivot.rotation.z*=0.85;
         PL.armL.rotation.x*=0.8;PL.armL.rotation.z*=0.85;
