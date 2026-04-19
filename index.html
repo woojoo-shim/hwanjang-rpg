@@ -241,6 +241,43 @@ window.addEventListener('appinstalled',function(){
         <div id="fade-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s;z-index:9999;"></div>
         <div id="building-hint" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#c9a84c;padding:10px 20px;border:1px solid #c9a84c88;border-radius:6px;font-size:14px;letter-spacing:1px;z-index:20;pointer-events:none;">E — 입장</div>
         <div id="skill-bar" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;"></div>
+        <!-- 마크 RPG 스타일 HUD -->
+        <div id="mc-hud" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;z-index:11;padding:6px 10px;background:linear-gradient(180deg,rgba(20,20,30,0.85),rgba(10,10,20,0.95));border:2px solid #2a2a3a;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+          <!-- HP 하트 -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
+            <div style="position:relative;width:48px;height:44px;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.8));">❤️</div>
+            </div>
+            <div id="mc-hp-text" style="color:#fff;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:-4px;">100</div>
+          </div>
+          <!-- MP 포션 -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
+            <div style="width:42px;height:42px;background:linear-gradient(180deg,#2a2a4a,#1a1a2e);border:2px solid #4a4a7a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6));">🧪</div>
+            <div id="mc-mp-text" style="color:#88ccff;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:2px;">60</div>
+          </div>
+          <!-- EXP + Level -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:120px;">
+            <div style="color:#44ee44;font-size:12px;font-weight:bold;text-shadow:1px 1px 2px #000;">Lv.<span id="mc-lv">1</span></div>
+            <div style="width:110px;height:10px;background:#0a0a15;border:2px solid #2a2a3a;border-radius:4px;overflow:hidden;margin-top:2px;">
+              <div id="mc-exp-fill" style="width:0%;height:100%;background:linear-gradient(90deg,#4488ff,#88ccff,#aaddff);box-shadow:inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+            </div>
+          </div>
+          <!-- 골드 -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
+            <div style="width:42px;height:42px;background:linear-gradient(180deg,#3a3a1a,#1a1a0a);border:2px solid #5a4a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6));">💰</div>
+            <div id="mc-gold-text" style="color:#ffdd44;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:2px;">0</div>
+          </div>
+          <!-- 공격력 -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
+            <div style="width:42px;height:42px;background:linear-gradient(180deg,#3a1a1a,#1a0a0a);border:2px solid #5a2a2a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6));">⚔️</div>
+            <div id="mc-atk-text" style="color:#ff8866;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:2px;">5</div>
+          </div>
+          <!-- 방어력 -->
+          <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
+            <div style="width:42px;height:42px;background:linear-gradient(180deg,#1a3a1a,#0a1a0a);border:2px solid #2a5a2a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6));">🛡️</div>
+            <div id="mc-def-text" style="color:#88ff88;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:2px;">0</div>
+          </div>
+        </div>
         <div class="chint">WASD 이동 &nbsp;|&nbsp; 드래그 카메라 &nbsp;|&nbsp; E 대화 &nbsp;|&nbsp; F 공격 &nbsp;|&nbsp; Q R T 스킬 &nbsp;|&nbsp; I 인벤토리 &nbsp;|&nbsp; P 파티초대</div>
       </div>
     </div>

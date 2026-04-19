@@ -1305,6 +1305,36 @@ function updPlayerHpBar(){
   });
   var vals=document.querySelectorAll('.hbv');
   if(vals[0])vals[0].textContent=playerHP+'/'+playerMaxHP;
+  /* 마크 스타일 HUD 업데이트 */
+  updMcHud();
+}
+
+function updMcHud(){
+  var hp=document.getElementById('mc-hp-text');if(hp)hp.textContent=Math.max(0,Math.floor(playerHP));
+  var mp=document.getElementById('mc-mp-text');if(mp)mp.textContent=(typeof playerMP!=='undefined'?Math.floor(playerMP):60);
+  var lv=document.getElementById('mc-lv');if(lv)lv.textContent=playerLevel;
+  var exp=document.getElementById('mc-exp-fill');if(exp){
+    var need=playerLevel*100;
+    var pct2=Math.min(100,playerEXP/need*100);
+    exp.style.width=pct2+'%';
+  }
+  var gold=document.getElementById('mc-gold-text');if(gold&&typeof window.gold!=='undefined')gold.textContent=window.gold;
+  var atk=document.getElementById('mc-atk-text');if(atk){
+    var baseAtk=5;
+    if(typeof equipped!=='undefined'&&equipped.weapon){
+      var wd=getItemDef(equipped.weapon);
+      if(wd&&wd.stats&&wd.stats['공격력'])baseAtk=parseInt(wd.stats['공격력'])||5;
+    }
+    atk.textContent=baseAtk;
+  }
+  var def=document.getElementById('mc-def-text');if(def){
+    var baseDef=0;
+    if(typeof equipped!=='undefined'&&equipped.armor){
+      var ad=getItemDef(equipped.armor);
+      if(ad&&ad.stats&&ad.stats['방어력'])baseDef=parseInt(ad.stats['방어력'])||0;
+    }
+    def.textContent=baseDef;
+  }
 }
 
 /* checkZone — 거리 기반 존 감지 (섬형 맵) + 분위기 전환 */
