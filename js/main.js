@@ -133,12 +133,12 @@ function enterGame(){
   document.getElementById('load-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
   if(typeof showMobileControls==='function')showMobileControls();
-  document.getElementById('hname').textContent=myName;
+  var _hname=document.getElementById('hname');if(_hname)_hname.textContent=myName;
   /* 복귀 유저 HUD 복원 */
   if(playerData){
-    document.querySelector('.hlv').textContent='Lv.'+playerLevel;
+    var _hlv=document.querySelector('.hlv');if(_hlv)_hlv.textContent='Lv.'+playerLevel;
     updPlayerHpBar();
-    document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    var _ig=document.getElementById('inv-gold');if(_ig)_ig.textContent='💰 '+gold+' 골드';
     var ef=document.getElementById('exp-bar-fill');
     if(ef)ef.style.width=Math.min(100,playerEXP/(playerLevel*100)*100)+'%';
   }
