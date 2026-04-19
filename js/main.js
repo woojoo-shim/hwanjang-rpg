@@ -141,6 +141,7 @@ function enterGame(){
       if(typeof initSpecialClassNpcs==='function')initSpecialClassNpcs();
       if(typeof buildDungeonEntrances==='function')buildDungeonEntrances();
       if(typeof buildRaidNPCs==='function')buildRaidNPCs();
+      if(typeof spawnGachaNpc==='function')spawnGachaNpc();
       if(typeof initKingdom==='function')initKingdom();
       if(typeof checkDailyLogin==='function')checkDailyLogin();
       /* BGM 즉시 시작 — 로그인 과정에서 이미 유저 상호작용 발생했으므로 autoplay 허용됨 */

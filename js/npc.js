@@ -1096,6 +1096,11 @@ function talk(n){
     if(typeof showRaidConfirm==='function')showRaidConfirm(n);
     return;
   }
+  /* 가챠 NPC 체크 */
+  if(n.gachaNpc){
+    if(typeof openGachaModal==='function')openGachaModal();
+    return;
+  }
   /* 던전 NPC 체크 */
   if(n.dungeonId){
     showDungeonConfirm(n);
