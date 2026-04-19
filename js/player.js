@@ -248,8 +248,29 @@ function refreshWeaponMesh(){
   if(!equipped.weapon)return;
   var wm=buildWeaponMesh(equipped.weapon);
   if(!wm)return;
-  wm.position.set(0.1, -0.58, 0.25);
-  wm.rotation.set(0, 0, 0);
+  /* 무기 종류별 위치/회전 조정 — 손에 잡힌 자연스러운 자세 */
+  var def=getItemDef(equipped.weapon);
+  var icon=def?def.icon:'';
+  if(icon==='sword'||icon==='dagger'){
+    /* 검: 손에서 위로 곧게, 살짝 앞으로 */
+    wm.position.set(0, -0.45, 0);
+    wm.rotation.set(-0.15, 0, 0);
+  }else if(icon==='axe'||icon==='hammer'){
+    /* 도끼: 손에 똑바로 잡고 머리가 앞쪽 */
+    wm.position.set(0, -0.45, 0);
+    wm.rotation.set(0, 0, 0);
+  }else if(icon==='bow'){
+    /* 활: 손에 가로로 잡음 (현이 앞, 활대가 옆) */
+    wm.position.set(0, -0.4, 0);
+    wm.rotation.set(0, Math.PI/2, Math.PI/2);
+  }else if(icon==='staff'){
+    /* 지팡이: 손에서 위로 곧게, 보석이 위에 */
+    wm.position.set(0, -0.4, 0);
+    wm.rotation.set(0, 0, 0);
+  }else{
+    wm.position.set(0, -0.45, 0);
+    wm.rotation.set(0, 0, 0);
+  }
   PL.armRPivot.add(wm);
   PL.weaponMesh=wm;
 }
