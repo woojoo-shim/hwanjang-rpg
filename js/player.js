@@ -1283,8 +1283,26 @@ function handleMove(dt){
     _turnVel*=0.85;
     /* 다리/팔 부드럽게 귀환 */
     PL.legL.rotation.x*=0.8;PL.legR.rotation.x*=0.8;
-    PL.armL.rotation.x*=0.8;PL.armL.rotation.z*=0.85;
-    if(PL.atkPhase===0){PL.armRPivot.rotation.x*=0.8;PL.armRPivot.rotation.z*=0.85;}
+    /* 무기 장착 시 전투 자세 (lerp to stance) */
+    var hasWeapon=equipped&&equipped.weapon;
+    if(PL.atkPhase===0){
+      if(hasWeapon){
+        /* 오른팔: 앞으로 내밀고 살짝 아래로 (검 비스듬히 들기) */
+        var tgtRX=-0.45,tgtRZ=0.25;
+        PL.armRPivot.rotation.x+=(tgtRX-PL.armRPivot.rotation.x)*0.12;
+        PL.armRPivot.rotation.z+=(tgtRZ-PL.armRPivot.rotation.z)*0.12;
+        /* 왼팔: 살짝 앞으로 + 몸통 쪽으로 */
+        var tgtLX=-0.2,tgtLZ=-0.15;
+        PL.armL.rotation.x+=(tgtLX-PL.armL.rotation.x)*0.12;
+        PL.armL.rotation.z+=(tgtLZ-PL.armL.rotation.z)*0.12;
+        /* 몸통 살짝 비스듬히 */
+        if(PL.body)PL.body.rotation.y+=(0.15-PL.body.rotation.y)*0.08;
+      }else{
+        PL.armRPivot.rotation.x*=0.8;PL.armRPivot.rotation.z*=0.85;
+        PL.armL.rotation.x*=0.8;PL.armL.rotation.z*=0.85;
+        if(PL.body)PL.body.rotation.y*=0.9;
+      }
+    }
     /* 호흡 애니메이션 (body scale.y 미세 맥동) */
     _breathT+=dt;
     if(PL.body){
