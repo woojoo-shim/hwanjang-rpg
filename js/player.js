@@ -252,13 +252,13 @@ function refreshWeaponMesh(){
   var def=getItemDef(equipped.weapon);
   var icon=def?def.icon:'';
   if(icon==='sword'||icon==='dagger'){
-    /* 검: 옆에 자연스럽게 늘어뜨림 - 칼날 면이 정면을 향함 (Y축 90° 회전) */
-    wm.position.set(0, -0.55, 0);
-    wm.rotation.set(Math.PI, Math.PI/2, 0);
+    /* 검: 손과 수직 (앞쪽 수평으로 뻗음) */
+    wm.position.set(0, -0.5, 0.15);
+    wm.rotation.set(-Math.PI/2, 0, 0);
   }else if(icon==='axe'||icon==='hammer'){
-    /* 도끼: 머리가 아래쪽, 정면 향함 */
-    wm.position.set(0, -0.55, 0);
-    wm.rotation.set(Math.PI, Math.PI/2, 0);
+    /* 도끼: 손과 수직 (앞쪽 수평) */
+    wm.position.set(0, -0.5, 0.15);
+    wm.rotation.set(-Math.PI/2, 0, 0);
   }else if(icon==='bow'){
     /* 활: 손에 세로로 들고 옆에 (활대가 앞뒤) */
     wm.position.set(0, -0.45, 0);
