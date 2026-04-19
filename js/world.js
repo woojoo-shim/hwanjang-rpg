@@ -1925,19 +1925,15 @@ function onResize(){
   }
 }
 
-/* 카메라 모드: 'follow' (기본, 플레이어 따라감) / 'fixed' (고정 위치) */
+/* 카메라 모드: 'follow' (기본, 자유 회전) / 'back' (플레이어 등뒤 고정) */
 var cameraMode='follow';
-var _fixedCamPos=null;
-var _fixedCamTarget=null;
 function toggleCameraMode(){
   if(cameraMode==='follow'){
-    cameraMode='fixed';
-    _fixedCamPos={x:camera.position.x,y:camera.position.y,z:camera.position.z};
-    _fixedCamTarget={x:PL.group.position.x,y:PL.group.position.y+1.2,z:PL.group.position.z};
-    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 고정 모드');
+    cameraMode='back';
+    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 모드: 등 뒤 고정');
   }else{
     cameraMode='follow';
-    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 기본 모드');
+    if(typeof addChat==='function')addChat('sys','[시스템]','카메라 모드: 자유 회전');
   }
 }
 
@@ -1953,9 +1949,17 @@ function updCam(){
     camera.lookAt(p.x,p.y,p.z);
     return;
   }
-  /* 고정 카메라 모드 */
-  if(cameraMode==='fixed'&&_fixedCamPos){
-    camera.position.set(_fixedCamPos.x,_fixedCamPos.y,_fixedCamPos.z);
+  /* 등 뒤 고정 모드: 플레이어 회전 방향을 기준으로 카메라가 뒤에 따라붙음 */
+  if(cameraMode==='back'){
+    var ry=PL.group.rotation.y;
+    /* 플레이어 뒤쪽 = -forward 방향 */
+    var backDist=10,camHeight=5;
+    var bx=p.x-Math.sin(ry)*backDist;
+    var bz=p.z-Math.cos(ry)*backDist;
+    var lr=.15;
+    camera.position.x+=(bx-camera.position.x)*lr;
+    camera.position.y+=(p.y+camHeight-camera.position.y)*lr;
+    camera.position.z+=(bz-camera.position.z)*lr;
     camera.lookAt(p.x,p.y+1.2,p.z);
     if(window._sun){
       window._sun.position.set(p.x-60,p.y+120,p.z+80);
