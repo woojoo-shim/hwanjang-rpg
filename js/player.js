@@ -434,15 +434,20 @@ function tickSwordAnim(dt,spdMul){
     var et=easeOutQuad(t);
 
     if(combo===0){
-      /* 가로 베기: 오른쪽 뒤로 당기기 (armR Y축 회전) */
-      PL.armRPivot.rotation.y=et*(Math.PI*0.5);
-      PL.armRPivot.rotation.x=et*(-Math.PI*0.3);
-      _atkBodyYaw=et*(-0.25);
+      /* 가로 베기: 오른쪽 크게 뒤로 당기기 (armR Y축 회전) */
+      PL.armRPivot.rotation.y=et*(Math.PI*0.85);
+      PL.armRPivot.rotation.x=et*(-Math.PI*0.25);
+      PL.armRPivot.rotation.z=et*(Math.PI*0.15);
+      _atkBodyYaw=et*(-0.45);
+      /* 왼팔 균형 */
+      if(PL.armL)PL.armL.rotation.y=et*(-Math.PI*0.3);
     }else if(combo===1){
-      /* 가로 베기: 왼쪽 뒤로 당기기 */
-      PL.armRPivot.rotation.y=et*(-Math.PI*0.5);
-      PL.armRPivot.rotation.x=et*(-Math.PI*0.3);
-      _atkBodyYaw=et*(0.25);
+      /* 가로 베기: 왼쪽 크게 뒤로 당기기 */
+      PL.armRPivot.rotation.y=et*(-Math.PI*0.85);
+      PL.armRPivot.rotation.x=et*(-Math.PI*0.25);
+      PL.armRPivot.rotation.z=et*(-Math.PI*0.15);
+      _atkBodyYaw=et*(0.45);
+      if(PL.armL)PL.armL.rotation.y=et*(Math.PI*0.3);
     }else{
       /* 내려치기: 위로 */
       PL.armRPivot.rotation.x=et*(-Math.PI*0.9);
@@ -462,15 +467,19 @@ function tickSwordAnim(dt,spdMul){
     var et=easeInQuad(t);
 
     if(combo===0){
-      /* 가로 베기 우→좌: Y축 +PI/2 → -PI/2 (왼쪽으로 휘두름) */
-      PL.armRPivot.rotation.y=(Math.PI*0.5)+(et*(-Math.PI));
-      PL.armRPivot.rotation.x=(-Math.PI*0.3);
-      _atkBodyYaw=(-0.25)+(et*0.5);
+      /* 가로 베기 우→좌: Y축 +0.85π → -0.85π (큰 호) */
+      PL.armRPivot.rotation.y=(Math.PI*0.85)+(et*(-Math.PI*1.7));
+      PL.armRPivot.rotation.x=(-Math.PI*0.25);
+      PL.armRPivot.rotation.z=(Math.PI*0.15)+(et*(-Math.PI*0.3));
+      _atkBodyYaw=(-0.45)+(et*0.9);
+      if(PL.armL)PL.armL.rotation.y=(-Math.PI*0.3)+(et*Math.PI*0.6);
     }else if(combo===1){
-      /* 가로 베기 좌→우: Y축 -PI/2 → +PI/2 */
-      PL.armRPivot.rotation.y=(-Math.PI*0.5)+(et*Math.PI);
-      PL.armRPivot.rotation.x=(-Math.PI*0.3);
-      _atkBodyYaw=(0.25)+(et*(-0.5));
+      /* 가로 베기 좌→우 */
+      PL.armRPivot.rotation.y=(-Math.PI*0.85)+(et*Math.PI*1.7);
+      PL.armRPivot.rotation.x=(-Math.PI*0.25);
+      PL.armRPivot.rotation.z=(-Math.PI*0.15)+(et*Math.PI*0.3);
+      _atkBodyYaw=(0.45)+(et*(-0.9));
+      if(PL.armL)PL.armL.rotation.y=(Math.PI*0.3)+(et*(-Math.PI*0.6));
     }else{
       /* 내려치기: 위→아래 */
       PL.armRPivot.rotation.x=(-Math.PI*0.9)+(et*Math.PI*1.15);
@@ -493,14 +502,17 @@ function tickSwordAnim(dt,spdMul){
     PL.armRPivot.rotation.y*=(1-et);
     PL.armRPivot.rotation.z*=(1-et);
     _atkBodyYaw*=(1-et);
-    if(PL.armL)PL.armL.rotation.x*=(1-et);
+    if(PL.armL){
+      PL.armL.rotation.x*=(1-et);
+      PL.armL.rotation.y*=(1-et);
+    }
     if(PL.legL)PL.legL.rotation.x*=(1-et);
     if(PL.legR)PL.legR.rotation.x*=(1-et);
 
     if(atkAnimTimer>=dur){
       PL.atkPhase=0;atkAnimTimer=0;
       PL.armRPivot.rotation.x=0;PL.armRPivot.rotation.y=0;PL.armRPivot.rotation.z=0;
-      if(PL.armL)PL.armL.rotation.x=0;
+      if(PL.armL){PL.armL.rotation.x=0;PL.armL.rotation.y=0;}
       if(PL.legL)PL.legL.rotation.x=0;
       if(PL.legR)PL.legR.rotation.x=0;
       _atkBodyYaw=0;
