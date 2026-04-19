@@ -831,35 +831,35 @@ function mkHuman(bc,hc,gender){
   bootR.position.set(0,-.63,.04);bootR.castShadow=true;legR.add(bootR);
   legR.position.set(.14,.55,0);g.add(legR);
 
-  /* 팔 — 어깨 + 상박 + 손 */
-  var upperArmGeo=new THREE.BoxGeometry(.18,.5,.2);
-  var foreArmGeo=new THREE.BoxGeometry(.16,.3,.18);
-  var handGeo=new THREE.BoxGeometry(.2,.18,.2);
-  var shoulderGeo=new THREE.SphereGeometry(.13,8,6);
+  /* 팔 — 어깨 + 상박 + 전박 + 손 (인체 비율 조정: 팔이 짧아짐) */
+  var upperArmGeo=new THREE.BoxGeometry(.16,.38,.18);
+  var foreArmGeo=new THREE.BoxGeometry(.14,.28,.16);
+  var handGeo=new THREE.BoxGeometry(.16,.14,.18);
+  var shoulderGeo=new THREE.SphereGeometry(.11,8,6);
 
   /* 왼팔 */
   var armL=new THREE.Group();
   var armLShoulder=new THREE.Mesh(shoulderGeo,bm);
-  armLShoulder.position.set(0,.02,0);armL.add(armLShoulder);
+  armLShoulder.position.set(0,0,0);armL.add(armLShoulder);
   var armLUpper=new THREE.Mesh(upperArmGeo,bm);
-  armLUpper.position.set(0,-.27,0);armLUpper.castShadow=true;armL.add(armLUpper);
+  armLUpper.position.set(0,-.21,0);armLUpper.castShadow=true;armL.add(armLUpper);
   var armLFore=new THREE.Mesh(foreArmGeo,hm);
-  armLFore.position.set(0,-.68,0);armL.add(armLFore);
+  armLFore.position.set(0,-.54,0);armL.add(armLFore);
   var handL=new THREE.Mesh(handGeo,hm);
-  handL.position.set(0,-.9,0);armL.add(handL);
-  armL.position.set(-.36,1.32,0);g.add(armL);
+  handL.position.set(0,-.75,0);armL.add(handL);
+  armL.position.set(-.34,1.42,0);g.add(armL);
 
   /* 오른팔 (pivot) */
   var armRPivot=new THREE.Group();
-  armRPivot.position.set(.36,1.32,0);
+  armRPivot.position.set(.34,1.42,0);
   var armRShoulder=new THREE.Mesh(shoulderGeo,bm);
-  armRShoulder.position.set(0,.02,0);armRPivot.add(armRShoulder);
+  armRShoulder.position.set(0,0,0);armRPivot.add(armRShoulder);
   var armRUpper=new THREE.Mesh(upperArmGeo,bm);
-  armRUpper.position.set(0,-.27,0);armRUpper.castShadow=true;armRPivot.add(armRUpper);
+  armRUpper.position.set(0,-.21,0);armRUpper.castShadow=true;armRPivot.add(armRUpper);
   var armRFore=new THREE.Mesh(foreArmGeo,hm);
-  armRFore.position.set(0,-.68,0);armRPivot.add(armRFore);
+  armRFore.position.set(0,-.54,0);armRPivot.add(armRFore);
   var handR=new THREE.Mesh(handGeo,hm);
-  handR.position.set(0,-.9,0);armRPivot.add(handR);
+  handR.position.set(0,-.75,0);armRPivot.add(handR);
   g.add(armRPivot);
 
   return{group:g,body:body,head:head,legL:legL,legR:legR,armL:armL,armR:armRPivot,armRPivot:armRPivot,bodyMat:bm,handR:handR,handL:handL};
