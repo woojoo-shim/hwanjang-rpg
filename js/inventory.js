@@ -328,9 +328,9 @@ function startCharPreview(){
           wm.position.set(0,-.65,-.15);
           wm.rotation.set(Math.PI/2,Math.PI/2,0);
         }else if(icon==='axe'||icon==='hammer'){
-          /* 검과 같은 자세 + Z축 180° */
+          /* 도끼 머리가 정면으로 */
           wm.position.set(0,-.65,-.15);
-          wm.rotation.set(Math.PI/2,Math.PI/2,Math.PI);
+          wm.rotation.set(Math.PI/2,0,Math.PI);
         }else if(icon==='bow'){
           wm.position.set(0,-.45,0);
           wm.rotation.set(0,0,0);
