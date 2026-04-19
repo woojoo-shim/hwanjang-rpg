@@ -847,11 +847,11 @@ function mkHuman(bc,hc,gender){
   armLFore.position.set(0,-.54,0);armL.add(armLFore);
   var handL=new THREE.Mesh(handGeo,hm);
   handL.position.set(0,-.75,0);armL.add(handL);
-  armL.position.set(-.34,1.42,0);g.add(armL);
+  armL.position.set(.34,1.42,0);g.add(armL);
 
-  /* 오른팔 (pivot) */
+  /* 오른팔 (pivot) — 시각적 오른손 */
   var armRPivot=new THREE.Group();
-  armRPivot.position.set(.34,1.42,0);
+  armRPivot.position.set(-.34,1.42,0);
   var armRShoulder=new THREE.Mesh(shoulderGeo,bm);
   armRShoulder.position.set(0,0,0);armRPivot.add(armRShoulder);
   var armRUpper=new THREE.Mesh(upperArmGeo,bm);
