@@ -16,6 +16,19 @@ for(var i=0;i<120;i++){
 
 /* ── 닉네임 ── */
 var tries=0,myName='';
+var playerGender='male';/* 'male' or 'female' */
+function selectGender(g){
+  playerGender=g;
+  var mBtn=document.getElementById('gender-male');
+  var fBtn=document.getElementById('gender-female');
+  if(g==='male'){
+    if(mBtn){mBtn.style.background='#6aa0dd';mBtn.style.color='#0c0c1e';}
+    if(fBtn){fBtn.style.background='transparent';fBtn.style.color='#dd6aaa';}
+  }else{
+    if(fBtn){fBtn.style.background='#dd6aaa';fBtn.style.color='#0c0c1e';}
+    if(mBtn){mBtn.style.background='transparent';mBtn.style.color='#6aa0dd';}
+  }
+}
 var MAXTR=5;
 
 function showErr(m){

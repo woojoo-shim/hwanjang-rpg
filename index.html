@@ -192,6 +192,13 @@ window.addEventListener('appinstalled',function(){
           <div class="flbl">[ 닉네임 확정 ]</div>
           <div class="fname" id="fname"></div>
           <div class="fsub">닉네임이 성공적으로 등록되었습니다.<br>변경 및 재설정은 불가능합니다.</div>
+          <div id="gender-select" style="margin-top:16px;">
+            <div style="color:#c9a84c;font-size:12px;letter-spacing:2px;margin-bottom:8px;">▸ 성별 선택</div>
+            <div style="display:flex;gap:10px;">
+              <button id="gender-male" onclick="selectGender('male')" style="flex:1;background:transparent;color:#6aa0dd;border:2px solid #6aa0dd;padding:14px;font-family:inherit;font-size:13px;cursor:pointer;border-radius:6px;letter-spacing:2px;">♂ 남 자</button>
+              <button id="gender-female" onclick="selectGender('female')" style="flex:1;background:transparent;color:#dd6aaa;border:2px solid #dd6aaa;padding:14px;font-family:inherit;font-size:13px;cursor:pointer;border-radius:6px;letter-spacing:2px;">♀ 여 자</button>
+            </div>
+          </div>
         </div>
         <button class="sbtn" id="sbtn" onclick="startGame()">▶ 게임 시작</button>
       </div>

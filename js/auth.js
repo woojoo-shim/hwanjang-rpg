@@ -128,6 +128,7 @@ async function savePlayerData(){
     position_z:PL.group.position.z,
     zone:currentZone||'village',
     class:playerClass,
+    gender:(typeof playerGender!=='undefined')?playerGender:'male',
     visited_zones:visitedZones,
     equipped_dur:equippedDur,
     reputation:playerReputation,
@@ -154,6 +155,7 @@ function restoreGameState(){
   var _eq=playerData.equipped||{};
   equipped={weapon:_eq.weapon||null,armor:_eq.armor||null,hat:_eq.hat||null,cape:_eq.cape||null,dye:_eq.dye||null};
   playerClass=playerData.class||'none';
+  if(playerData.gender)playerGender=playerData.gender;
   if(playerData.visited_zones)visitedZones=playerData.visited_zones;
   if(playerData.equipped_dur)equippedDur=playerData.equipped_dur;
   if(playerData.reputation)playerReputation=playerData.reputation;

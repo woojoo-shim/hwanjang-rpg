@@ -759,18 +759,20 @@ function getTerrainY(x,z){
 /* TERRAIN_HILLS 호환성용 빈 배열 (더 이상 사용 안 함) */
 var TERRAIN_HILLS=[];
 
-function mkHuman(bc,hc){
+function mkHuman(bc,hc,gender){
+  var isFemale=(gender==='female');
   var g=new THREE.Group();
   var bm=new THREE.MeshLambertMaterial({color:bc});
   var hm=new THREE.MeshLambertMaterial({color:hc});
   var pantsMat=new THREE.MeshLambertMaterial({color:0x2a2a3a});
   var bootMat=new THREE.MeshLambertMaterial({color:0x3a2a18});
-  var hairMat=new THREE.MeshLambertMaterial({color:0x2a1a08});
+  var hairMat=new THREE.MeshLambertMaterial({color:isFemale?0x6a3a1a:0x2a1a08});
   var eyeMat=new THREE.MeshBasicMaterial({color:0x1a1a1a});
   var belt=new THREE.MeshLambertMaterial({color:0x4a2e12});
 
-  /* 몸통 — 상의 + 하복부 */
-  var body=new THREE.Mesh(new THREE.BoxGeometry(.58,.75,.34),bm);
+  /* 몸통 — 여자는 좁게, 남자는 넓게 */
+  var bodyW=isFemale?0.5:0.58;
+  var body=new THREE.Mesh(new THREE.BoxGeometry(bodyW,.75,.34),bm);
   body.position.set(0,1.15,0);
   body.castShadow=true;body.receiveShadow=true;
   g.add(body);
@@ -792,6 +794,16 @@ function mkHuman(bc,hc){
   /* 머리카락 앞머리 */
   var bangs=new THREE.Mesh(new THREE.BoxGeometry(.44,.1,.05),hairMat);
   bangs.position.set(0,.15,.21);head.add(bangs);
+  /* 여자: 긴 머리카락 (뒤로 흘러내림) */
+  if(isFemale){
+    var longHair=new THREE.Mesh(new THREE.BoxGeometry(.46,.5,.1),hairMat);
+    longHair.position.set(0,-.05,-.2);head.add(longHair);
+    /* 사이드 헤어 */
+    var sideL=new THREE.Mesh(new THREE.BoxGeometry(.05,.35,.3),hairMat);
+    sideL.position.set(-.22,-.05,0);head.add(sideL);
+    var sideR=new THREE.Mesh(new THREE.BoxGeometry(.05,.35,.3),hairMat);
+    sideR.position.set(.22,-.05,0);head.add(sideR);
+  }
   /* 눈 2개 */
   var eyeL=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,.02),eyeMat);
   eyeL.position.set(-.09,0,.22);head.add(eyeL);
@@ -1878,7 +1890,7 @@ function initScene(){
   buildZoneParticles();
 
   /* 플레이어 */
-  var ph2=mkHuman(0x2a6a3a,0xddcc99);
+  var ph2=mkHuman(0x2a6a3a,0xddcc99,(typeof playerGender!=='undefined')?playerGender:'male');
   PL.group=ph2.group;PL.body=ph2.body;PL.head=ph2.head;PL.bodyMat=ph2.bodyMat;
   PL.legL=ph2.legL;PL.legR=ph2.legR;
   PL.armL=ph2.armL;PL.armR=ph2.armR;PL.armRPivot=ph2.armRPivot;
