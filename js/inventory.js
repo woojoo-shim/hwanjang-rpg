@@ -70,6 +70,7 @@ function equipItem(slot){
   if(typeof SFX!=='undefined')SFX.click();
   addChat('sys','[시스템]','['+it.name+']을(를) 장착했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
+  if(it.type==='armor'&&typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
   renderInv();showDetail(slot);updEquipHud();
 }
 
@@ -131,6 +132,7 @@ function unequipItem(slot){
   equipped[it.type]=null;
   addChat('sys','[시스템]','['+it.name+']을(를) 해제했습니다.');
   if(it.type==='weapon')refreshWeaponMesh();
+  if(it.type==='armor'&&typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
   renderInv();showDetail(slot);updEquipHud();
 }
 

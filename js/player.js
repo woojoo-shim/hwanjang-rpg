@@ -1483,6 +1483,90 @@ var _capeSwayT=0;
 function refreshCosmeticMesh(){
   if(!PL.group)return;
 
+  /* ── 갑옷 제거 ── */
+  if(PL.armorMesh){PL.body.remove(PL.armorMesh);PL.armorMesh=null;}
+  if(PL.helmMesh){PL.head.remove(PL.helmMesh);PL.helmMesh=null;}
+  if(PL.glovesL){PL.armL.remove(PL.glovesL);PL.glovesL=null;}
+  if(PL.glovesR){PL.armRPivot.remove(PL.glovesR);PL.glovesR=null;}
+  if(PL.bootsL){PL.legL.remove(PL.bootsL);PL.bootsL=null;}
+  if(PL.bootsR){PL.legR.remove(PL.bootsR);PL.bootsR=null;}
+
+  /* ── 갑옷 생성 ── */
+  var armorId=equipped.armor;
+  if(armorId&&PL.body){
+    var armorDef=getItemDef(armorId);
+    if(armorDef){
+      var icon=armorDef.icon||'armor';
+      var rarity=armorDef.rarity||'common';
+      var rarityColors={common:0x888888,uncommon:0x88aa88,rare:0x88aacc,epic:0xaa88dd,legendary:0xdda044,hidden:0xff66aa};
+      var armorColor=rarityColors[rarity]||0x888888;
+      var emColor=(rarity==='legendary'||rarity==='epic'||rarity==='hidden')?armorColor:0x000000;
+      var armorMat=new THREE.MeshLambertMaterial({color:armorColor,emissive:new THREE.Color(emColor),emissiveIntensity:0.15});
+
+      if(icon==='armor'||icon==='robe'||!icon){
+        /* 가슴/몸통 갑옷 — 몸통보다 약간 크게 덮음 */
+        var chest=new THREE.Mesh(new THREE.BoxGeometry(.62,.78,.38),armorMat);
+        chest.position.set(0,0,0);
+        /* 어깨 패드 */
+        var shoulderL=new THREE.Mesh(new THREE.SphereGeometry(.13,8,6),armorMat);
+        shoulderL.position.set(-.32,.32,0);chest.add(shoulderL);
+        var shoulderR=new THREE.Mesh(new THREE.SphereGeometry(.13,8,6),armorMat);
+        shoulderR.position.set(.32,.32,0);chest.add(shoulderR);
+        /* 가슴 장식 (등급에 따라) */
+        if(rarity!=='common'){
+          var emblem=new THREE.Mesh(new THREE.CircleGeometry(.07,6),new THREE.MeshLambertMaterial({color:0xffcc44,emissive:new THREE.Color(0x886622),emissiveIntensity:0.5}));
+          emblem.position.set(0,.05,.2);chest.add(emblem);
+        }
+        /* 허리 벨트 */
+        var belt=new THREE.Mesh(new THREE.BoxGeometry(.66,.08,.4),new THREE.MeshLambertMaterial({color:0x3a1808}));
+        belt.position.set(0,-.32,0);chest.add(belt);
+        var buckle=new THREE.Mesh(new THREE.BoxGeometry(.1,.08,.05),new THREE.MeshLambertMaterial({color:0xddaa44}));
+        buckle.position.set(0,-.32,.21);chest.add(buckle);
+        PL.body.add(chest);
+        PL.armorMesh=chest;
+        /* 전설 — 글로우 */
+        if(rarity==='legendary'||rarity==='epic'){
+          var aLight=new THREE.PointLight(armorColor,0.3,2);
+          aLight.position.set(0,0,.3);chest.add(aLight);
+        }
+      }
+      if(icon==='helmet'&&PL.head){
+        var helm=new THREE.Mesh(new THREE.BoxGeometry(.5,.42,.5),armorMat);
+        helm.position.set(0,.05,0);
+        /* 헬멧 바이저 */
+        var visor=new THREE.Mesh(new THREE.BoxGeometry(.46,.08,.04),new THREE.MeshBasicMaterial({color:0x111111}));
+        visor.position.set(0,.04,.24);helm.add(visor);
+        /* 헬멧 위 깃털/장식 */
+        if(rarity!=='common'){
+          var crest=new THREE.Mesh(new THREE.BoxGeometry(.06,.18,.3),new THREE.MeshLambertMaterial({color:rarity==='legendary'?0xff4444:0x4488ff}));
+          crest.position.set(0,.32,0);helm.add(crest);
+        }
+        PL.head.add(helm);
+        PL.helmMesh=helm;
+      }
+      if(icon==='gloves'){
+        if(PL.armL){
+          var gL=new THREE.Mesh(new THREE.BoxGeometry(.18,.18,.18),armorMat);
+          gL.position.set(0,-.32,0);PL.armL.add(gL);PL.glovesL=gL;
+        }
+        if(PL.armRPivot){
+          var gR=new THREE.Mesh(new THREE.BoxGeometry(.18,.18,.18),armorMat);
+          gR.position.set(0,-.32,0);PL.armRPivot.add(gR);PL.glovesR=gR;
+        }
+      }
+      if(icon==='boots'){
+        if(PL.legL){
+          var bL=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.28),armorMat);
+          bL.position.set(0,-.36,.04);PL.legL.add(bL);PL.bootsL=bL;
+        }
+        if(PL.legR){
+          var bR=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.28),armorMat);
+          bR.position.set(0,-.36,.04);PL.legR.add(bR);PL.bootsR=bR;
+        }
+      }
+    }
+  }
+
   /* ── 모자 제거 ── */
   if(PL.hatMesh){PL.head.remove(PL.hatMesh);PL.hatMesh=null;}
 
