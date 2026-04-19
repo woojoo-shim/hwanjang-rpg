@@ -324,10 +324,13 @@ function startCharPreview(){
       if(wm&&h.armR){
         var wDef=getItemDef(equipped.weapon);
         var icon=wDef?wDef.icon:'';
-        if(icon==='sword'||icon==='dagger'||icon==='axe'||icon==='hammer'){
-          /* 검/도끼: 이전 자세 */
+        if(icon==='sword'||icon==='dagger'){
           wm.position.set(0,-.65,-.15);
           wm.rotation.set(Math.PI/2,Math.PI/2,0);
+        }else if(icon==='axe'||icon==='hammer'){
+          /* 도끼: 머리가 위로 */
+          wm.position.set(0,-.78,0);
+          wm.rotation.set(0,Math.PI/2,0);
         }else if(icon==='bow'){
           wm.position.set(0,-.45,0);
           wm.rotation.set(0,0,0);
