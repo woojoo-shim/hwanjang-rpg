@@ -252,24 +252,24 @@ function refreshWeaponMesh(){
   var def=getItemDef(equipped.weapon);
   var icon=def?def.icon:'';
   if(icon==='sword'||icon==='dagger'){
-    /* 검: 손에서 위로 곧게, 살짝 앞으로 */
-    wm.position.set(0, -0.45, 0);
-    wm.rotation.set(-0.15, 0, 0);
+    /* 검: 손에서 아래로 향함 (사이드 가드 자세) - 칼날이 앞쪽 아래로 */
+    wm.position.set(0, -0.5, 0);
+    wm.rotation.set(Math.PI, 0, 0);/* X축 180° 회전 → 칼날이 아래로 */
   }else if(icon==='axe'||icon==='hammer'){
-    /* 도끼: 손에 똑바로 잡고 머리가 앞쪽 */
+    /* 도끼: 머리가 아래쪽 */
+    wm.position.set(0, -0.5, 0);
+    wm.rotation.set(Math.PI, 0, 0);
+  }else if(icon==='bow'){
+    /* 활: 손에 세로로 들고 옆에 (활대가 앞뒤) */
     wm.position.set(0, -0.45, 0);
     wm.rotation.set(0, 0, 0);
-  }else if(icon==='bow'){
-    /* 활: 손에 가로로 잡음 (현이 앞, 활대가 옆) */
-    wm.position.set(0, -0.4, 0);
-    wm.rotation.set(0, Math.PI/2, Math.PI/2);
   }else if(icon==='staff'){
-    /* 지팡이: 손에서 위로 곧게, 보석이 위에 */
+    /* 지팡이: 손에서 위로 곧게 (보석이 위, 짚는 자세) */
     wm.position.set(0, -0.4, 0);
     wm.rotation.set(0, 0, 0);
   }else{
-    wm.position.set(0, -0.45, 0);
-    wm.rotation.set(0, 0, 0);
+    wm.position.set(0, -0.5, 0);
+    wm.rotation.set(Math.PI, 0, 0);
   }
   PL.armRPivot.add(wm);
   PL.weaponMesh=wm;
