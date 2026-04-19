@@ -1930,6 +1930,10 @@ var cameraMode='follow';
 function toggleCameraMode(){
   if(cameraMode==='follow'){
     cameraMode='back';
+    /* cYaw를 현재 플레이어 방향에 맞춰 단 한 번만 설정 */
+    if(typeof cYaw!=='undefined'&&PL&&PL.group){
+      cYaw=PL.group.rotation.y+Math.PI;
+    }
     if(typeof addChat==='function')addChat('sys','[시스템]','카메라 모드: 등 뒤 고정');
   }else{
     cameraMode='follow';
@@ -1952,8 +1956,6 @@ function updCam(){
   /* 등 뒤 고정 모드: 플레이어 회전 방향을 기준으로 카메라가 뒤에 따라붙음 */
   if(cameraMode==='back'){
     var ry=PL.group.rotation.y;
-    /* cYaw를 플레이어 회전에 동기화 — WASD 조작이 어긋나지 않도록 */
-    if(typeof cYaw!=='undefined')cYaw=ry+Math.PI;
     /* 플레이어 뒤쪽 = -forward 방향 */
     var backDist=10,camHeight=5;
     var bx=p.x-Math.sin(ry)*backDist;
