@@ -59,6 +59,7 @@ function equipItem(slot){
     if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
     if(typeof sendCosmeticUpdate==='function')sendCosmeticUpdate();
     renderInv();showDetail(slot);updEquipHud();
+    if(typeof refreshCharPreview==='function')refreshCharPreview();
     return;
   }
   equipped[it.type]=slot.itemId;
@@ -72,6 +73,7 @@ function equipItem(slot){
   if(it.type==='weapon')refreshWeaponMesh();
   if(it.type==='armor'&&typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
   renderInv();showDetail(slot);updEquipHud();
+  if(typeof refreshCharPreview==='function')refreshCharPreview();
 }
 
 /* 최대 내구도 조회 */
@@ -127,6 +129,7 @@ function unequipItem(slot){
     if(typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
     if(typeof sendCosmeticUpdate==='function')sendCosmeticUpdate();
     renderInv();showDetail(slot);updEquipHud();
+    if(typeof refreshCharPreview==='function')refreshCharPreview();
     return;
   }
   equipped[it.type]=null;
@@ -134,6 +137,7 @@ function unequipItem(slot){
   if(it.type==='weapon')refreshWeaponMesh();
   if(it.type==='armor'&&typeof refreshCosmeticMesh==='function')refreshCosmeticMesh();
   renderInv();showDetail(slot);updEquipHud();
+  if(typeof refreshCharPreview==='function')refreshCharPreview();
 }
 
 function useItem(slot){
@@ -236,7 +240,7 @@ function closeInv(){
 }
 
 /* ════════════ 캐릭터 미리보기 (마크 인벤토리 스타일) ════════════ */
-var _charPreview={scene:null,camera:null,renderer:null,player:null,running:false,rafId:0,yaw:0,dragging:false,lastX:0};
+var _charPreview={scene:null,camera:null,renderer:null,player:null,running:false,rafId:0,yaw:0,dragging:false,lastX:0,lastY:0,pitch:0,zoom:3.2,targetY:1.0};
 function startCharPreview(){
   var canvas=document.getElementById('inv-char-canvas');
   if(!canvas)return;
@@ -257,23 +261,55 @@ function startCharPreview(){
     disc.rotation.x=-Math.PI/2;disc.position.y=0;_charPreview.scene.add(disc);
     var ring=new THREE.Mesh(new THREE.TorusGeometry(.8,.025,6,24),new THREE.MeshLambertMaterial({color:0xc9a84c,emissive:new THREE.Color(0xc9a84c),emissiveIntensity:0.4}));
     ring.rotation.x=-Math.PI/2;ring.position.y=.01;_charPreview.scene.add(ring);
-    /* 드래그 회전 */
-    canvas.addEventListener('mousedown',function(e){_charPreview.dragging=true;_charPreview.lastX=e.clientX;canvas.style.cursor='grabbing';});
+    /* 드래그 회전 (X=좌우, Y=상하) */
+    canvas.addEventListener('mousedown',function(e){_charPreview.dragging=true;_charPreview.lastX=e.clientX;_charPreview.lastY=e.clientY;canvas.style.cursor='grabbing';});
     window.addEventListener('mouseup',function(){_charPreview.dragging=false;if(canvas)canvas.style.cursor='grab';});
     window.addEventListener('mousemove',function(e){
       if(!_charPreview.dragging)return;
       var dx=e.clientX-_charPreview.lastX;
+      var dy=e.clientY-_charPreview.lastY;
       _charPreview.yaw+=dx*0.012;
+      _charPreview.pitch+=dy*0.008;
+      _charPreview.pitch=Math.max(-0.8,Math.min(0.8,_charPreview.pitch));
       _charPreview.lastX=e.clientX;
+      _charPreview.lastY=e.clientY;
     });
-    /* 터치 회전 */
-    canvas.addEventListener('touchstart',function(e){if(e.touches[0]){_charPreview.dragging=true;_charPreview.lastX=e.touches[0].clientX;}},{passive:true});
-    canvas.addEventListener('touchend',function(){_charPreview.dragging=false;},{passive:true});
+    /* 마우스 휠 줌 */
+    canvas.addEventListener('wheel',function(e){
+      e.preventDefault();
+      _charPreview.zoom+=e.deltaY*0.003;
+      _charPreview.zoom=Math.max(1.2,Math.min(7,_charPreview.zoom));
+    },{passive:false});
+    /* 터치 회전 + 핀치 줌 */
+    var _pinchDist=0;
+    canvas.addEventListener('touchstart',function(e){
+      if(e.touches.length===1){_charPreview.dragging=true;_charPreview.lastX=e.touches[0].clientX;_charPreview.lastY=e.touches[0].clientY;}
+      else if(e.touches.length===2){
+        var dx=e.touches[0].clientX-e.touches[1].clientX;
+        var dy=e.touches[0].clientY-e.touches[1].clientY;
+        _pinchDist=Math.sqrt(dx*dx+dy*dy);
+      }
+    },{passive:true});
+    canvas.addEventListener('touchend',function(){_charPreview.dragging=false;_pinchDist=0;},{passive:true});
     canvas.addEventListener('touchmove',function(e){
-      if(!_charPreview.dragging||!e.touches[0])return;
-      var dx=e.touches[0].clientX-_charPreview.lastX;
-      _charPreview.yaw+=dx*0.012;
-      _charPreview.lastX=e.touches[0].clientX;
+      if(e.touches.length===1&&_charPreview.dragging){
+        var dx=e.touches[0].clientX-_charPreview.lastX;
+        var dy=e.touches[0].clientY-_charPreview.lastY;
+        _charPreview.yaw+=dx*0.012;
+        _charPreview.pitch+=dy*0.008;
+        _charPreview.pitch=Math.max(-0.8,Math.min(0.8,_charPreview.pitch));
+        _charPreview.lastX=e.touches[0].clientX;
+        _charPreview.lastY=e.touches[0].clientY;
+      }else if(e.touches.length===2){
+        var dx=e.touches[0].clientX-e.touches[1].clientX;
+        var dy=e.touches[0].clientY-e.touches[1].clientY;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(_pinchDist>0){
+          _charPreview.zoom+=(_pinchDist-d)*0.01;
+          _charPreview.zoom=Math.max(1.2,Math.min(7,_charPreview.zoom));
+        }
+        _pinchDist=d;
+      }
     },{passive:true});
   }
   /* 기존 모델 제거 후 새로 생성 */
@@ -325,8 +361,20 @@ function _charPreviewLoop(){
     if(!_charPreview.dragging)_charPreview.yaw+=0.005;/* 자동 회전 */
     _charPreview.player.rotation.y=_charPreview.yaw;
   }
+  /* 카메라 위치 업데이트 (줌 + 수직 회전) */
+  if(_charPreview.camera){
+    var d=_charPreview.zoom;
+    var p=_charPreview.pitch;
+    _charPreview.camera.position.set(0,1.4+Math.sin(p)*d*0.5,d*Math.cos(p));
+    _charPreview.camera.lookAt(0,_charPreview.targetY,0);
+  }
   _charPreview.renderer.render(_charPreview.scene,_charPreview.camera);
   _charPreview.rafId=requestAnimationFrame(_charPreviewLoop);
+}
+
+/* 장비/코디 변경 시 미리보기 즉시 새로고침 */
+function refreshCharPreview(){
+  if(_charPreview.running&&typeof startCharPreview==='function')startCharPreview();
 }
 function stopCharPreview(){
   _charPreview.running=false;
