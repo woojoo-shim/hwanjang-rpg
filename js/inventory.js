@@ -282,11 +282,27 @@ function startCharPreview(){
     var h=mkHuman(0x2a6a3a,0xddcc99,(typeof playerGender!=='undefined')?playerGender:'male');
     _charPreview.player=h.group;
     _charPreview.scene.add(_charPreview.player);
-    /* 장착 무기 표시 */
+    /* 장착 무기 표시 — 무기 종류별 자세 */
     if(typeof equipped!=='undefined'&&equipped.weapon&&typeof buildWeaponMesh==='function'){
       var wm=buildWeaponMesh(equipped.weapon);
       if(wm&&h.armR){
-        wm.position.set(0,-.45,.25);
+        var wDef=getItemDef(equipped.weapon);
+        var icon=wDef?wDef.icon:'';
+        if(icon==='sword'||icon==='dagger'||icon==='axe'||icon==='hammer'){
+          /* 검/도끼: 손에서 앞쪽으로 */
+          wm.position.set(0,-.5,.1);
+          wm.rotation.set(-Math.PI/2,0,0);
+        }else if(icon==='bow'){
+          wm.position.set(0,-.45,0);
+          wm.rotation.set(0,0,0);
+        }else if(icon==='staff'){
+          /* 지팡이: 손에서 위로 */
+          wm.position.set(0,-.4,0);
+          wm.rotation.set(0,0,0);
+        }else{
+          wm.position.set(0,-.5,.1);
+          wm.rotation.set(-Math.PI/2,0,0);
+        }
         h.armR.add(wm);
       }
     }
