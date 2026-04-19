@@ -85,40 +85,160 @@ function buildWeaponMesh(itemId){
   var def=getItemDef(itemId);
   if(!def)return null;
   var icon=def.icon||'';
+  /* 등급별 색상 */
+  var rarity=def.rarity||'common';
+  var bladeColors={common:0xbbbbbb,uncommon:0xccffcc,rare:0xaaccff,epic:0xddaaff,legendary:0xffddaa,hidden:0xff66aa};
+  var emissiveColors={common:0x111111,uncommon:0x114411,rare:0x1144aa,epic:0x441188,legendary:0xaa6611,hidden:0xaa1166};
+  var bladeColor=bladeColors[rarity]||0xbbbbbb;
+  var emColor=emissiveColors[rarity]||0x222222;
+  var emInt=(rarity==='legendary'||rarity==='epic'||rarity==='hidden')?0.6:0.2;
   var mesh=null;
+
   if(icon==='sword'||icon==='dagger'){
     var g=new THREE.Group();
-    var blade=new THREE.Mesh(new THREE.BoxGeometry(.06,.7,.04),new THREE.MeshLambertMaterial({color:0xccddee,emissive:new THREE.Color(0x223344),emissiveIntensity:.3}));
-    blade.position.set(0,.38,0);g.add(blade);
-    var guard=new THREE.Mesh(new THREE.BoxGeometry(.22,.06,.06),new THREE.MeshLambertMaterial({color:0x886622}));
-    guard.position.set(0,.04,0);g.add(guard);
-    var hilt=new THREE.Mesh(new THREE.BoxGeometry(.06,.2,.06),new THREE.MeshLambertMaterial({color:0x663300}));
-    hilt.position.set(0,-.12,0);g.add(hilt);
+    var len=icon==='dagger'?0.45:0.75;
+    /* 칼날 — 다층 구조 (날카로움) */
+    var bladeMat=new THREE.MeshLambertMaterial({color:bladeColor,emissive:new THREE.Color(emColor),emissiveIntensity:emInt});
+    var blade=new THREE.Mesh(new THREE.BoxGeometry(.05,len,.025),bladeMat);
+    blade.position.set(0,.3+len/2,0);g.add(blade);
+    /* 칼날 중앙 융기 (피홈) */
+    var ridge=new THREE.Mesh(new THREE.BoxGeometry(.012,len*0.95,.04),new THREE.MeshLambertMaterial({color:0xeeeeff,emissive:new THREE.Color(emColor),emissiveIntensity:emInt*1.5}));
+    ridge.position.set(0,.3+len/2,0);g.add(ridge);
+    /* 칼끝 (뾰족한 삼각형) */
+    var tip=new THREE.Mesh(new THREE.ConeGeometry(.04,.12,4),bladeMat);
+    tip.position.set(0,.3+len+.06,0);g.add(tip);
+    /* 가드 (장식적) */
+    var guardColor=rarity==='legendary'?0xffcc44:rarity==='epic'?0x6622aa:0x886622;
+    var guardMat=new THREE.MeshLambertMaterial({color:guardColor});
+    var guard=new THREE.Mesh(new THREE.BoxGeometry(.28,.05,.07),guardMat);
+    guard.position.set(0,.28,0);g.add(guard);
+    /* 가드 양쪽 끝 장식 (구슬) */
+    var guardEnd=new THREE.Mesh(new THREE.SphereGeometry(.035,6,5),guardMat);
+    guardEnd.position.set(.14,.28,0);g.add(guardEnd);
+    var guardEnd2=new THREE.Mesh(new THREE.SphereGeometry(.035,6,5),guardMat);
+    guardEnd2.position.set(-.14,.28,0);g.add(guardEnd2);
+    /* 손잡이 (가죽 감긴 느낌) */
+    var hiltMat=new THREE.MeshLambertMaterial({color:0x4a2010});
+    var hilt=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.22,6),hiltMat);
+    hilt.position.set(0,.16,0);g.add(hilt);
+    /* 손잡이 끝 폼멜 */
+    var pommel=new THREE.Mesh(new THREE.SphereGeometry(.05,6,5),guardMat);
+    pommel.position.set(0,.04,0);g.add(pommel);
+    /* 전설/에픽 — 광원 효과 */
+    if(rarity==='legendary'||rarity==='epic'||rarity==='hidden'){
+      var glow=new THREE.PointLight(bladeColor,0.4,2);
+      glow.position.set(0,.3+len/2,0);g.add(glow);
+    }
     mesh=g;
-  } else if(icon==='axe'){
+  } else if(icon==='axe'||icon==='hammer'){
     var g=new THREE.Group();
-    var handle=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,.8,6),new THREE.MeshLambertMaterial({color:0x663300}));
+    /* 손잡이 — 나무결 */
+    var handleMat=new THREE.MeshLambertMaterial({color:0x5a3010});
+    var handle=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.85,7),handleMat);
     handle.position.set(0,.1,0);g.add(handle);
-    var head=new THREE.Mesh(new THREE.BoxGeometry(.38,.3,.05),new THREE.MeshLambertMaterial({color:0x88aacc,emissive:new THREE.Color(0x1a2a3a),emissiveIntensity:.2}));
-    head.position.set(.12,.42,0);g.add(head);
+    /* 손잡이 그립 (가죽) */
+    var grip=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.18,6),new THREE.MeshLambertMaterial({color:0x3a1808}));
+    grip.position.set(0,-.15,0);g.add(grip);
+    /* 도끼날 — 양면 */
+    var headMat=new THREE.MeshLambertMaterial({color:bladeColor,emissive:new THREE.Color(emColor),emissiveIntensity:emInt});
+    var head=new THREE.Mesh(new THREE.BoxGeometry(.42,.32,.06),headMat);
+    head.position.set(.1,.45,0);g.add(head);
+    /* 도끼날 곡선 (위쪽 뿔) */
+    var horn=new THREE.Mesh(new THREE.ConeGeometry(.06,.18,4),headMat);
+    horn.position.set(.28,.6,0);horn.rotation.z=-0.5;g.add(horn);
+    /* 망치형이면 평평한 뒷면 */
+    if(icon==='hammer'){
+      var hammerHead=new THREE.Mesh(new THREE.BoxGeometry(.16,.3,.18),headMat);
+      hammerHead.position.set(-.12,.45,0);g.add(hammerHead);
+    }else{
+      /* 도끼면 반대쪽 작은 날 */
+      var smallBlade=new THREE.Mesh(new THREE.BoxGeometry(.18,.22,.05),headMat);
+      smallBlade.position.set(-.1,.45,0);g.add(smallBlade);
+    }
+    /* 손잡이와 머리 연결부 (금속 밴드) */
+    var band=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.06,8),new THREE.MeshLambertMaterial({color:0x222222}));
+    band.position.set(0,.4,0);g.add(band);
+    if(rarity==='legendary'||rarity==='epic'){
+      var glow=new THREE.PointLight(bladeColor,0.3,2);
+      glow.position.set(.1,.45,0);g.add(glow);
+    }
     mesh=g;
   } else if(icon==='bow'){
     var g=new THREE.Group();
-    var bm=new THREE.MeshLambertMaterial({color:0x7a4a10});
-    var top=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.5,6),bm);top.position.set(0,.3,0);top.rotation.z=.18;g.add(top);
-    var bot=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.5,6),bm);bot.position.set(0,-.3,0);bot.rotation.z=-.18;g.add(bot);
-    var string=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.9,4),new THREE.MeshLambertMaterial({color:0xeeddbb}));
-    string.position.set(.06,0,0);g.add(string);
+    /* 활대 — 곡선 (TorusGeometry 절반) */
+    var bowMat=new THREE.MeshLambertMaterial({color:0x6a3a10,emissive:new THREE.Color(emColor),emissiveIntensity:emInt*0.5});
+    var bowArc=new THREE.Mesh(new THREE.TorusGeometry(.35,.025,5,12,Math.PI),bowMat);
+    bowArc.position.set(.05,0,0);bowArc.rotation.y=Math.PI/2;g.add(bowArc);
+    /* 활 손잡이 (그립) */
+    var grip=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.15,6),new THREE.MeshLambertMaterial({color:0x3a1808}));
+    grip.position.set(0,0,0);g.add(grip);
+    /* 활 끝 장식 */
+    var tip1=new THREE.Mesh(new THREE.ConeGeometry(.025,.07,4),bowMat);
+    tip1.position.set(0,.34,0);g.add(tip1);
+    var tip2=new THREE.Mesh(new THREE.ConeGeometry(.025,.07,4),bowMat);
+    tip2.position.set(0,-.34,0);tip2.rotation.x=Math.PI;g.add(tip2);
+    /* 활시위 — 팽팽한 줄 */
+    var string=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,.7,4),new THREE.MeshBasicMaterial({color:0xffffff}));
+    string.position.set(-.05,0,0);g.add(string);
+    /* 화살 (장착됨) */
+    var arrowShaft=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.5,5),new THREE.MeshLambertMaterial({color:0x8a5a20}));
+    arrowShaft.position.set(.05,0,0);arrowShaft.rotation.x=Math.PI/2;arrowShaft.rotation.z=Math.PI/2;g.add(arrowShaft);
+    /* 화살촉 */
+    var arrowHead=new THREE.Mesh(new THREE.ConeGeometry(.025,.06,4),new THREE.MeshLambertMaterial({color:0xaaaaaa}));
+    arrowHead.position.set(.32,0,0);arrowHead.rotation.z=-Math.PI/2;g.add(arrowHead);
+    /* 깃털 */
+    var feather=new THREE.Mesh(new THREE.BoxGeometry(.03,.06,.01),new THREE.MeshLambertMaterial({color:rarity==='legendary'?0xffaa44:0xcc3333}));
+    feather.position.set(-.16,0,0);g.add(feather);
+    if(rarity==='legendary'||rarity==='epic'){
+      var glow=new THREE.PointLight(bladeColor,0.3,2);
+      glow.position.set(0,0,0);g.add(glow);
+    }
     mesh=g;
   } else if(icon==='staff'){
     var g=new THREE.Group();
-    var rod=new THREE.Mesh(new THREE.CylinderGeometry(.04,.055,.95,7),new THREE.MeshLambertMaterial({color:0x5a3010}));
-    rod.position.set(0,.05,0);g.add(rod);
-    var orb=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),new THREE.MeshLambertMaterial({color:0x8844ff,emissive:new THREE.Color(0x4400cc),emissiveIntensity:.7}));
-    orb.position.set(0,.56,0);g.add(orb);
+    /* 막대 — 구부러진 나무 (3 segment) */
+    var rodMat=new THREE.MeshLambertMaterial({color:0x4a2810});
+    var rod1=new THREE.Mesh(new THREE.CylinderGeometry(.045,.05,.4,7),rodMat);
+    rod1.position.set(0,-.15,0);g.add(rod1);
+    var rod2=new THREE.Mesh(new THREE.CylinderGeometry(.04,.045,.35,7),rodMat);
+    rod2.position.set(.02,.2,0);rod2.rotation.z=-.05;g.add(rod2);
+    var rod3=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.2,7),rodMat);
+    rod3.position.set(.04,.45,0);rod3.rotation.z=-.1;g.add(rod3);
+    /* 손잡이 그립 */
+    var grip=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.2,6),new THREE.MeshLambertMaterial({color:0x2a1408}));
+    grip.position.set(0,-.2,0);g.add(grip);
+    /* 막대 끝 장식 (곁가지) */
+    var twig1=new THREE.Mesh(new THREE.CylinderGeometry(.012,.018,.2,4),rodMat);
+    twig1.position.set(.15,.55,0);twig1.rotation.z=-1.0;g.add(twig1);
+    var twig2=new THREE.Mesh(new THREE.CylinderGeometry(.012,.018,.18,4),rodMat);
+    twig2.position.set(-.12,.55,0);twig2.rotation.z=1.0;g.add(twig2);
+    /* 마법 보석 — 큰 구슬 + 외곽 글로우 */
+    var orbColor=rarity==='legendary'?0xffaa44:rarity==='epic'?0xaa44ff:0x4488ff;
+    var orbEm=rarity==='legendary'?0xff6600:rarity==='epic'?0x6600cc:0x0044aa;
+    var orbMat=new THREE.MeshLambertMaterial({color:orbColor,emissive:new THREE.Color(orbEm),emissiveIntensity:0.9});
+    var orb=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),orbMat);
+    orb.position.set(.06,.62,0);g.add(orb);
+    /* 보석 외곽 글로우 (반투명) */
+    var orbGlow=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),new THREE.MeshBasicMaterial({color:orbColor,transparent:true,opacity:.3}));
+    orbGlow.position.set(.06,.62,0);g.add(orbGlow);
+    /* 보석 받침 (금속 발) */
+    var clawMat=new THREE.MeshLambertMaterial({color:0xaa8833});
+    for(var ci=0;ci<4;ci++){
+      var ang=ci*Math.PI/2;
+      var claw=new THREE.Mesh(new THREE.ConeGeometry(.025,.12,4),clawMat);
+      claw.position.set(.06+Math.cos(ang)*.1,.5,Math.sin(ang)*.1);
+      claw.rotation.x=ang;g.add(claw);
+    }
+    /* PointLight (마법 광원) */
+    var orbLight=new THREE.PointLight(orbColor,0.6,3);
+    orbLight.position.set(.06,.62,0);g.add(orbLight);
     mesh=g;
+  } else if(icon==='helmet'||icon==='shield'){
+    /* 방어구 등 — 작은 큐브 */
+    mesh=new THREE.Mesh(new THREE.BoxGeometry(.15,.2,.05),new THREE.MeshLambertMaterial({color:bladeColor}));
   } else {
-    mesh=new THREE.Mesh(new THREE.BoxGeometry(.08,.55,.08),new THREE.MeshLambertMaterial({color:0xaabbcc}));
+    /* 기본 — 단순 막대 */
+    mesh=new THREE.Mesh(new THREE.BoxGeometry(.06,.5,.06),new THREE.MeshLambertMaterial({color:bladeColor,emissive:new THREE.Color(emColor),emissiveIntensity:emInt}));
   }
   return mesh;
 }
