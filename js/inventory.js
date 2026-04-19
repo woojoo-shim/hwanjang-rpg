@@ -325,9 +325,9 @@ function startCharPreview(){
         var wDef=getItemDef(equipped.weapon);
         var icon=wDef?wDef.icon:'';
         if(icon==='sword'||icon==='dagger'||icon==='axe'||icon==='hammer'){
-          /* 검/도끼: 손에서 앞쪽으로 */
-          wm.position.set(0,-.5,.1);
-          wm.rotation.set(-Math.PI/2,0,0);
+          /* 검/도끼: 옆에 자연스럽게 늘어뜨림 (칼날 아래) */
+          wm.position.set(0,-.55,0);
+          wm.rotation.set(Math.PI,0,0);
         }else if(icon==='bow'){
           wm.position.set(0,-.45,0);
           wm.rotation.set(0,0,0);

@@ -252,13 +252,13 @@ function refreshWeaponMesh(){
   var def=getItemDef(equipped.weapon);
   var icon=def?def.icon:'';
   if(icon==='sword'||icon==='dagger'){
-    /* 검: 손에서 앞쪽으로 뻗음 (전투 그립) - 칼날이 앞으로 */
-    wm.position.set(0, -0.5, 0.1);
-    wm.rotation.set(-Math.PI/2, 0, 0);/* X축 -90° → 칼날이 앞쪽으로 */
+    /* 검: 옆에 자연스럽게 늘어뜨림 - 칼날이 땅을 향함 */
+    wm.position.set(0, -0.55, 0);
+    wm.rotation.set(Math.PI, 0, 0);/* 180° 뒤집어서 칼날 아래로 */
   }else if(icon==='axe'||icon==='hammer'){
-    /* 도끼: 머리가 앞쪽 */
-    wm.position.set(0, -0.5, 0.1);
-    wm.rotation.set(-Math.PI/2, 0, 0);
+    /* 도끼: 머리가 아래쪽 (땅 향함) */
+    wm.position.set(0, -0.55, 0);
+    wm.rotation.set(Math.PI, 0, 0);
   }else if(icon==='bow'){
     /* 활: 손에 세로로 들고 옆에 (활대가 앞뒤) */
     wm.position.set(0, -0.45, 0);
@@ -1428,16 +1428,14 @@ function handleMove(dt){
     var hasWeapon=equipped&&equipped.weapon;
     if(PL.atkPhase===0){
       if(hasWeapon){
-        /* 오른팔: 살짝 앞으로 (자연스러운 검 잡기) */
-        var tgtRX=-0.25,tgtRZ=0.05;
-        PL.armRPivot.rotation.x+=(tgtRX-PL.armRPivot.rotation.x)*0.1;
-        PL.armRPivot.rotation.z+=(tgtRZ-PL.armRPivot.rotation.z)*0.1;
-        /* 왼팔: 자연스럽게 옆에 (살짝 안쪽) */
-        var tgtLX=0,tgtLZ=-0.05;
-        PL.armL.rotation.x+=(tgtLX-PL.armL.rotation.x)*0.1;
-        PL.armL.rotation.z+=(tgtLZ-PL.armL.rotation.z)*0.1;
-        /* 몸통 살짝만 비스듬히 */
-        if(PL.body)PL.body.rotation.y+=(0.08-PL.body.rotation.y)*0.06;
+        /* 오른팔: 자연스럽게 옆에 (검은 손에 늘어뜨림) */
+        PL.armRPivot.rotation.x+=(0-PL.armRPivot.rotation.x)*0.1;
+        PL.armRPivot.rotation.z+=(0-PL.armRPivot.rotation.z)*0.1;
+        /* 왼팔: 자연스럽게 옆에 */
+        PL.armL.rotation.x+=(0-PL.armL.rotation.x)*0.1;
+        PL.armL.rotation.z+=(0-PL.armL.rotation.z)*0.1;
+        /* 몸통 정면 */
+        if(PL.body)PL.body.rotation.y*=0.92;
       }else{
         PL.armRPivot.rotation.x*=0.8;PL.armRPivot.rotation.z*=0.85;
         PL.armL.rotation.x*=0.8;PL.armL.rotation.z*=0.85;
