@@ -325,9 +325,9 @@ function startCharPreview(){
         var wDef=getItemDef(equipped.weapon);
         var icon=wDef?wDef.icon:'';
         if(icon==='sword'||icon==='dagger'||icon==='axe'||icon==='hammer'){
-          /* 검/도끼: 플레이어 뒤쪽 */
+          /* 검/도끼: Y축 90° 추가 회전 */
           wm.position.set(0,-.5,-.15);
-          wm.rotation.set(Math.PI/2,0,0);
+          wm.rotation.set(Math.PI/2,Math.PI/2,0);
         }else if(icon==='bow'){
           wm.position.set(0,-.45,0);
           wm.rotation.set(0,0,0);
