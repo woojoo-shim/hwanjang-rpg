@@ -335,8 +335,8 @@ function startCharPreview(){
           wm.position.set(0,-.45,0);
           wm.rotation.set(0,0,0);
         }else if(icon==='staff'){
-          /* 지팡이: 손에서 위로 */
-          wm.position.set(0,-.4,0);
+          /* 지팡이: 손에 수직 */
+          wm.position.set(0,-.55,0);
           wm.rotation.set(0,0,0);
         }else{
           wm.position.set(0,-.5,.1);

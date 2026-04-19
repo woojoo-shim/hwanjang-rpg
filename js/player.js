@@ -263,8 +263,8 @@ function refreshWeaponMesh(){
     wm.position.set(0, -0.45, 0);
     wm.rotation.set(0, 0, 0);
   }else if(icon==='staff'){
-    /* 지팡이: 손에서 위로 곧게 (보석이 위, 짚는 자세) */
-    wm.position.set(0, -0.4, 0);
+    /* 지팡이: 손에 수직으로 쥐기 (그립이 손에, 보석이 위) */
+    wm.position.set(0, -0.55, 0);
     wm.rotation.set(0, 0, 0);
   }else{
     wm.position.set(0, -0.5, 0);
