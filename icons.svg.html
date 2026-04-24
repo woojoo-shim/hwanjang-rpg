@@ -1,0 +1,750 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+
+  <!-- Excalibur — diagonal heroic longsword, rich gold hilt -->
+  <symbol id="ico-sword" viewBox="0 0 24 24">
+    <!-- diagonal blade, bottom-left to top-right -->
+    <!-- tip -->
+    <rect x="17" y="3" width="2" height="2" fill="#ffffff"/>
+    <rect x="16" y="5" width="3" height="1" fill="#f0e4bb"/>
+    <!-- blade body along diagonal -->
+    <rect x="15" y="5" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="14" y="6" width="2" height="2" fill="#e8dcb0"/>
+    <rect x="13" y="7" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="12" y="8" width="2" height="2" fill="#e8dcb0"/>
+    <rect x="11" y="9" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="10" y="10" width="2" height="2" fill="#e8dcb0"/>
+    <rect x="9" y="11" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="8" y="12" width="2" height="2" fill="#e8dcb0"/>
+    <!-- highlight edge -->
+    <rect x="16" y="4" width="1" height="1" fill="#ffffff"/>
+    <rect x="14" y="5" width="1" height="1" fill="#ffffff" opacity=".6"/>
+    <rect x="12" y="7" width="1" height="1" fill="#ffffff" opacity=".5"/>
+    <rect x="10" y="9" width="1" height="1" fill="#ffffff" opacity=".4"/>
+    <!-- dark edge -->
+    <rect x="16" y="6" width="1" height="1" fill="#b89a6a"/>
+    <rect x="14" y="8" width="1" height="1" fill="#b89a6a"/>
+    <rect x="12" y="10" width="1" height="1" fill="#b89a6a"/>
+    <rect x="10" y="12" width="1" height="1" fill="#b89a6a"/>
+    <!-- crossguard, perpendicular -->
+    <rect x="5" y="11" width="2" height="2" fill="#c9a84c"/>
+    <rect x="6" y="10" width="3" height="1" fill="#c9a84c"/>
+    <rect x="8" y="13" width="3" height="1" fill="#c9a84c"/>
+    <rect x="4" y="12" width="2" height="2" fill="#8a6820"/>
+    <rect x="9" y="14" width="2" height="2" fill="#8a6820"/>
+    <!-- gem in guard -->
+    <rect x="7" y="12" width="1" height="1" fill="#aa55ff"/>
+    <rect x="7" y="12" width="1" height="1" fill="#ff88ff" opacity=".4"/>
+    <!-- grip (wrapped) -->
+    <rect x="4" y="14" width="2" height="2" fill="#6a4a1a"/>
+    <rect x="3" y="15" width="2" height="2" fill="#6a4a1a"/>
+    <rect x="4" y="14" width="1" height="1" fill="#8a6a3a"/>
+    <rect x="5" y="15" width="1" height="1" fill="#4a2a0a"/>
+    <rect x="3" y="16" width="1" height="1" fill="#8a6a3a"/>
+    <!-- pommel -->
+    <rect x="2" y="17" width="3" height="2" fill="#c9a84c"/>
+    <rect x="1" y="18" width="2" height="1" fill="#8a6820"/>
+    <rect x="4" y="18" width="2" height="1" fill="#8a6820"/>
+    <rect x="2" y="17" width="1" height="1" fill="#f0d060"/>
+  </symbol>
+
+  <!-- Fire staff — tall wooden staff topped with flame crystal -->
+  <symbol id="ico-staff" viewBox="0 0 24 24">
+    <!-- staff shaft, diagonal -->
+    <rect x="15" y="6" width="2" height="2" fill="#8a5a3a"/>
+    <rect x="14" y="8" width="2" height="2" fill="#6a4a2a"/>
+    <rect x="13" y="10" width="2" height="2" fill="#8a5a3a"/>
+    <rect x="12" y="12" width="2" height="2" fill="#6a4a2a"/>
+    <rect x="11" y="14" width="2" height="2" fill="#8a5a3a"/>
+    <rect x="10" y="16" width="2" height="2" fill="#6a4a2a"/>
+    <rect x="9" y="18" width="2" height="2" fill="#8a5a3a"/>
+    <!-- wood highlight -->
+    <rect x="15" y="6" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="13" y="10" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="11" y="14" width="1" height="1" fill="#aa7a4a"/>
+    <!-- wood dark -->
+    <rect x="16" y="7" width="1" height="1" fill="#4a2a0a"/>
+    <rect x="14" y="9" width="1" height="1" fill="#4a2a0a"/>
+    <rect x="12" y="13" width="1" height="1" fill="#4a2a0a"/>
+    <!-- ornament claws holding gem -->
+    <rect x="16" y="4" width="1" height="2" fill="#8a5a3a"/>
+    <rect x="18" y="4" width="1" height="2" fill="#8a5a3a"/>
+    <rect x="15" y="5" width="1" height="1" fill="#6a4a2a"/>
+    <rect x="19" y="5" width="1" height="1" fill="#6a4a2a"/>
+    <!-- purple crystal/orb, diamond-ish -->
+    <rect x="17" y="2" width="1" height="1" fill="#ff88ff"/>
+    <rect x="16" y="3" width="3" height="1" fill="#aa55ff"/>
+    <rect x="15" y="4" width="5" height="2" fill="#aa55ff"/>
+    <rect x="16" y="6" width="3" height="1" fill="#7a2a9a"/>
+    <rect x="17" y="7" width="1" height="1" fill="#4a0a5a"/>
+    <!-- crystal highlight -->
+    <rect x="16" y="4" width="1" height="1" fill="#ff88ff"/>
+    <rect x="16" y="4" width="1" height="1" fill="#ffffff" opacity=".5"/>
+    <!-- flame flicker above -->
+    <rect x="17" y="1" width="1" height="1" fill="#ffcc44"/>
+    <rect x="16" y="0" width="1" height="1" fill="#ff6644" opacity=".7"/>
+    <rect x="18" y="0" width="1" height="1" fill="#ff6644" opacity=".7"/>
+    <!-- staff ferrule bottom -->
+    <rect x="8" y="20" width="3" height="1" fill="#c9a84c"/>
+    <rect x="8" y="21" width="3" height="1" fill="#8a6820"/>
+  </symbol>
+
+  <!-- Hunter's bow — curved D-shape with taut string -->
+  <symbol id="ico-bow" viewBox="0 0 24 24">
+    <!-- top tip -->
+    <rect x="15" y="2" width="2" height="1" fill="#6a3a1a"/>
+    <rect x="16" y="3" width="1" height="1" fill="#6a3a1a"/>
+    <!-- upper curve -->
+    <rect x="14" y="3" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="13" y="4" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="12" y="5" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="10" y="6" width="3" height="1" fill="#8a5a3a"/>
+    <rect x="8" y="7" width="3" height="1" fill="#8a5a3a"/>
+    <rect x="7" y="8" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="6" y="9" width="2" height="1" fill="#8a5a3a"/>
+    <!-- middle grip (thicker, wrapped in leather) -->
+    <rect x="5" y="10" width="2" height="4" fill="#6a3a1a"/>
+    <rect x="4" y="11" width="2" height="2" fill="#4a2a0a"/>
+    <rect x="5" y="10" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="5" y="13" width="1" height="1" fill="#aa7a4a"/>
+    <!-- lower curve (mirror) -->
+    <rect x="6" y="14" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="7" y="15" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="8" y="16" width="3" height="1" fill="#8a5a3a"/>
+    <rect x="10" y="17" width="3" height="1" fill="#8a5a3a"/>
+    <rect x="12" y="18" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="13" y="19" width="2" height="1" fill="#8a5a3a"/>
+    <rect x="14" y="20" width="2" height="1" fill="#8a5a3a"/>
+    <!-- bottom tip -->
+    <rect x="15" y="21" width="2" height="1" fill="#6a3a1a"/>
+    <rect x="16" y="20" width="1" height="1" fill="#6a3a1a"/>
+    <!-- wood highlight top edge -->
+    <rect x="13" y="3" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="10" y="5" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="7" y="7" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="7" y="15" width="1" height="1" fill="#aa7a4a"/>
+    <rect x="11" y="17" width="1" height="1" fill="#aa7a4a"/>
+    <!-- bowstring taut -->
+    <rect x="17" y="3" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="4" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="5" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="6" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="7" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="8" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="9" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="10" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="11" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="12" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="13" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="14" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="15" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="16" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="17" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="18" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="19" width="1" height="1" fill="#e0d49a"/>
+    <rect x="17" y="20" width="1" height="1" fill="#e0d49a"/>
+    <!-- nock point -->
+    <rect x="17" y="11" width="1" height="2" fill="#ff4444"/>
+  </symbol>
+
+  <!-- Iron short sword — clean straight silhouette -->
+  <symbol id="ico-shortsword" viewBox="0 0 24 24">
+    <!-- blade -->
+    <rect x="11" y="2" width="2" height="1" fill="#ffffff"/>
+    <rect x="10" y="3" width="4" height="1" fill="#dcdce0"/>
+    <rect x="10" y="4" width="4" height="10" fill="#c0c0c8"/>
+    <rect x="10" y="4" width="1" height="10" fill="#e0e0e8"/>
+    <rect x="13" y="4" width="1" height="10" fill="#808088"/>
+    <rect x="11" y="14" width="2" height="1" fill="#808088"/>
+    <!-- fuller groove -->
+    <rect x="11" y="5" width="1" height="8" fill="#a0a0a8"/>
+    <!-- crossguard -->
+    <rect x="6" y="14" width="12" height="2" fill="#8a6820"/>
+    <rect x="6" y="14" width="12" height="1" fill="#c9a84c"/>
+    <rect x="5" y="15" width="1" height="1" fill="#6a4a1a"/>
+    <rect x="18" y="15" width="1" height="1" fill="#6a4a1a"/>
+    <!-- grip -->
+    <rect x="10" y="16" width="4" height="4" fill="#4a2a1a"/>
+    <rect x="10" y="16" width="1" height="4" fill="#6a3a1a"/>
+    <rect x="13" y="16" width="1" height="4" fill="#2a1a0a"/>
+    <rect x="10" y="17" width="4" height="1" fill="#2a1a0a" opacity=".5"/>
+    <rect x="10" y="19" width="4" height="1" fill="#2a1a0a" opacity=".5"/>
+    <!-- pommel -->
+    <rect x="9" y="20" width="6" height="2" fill="#c9a84c"/>
+    <rect x="9" y="21" width="6" height="1" fill="#8a6820"/>
+    <rect x="10" y="20" width="1" height="1" fill="#f0d060"/>
+  </symbol>
+
+  <!-- HP Potion — tall corked bottle with red liquid -->
+  <symbol id="ico-potion-red" viewBox="0 0 24 24">
+    <!-- cork -->
+    <rect x="10" y="2" width="4" height="1" fill="#a0a0a8"/>
+    <rect x="10" y="3" width="4" height="2" fill="#6a5a3a"/>
+    <rect x="10" y="3" width="1" height="2" fill="#8a7a5a"/>
+    <!-- neck -->
+    <rect x="10" y="5" width="4" height="2" fill="#3a3a4a"/>
+    <rect x="10" y="5" width="1" height="2" fill="#5a5a6a"/>
+    <rect x="9" y="7" width="6" height="1" fill="#3a3a4a"/>
+    <!-- bottle shoulder -->
+    <rect x="8" y="8" width="8" height="1" fill="#2a2a3a"/>
+    <!-- glass body -->
+    <rect x="7" y="9" width="10" height="1" fill="#2a2a3a"/>
+    <rect x="6" y="10" width="12" height="11" fill="#2a2a3a"/>
+    <!-- red liquid inside -->
+    <rect x="7" y="11" width="10" height="9" fill="#cc2244"/>
+    <rect x="7" y="11" width="10" height="1" fill="#ff4466"/>
+    <rect x="7" y="20" width="10" height="1" fill="#8a1a2a"/>
+    <!-- bubbles -->
+    <rect x="9" y="13" width="1" height="1" fill="#ff8899"/>
+    <rect x="12" y="16" width="1" height="1" fill="#ff8899" opacity=".7"/>
+    <rect x="14" y="14" width="1" height="1" fill="#ff8899" opacity=".5"/>
+    <!-- glass highlight -->
+    <rect x="7" y="11" width="1" height="8" fill="#ff8899" opacity=".4"/>
+    <rect x="8" y="10" width="1" height="1" fill="#ffffff" opacity=".6"/>
+    <!-- base -->
+    <rect x="7" y="21" width="10" height="1" fill="#1a1a2a"/>
+  </symbol>
+
+  <!-- Void fragment — jagged faceted dark crystal -->
+  <symbol id="ico-void" viewBox="0 0 24 24">
+    <!-- jagged shard silhouette -->
+    <rect x="11" y="2" width="2" height="1" fill="#ff88ff"/>
+    <rect x="10" y="3" width="4" height="1" fill="#cc66ee"/>
+    <rect x="9" y="4" width="6" height="1" fill="#aa44cc"/>
+    <rect x="8" y="5" width="8" height="1" fill="#8a2aaa"/>
+    <rect x="7" y="6" width="10" height="2" fill="#6a1888"/>
+    <rect x="6" y="8" width="12" height="3" fill="#4a0a6a"/>
+    <rect x="7" y="11" width="10" height="3" fill="#3a0055"/>
+    <rect x="8" y="14" width="8" height="2" fill="#2a0040"/>
+    <rect x="9" y="16" width="6" height="2" fill="#1a0030"/>
+    <rect x="10" y="18" width="4" height="2" fill="#0a0020"/>
+    <rect x="11" y="20" width="2" height="2" fill="#050015"/>
+    <!-- facet highlights (crystalline angles) -->
+    <rect x="9" y="5" width="1" height="3" fill="#ff66ff" opacity=".6"/>
+    <rect x="10" y="6" width="1" height="2" fill="#ff88ff" opacity=".8"/>
+    <rect x="13" y="7" width="1" height="4" fill="#7a2288" opacity=".9"/>
+    <rect x="8" y="11" width="1" height="3" fill="#ff44ff" opacity=".3"/>
+    <rect x="14" y="10" width="1" height="4" fill="#2a0040" opacity=".9"/>
+    <!-- inner glow pulse dot -->
+    <rect x="11" y="10" width="2" height="2" fill="#ff88ff" opacity=".5"/>
+    <rect x="11" y="10" width="1" height="1" fill="#ffffff" opacity=".4"/>
+    <!-- surrounding void sparkles -->
+    <rect x="3" y="10" width="1" height="1" fill="#ff44ff" opacity=".6"/>
+    <rect x="20" y="15" width="1" height="1" fill="#ff44ff" opacity=".6"/>
+    <rect x="19" y="5" width="1" height="1" fill="#ff88ff" opacity=".5"/>
+    <rect x="4" y="19" width="1" height="1" fill="#ff88ff" opacity=".5"/>
+  </symbol>
+
+  <!-- Gem: fire — faceted ruby -->
+  <symbol id="gem-fire" viewBox="0 0 16 16">
+    <rect x="6" y="3" width="4" height="1" fill="#ffcc88"/>
+    <rect x="5" y="4" width="6" height="1" fill="#ff8844"/>
+    <rect x="4" y="5" width="8" height="2" fill="#ff6644"/>
+    <rect x="3" y="7" width="10" height="3" fill="#cc3322"/>
+    <rect x="4" y="10" width="8" height="2" fill="#8a1a0a"/>
+    <rect x="5" y="12" width="6" height="1" fill="#4a0a00"/>
+    <rect x="6" y="13" width="4" height="1" fill="#2a0500"/>
+    <rect x="5" y="5" width="1" height="2" fill="#ffee99" opacity=".9"/>
+    <rect x="6" y="4" width="1" height="1" fill="#ffffff" opacity=".8"/>
+    <rect x="10" y="8" width="1" height="2" fill="#4a0a00" opacity=".8"/>
+  </symbol>
+
+  <!-- Gem: ice — faceted sapphire -->
+  <symbol id="gem-ice" viewBox="0 0 16 16">
+    <rect x="6" y="3" width="4" height="1" fill="#ddf0ff"/>
+    <rect x="5" y="4" width="6" height="1" fill="#aaddff"/>
+    <rect x="4" y="5" width="8" height="2" fill="#66aadd"/>
+    <rect x="3" y="7" width="10" height="3" fill="#3377bb"/>
+    <rect x="4" y="10" width="8" height="2" fill="#1a4488"/>
+    <rect x="5" y="12" width="6" height="1" fill="#0a2a5a"/>
+    <rect x="6" y="13" width="4" height="1" fill="#05102a"/>
+    <rect x="5" y="5" width="1" height="2" fill="#ffffff" opacity=".9"/>
+    <rect x="6" y="4" width="1" height="1" fill="#ffffff"/>
+    <rect x="10" y="8" width="1" height="2" fill="#0a2a5a" opacity=".8"/>
+  </symbol>
+
+  <!-- Empty socket (octagonal hole with bevel) -->
+  <symbol id="gem-empty" viewBox="0 0 16 16">
+    <rect x="5" y="3" width="6" height="1" fill="#2a2a3a"/>
+    <rect x="4" y="4" width="8" height="1" fill="#1a1a2a"/>
+    <rect x="3" y="5" width="10" height="6" fill="#000000"/>
+    <rect x="4" y="11" width="8" height="1" fill="#2a2a3a"/>
+    <rect x="5" y="12" width="6" height="1" fill="#3a3a4a"/>
+    <rect x="4" y="5" width="1" height="6" fill="#1a1a2a"/>
+    <rect x="11" y="5" width="1" height="6" fill="#3a3a4a"/>
+  </symbol>
+
+  <!-- Enchant sparkle -->
+  <symbol id="ench-spark" viewBox="0 0 16 16">
+    <rect x="7" y="2" width="2" height="12" fill="#f0d060"/>
+    <rect x="2" y="7" width="12" height="2" fill="#f0d060"/>
+    <rect x="7" y="4" width="2" height="8" fill="#ffffff" opacity=".9"/>
+    <rect x="4" y="7" width="8" height="2" fill="#ffffff" opacity=".9"/>
+    <rect x="7" y="7" width="2" height="2" fill="#ffffff"/>
+  </symbol>
+
+  <!-- Shield — kite shield with gold trim -->
+  <symbol id="ico-shield" viewBox="0 0 24 24">
+    <rect x="6" y="3" width="12" height="1" fill="#c9a84c"/>
+    <rect x="5" y="4" width="14" height="1" fill="#c9a84c"/>
+    <rect x="5" y="5" width="14" height="11" fill="#4a6aaa"/>
+    <rect x="5" y="5" width="14" height="1" fill="#6a8acc"/>
+    <rect x="18" y="5" width="1" height="11" fill="#2a4a8a"/>
+    <rect x="5" y="5" width="1" height="11" fill="#6a8acc"/>
+    <rect x="6" y="16" width="12" height="1" fill="#2a4a8a"/>
+    <rect x="7" y="17" width="10" height="1" fill="#2a4a8a"/>
+    <rect x="8" y="18" width="8" height="1" fill="#1a3a6a"/>
+    <rect x="9" y="19" width="6" height="1" fill="#1a3a6a"/>
+    <rect x="10" y="20" width="4" height="1" fill="#0a2a4a"/>
+    <rect x="11" y="21" width="2" height="1" fill="#0a2a4a"/>
+    <!-- boss + cross emblem -->
+    <rect x="11" y="8" width="2" height="6" fill="#c9a84c"/>
+    <rect x="9" y="10" width="6" height="2" fill="#c9a84c"/>
+    <rect x="11" y="8" width="1" height="6" fill="#f0d060"/>
+    <rect x="9" y="10" width="6" height="1" fill="#f0d060"/>
+    <rect x="11" y="13" width="2" height="1" fill="#8a6820"/>
+    <rect x="14" y="11" width="1" height="1" fill="#8a6820"/>
+    <!-- rivets -->
+    <rect x="6" y="6" width="1" height="1" fill="#c9a84c"/>
+    <rect x="17" y="6" width="1" height="1" fill="#c9a84c"/>
+    <rect x="6" y="14" width="1" height="1" fill="#c9a84c"/>
+    <rect x="17" y="14" width="1" height="1" fill="#c9a84c"/>
+  </symbol>
+
+  <!-- Helmet — knight's great helm -->
+  <symbol id="ico-helmet" viewBox="0 0 24 24">
+    <!-- crest plume -->
+    <rect x="11" y="2" width="2" height="2" fill="#cc3322"/>
+    <rect x="10" y="3" width="4" height="1" fill="#cc3322"/>
+    <rect x="11" y="2" width="1" height="1" fill="#ff6644"/>
+    <!-- dome -->
+    <rect x="8" y="4" width="8" height="1" fill="#6a6a7a"/>
+    <rect x="7" y="5" width="10" height="1" fill="#8a8a9a"/>
+    <rect x="6" y="6" width="12" height="3" fill="#a0a0b0"/>
+    <rect x="6" y="6" width="12" height="1" fill="#c0c0d0"/>
+    <rect x="6" y="6" width="2" height="3" fill="#c0c0d0"/>
+    <rect x="16" y="6" width="2" height="3" fill="#6a6a7a"/>
+    <!-- visor band -->
+    <rect x="5" y="9" width="14" height="2" fill="#3a3a4a"/>
+    <rect x="5" y="9" width="14" height="1" fill="#5a5a6a"/>
+    <!-- eye slits -->
+    <rect x="7" y="10" width="3" height="1" fill="#000"/>
+    <rect x="14" y="10" width="3" height="1" fill="#000"/>
+    <rect x="7" y="10" width="3" height="1" fill="#f0d060" opacity=".6"/>
+    <rect x="14" y="10" width="3" height="1" fill="#f0d060" opacity=".6"/>
+    <!-- lower face -->
+    <rect x="6" y="11" width="12" height="5" fill="#8a8a9a"/>
+    <rect x="6" y="11" width="2" height="5" fill="#a0a0b0"/>
+    <rect x="16" y="11" width="2" height="5" fill="#6a6a7a"/>
+    <!-- breathing holes -->
+    <rect x="9" y="13" width="1" height="1" fill="#3a3a4a"/>
+    <rect x="11" y="13" width="1" height="1" fill="#3a3a4a"/>
+    <rect x="13" y="13" width="1" height="1" fill="#3a3a4a"/>
+    <!-- collar -->
+    <rect x="7" y="16" width="10" height="1" fill="#6a6a7a"/>
+    <rect x="8" y="17" width="8" height="1" fill="#3a3a4a"/>
+    <!-- gold trim -->
+    <rect x="6" y="9" width="14" height="1" fill="#c9a84c" opacity=".4"/>
+    <rect x="11" y="4" width="2" height="1" fill="#c9a84c"/>
+  </symbol>
+
+  <!-- Gauntlet / glove -->
+  <symbol id="ico-gloves" viewBox="0 0 24 24">
+    <!-- cuff -->
+    <rect x="5" y="16" width="14" height="2" fill="#c9a84c"/>
+    <rect x="5" y="16" width="14" height="1" fill="#f0d060"/>
+    <rect x="5" y="18" width="14" height="1" fill="#8a6820"/>
+    <!-- palm/back of hand -->
+    <rect x="6" y="8" width="12" height="8" fill="#6a3a1a"/>
+    <rect x="6" y="8" width="12" height="1" fill="#8a5a3a"/>
+    <rect x="6" y="8" width="2" height="8" fill="#8a5a3a"/>
+    <rect x="16" y="8" width="2" height="8" fill="#4a2a0a"/>
+    <!-- plated knuckles -->
+    <rect x="7" y="10" width="2" height="2" fill="#a0a0b0"/>
+    <rect x="10" y="10" width="2" height="2" fill="#a0a0b0"/>
+    <rect x="13" y="10" width="2" height="2" fill="#a0a0b0"/>
+    <rect x="15" y="10" width="2" height="2" fill="#8a8a9a"/>
+    <rect x="7" y="10" width="2" height="1" fill="#c0c0d0"/>
+    <rect x="10" y="10" width="2" height="1" fill="#c0c0d0"/>
+    <rect x="13" y="10" width="2" height="1" fill="#c0c0d0"/>
+    <!-- fingers -->
+    <rect x="6" y="4" width="2" height="4" fill="#6a3a1a"/>
+    <rect x="9" y="3" width="2" height="5" fill="#6a3a1a"/>
+    <rect x="12" y="3" width="2" height="5" fill="#6a3a1a"/>
+    <rect x="15" y="4" width="2" height="4" fill="#6a3a1a"/>
+    <rect x="6" y="4" width="1" height="4" fill="#8a5a3a"/>
+    <rect x="9" y="3" width="1" height="5" fill="#8a5a3a"/>
+    <rect x="12" y="3" width="1" height="5" fill="#8a5a3a"/>
+    <rect x="15" y="4" width="1" height="4" fill="#8a5a3a"/>
+    <!-- finger plates -->
+    <rect x="6" y="6" width="2" height="1" fill="#a0a0b0"/>
+    <rect x="9" y="5" width="2" height="1" fill="#a0a0b0"/>
+    <rect x="12" y="5" width="2" height="1" fill="#a0a0b0"/>
+    <rect x="15" y="6" width="2" height="1" fill="#a0a0b0"/>
+    <!-- rivets on cuff -->
+    <rect x="7" y="17" width="1" height="1" fill="#f0d060"/>
+    <rect x="11" y="17" width="1" height="1" fill="#f0d060"/>
+    <rect x="15" y="17" width="1" height="1" fill="#f0d060"/>
+  </symbol>
+
+  <!-- Boots — armored/leather boots -->
+  <symbol id="ico-boots" viewBox="0 0 24 24">
+    <!-- shaft -->
+    <rect x="8" y="3" width="8" height="10" fill="#6a3a1a"/>
+    <rect x="8" y="3" width="2" height="10" fill="#8a5a3a"/>
+    <rect x="14" y="3" width="2" height="10" fill="#4a2a0a"/>
+    <rect x="8" y="3" width="8" height="1" fill="#8a5a3a"/>
+    <!-- laces -->
+    <rect x="11" y="5" width="2" height="1" fill="#2a1a0a"/>
+    <rect x="11" y="7" width="2" height="1" fill="#2a1a0a"/>
+    <rect x="11" y="9" width="2" height="1" fill="#2a1a0a"/>
+    <rect x="11" y="11" width="2" height="1" fill="#2a1a0a"/>
+    <!-- ankle guard plate -->
+    <rect x="7" y="9" width="10" height="3" fill="#a0a0b0"/>
+    <rect x="7" y="9" width="10" height="1" fill="#c0c0d0"/>
+    <rect x="7" y="11" width="10" height="1" fill="#6a6a7a"/>
+    <!-- foot -->
+    <rect x="7" y="13" width="12" height="5" fill="#6a3a1a"/>
+    <rect x="7" y="13" width="12" height="1" fill="#8a5a3a"/>
+    <rect x="19" y="13" width="1" height="5" fill="#4a2a0a"/>
+    <!-- toe cap -->
+    <rect x="17" y="14" width="3" height="4" fill="#a0a0b0"/>
+    <rect x="17" y="14" width="3" height="1" fill="#c0c0d0"/>
+    <rect x="19" y="14" width="1" height="4" fill="#6a6a7a"/>
+    <!-- sole -->
+    <rect x="6" y="18" width="14" height="2" fill="#3a1a0a"/>
+    <rect x="6" y="18" width="14" height="1" fill="#5a2a1a"/>
+    <rect x="6" y="20" width="14" height="1" fill="#1a0a00"/>
+    <!-- heel -->
+    <rect x="6" y="16" width="2" height="2" fill="#4a2a0a"/>
+  </symbol>
+
+  <!-- Ring with gem -->
+  <symbol id="ico-ring" viewBox="0 0 24 24">
+    <!-- band circle -->
+    <rect x="9" y="8" width="6" height="1" fill="#c9a84c"/>
+    <rect x="7" y="9" width="2" height="1" fill="#c9a84c"/>
+    <rect x="15" y="9" width="2" height="1" fill="#c9a84c"/>
+    <rect x="6" y="10" width="2" height="4" fill="#c9a84c"/>
+    <rect x="16" y="10" width="2" height="4" fill="#c9a84c"/>
+    <rect x="7" y="14" width="2" height="1" fill="#c9a84c"/>
+    <rect x="15" y="14" width="2" height="1" fill="#c9a84c"/>
+    <rect x="9" y="15" width="6" height="1" fill="#c9a84c"/>
+    <!-- inner hole -->
+    <rect x="9" y="10" width="6" height="4" fill="#0a0a14"/>
+    <!-- highlights -->
+    <rect x="9" y="8" width="1" height="1" fill="#f0d060"/>
+    <rect x="6" y="10" width="1" height="4" fill="#f0d060"/>
+    <rect x="17" y="10" width="1" height="4" fill="#8a6820"/>
+    <rect x="14" y="15" width="1" height="1" fill="#8a6820"/>
+    <!-- mount prongs -->
+    <rect x="10" y="6" width="1" height="2" fill="#c9a84c"/>
+    <rect x="13" y="6" width="1" height="2" fill="#c9a84c"/>
+    <!-- gem (faceted red) -->
+    <rect x="10" y="3" width="4" height="1" fill="#ff8888"/>
+    <rect x="9" y="4" width="6" height="1" fill="#ff4466"/>
+    <rect x="9" y="5" width="6" height="2" fill="#cc2244"/>
+    <rect x="10" y="7" width="4" height="1" fill="#8a1a2a"/>
+    <rect x="10" y="3" width="1" height="1" fill="#ffffff"/>
+    <rect x="10" y="4" width="1" height="2" fill="#ff8899" opacity=".7"/>
+    <rect x="13" y="6" width="1" height="1" fill="#4a0a00"/>
+  </symbol>
+
+  <!-- Necklace with pendant -->
+  <symbol id="ico-necklace" viewBox="0 0 24 24">
+    <!-- chain arc -->
+    <rect x="5" y="4" width="2" height="1" fill="#c9a84c"/>
+    <rect x="17" y="4" width="2" height="1" fill="#c9a84c"/>
+    <rect x="4" y="5" width="1" height="2" fill="#c9a84c"/>
+    <rect x="19" y="5" width="1" height="2" fill="#c9a84c"/>
+    <rect x="4" y="7" width="1" height="1" fill="#c9a84c"/>
+    <rect x="19" y="7" width="1" height="1" fill="#c9a84c"/>
+    <rect x="5" y="8" width="1" height="1" fill="#c9a84c"/>
+    <rect x="18" y="8" width="1" height="1" fill="#c9a84c"/>
+    <rect x="6" y="9" width="1" height="1" fill="#c9a84c"/>
+    <rect x="17" y="9" width="1" height="1" fill="#c9a84c"/>
+    <rect x="7" y="10" width="1" height="1" fill="#c9a84c"/>
+    <rect x="16" y="10" width="1" height="1" fill="#c9a84c"/>
+    <rect x="8" y="11" width="2" height="1" fill="#c9a84c"/>
+    <rect x="14" y="11" width="2" height="1" fill="#c9a84c"/>
+    <rect x="10" y="12" width="4" height="1" fill="#c9a84c"/>
+    <!-- chain highlight -->
+    <rect x="5" y="5" width="1" height="1" fill="#f0d060"/>
+    <rect x="7" y="9" width="1" height="1" fill="#f0d060" opacity=".6"/>
+    <!-- pendant ring -->
+    <rect x="11" y="13" width="2" height="1" fill="#c9a84c"/>
+    <!-- pendant (ornate teardrop with gem) -->
+    <rect x="10" y="14" width="4" height="1" fill="#c9a84c"/>
+    <rect x="9" y="15" width="6" height="1" fill="#c9a84c"/>
+    <rect x="9" y="16" width="6" height="4" fill="#c9a84c"/>
+    <rect x="10" y="20" width="4" height="1" fill="#c9a84c"/>
+    <rect x="11" y="21" width="2" height="1" fill="#8a6820"/>
+    <!-- gem inset (green) -->
+    <rect x="11" y="16" width="2" height="3" fill="#44cc66"/>
+    <rect x="10" y="17" width="4" height="1" fill="#66dd88"/>
+    <rect x="11" y="16" width="1" height="1" fill="#88ffaa"/>
+    <rect x="12" y="18" width="1" height="1" fill="#1a8a3a"/>
+    <!-- pendant highlights -->
+    <rect x="9" y="15" width="1" height="4" fill="#f0d060"/>
+    <rect x="14" y="15" width="1" height="4" fill="#8a6820"/>
+  </symbol>
+
+  <!-- Meat / food (cooked drumstick) -->
+  <symbol id="ico-food" viewBox="0 0 24 24">
+    <!-- bone tip -->
+    <rect x="16" y="5" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="18" y="6" width="2" height="2" fill="#f0e4bb"/>
+    <rect x="17" y="7" width="2" height="1" fill="#d0c49a"/>
+    <rect x="16" y="5" width="1" height="1" fill="#ffffff"/>
+    <rect x="18" y="6" width="1" height="1" fill="#ffffff"/>
+    <!-- bone shaft -->
+    <rect x="14" y="8" width="2" height="2" fill="#e0d49a"/>
+    <rect x="13" y="9" width="2" height="2" fill="#d0c49a"/>
+    <!-- meat chunk -->
+    <rect x="10" y="9" width="2" height="2" fill="#8a4a2a"/>
+    <rect x="8" y="10" width="4" height="2" fill="#aa5a3a"/>
+    <rect x="6" y="11" width="8" height="4" fill="#8a4a2a"/>
+    <rect x="5" y="13" width="9" height="3" fill="#6a3a1a"/>
+    <rect x="5" y="15" width="9" height="2" fill="#4a2a0a"/>
+    <rect x="6" y="17" width="7" height="1" fill="#2a1a0a"/>
+    <!-- glaze shine -->
+    <rect x="7" y="11" width="3" height="1" fill="#cc7a4a"/>
+    <rect x="8" y="12" width="2" height="1" fill="#ee9a6a" opacity=".8"/>
+    <rect x="9" y="13" width="1" height="1" fill="#ffffff" opacity=".5"/>
+    <!-- grill marks -->
+    <rect x="6" y="14" width="8" height="1" fill="#2a1a0a" opacity=".7"/>
+  </symbol>
+
+  <!-- Scroll -->
+  <symbol id="ico-scroll" viewBox="0 0 24 24">
+    <!-- top roll -->
+    <rect x="4" y="5" width="16" height="3" fill="#d0b880"/>
+    <rect x="4" y="5" width="16" height="1" fill="#f0d8a0"/>
+    <rect x="4" y="7" width="16" height="1" fill="#8a6820"/>
+    <rect x="4" y="5" width="1" height="3" fill="#8a6820"/>
+    <rect x="19" y="5" width="1" height="3" fill="#8a6820"/>
+    <!-- parchment -->
+    <rect x="5" y="8" width="14" height="9" fill="#e8d8a0"/>
+    <rect x="5" y="8" width="14" height="1" fill="#f0e0b0"/>
+    <rect x="5" y="16" width="14" height="1" fill="#c0a870"/>
+    <rect x="5" y="8" width="1" height="9" fill="#f0e0b0"/>
+    <rect x="18" y="8" width="1" height="9" fill="#c0a870"/>
+    <!-- lines of text -->
+    <rect x="7" y="10" width="10" height="1" fill="#6a4a1a"/>
+    <rect x="7" y="12" width="8" height="1" fill="#6a4a1a"/>
+    <rect x="7" y="14" width="9" height="1" fill="#6a4a1a"/>
+    <!-- rune seal -->
+    <rect x="15" y="13" width="3" height="3" fill="#cc2244"/>
+    <rect x="15" y="13" width="3" height="1" fill="#ff4466"/>
+    <rect x="16" y="14" width="1" height="1" fill="#ffffff" opacity=".8"/>
+    <!-- bottom roll -->
+    <rect x="4" y="17" width="16" height="3" fill="#d0b880"/>
+    <rect x="4" y="17" width="16" height="1" fill="#8a6820"/>
+    <rect x="4" y="19" width="16" height="1" fill="#6a4a1a"/>
+    <rect x="4" y="17" width="1" height="3" fill="#8a6820"/>
+    <rect x="19" y="17" width="1" height="3" fill="#8a6820"/>
+    <!-- ribbon -->
+    <rect x="11" y="4" width="2" height="3" fill="#cc2244"/>
+    <rect x="10" y="4" width="1" height="1" fill="#cc2244"/>
+    <rect x="13" y="4" width="1" height="1" fill="#cc2244"/>
+    <rect x="11" y="4" width="1" height="3" fill="#ff4466"/>
+  </symbol>
+
+  <!-- Rabbit liver (quest item) — small organic blob -->
+  <symbol id="ico-liver" viewBox="0 0 24 24">
+    <rect x="9" y="6" width="6" height="1" fill="#8a2244"/>
+    <rect x="7" y="7" width="10" height="2" fill="#aa2a55"/>
+    <rect x="6" y="9" width="12" height="6" fill="#cc3366"/>
+    <rect x="7" y="15" width="10" height="2" fill="#aa2a55"/>
+    <rect x="9" y="17" width="6" height="1" fill="#8a2244"/>
+    <!-- highlight -->
+    <rect x="8" y="8" width="3" height="2" fill="#ee5588" opacity=".7"/>
+    <rect x="9" y="9" width="2" height="1" fill="#ff8899"/>
+    <!-- lobe crease -->
+    <rect x="11" y="9" width="1" height="6" fill="#6a1a33" opacity=".7"/>
+    <!-- dark side -->
+    <rect x="16" y="10" width="1" height="4" fill="#6a1a33"/>
+    <rect x="15" y="13" width="2" height="2" fill="#6a1a33" opacity=".6"/>
+  </symbol>
+
+  <!-- Gold coin stack -->
+  <symbol id="ico-coin" viewBox="0 0 24 24">
+    <!-- bottom coin -->
+    <rect x="4" y="16" width="16" height="3" fill="#8a6820"/>
+    <rect x="4" y="16" width="16" height="1" fill="#c9a84c"/>
+    <rect x="5" y="19" width="14" height="1" fill="#4a3810"/>
+    <!-- middle coin -->
+    <rect x="5" y="12" width="14" height="3" fill="#c9a84c"/>
+    <rect x="5" y="12" width="14" height="1" fill="#f0d060"/>
+    <rect x="5" y="15" width="14" height="1" fill="#8a6820"/>
+    <!-- top coin -->
+    <rect x="6" y="8" width="12" height="3" fill="#c9a84c"/>
+    <rect x="6" y="8" width="12" height="1" fill="#f0d060"/>
+    <rect x="6" y="11" width="12" height="1" fill="#8a6820"/>
+    <!-- coin face -->
+    <rect x="10" y="9" width="4" height="1" fill="#f0d060"/>
+    <rect x="11" y="10" width="2" height="1" fill="#8a6820"/>
+    <!-- sparkle -->
+    <rect x="18" y="6" width="1" height="1" fill="#ffffff"/>
+    <rect x="17" y="5" width="1" height="1" fill="#f0d060"/>
+    <rect x="19" y="5" width="1" height="1" fill="#f0d060"/>
+    <rect x="18" y="4" width="1" height="1" fill="#f0d060"/>
+  </symbol>
+
+  <!-- Star fragment -->
+  <symbol id="ico-star" viewBox="0 0 24 24">
+    <rect x="11" y="3" width="2" height="2" fill="#ffffff"/>
+    <rect x="10" y="5" width="4" height="2" fill="#ffee99"/>
+    <rect x="6" y="7" width="12" height="2" fill="#f0d060"/>
+    <rect x="4" y="9" width="16" height="2" fill="#ffee99"/>
+    <rect x="6" y="11" width="12" height="2" fill="#f0d060"/>
+    <rect x="8" y="13" width="8" height="2" fill="#c9a84c"/>
+    <rect x="6" y="15" width="4" height="3" fill="#c9a84c"/>
+    <rect x="14" y="15" width="4" height="3" fill="#c9a84c"/>
+    <rect x="5" y="18" width="3" height="2" fill="#8a6820"/>
+    <rect x="16" y="18" width="3" height="2" fill="#8a6820"/>
+    <rect x="4" y="20" width="2" height="1" fill="#8a6820"/>
+    <rect x="18" y="20" width="2" height="1" fill="#8a6820"/>
+    <!-- bright core -->
+    <rect x="10" y="9" width="4" height="2" fill="#ffffff"/>
+    <rect x="11" y="8" width="2" height="4" fill="#ffffff" opacity=".8"/>
+  </symbol>
+
+  <!-- Crown -->
+  <symbol id="ico-crown" viewBox="0 0 24 24">
+    <!-- band -->
+    <rect x="4" y="13" width="16" height="4" fill="#c9a84c"/>
+    <rect x="4" y="13" width="16" height="1" fill="#f0d060"/>
+    <rect x="4" y="16" width="16" height="1" fill="#8a6820"/>
+    <!-- 3 spikes -->
+    <rect x="4" y="7" width="3" height="6" fill="#c9a84c"/>
+    <rect x="10" y="5" width="4" height="8" fill="#c9a84c"/>
+    <rect x="17" y="7" width="3" height="6" fill="#c9a84c"/>
+    <!-- spike highlights -->
+    <rect x="4" y="7" width="1" height="6" fill="#f0d060"/>
+    <rect x="10" y="5" width="1" height="8" fill="#f0d060"/>
+    <rect x="17" y="7" width="1" height="6" fill="#f0d060"/>
+    <rect x="6" y="7" width="1" height="6" fill="#8a6820"/>
+    <rect x="13" y="5" width="1" height="8" fill="#8a6820"/>
+    <rect x="19" y="7" width="1" height="6" fill="#8a6820"/>
+    <!-- spike tips as gems -->
+    <rect x="4" y="6" width="3" height="1" fill="#cc2244"/>
+    <rect x="10" y="3" width="4" height="2" fill="#5588ff"/>
+    <rect x="17" y="6" width="3" height="1" fill="#44cc66"/>
+    <rect x="11" y="4" width="2" height="1" fill="#aaddff"/>
+    <!-- gems on band -->
+    <rect x="7" y="14" width="2" height="2" fill="#5588ff"/>
+    <rect x="11" y="14" width="2" height="2" fill="#cc2244"/>
+    <rect x="15" y="14" width="2" height="2" fill="#44cc66"/>
+    <rect x="7" y="14" width="1" height="1" fill="#aaddff"/>
+    <rect x="11" y="14" width="1" height="1" fill="#ff8899"/>
+    <rect x="15" y="14" width="1" height="1" fill="#aaffcc"/>
+  </symbol>
+
+  <!-- Chainmail / torso armor -->
+  <symbol id="ico-chainmail" viewBox="0 0 24 24">
+    <!-- collar -->
+    <rect x="9" y="3" width="6" height="1" fill="#3a3a4a"/>
+    <rect x="8" y="4" width="8" height="1" fill="#5a5a6a"/>
+    <!-- shoulders -->
+    <rect x="4" y="5" width="4" height="5" fill="#6a6a7a"/>
+    <rect x="16" y="5" width="4" height="5" fill="#6a6a7a"/>
+    <rect x="4" y="5" width="4" height="1" fill="#8a8a9a"/>
+    <rect x="16" y="5" width="4" height="1" fill="#8a8a9a"/>
+    <rect x="4" y="9" width="4" height="1" fill="#3a3a4a"/>
+    <rect x="16" y="9" width="4" height="1" fill="#3a3a4a"/>
+    <!-- chest -->
+    <rect x="7" y="5" width="10" height="12" fill="#5a5a6a"/>
+    <rect x="7" y="5" width="10" height="1" fill="#7a7a8a"/>
+    <!-- chainmail pattern (diagonal speckle) -->
+    <rect x="8" y="7" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="10" y="7" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="12" y="7" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="14" y="7" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="9" y="8" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="11" y="8" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="13" y="8" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="15" y="8" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="8" y="9" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="10" y="9" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="12" y="9" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="14" y="9" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="9" y="10" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="11" y="10" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="13" y="10" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="15" y="10" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="8" y="11" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="10" y="11" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="12" y="11" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="14" y="11" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="9" y="12" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="11" y="12" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="13" y="12" width="1" height="1" fill="#7a7a8a"/>
+    <rect x="15" y="12" width="1" height="1" fill="#7a7a8a"/>
+    <!-- belt -->
+    <rect x="7" y="14" width="10" height="2" fill="#6a3a1a"/>
+    <rect x="7" y="14" width="10" height="1" fill="#8a5a3a"/>
+    <rect x="11" y="14" width="2" height="2" fill="#c9a84c"/>
+    <rect x="11" y="14" width="1" height="1" fill="#f0d060"/>
+    <!-- bottom skirt -->
+    <rect x="7" y="16" width="10" height="4" fill="#4a4a5a"/>
+    <rect x="7" y="16" width="10" height="1" fill="#6a6a7a"/>
+    <rect x="8" y="20" width="8" height="1" fill="#3a3a4a"/>
+    <rect x="7" y="16" width="2" height="4" fill="#6a6a7a"/>
+    <rect x="15" y="16" width="2" height="4" fill="#3a3a4a"/>
+  </symbol>
+
+  <!-- Moonblade (purple moon-glyph sword) -->
+  <symbol id="ico-moonblade" viewBox="0 0 24 24">
+    <rect x="11" y="2" width="2" height="1" fill="#ffffff"/>
+    <rect x="10" y="3" width="4" height="1" fill="#ddccff"/>
+    <rect x="10" y="4" width="4" height="10" fill="#aabbff"/>
+    <rect x="10" y="4" width="1" height="10" fill="#ddccff"/>
+    <rect x="13" y="4" width="1" height="10" fill="#7788cc"/>
+    <rect x="11" y="14" width="2" height="1" fill="#7788cc"/>
+    <!-- moon glyph etched -->
+    <rect x="11" y="7" width="2" height="1" fill="#5566aa" opacity=".8"/>
+    <rect x="10" y="8" width="1" height="2" fill="#5566aa" opacity=".8"/>
+    <rect x="12" y="9" width="2" height="1" fill="#5566aa" opacity=".8"/>
+    <!-- crossguard (curved like crescent) -->
+    <rect x="5" y="14" width="14" height="2" fill="#6a4a8a"/>
+    <rect x="5" y="14" width="14" height="1" fill="#aa88cc"/>
+    <rect x="4" y="15" width="1" height="1" fill="#4a2a6a"/>
+    <rect x="19" y="15" width="1" height="1" fill="#4a2a6a"/>
+    <!-- moon gem in guard -->
+    <rect x="11" y="14" width="2" height="2" fill="#ddccff"/>
+    <rect x="11" y="14" width="1" height="1" fill="#ffffff"/>
+    <!-- grip -->
+    <rect x="10" y="16" width="4" height="4" fill="#3a1a4a"/>
+    <rect x="10" y="16" width="1" height="4" fill="#5a3a6a"/>
+    <rect x="13" y="16" width="1" height="4" fill="#1a0a2a"/>
+    <rect x="10" y="17" width="4" height="1" fill="#1a0a2a" opacity=".5"/>
+    <!-- pommel -->
+    <rect x="9" y="20" width="6" height="2" fill="#aa88cc"/>
+    <rect x="9" y="21" width="6" height="1" fill="#6a4a8a"/>
+    <rect x="11" y="20" width="2" height="1" fill="#ffffff"/>
+  </symbol>
+
+  <!-- Night crystal -->
+  <symbol id="ico-crystal" viewBox="0 0 24 24">
+    <rect x="11" y="3" width="2" height="1" fill="#ffffff"/>
+    <rect x="10" y="4" width="4" height="1" fill="#aaddff"/>
+    <rect x="9" y="5" width="6" height="2" fill="#66aadd"/>
+    <rect x="8" y="7" width="8" height="3" fill="#3377bb"/>
+    <rect x="7" y="10" width="10" height="7" fill="#1a4488"/>
+    <rect x="8" y="17" width="8" height="2" fill="#0a2a5a"/>
+    <rect x="9" y="19" width="6" height="1" fill="#05102a"/>
+    <rect x="10" y="20" width="4" height="1" fill="#02081a"/>
+    <!-- facet highlights -->
+    <rect x="10" y="5" width="1" height="2" fill="#ffffff" opacity=".7"/>
+    <rect x="11" y="6" width="1" height="4" fill="#aaddff" opacity=".6"/>
+    <rect x="13" y="8" width="1" height="6" fill="#0a2a5a" opacity=".8"/>
+    <!-- inner glow -->
+    <rect x="10" y="12" width="4" height="2" fill="#66aadd" opacity=".6"/>
+    <rect x="11" y="12" width="2" height="2" fill="#aaddff" opacity=".7"/>
+    <!-- sparkles around -->
+    <rect x="3" y="8" width="1" height="1" fill="#aaddff" opacity=".6"/>
+    <rect x="20" y="13" width="1" height="1" fill="#aaddff" opacity=".6"/>
+    <rect x="19" y="6" width="1" height="1" fill="#ffffff" opacity=".5"/>
+  </symbol>
+
+</defs></svg>

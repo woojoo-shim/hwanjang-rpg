@@ -22,6 +22,12 @@ if('serviceWorker' in navigator){
 </script>
 </head>
 <body>
+<div id="icons-holder"></div>
+<script>
+  fetch('icons.svg.html').then(function(r){return r.text();}).then(function(t){
+    var h=document.getElementById('icons-holder');if(h)h.innerHTML=t;
+  }).catch(function(){});
+</script>
 <div id="rotate-warning">
   <div class="rotate-icon">📱</div>
   <div>화면을 가로로 돌려주세요</div>
@@ -375,15 +381,22 @@ window.addEventListener('appinstalled',function(){
 
 <!-- 인벤토리 -->
 <div id="inv-overlay">
-  <div id="inv-panel">
-    <div id="inv-header">
-      <h2>▣ 인벤토리</h2>
-      <div id="inv-header-right">
-        <span id="inv-gold">💰 0 골드</span>
-        <button id="inv-close-btn" onclick="closeInv()">[ I 닫기 ]</button>
-      </div>
+  <div id="inv-panel" class="inv-panel">
+    <span class="inv-crn tl"></span><span class="inv-crn tr"></span>
+    <span class="inv-crn bl"></span><span class="inv-crn br"></span>
+    <div class="inv-title">
+      <span>▣ 인 벤 토 리 ▣</span>
+      <span class="inv-x" id="inv-close-btn" onclick="closeInv()">ESC</span>
     </div>
-    <div id="inv-tabs">
+    <div class="inv-head">
+      <div class="inv-stats"><span class="gold-v" id="inv-gold">💰 0 골드</span></div>
+      <div class="inv-weight">슬롯 <span class="wv" id="inv-slot-count">0</span> / 48</div>
+    </div>
+    <div id="inv-header" style="display:none;">
+      <h2>▣ 인벤토리</h2>
+      <div id="inv-header-right"></div>
+    </div>
+    <div id="inv-tabs" class="inv-tabs">
       <button class="inv-tab active" onclick="switchTab('all',this)">전체</button>
       <button class="inv-tab" onclick="switchTab('weapon',this)">무기</button>
       <button class="inv-tab" onclick="switchTab('armor',this)">방어구</button>
@@ -392,15 +405,15 @@ window.addEventListener('appinstalled',function(){
       <button class="inv-tab" onclick="switchTab('cosmetic',this)" style="color:#cc88ff;">🎨 코스메틱</button>
       <button class="inv-tab" onclick="switchTab('hidden',this)" style="color:#aa44aa;">✦ 히든</button>
     </div>
-    <div id="inv-body">
+    <div id="inv-body" class="inv-body">
       <div id="inv-character" style="width:180px;background:linear-gradient(180deg,#1a1a2e,#0c0c1e);border:1px solid #c9a84c44;border-radius:6px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <div style="color:#c9a84c;font-size:11px;letter-spacing:2px;">▣ 캐릭터</div>
+        <div style="color:#c9a84c;font-size:11px;letter-spacing:2px;">▣ 캐 릭 터 ▣</div>
         <canvas id="inv-char-canvas" width="160" height="220" style="background:#050510;border:1px solid #c9a84c33;border-radius:4px;cursor:grab;"></canvas>
         <div style="color:#aaa;font-size:9px;text-align:center;">드래그로 회전</div>
         <div id="inv-char-stats" style="width:100%;color:#f0e4bb;font-size:10px;display:flex;flex-direction:column;gap:2px;"></div>
       </div>
-      <div id="inv-grid"></div>
-      <div id="inv-detail">
+      <div id="inv-grid" class="inv-grid"></div>
+      <div id="inv-detail" class="inv-detail">
         <div id="inv-detail-empty">아이템을<br>선택하세요</div>
         <div id="inv-detail-content" style="display:none">
           <div id="inv-detail-icon"></div>
