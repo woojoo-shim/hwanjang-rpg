@@ -47,6 +47,11 @@ function isEquipped(slot){
 
 function equipItem(slot){
   var it=getItemFull(slot);
+  /* 요구 레벨 체크 */
+  if(it.reqLevel&&playerLevel<it.reqLevel){
+    addChat('sys','[시스템]','⚠️ 요구 레벨이 부족합니다. (Lv.'+it.reqLevel+' 필요)');
+    return;
+  }
   /* 클래스 무기 — 비전공 무기는 장착 가능하지만 경고 */
   if(it.type==='weapon'&&playerClass!=='none'){
     var cls=CLASS_DEFS[playerClass];
