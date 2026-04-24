@@ -377,7 +377,16 @@ function initShops(){
     SHOP_STOCK=saved.stock||{};
     SHOP_REFRESH_COUNT=saved.refresh||{};
   }
-  /* 오늘 처음인 상점은 자동 롤 */
+  /* 캐시 검증: 존재하지 않는 아이템 ID가 있으면 재롤 */
+  Object.keys(SHOP_STOCK).forEach(function(name){
+    var stock=SHOP_STOCK[name];
+    if(!Array.isArray(stock))return;
+    var hasInvalid=stock.some(function(e){
+      return !getItemDef(e&&e.id);
+    });
+    if(hasInvalid){delete SHOP_STOCK[name];}
+  });
+  /* 오늘 처음이거나 캐시 무효화된 상점은 자동 롤 */
   Object.keys(SHOP_CATEGORIES).forEach(function(name){
     if(!SHOP_STOCK[name]){
       rollShopStock(name);
