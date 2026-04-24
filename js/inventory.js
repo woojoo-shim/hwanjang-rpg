@@ -11,7 +11,11 @@ var currentTab='all';
 var selectedItem=null;
 var equipped={weapon:null,armor:null,hat:null,cape:null,dye:null};
 
-function getItemDef(id){return ITEM_POOL.find(function(x){return x.id===id;});}
+function getItemDef(id){
+  /* 강화된 장비는 {id,enhLevel} 객체 — id 추출 */
+  if(id&&typeof id==='object'&&id.id)id=id.id;
+  return ITEM_POOL.find(function(x){return x.id===id;});
+}
 
 function addItem(itemId,qty,customDef){
   qty=qty||1;

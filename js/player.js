@@ -752,10 +752,13 @@ function useSkill(slotIdx){
 
   var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
   var baseAtk=5;
-  if(equipped.weapon){
-    var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
+  var _swId=equipped.weapon&&typeof equipped.weapon==='object'?equipped.weapon.id:equipped.weapon;
+  var _sEnhLv=(equipped.weapon&&typeof equipped.weapon==='object')?(equipped.weapon.enhLevel||0):0;
+  if(_swId){
+    var wi=getItemFull(inventory.find(function(s){return s.itemId===_swId;})||{itemId:''});
     if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
   }
+  if(_sEnhLv>0)baseAtk=Math.floor(baseAtk*(1+_sEnhLv*0.1));
   var dmg=Math.floor((baseAtk+Math.floor(Math.random()*5))*cls.atkMul*(sk.dmgMul||1));
   /* 비전공 무기 패널티 */
   if(playerClass!=='none'&&equipped.weapon){
@@ -904,10 +907,15 @@ function playerAttack(){
   }
 
   var baseAtk=5;
-  if(equipped.weapon){
-    var wi=getItemFull(inventory.find(function(s){return s.itemId===equipped.weapon;})||{itemId:''});
+  /* 강화 후 equipped.weapon은 객체일 수 있음 — id 정규화 */
+  var _wpnId=equipped.weapon&&typeof equipped.weapon==='object'?equipped.weapon.id:equipped.weapon;
+  var _enhLv=(equipped.weapon&&typeof equipped.weapon==='object')?(equipped.weapon.enhLevel||0):0;
+  if(_wpnId){
+    var wi=getItemFull(inventory.find(function(s){return s.itemId===_wpnId;})||{itemId:''});
     if(wi&&wi.stats&&wi.stats['공격력'])baseAtk=parseInt(wi.stats['공격력'])||5;
   }
+  /* 강화 보너스 적용 (+N당 10%) */
+  if(_enhLv>0)baseAtk=Math.floor(baseAtk*(1+_enhLv*0.1));
   /* 무기 내구도 감소 */
   if(typeof damageEquipment==='function')damageEquipment('weapon',1);
   var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
