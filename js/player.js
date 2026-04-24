@@ -916,6 +916,16 @@ function playerAttack(){
   }
   /* 강화 보너스 적용 (+N당 10%) */
   if(_enhLv>0)baseAtk=Math.floor(baseAtk*(1+_enhLv*0.1));
+  /* 스탯 보너스: 근접=STR, 원거리=DEX, 마법=INT */
+  var _sb=(typeof getStatBonuses==='function')?getStatBonuses():null;
+  if(_sb){
+    if(isRangedWeapon())baseAtk+=_sb.rangedDmg;
+    else{
+      var _wDefStat=equipped.weapon?getItemDef(equipped.weapon):null;
+      if(_wDefStat&&(_wDefStat.icon==='staff'||_wDefStat.type==='magic'))baseAtk+=_sb.magicDmg;
+      else baseAtk+=_sb.meleeDmg;
+    }
+  }
   /* 무기 내구도 감소 */
   if(typeof damageEquipment==='function')damageEquipment('weapon',1);
   var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;
@@ -929,9 +939,11 @@ function playerAttack(){
   }
   /* 광전사 패시브: HP 낮을수록 ATK 증가 */
   if(cls.passive==='rage'){var hpRatio=playerHP/playerMaxHP;dmg=Math.floor(dmg*(1+(1-hpRatio)*0.8));}
-  /* 치명타 판정 */
+  /* 치명타 판정 (DEX/LUK 스탯 보너스 반영) */
+  var _critCh=cls.crit+(_sb?_sb.critChance:0);
+  var _critDmg=cls.critDmg+(_sb?_sb.critDmgBonus:0);
   var _isCrit=false;
-  if(Math.random()<cls.crit){dmg=Math.floor(dmg*cls.critDmg);_isCrit=true;}
+  if(Math.random()<_critCh){dmg=Math.floor(dmg*_critDmg);_isCrit=true;}
 
   /* 활: 마우스 방향으로 화살 발사 */
   if(isRangedWeapon()){
