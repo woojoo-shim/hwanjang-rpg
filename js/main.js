@@ -376,6 +376,10 @@ function loop(){
     if(!dialogOpen&&!invOpen&&!shopOpen)handleMove(dt);
     else tickAtkAnim(dt);
     updCam();updNpcs(now/1000);chkNpc();
+    /* MC HUD 주기 갱신 (30프레임마다) */
+    if(typeof _mcHudFrame==='undefined')_mcHudFrame=0;
+    _mcHudFrame++;
+    if(_mcHudFrame>=30){_mcHudFrame=0;if(typeof updMcHud==='function')updMcHud();}
     updMonsters(dt,now/1000);
     if(typeof updateGroundEffects==='function')updateGroundEffects(dt);
     if(typeof tickDynamicNpcs==='function')tickDynamicNpcs(dt);

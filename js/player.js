@@ -1334,25 +1334,44 @@ function updMcHud(){
   var mp=document.getElementById('mc-mp-text');if(mp)mp.textContent=(typeof playerMP!=='undefined'?Math.floor(playerMP):60);
   var lv=document.getElementById('mc-lv');if(lv)lv.textContent=playerLevel;
   var exp=document.getElementById('mc-exp-fill');if(exp){
-    var need=playerLevel*100;
+    /* 실제 레벨업 공식과 동일 */
+    var need=Math.floor(100*Math.pow(playerLevel,2.2));
     var pct2=Math.min(100,playerEXP/need*100);
     exp.style.width=pct2+'%';
   }
-  var gold=document.getElementById('mc-gold-text');if(gold&&typeof window.gold!=='undefined')gold.textContent=window.gold;
+  /* 골드 — 전역 var gold 직접 참조 */
+  var goldEl=document.getElementById('mc-gold-text');
+  if(goldEl&&typeof gold!=='undefined')goldEl.textContent=gold;
+  /* 공격력 — 강화 + 스탯 보너스 반영 */
   var atk=document.getElementById('mc-atk-text');if(atk){
     var baseAtk=5;
-    if(typeof equipped!=='undefined'&&equipped.weapon){
-      var wd=getItemDef(equipped.weapon);
+    var _wId=(typeof equipped!=='undefined'&&equipped.weapon)?(typeof equipped.weapon==='object'?equipped.weapon.id:equipped.weapon):null;
+    var _eLv=(typeof equipped!=='undefined'&&equipped.weapon&&typeof equipped.weapon==='object')?(equipped.weapon.enhLevel||0):0;
+    if(_wId){
+      var wd=getItemDef(_wId);
       if(wd&&wd.stats&&wd.stats['공격력'])baseAtk=parseInt(wd.stats['공격력'])||5;
+    }
+    if(_eLv>0)baseAtk=Math.floor(baseAtk*(1+_eLv*0.1));
+    if(typeof getStatBonuses==='function'){
+      var _sb=getStatBonuses();
+      if(_wId){
+        var _wd=getItemDef(_wId);
+        if(_wd&&_wd.icon==='bow')baseAtk+=_sb.rangedDmg;
+        else if(_wd&&_wd.icon==='staff')baseAtk+=_sb.magicDmg;
+        else baseAtk+=_sb.meleeDmg;
+      }else baseAtk+=_sb.meleeDmg;
     }
     atk.textContent=baseAtk;
   }
+  /* 방어력 — 스탯 보너스 반영 */
   var def=document.getElementById('mc-def-text');if(def){
     var baseDef=0;
-    if(typeof equipped!=='undefined'&&equipped.armor){
-      var ad=getItemDef(equipped.armor);
+    var _aId=(typeof equipped!=='undefined'&&equipped.armor)?(typeof equipped.armor==='object'?equipped.armor.id:equipped.armor):null;
+    if(_aId){
+      var ad=getItemDef(_aId);
       if(ad&&ad.stats&&ad.stats['방어력'])baseDef=parseInt(ad.stats['방어력'])||0;
     }
+    if(typeof getStatBonuses==='function')baseDef+=getStatBonuses().defBonus;
     def.textContent=baseDef;
   }
 }
