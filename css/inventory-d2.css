@@ -1,0 +1,288 @@
+/* ════════════════════════════════════════════════════════════
+   inventory-d2.css — D2-style 인벤토리 오버라이드
+   로드: <link rel="stylesheet" href="css/style.css">
+         <link rel="stylesheet" href="css/inventory-d2.css">
+   (style.css 뒤에 import → 기존 인벤토리 스타일 덮어씀)
+
+   HTML 구조는 js/inventory.js 의 buildInventoryDOM() 이 생성.
+   필수: <div id="inv-overlay"></div> (body 직속)
+        <svg>의 <symbol id="ico-*">/<symbol id="gem-*"> 심볼 세트
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── 애니메이션 ─── */
+@keyframes d2Shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes d2Pulse{0%,100%{box-shadow:0 0 8px var(--rg,transparent),inset 0 0 12px #00000066;}50%{box-shadow:0 0 18px var(--rg,transparent),inset 0 0 12px #00000066;}}
+@keyframes d2Rainbow{0%{border-color:#ff4444}16%{border-color:#ff8800}33%{border-color:#ffff00}50%{border-color:#44ff44}66%{border-color:#4488ff}83%{border-color:#ff44ff}100%{border-color:#ff4444}}
+@keyframes d2Float{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+@keyframes d2Pip{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* ─── Overlay & Panel (기존 #inv-overlay/#inv-panel 덮어씀) ─── */
+#inv-overlay{
+  position:fixed;inset:0;z-index:80;background:#000000cc;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#inv-overlay.show{opacity:1;pointer-events:all;}
+
+#inv-panel{
+  background:#0c0c1e;border:2px solid #c9a84c;
+  box-shadow:0 0 60px #c9a84c22,0 0 120px #00000088;
+  width:min(760px,96vw);max-height:92vh;
+  display:flex;flex-direction:column;position:relative;
+  font-family:inherit;color:#f0e4bb;animation:fadeup .25s ease;
+}
+#inv-panel::before{
+  content:'';position:absolute;left:10px;right:10px;top:2px;height:1px;
+  background:linear-gradient(90deg,transparent,#f0d060 50%,transparent);
+  background-size:200% 100%;animation:d2Shimmer 4s linear infinite;opacity:.7;pointer-events:none;
+}
+.inv-crn{position:absolute;width:12px;height:12px;border:2px solid #c9a84c;pointer-events:none;}
+.inv-crn.tl{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+.inv-crn.tr{top:-1px;right:-1px;border-left:none;border-bottom:none;}
+.inv-crn.bl{bottom:-1px;left:-1px;border-right:none;border-top:none;}
+.inv-crn.br{bottom:-1px;right:-1px;border-left:none;border-top:none;}
+
+/* ─── Title bar ─── */
+.inv-title{
+  background:#c9a84c;color:#0c0c1e;
+  padding:9px 16px;display:flex;justify-content:space-between;align-items:center;
+  font-weight:700;letter-spacing:6px;font-size:13px;
+}
+.inv-x{
+  background:#0c0c1e;color:#c9a84c;padding:2px 10px;font-size:11px;
+  letter-spacing:2px;cursor:pointer;
+}
+.inv-x:hover{background:#000;color:#f0d060;}
+
+/* ─── Head stats row ─── */
+.inv-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;font-size:10px;letter-spacing:1.5px;
+  background:linear-gradient(180deg,#0a0a1850,transparent);
+  border-bottom:1px solid #c9a84c44;
+}
+.inv-stats{color:#c8b07a;display:flex;gap:16px;flex-wrap:wrap;}
+.inv-stats .k{color:#5a5a7a;margin-right:4px;}
+.inv-stats .gold-v{color:#f0c040;font-weight:700;}
+.inv-stats .v-lv{color:#f0d060;}
+.inv-stats .v-hp{color:#90ffa0;}
+.inv-weight{color:#8a8aaa;}
+.inv-weight .wv{color:#f0e4bb;font-weight:700;}
+
+/* ─── Tabs ─── */
+.inv-tabs{display:flex;gap:2px;padding:8px 14px 0;}
+.inv-tab{
+  padding:6px 14px;font-size:10px;letter-spacing:2px;color:#5a5a7a;
+  background:#12122a;border:1px solid #2a2a4a;border-bottom:none;
+  cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;
+}
+.inv-tab:hover{color:#c9a84c;border-color:#c9a84c55;}
+.inv-tab.active{
+  background:#0c0c1e;color:#c9a84c;
+  border-color:#c9a84c;border-bottom:1px solid #0c0c1e;
+  margin-bottom:-1px;z-index:2;
+}
+.inv-tab .count{color:#5a5a7a;margin-left:4px;font-size:9px;}
+.inv-tab.active .count{color:#c9a84c88;}
+
+/* ─── Body grid ─── */
+.inv-body{
+  display:grid;grid-template-columns:210px 1fr 210px;gap:12px;
+  padding:12px 16px 14px;border-top:1px solid #c9a84c;
+  background:#0c0c1e;flex:1;min-height:0;overflow:hidden;
+}
+
+/* ─── LEFT: equipment silhouette ─── */
+.eq-panel{
+  background:#12122a;border:1px solid #2a2a4a;padding:10px;
+  display:flex;flex-direction:column;gap:10px;overflow-y:auto;
+}
+.eq-h{
+  font-size:10px;letter-spacing:2px;color:#c9a84c;text-align:center;
+  padding-bottom:6px;border-bottom:1px solid #c9a84c33;
+}
+.silhouette{
+  position:relative;min-height:190px;display:grid;
+  grid-template-columns:46px 82px 46px;grid-template-rows:46px 46px 46px 46px;
+  gap:6px;align-items:center;justify-content:center;padding:4px 0 14px;
+}
+.eq{
+  width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%,#1a1a3a,#05050f);
+  position:relative;cursor:pointer;transition:transform .1s;
+}
+.eq:hover{transform:scale(1.08);z-index:2;}
+.eq svg{width:30px;height:30px;image-rendering:pixelated;}
+.eq .slot-label{position:absolute;bottom:-11px;left:0;right:0;text-align:center;font-size:7px;color:#3a3a5a;letter-spacing:1px;}
+.eq.empty{border:1.5px dashed #2a2a4a;background:#05050f;}
+.eq.empty .ph{color:#3a3a5a;font-size:14px;}
+.eq.common   {border:1.5px solid #5a5a6a;}
+.eq.uncommon {border:1.5px solid #55bb55;box-shadow:0 0 6px #55bb5544;}
+.eq.rare     {border:1.5px solid #5588ff;box-shadow:0 0 6px #5588ff44;}
+.eq.epic     {border:1.5px solid #aa55ff;box-shadow:0 0 8px #aa55ff55;--rg:#aa55ff55;animation:d2Pulse 2.8s infinite;}
+.eq.legendary{border:1.5px solid #c9a84c;--rg:#c9a84c66;animation:d2Pulse 2.4s infinite;}
+.eq.hidden   {border:1.5px solid #ff44ff;--rg:#ff44ff55;animation:d2Rainbow 3s linear infinite,d2Pulse 2s infinite;}
+.eq .lv{position:absolute;top:1px;right:2px;font-size:8px;color:#f0d060;text-shadow:1px 1px 0 #000;font-weight:700;}
+.eq .ench{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:radial-gradient(circle,#fff,#f0d060 50%,transparent);border-radius:50%;box-shadow:0 0 6px #f0d060;}
+
+/* 실루엣 슬롯 위치 (HEAD 중앙 1행, HAND-BODY-RING 2행, WEAP-NECK-OFF 3행, FOOT 중앙 4행) */
+.eq.helm    {grid-column:2;grid-row:1;justify-self:center;}
+.eq.gloves  {grid-column:1;grid-row:2;}
+.eq.chest   {grid-column:2;grid-row:2;justify-self:center;width:82px;height:46px;}
+.eq.chest svg{width:34px;height:34px;}
+.eq.ring    {grid-column:3;grid-row:2;}
+.eq.weap    {grid-column:1;grid-row:3;}
+.eq.necklace{grid-column:2;grid-row:3;justify-self:center;}
+.eq.shield  {grid-column:3;grid-row:3;}
+.eq.boots   {grid-column:2;grid-row:4;justify-self:center;}
+
+/* combat stat readout */
+.combat{
+  background:#0c0c1e;border:1px solid #c9a84c33;padding:8px 10px;
+  display:flex;flex-direction:column;gap:4px;font-size:10px;letter-spacing:1px;
+}
+.combat .cr{display:flex;justify-content:space-between;}
+.combat .cr .k{color:#5a5a7a;}
+.combat .cr .v{color:#f0d060;font-weight:700;}
+
+/* ─── MIDDLE: item grid ─── */
+.grid-col{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.sort-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;letter-spacing:2px;color:#5a5a7a;padding:0 2px;
+}
+.sort-row .sr-left{display:flex;gap:6px;}
+.sort-row .sr-count{color:#5a5a7a;}
+
+.inv-grid{
+  background:#12122a;border:1px solid #2a2a4a;padding:10px;
+  display:grid;grid-template-columns:repeat(8,1fr);gap:5px;
+  overflow-y:auto;align-content:start;flex:1;min-height:0;
+}
+.inv-grid::-webkit-scrollbar{width:3px;}
+.inv-grid::-webkit-scrollbar-thumb{background:#c9a84c44;}
+
+.cell{
+  aspect-ratio:1;
+  background:radial-gradient(circle at 50% 35%,#12122a,#06060f);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  border:1.5px solid #2a2a4a;cursor:pointer;transition:transform .1s;
+}
+.cell:hover{transform:translateY(-1px) scale(1.03);z-index:2;}
+.cell svg{width:70%;height:70%;image-rendering:pixelated;}
+.cell .q{position:absolute;right:3px;bottom:2px;font-size:9px;color:#fff;text-shadow:1px 1px 0 #000,0 0 3px #000;font-weight:700;}
+.cell .lv{position:absolute;left:3px;top:2px;font-size:8px;color:#f0d060;text-shadow:1px 1px 0 #000;font-weight:700;}
+.cell .ench{position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:radial-gradient(circle,#fff,#f0d060 50%,transparent);border-radius:50%;box-shadow:0 0 4px #f0d060;}
+.cell .new{position:absolute;top:2px;left:2px;background:#ff4444;color:#fff;font-size:7px;padding:1px 3px;font-weight:700;animation:d2Pip 1.2s infinite;}
+
+.cell.common    {border-color:#5a5a6a;}
+.cell.uncommon  {border-color:#55bb55;box-shadow:inset 0 0 8px #55bb5522;}
+.cell.rare      {border-color:#5588ff;box-shadow:inset 0 0 8px #5588ff33;}
+.cell.epic      {border-color:#aa55ff;box-shadow:inset 0 0 10px #aa55ff44,0 0 6px #aa55ff33;}
+.cell.legendary {border-color:#c9a84c;box-shadow:inset 0 0 10px #c9a84c55,0 0 8px #c9a84c44;--rg:#c9a84c44;animation:d2Pulse 2.6s infinite;}
+.cell.hidden    {--rg:#ff44ff66;animation:d2Rainbow 3s linear infinite,d2Pulse 2s infinite;}
+.cell.selected  {outline:2px solid #f0d060;outline-offset:-2px;}
+.cell.selected::after{content:'';position:absolute;inset:-4px;border:1px solid #f0d060;pointer-events:none;box-shadow:0 0 12px #f0d060;}
+.cell.empty     {background:#06060f;border:1.5px dashed #1a1a2a;cursor:default;}
+.cell.empty:hover{transform:none;}
+
+/* ─── RIGHT: detail inspector ─── */
+.inv-detail{
+  background:#12122a;border:1px solid #c9a84c;
+  padding:0;display:flex;flex-direction:column;position:relative;
+  box-shadow:0 0 12px #c9a84c33;overflow-y:auto;min-width:0;
+}
+.inv-detail.r-common   {border-color:#5a5a6a;box-shadow:0 0 8px #5a5a6a33;}
+.inv-detail.r-uncommon {border-color:#55bb55;box-shadow:0 0 10px #55bb5533;}
+.inv-detail.r-rare     {border-color:#5588ff;box-shadow:0 0 12px #5588ff44;}
+.inv-detail.r-epic     {border-color:#aa55ff;box-shadow:0 0 14px #aa55ff55;}
+.inv-detail.r-legendary{border-color:#c9a84c;box-shadow:0 0 14px #c9a84c66;}
+.inv-detail.r-hidden   {border-color:#ff44ff;box-shadow:0 0 14px #ff44ff66;animation:d2Rainbow 3s linear infinite;}
+
+.inv-detail-empty{
+  color:#3a3a5a;font-size:11px;line-height:2;letter-spacing:1px;
+  text-align:center;margin:auto;padding:30px 12px;
+}
+
+.dcrn{position:absolute;width:8px;height:8px;border:1.5px solid #c9a84c;z-index:2;}
+.dcrn.tl{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+.dcrn.tr{top:-1px;right:-1px;border-left:none;border-bottom:none;}
+.dcrn.bl{bottom:-1px;left:-1px;border-right:none;border-top:none;}
+.dcrn.br{bottom:-1px;right:-1px;border-left:none;border-top:none;}
+
+.detail-head{padding:12px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #c9a84c33;}
+.detail-head .big{
+  width:56px;height:56px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 35%,#1a1a3a,#05050f);
+  flex-shrink:0;position:relative;border:2px solid #c9a84c;
+}
+.detail-head .big.r-common   {border-color:#5a5a6a;}
+.detail-head .big.r-uncommon {border-color:#55bb55;box-shadow:0 0 8px #55bb5544;}
+.detail-head .big.r-rare     {border-color:#5588ff;box-shadow:0 0 10px #5588ff55;}
+.detail-head .big.r-epic     {border-color:#aa55ff;box-shadow:0 0 12px #aa55ff66;}
+.detail-head .big.r-legendary{border-color:#c9a84c;box-shadow:0 0 12px #c9a84c66;}
+.detail-head .big.r-hidden   {border-color:#ff44ff;box-shadow:0 0 12px #ff44ff66;}
+.detail-head .big svg{width:42px;height:42px;image-rendering:pixelated;animation:d2Float 2.4s infinite;}
+.detail-head .big .lv-big{position:absolute;top:2px;right:3px;font-size:9px;color:#f0d060;text-shadow:1px 1px 0 #000;font-weight:700;}
+.detail-head .dh-text{min-width:0;flex:1;}
+.detail-head .d-name{font-size:13px;letter-spacing:2px;font-weight:700;line-height:1.3;word-break:break-word;}
+.detail-head .d-sub{font-size:9px;letter-spacing:1.5px;color:#5a5a7a;margin-top:3px;}
+
+.detail-body{padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.5px;flex:1;}
+.stat-line{display:flex;justify-content:space-between;color:#c8b07a;padding:1px 0;}
+.stat-line .k{color:#5a5a7a;letter-spacing:1px;}
+.stat-line .v{color:#f0e4bb;font-weight:700;}
+.stat-line .v.good{color:#90ffa0;}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,#c9a84c66,transparent);margin:4px 0;}
+
+.ench-line{
+  color:#f0d060;font-size:10px;letter-spacing:1px;
+  padding:3px 0;display:flex;gap:5px;align-items:center;
+}
+.ench-line::before{content:'✦';color:#c9a84c;}
+
+.flavor{
+  font-size:10px;color:#c9a84c88;line-height:1.6;letter-spacing:.5px;
+  font-style:italic;padding:6px 0;border-top:1px dashed #c9a84c33;margin-top:4px;
+}
+.value-row{display:flex;justify-content:space-between;font-size:10px;letter-spacing:1px;padding-top:6px;border-top:1px solid #c9a84c22;margin-top:4px;}
+.value-row .k{color:#5a5a7a;}
+.value-row .gold{color:#f0c040;font-weight:700;}
+
+.actions{display:flex;gap:4px;padding:8px 10px;border-top:1px solid #c9a84c33;background:#0c0c1e;}
+.act{
+  flex:1;padding:7px 0;background:transparent;border:1px solid #c9a84c44;
+  color:#c9a84c;font-family:inherit;font-size:10px;letter-spacing:2px;
+  cursor:pointer;font-weight:700;transition:background .15s,color .15s;
+}
+.act:hover{background:#c9a84c22;color:#f0d060;border-color:#c9a84c;}
+.act.primary{background:#c9a84c;color:#0c0c1e;border-color:#c9a84c;}
+.act.primary:hover{background:#f0d060;}
+.act.danger{color:#ff7070;border-color:#ff444455;}
+.act.danger:hover{background:#ff444422;color:#ff9090;}
+
+/* ─── Footer ─── */
+.inv-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 16px;font-size:9px;letter-spacing:1.5px;color:#5a5a7a;
+  background:#06060f;border-top:1px solid #c9a84c33;
+}
+.inv-foot kbd{
+  background:#12122a;border:1px solid #2a2a4a;padding:1px 5px;
+  font-family:inherit;font-size:8px;color:#c9a84c;letter-spacing:1px;margin:0 2px;
+}
+.f-left,.f-right{display:flex;gap:12px;align-items:center;}
+
+/* ─── 모바일 ─── */
+@media(max-height:500px),(max-width:768px){
+  #inv-panel{width:96vw;max-height:94vh;}
+  .inv-body{grid-template-columns:150px 1fr 180px;gap:6px;padding:8px;}
+  .inv-grid{grid-template-columns:repeat(6,1fr);gap:3px;padding:6px;}
+  .silhouette{grid-template-columns:36px 60px 36px;grid-template-rows:repeat(4,36px);}
+  .eq{width:36px;height:36px;}
+  .eq.chest{width:60px;height:36px;}
+  .eq svg{width:22px;height:22px;}
+  .inv-tabs{padding:6px 8px 0;gap:1px;}
+  .inv-tab{padding:5px 8px;font-size:9px;letter-spacing:1px;}
+}
