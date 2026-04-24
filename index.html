@@ -243,10 +243,22 @@ window.addEventListener('appinstalled',function(){
         <div id="skill-bar" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;"></div>
         <!-- 마크 RPG 스타일 HUD -->
         <div id="mc-hud" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;z-index:11;padding:6px 10px;background:linear-gradient(180deg,rgba(20,20,30,0.85),rgba(10,10,20,0.95));border:2px solid #2a2a3a;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-          <!-- HP 하트 -->
+          <!-- HP 하트 (HP% 만큼 채워짐) -->
           <div class="mc-stat" style="display:flex;flex-direction:column;align-items:center;min-width:60px;">
-            <div style="position:relative;width:48px;height:44px;">
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.8));">❤️</div>
+            <div style="position:relative;width:48px;height:44px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.8));">
+              <svg viewBox="0 0 32 29" style="position:absolute;inset:0;width:100%;height:100%;">
+                <defs>
+                  <clipPath id="mc-hp-clip"><rect id="mc-hp-rect" x="0" y="0" width="32" height="29"/></clipPath>
+                  <linearGradient id="mc-hp-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ff5555"/>
+                    <stop offset="100%" stop-color="#aa0000"/>
+                  </linearGradient>
+                </defs>
+                <!-- 비어있는 회색 하트 배경 -->
+                <path d="M16 28s-13-8.5-13-17a7 7 0 0 1 13-4 7 7 0 0 1 13 4c0 8.5-13 17-13 17z" fill="#3a3a3a" stroke="#111" stroke-width="1.5"/>
+                <!-- HP 채워지는 하트 (위에서 아래로 깎임) -->
+                <path d="M16 28s-13-8.5-13-17a7 7 0 0 1 13-4 7 7 0 0 1 13 4c0 8.5-13 17-13 17z" fill="url(#mc-hp-grad)" stroke="#111" stroke-width="1.5" clip-path="url(#mc-hp-clip)"/>
+              </svg>
             </div>
             <div id="mc-hp-text" style="color:#fff;font-size:11px;font-weight:bold;text-shadow:1px 1px 2px #000;margin-top:-4px;">100</div>
           </div>

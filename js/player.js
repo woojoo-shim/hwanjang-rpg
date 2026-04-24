@@ -1331,6 +1331,18 @@ function updPlayerHpBar(){
 
 function updMcHud(){
   var hp=document.getElementById('mc-hp-text');if(hp)hp.textContent=Math.max(0,Math.floor(playerHP));
+  /* HP 비율에 따라 하트 채우기 (위에서 아래로 깎임) */
+  var hpRect=document.getElementById('mc-hp-rect');
+  if(hpRect){
+    var ratio=Math.max(0,Math.min(1,playerHP/playerMaxHP));
+    /* rect 높이는 고정(29), y 좌표를 올려서 상단부터 깎아냄 */
+    var hidden=29*(1-ratio);
+    hpRect.setAttribute('y',hidden);
+    hpRect.setAttribute('height',29-hidden);
+    /* 저체력 시 전체 하트를 붉게 깜빡임 (색상 변경) */
+    var grad=document.querySelector('#mc-hp-grad stop:first-child');
+    if(grad)grad.setAttribute('stop-color',ratio<0.25?'#ff3333':'#ff5555');
+  }
   var mp=document.getElementById('mc-mp-text');if(mp)mp.textContent=(typeof playerMP!=='undefined'?Math.floor(playerMP):60);
   var lv=document.getElementById('mc-lv');if(lv)lv.textContent=playerLevel;
   var exp=document.getElementById('mc-exp-fill');if(exp){
