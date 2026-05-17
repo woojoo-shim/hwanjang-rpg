@@ -1302,11 +1302,14 @@ function checkLevelUp(){
   if(playerEXP>=need){
     playerEXP-=need;playerLevel++;var cls=CLASS_DEFS[playerClass]||CLASS_DEFS.none;playerMaxHP+=Math.floor(12*cls.hpMul);playerHP=playerMaxHP;
     if(playerLevel>=MAX_LEVEL){playerEXP=0;addChat('sys','[시스템]','★★★ 최대 레벨 달성! ★★★');}
-    document.querySelector('.hlv').textContent='Lv.'+playerLevel;
+    var _hlv=document.querySelector('.hlv');if(_hlv)_hlv.textContent='Lv.'+playerLevel;
+    var _mcLv=document.getElementById('mc-lv-text');if(_mcLv)_mcLv.textContent='Lv.'+playerLevel;
     updPlayerHpBar();
     if(typeof SFX!=='undefined')SFX.levelUp();
     addChat('sys','[시스템]','★ 레벨 UP! Lv.'+playerLevel+' 달성! (최대 HP +20)');
-    gold+=playerLevel*10;document.getElementById('inv-gold').textContent='💰 '+gold+' 골드';
+    gold+=playerLevel*10;
+    var _g=document.getElementById('inv-gold');if(_g)_g.textContent='💰 '+gold+' 골드';
+    var _mcG=document.getElementById('mc-gold-text');if(_mcG)_mcG.textContent=gold;
     /* 스탯 포인트 지급 */
     if(typeof grantStatPoints==='function')grantStatPoints(5);
     if(typeof applyStatEffects==='function')applyStatEffects();
